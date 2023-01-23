@@ -1,0 +1,89 @@
+function CoefWesWes = f_cweswes(mesh,varargin)
+% F_CWESWES computes the mass matrix int_s(coef x We_s x We_s x ds)
+%--------------------------------------------------------------------------
+% FIXED INPUT
+% mesh : mesh data structure
+%--------------------------------------------------------------------------
+% OPTIONAL INPUT
+% 'id_face' : array of indices of faces in the mesh
+%     o default_value = 1:nbFace
+% 'coef' : coefficient (scalar, tensor or matrix)
+%     o default_value = 1
+%--------------------------------------------------------------------------
+% OUTPUT
+% CoefWesWes : nb_edges_on_surface x nb_edges_on_surface
+%--------------------------------------------------------------------------
+% EXAMPLE
+% CoefWesWes = F_CWESWES(mesh,'id_face',id_face,'coef',coef)
+%--------------------------------------------------------------------------
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
+%--------------------------------------------------------------------------
+% See also 
+
+% --- valid argument list (to be updated each time modifying function)
+arglist = {'mesh','coef','id_face'};
+
+% --- default input value
+id_face = [];
+coef = 1;
+
+% --- check and update input
+for i = 1:(nargin-1)/2
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    else
+        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+    end
+end
+
+%--------------------------------------------------------------------------
+
+nbFace = mesh.nbFace;
+nbEdge = mesh.nbEdge;
+if isempty(id_face)
+    id_face = 1:nbFace;
+end
+
+%--------------------------------------------------------------------------
+
+[face,id_face_out] = f_filterface(mesh.face(:,id_face));
+for i = 1:length(face)
+    id_face_out{i} = id_face(id_face_out{i});
+end
+
+%--------------------------------------------------------------------------
+
+CoefWesWes = sparse(nbEdge,nbEdge);
+
+for i = 1:length(face)
+    idgFace = id_face_out{i};
+    [flatnode,flatface] = f_flatface(mesh.node,...
+                                     mesh.face(:,idgFace));
+    if size(flatface,1) == 3
+        mesh_out = f_mdstri(mesh.node,flatface);
+        id_ledge = [];
+        id_gedge = [];
+        for j = 1:3
+            id_ledge = [id_ledge mesh_out.edge_in_elem(j,:)];
+            id_gedge = [id_gedge mesh.edge_in_face(j,idgFace)];
+        end
+        idgEdge = zeros(1,mesh_out.nbEdge);
+        idgEdge(id_ledge) = id_gedge;
+    elseif size(flatface,1) == 4
+        mesh_out = f_mdsquad(mesh.node,flatface);
+        id_ledge = [];
+        id_gedge = [];
+        for j = 1:4
+            id_ledge = [id_ledge mesh_out.edge_in_elem(j,:)];
+            id_gedge = [id_gedge mesh.edge_in_face(j,idgFace)];
+        end
+        idgEdge = zeros(1,mesh_out.nbEdge);
+        idgEdge(id_ledge) = id_gedge;
+    end
+    mesh_out = f_intkit2d(mesh_out,'flatnode',flatnode);
+    CoefWesWes(idgEdge,idgEdge) = CoefWesWes(idgEdge,idgEdge) + f_cwewe(mesh_out,'coef',coef,'dim',2);
+end
+

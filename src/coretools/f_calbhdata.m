@@ -1,0 +1,78 @@
+function parameter = f_calbhdata(parameter,varargin)
+% F_CALBHDATA processes bh data
+%--------------------------------------------------------------------------
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
+%--------------------------------------------------------------------------
+
+bdata = parameter.b;
+hdata = parameter.h;
+
+%--------------------------------------------------------------------------
+% --- filtering
+
+%--------------------------------------------------------------------------
+% --- cubic spline interpolation
+b = linspace(min(bdata),max(bdata),1000);
+h = spline(bdata,hdata,b);
+%--------------------------------------------------------------------------
+% --- cleaning
+if b(1) == 0 || h(1) == 0
+    b(1) = [];
+    h(1) = [];
+end
+%--------------------------------------------------------------------------
+% --- compute mu et nu
+mu0 = 4*pi*1e-7;
+mur = b./h./mu0;   % relative permeability
+nur = 1./mur;      % relative reluctivity
+%--------------------------------------------------------------------------
+murjw = b./h./mu0;   % relative permeability
+nurjw = 1./murjw;      % relative reluctivity
+%--------------------------------------------------------------------------
+% --- compute differentials
+dnur = diff(nur);
+dmur = diff(mur);
+dB  = diff(b);
+dH  = diff(h);
+%--------------------------------------------------------------------------
+% --- cleaning
+b(end) = [];
+h(end) = [];
+mur(end) = [];
+nur(end) = [];
+murjw(end) = [];
+nurjw(end) = [];
+%--------------------------------------------------------------------------
+% --- compute H2xdmu/dH2, B2xdnu/dB2, Bxdnu/dB
+dnurdb = dnur./dB;
+dmurdh = dmur./dH;
+% dnudb2 = dnu./dB2;
+% dmudh2 = dmu./dH2;
+
+%--------------------------------------------------------------------------
+% --- compute H2xdmu/dH2, B2xdnu/dB2, Bxdnu/dB
+dnurdbjw = dnur./dB;
+dmurdhjw = dmur./dH;
+
+%--------------------------------------------------------------------------
+% --- output
+parameter.b = b;
+parameter.h = h;
+parameter.mur = mur;
+parameter.nur = nur;
+parameter.dnurdb = dnurdb;
+parameter.dmurdh = dmurdh;
+% ---
+parameter.murjw = murjw;
+parameter.nurjw = nurjw;
+parameter.dnurdbjw = dnurdbjw;
+parameter.dmurdhjw = dmurdhjw;
+
+
+
+
+
+

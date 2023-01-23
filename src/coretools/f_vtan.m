@@ -1,0 +1,54 @@
+function vtan = f_vtan(node,elem,varargin)
+% F_VTAN returns the tangent vectors of elem
+%--------------------------------------------------------------------------
+% vtan = F_VTAN(node,elem)
+%--------------------------------------------------------------------------
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
+%--------------------------------------------------------------------------
+
+if mod(nargin,2) ~= 0 
+    error([mfilename ': Check function arguments : #node, #elem, #dim, #nb_vertices !']);
+end
+
+for i = 1:(nargin-2)/2
+    eval([varargin{2*i-1} '= varargin{2*i};']);
+end
+
+if ~exist('node','var') | ~exist('elem','var') | ~exist('dim','var')
+    error([mfilename ': Check function arguments : #node, #elem, #dim, #nb_vertices !']);
+end
+if ~exist('nb_vertices','var')
+    nb_vertices = 2;
+end
+if ~exist('normalize','var')
+    normalize = 1;
+end
+
+%--------------------------------------------------------------------------
+len = size(elem,2);
+vtan = zeros(dim,len);
+if size(node,1) < dim
+    for i = 1:dim-size(node,1)
+        node = [node; zeros(1,len)];
+    end
+end
+switch nb_vertices
+    case 2
+        mag = zeros(1,len);
+        for i = 1:dim
+            vtan(i,:) = node(i,elem(2,:)) - node(i,elem(1,:));
+            mag = mag + vtan(i,:).^2;
+        end
+        mag = sqrt(mag);
+        if normalize == 1 | strcmpi(normalize,'yes')
+            for i = 1:dim
+                vtan(i,:) = vtan(i,:)./mag;
+            end
+        end
+    otherwise
+end
+%--------------------------------------------------------------------------
+end
