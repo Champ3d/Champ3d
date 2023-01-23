@@ -1,0 +1,9 @@
+# ignore all .xxx files
+*.mat
+*.~m
+
+# ignore all files in any directory named xxx
+temp/
+doc/
+bin/
+tutorial/
