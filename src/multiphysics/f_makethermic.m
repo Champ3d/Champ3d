@@ -3,31 +3,53 @@ function design3d = f_makethermic(design3d,varargin)
 %--------------------------------------------------------------------------
 % System = F_MAKETHERMIC(dom3D,option);
 %--------------------------------------------------------------------------
-% Questions and inquiries can be addressed to the author:
-% Dr. H-K. Bui
-% Lab. IREENA (Institut de recherche en Energie Electrique de Nantes Atlantique)
-% Dep. Mesures Physiques, IUT of Saint Nazaire, University of Nantes
-% 37, boulevard de l Universite, 44600 Saint Nazaire, France
-% Email : huu-kien.bui@univ-nantes.fr
-% Copyright (c) 2019 Huu-Kien Bui. All Rights Reserved.
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
+
+% --- valid argument list (to be updated each time modifying function)
+arglist = {'stype','sfrom','id_bcon_temp',...
+           'delta_t','t_heat','t_end','sflux_onbof','svolumic_in'};
+
+% --- default input value
+stype = [];
+sfrom = [];
+id_bcon_temp = [];
+delta_t = [];
+t_heat = [];
+t_end = [];
+sflux_onbof = [];
+svolumic_in = [];
+% --- check and update input
+for i = 1:(nargin-1)/2
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    else
+        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+    end
+end
+
 
 for i = 1:(nargin-1)/2
     datin.(lower(varargin{2*i-1})) = varargin{2*i};
 end
 
-
 design3d.Thermic.formulation = 'thermic';
-design3d.Thermic.delta_t     = datin.delta_t;
-design3d.Thermic.t_heat      = datin.t_heat;
+design3d.Thermic.stype       = stype;
+design3d.Thermic.sfrom       = sfrom;
+design3d.Thermic.delta_t     = delta_t;
+design3d.Thermic.t_heat      = t_heat;
+design3d.Thermic.sflux_onbof = sflux_onbof;
+design3d.Thermic.svolumic_in = svolumic_in;
+design3d.Thermic.id_bcon_temp = id_bcon_temp;
 
 if ~isfield(datin,'t_end')
-    design3d.Thermic.t_end = datin.t_heat;
+    design3d.Thermic.t_end = t_heat;
 else
-    design3d.Thermic.t_end = datin.t_end;
+    design3d.Thermic.t_end = t_end;
 end
-
-
 
 
 nbElem = design3d.mesh.nbElem;
@@ -48,14 +70,14 @@ if isfield(design3d,'tconductor')
         iNoTemp = [iNoTemp reshape(design3d.mesh.elem(1:con.nbNo_inEl,design3d.tconductor(i).id_elem),...
                                    1,con.nbNo_inEl*length(design3d.tconductor(i).id_elem))];
         %------------------------------------------------------------------
-        if isfield(design3d.Thermic,'sflux_onbof')
+        if ~isempty(design3d.Thermic.sflux_onbof)
             if ismember(i,design3d.Thermic.sflux_onbof)
                 iFa_sFlux = [iFa_sFlux reshape(design3d.mesh.face_in_elem(1:con.nbFa_inEl,design3d.tconductor(i).id_elem),...
                                        1,con.nbFa_inEl*length(design3d.tconductor(i).id_elem))];
             end
         end
         %------------------------------------------------------------------
-        if isfield(design3d.Thermic,'svolumic_in')
+        if ~isempty(design3d.Thermic.svolumic_in)
             if ismember(i,design3d.Thermic.svolumic_in)
                 iEl_sVolumic = [iEl_sVolumic design3d.tconductor(i).id_elem];
             end

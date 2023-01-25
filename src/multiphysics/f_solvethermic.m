@@ -1,12 +1,9 @@
 function design3d = f_solvethermic(design3d,varargin)
 %--------------------------------------------------------------------------
-% Questions and inquiries can be addressed to the author:
-% Dr. H-K. Bui
-% Lab. IREENA (Institut de recherche en Energie Electrique de Nantes Atlantique)
-% Dep. Mesures Physiques, IUT of Saint Nazaire, University of Nantes
-% 37, boulevard de l Universite, 44600 Saint Nazaire, France
-% Email : huu-kien.bui@univ-nantes.fr
-% Copyright (c) 2019 Huu-Kien Bui. All Rights Reserved.
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
 fprintf('Solving system ... \n');
 

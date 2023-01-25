@@ -169,14 +169,16 @@ switch coilModel
         end
     case ['massive','i']
         %--------------------------
-        if ~isempty(design3d.coil(iec+1).cs_equation)
-            design3d.coil(iec+1).coil_model = 't3';
-        end
+%         if ~isempty(design3d.coil(iec+1).cs_equation)
+%             design3d.coil(iec+1).coil_model = 't3';
+%         end
+        design3d.coil(iec+1).coil_model = 't3';
     case ['massive','v']
         %--------------------------
-        if ~isempty(design3d.coil(iec+1).cs_equation)
-            design3d.coil(iec+1).coil_model = 't4';
-        end
+%         if ~isempty(design3d.coil(iec+1).cs_equation)
+%             design3d.coil(iec+1).coil_model = 't4';
+%         end
+        design3d.coil(iec+1).coil_model = 't3';
 end
 %--------------------------------------------------------------------------
 if isempty(design3d.coil(iec+1).id_elem)
