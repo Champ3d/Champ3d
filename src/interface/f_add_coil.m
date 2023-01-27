@@ -178,7 +178,7 @@ switch coilModel
 %         if ~isempty(design3d.coil(iec+1).cs_equation)
 %             design3d.coil(iec+1).coil_model = 't4';
 %         end
-        design3d.coil(iec+1).coil_model = 't3';
+        design3d.coil(iec+1).coil_model = 't4';
 end
 %--------------------------------------------------------------------------
 if isempty(design3d.coil(iec+1).id_elem)

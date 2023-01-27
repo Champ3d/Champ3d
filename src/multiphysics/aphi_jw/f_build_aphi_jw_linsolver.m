@@ -174,7 +174,7 @@ if design3d.aphi.fr ~= 0
         for i = 1:nb_dom
             switch [design3d.coil(i).coil_model design3d.coil(i).coil_mode]
                 case 't3transmitter'
-                    if length(solution) > length(design3d.aphi.id_edge_a)+length(design3d.aphi.id_node_phi)
+                    if length(MVPPhi) > length(design3d.aphi.id_edge_a)+length(design3d.aphi.id_node_phi)
                         dPhi = MVPPhi(length(design3d.aphi.id_edge_a)+length(design3d.aphi.id_node_phi)+1:end);
                         Voltage = 1j*2*pi*design3d.aphi.fr .* dPhi;
                         Phi = Phi + 1/(1j*2*pi*design3d.aphi.fr).*(design3d.aphi.Alpha{i} .* Voltage);

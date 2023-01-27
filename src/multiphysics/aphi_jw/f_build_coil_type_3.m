@@ -29,15 +29,18 @@ IDElem = coil.id_elem;
 %--------------------------------------------------------------------------
 Alpha = zeros(mesh.nbNode,1);
 IDNode_etrode = [];
-v_etrode = f_normalize(coil.v_etrode);
-for i = 1:length(coil.etrode)
-    Alpha(coil.etrode(i).id_node) = v_etrode(i);
-    IDNode_etrode = [IDNode_etrode coil.etrode(i).id_node];
+for i = 1:length(coil.petrode)
+    Alpha(coil.petrode(i).id_node) = 1;
+    IDNode_etrode = [IDNode_etrode coil.petrode(i).id_node];
+end
+for i = 1:length(coil.netrode)
+    Alpha(coil.netrode(i).id_node) = 0;
+    IDNode_etrode = [IDNode_etrode coil.netrode(i).id_node];
 end
 IDNode_Alpha = setdiff(coil.id_node,IDNode_etrode);
 
 %--------------------------------------------------------------------------
-GradGrad = mesh.G.' * f_coefWeWe(mesh,'id_elem',IDElem) * mesh.G;
+GradGrad = mesh.G.' * f_cwewe(mesh,'id_elem',IDElem) * mesh.G;
 AlphaRHS  = - GradGrad * Alpha;
 GradGrad = GradGrad(IDNode_Alpha,IDNode_Alpha);
 AlphaRHS  = AlphaRHS(IDNode_Alpha,1);

@@ -40,7 +40,7 @@ end
 IDNode_Alpha = setdiff(coil.id_node,IDNode_etrode);
 
 %--------------------------------------------------------------------------
-GradGrad = mesh.G.' * f_coefWeWe(mesh,'id_elem',IDElem) * mesh.G;
+GradGrad = mesh.G.' * f_cwewe(mesh,'id_elem',IDElem) * mesh.G;
 AlphaRHS  = - GradGrad * Alpha;
 GradGrad = GradGrad(IDNode_Alpha,IDNode_Alpha);
 AlphaRHS  = AlphaRHS(IDNode_Alpha,1);
