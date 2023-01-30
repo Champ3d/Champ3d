@@ -44,19 +44,6 @@ if isempty(linsolver_option.nb_iter)
     linsolver_option.nb_iter = 1e3;
 end
 %--------------------------------------------------------------------------
-if isempty(newtonsolver_option.solver)
-    newtonsolver_option.solver = 'qmr';
-end
-if isempty(newtonsolver_option.tolerance)
-    newtonsolver_option.tolerance = 1e-4;
-end
-if isempty(newtonsolver_option.nb_iter)
-    newtonsolver_option.nb_iter = 1e3;
-end
-if isempty(newtonsolver_option.epsilon)
-    newtonsolver_option.epsilon = 1e-4;
-end
-%--------------------------------------------------------------------------
 
 nbElem = design3d.mesh.nbElem;
 nbEdge = design3d.mesh.nbEdge;
@@ -101,7 +88,7 @@ if design3d.aphi.fr ~= 0
     S = K11;
     S = [S K12];
     S = [S; K12.' K22];
-    RHS = design3d.aphi.coilRHS + design3d.aphi.fixedRHS + design3d.aphi.pmagnetRHS;
+    RHS = design3d.aphi.coilRHS + design3d.aphi.fixedRHS + design3d.aphi.pmagnetRHS + design3d.aphi.sfieldRHS;
     RHS = RHS(design3d.aphi.id_edge_a,1);
     RHS = [RHS; zeros(length(design3d.aphi.id_node_phi),1)];
     if isfield(design3d,'coil')
@@ -186,74 +173,6 @@ if design3d.aphi.fr ~= 0
         end
     end
     design3d.aphi.Phi = Phi;
-    %----------------------------------------------------------------------
-    newton_flag = 0;
-    if isfield(design3d,'mconductor')
-        nb_dom = length(design3d.mconductor);
-        for idom = 1:nb_dom
-            if strcmpi(design3d.mconductor(idom).mur.main_value.f,'bhdata')
-                newton_flag = 1;
-            end
-        end
-    end
-    %---------------------- Newton-Raphson Iteration ----------------------
-    if newton_flag
-        fprintf('Newton-Raphson solver ... \n');
-        relerX = 1;
-        iNew = 0;
-        while relerX > newtonsolver_option.epsilon
-            % --- Newtion iteration number
-            iNew = iNew + 1;
-            design3d = f_build_mcon_aphi(design3d);
-            S = design3d.mesh.R.' * ...
-               (design3d.aphi.SWfnuWf + design3d.aphi.SWfWfAir) * ...
-                design3d.mesh.R;
-            % --- dirichlet remove
-            S = S(design3d.aphi.id_edge_a,design3d.aphi.id_edge_a);
-            % --- update Residual
-            R = S * MVPPhi - RHS;
-            % --- update relative error
-            relerR = norm(R)/norm(RHS);
-            % --- dR/dA
-            dR = design3d.mesh.R.' * ...
-                (design3d.aphi.SWfnuWf + design3d.aphi.SWfdnudbWf + design3d.aphi.SWfWfAir)* ...
-                 design3d.mesh.R;
-            dR = dR(design3d.aphi.id_edge_a,design3d.aphi.id_edge_a);
-            % --- Solve delta MVP
-            tic
-            % - 1
-            %LdR = ilu(dR, struct('type','crout','droptol',1e-2));
-            %dMVP = pcg(dR,-R,1e-4,1000,LdR,LdR');
-            % - 2
-            %precon = sqrt(diag(diag(dR)));
-            dMVP = f_qmr(dR,-R,newtonsolver_option);
-            % --- relaxation coef
-            if iNew == 1
-                relax = 1;
-            elseif relerR > 95/100*relerR0
-                relax = relax/2;
-                if relax < 0.01
-                    relax = 0.01;
-                end
-            else
-            end
-            % --- update previous relative error
-            relerR0 = relerR;
-            % --- update MVP
-            MVPPhi = MVPPhi + relax .* dMVP;
-            % --- update relerror
-            relerX = norm(dMVP)/norm(MVPPhi);
-            % --- display
-            fprintf('Newton iteration %d --- %.1f s --- |dR|/|b|=%.1fE-4, |dX|/|X|=%.1fE-4, relax=%.3f \n',...
-                     iNew,toc,relerR*1e4,relerX*1e4,relax);
-            % --- add solution of MVP
-            design3d.aphi.MVP(design3d.aphi.id_edge_a) = ...
-                     MVPPhi(1:length(design3d.aphi.id_edge_a));
-            %--------------------------------------------------------------
-        end
-    end
-    
-    
 %--------------------------------------------------------------------------
 else
 %--------------------------------------------------------------------------
@@ -293,72 +212,6 @@ else
             MVPPhi(length(design3d.aphi.id_edge_a)+1:...
                    length(design3d.aphi.id_edge_a)+...
                    length(design3d.aphi.id_node_phi));
-    end
-    %----------------------------------------------------------------------
-    newton_flag = 0;
-    if isfield(design3d,'mconductor')
-        nb_dom = length(design3d.mconductor);
-        for idom = 1:nb_dom
-            if strcmpi(design3d.mconductor(idom).mur.main_value.f,'bhdata')
-                newton_flag = 1;
-            end
-        end
-    end
-    %---------------------- Newton-Raphson Iteration ----------------------
-    if newton_flag
-        fprintf('Newton-Raphson solver ... \n');
-        relerX = 1;
-        iNew = 0;
-        while relerX > newtonsolver_option.epsilon
-            % --- Newtion iteration number
-            iNew = iNew + 1;
-            design3d = f_build_mcon_aphi(design3d);
-            S = design3d.mesh.R.' * ...
-               (design3d.aphi.SWfnuWf + design3d.aphi.SWfWfAir) * ...
-                design3d.mesh.R;
-            % --- dirichlet remove
-            S = S(design3d.aphi.id_edge_a,design3d.aphi.id_edge_a);
-            % --- update Residual
-            R = S * MVPPhi - RHS;
-            % --- update relative error
-            relerR = norm(R)/norm(RHS);
-            % --- dR/dA
-            dR = design3d.mesh.R.' * ...
-                (design3d.aphi.SWfnuWf + design3d.aphi.SWfdnudbWf + design3d.aphi.SWfWfAir)* ...
-                 design3d.mesh.R;
-            dR = dR(design3d.aphi.id_edge_a,design3d.aphi.id_edge_a);
-            % --- Solve delta MVP
-            tic
-            % - 1
-            %LdR = ilu(dR, struct('type','crout','droptol',1e-2));
-            %dMVP = pcg(dR,-R,1e-4,1000,LdR,LdR');
-            % - 2
-            %precon = sqrt(diag(diag(dR)));
-            dMVP = f_qmr(dR,-R,newtonsolver_option);
-            % --- relaxation coef
-            if iNew == 1
-                relax = 1;
-            elseif relerR > 95/100*relerR0
-                relax = relax/2;
-                if relax < 0.01
-                    relax = 0.01;
-                end
-            else
-            end
-            % --- update previous relative error
-            relerR0 = relerR;
-            % --- update MVP
-            MVPPhi = MVPPhi + relax .* dMVP;
-            % --- update relerror
-            relerX = norm(dMVP)/norm(MVPPhi);
-            % --- display
-            fprintf('Newton iteration %d --- %.1f s --- |dR|/|b|=%.1fE-4, |dX|/|X|=%.1fE-4, relax=%.3f \n',...
-                     iNew,toc,relerR*1e4,relerX*1e4,relax);
-            % --- add solution of MVP
-            design3d.aphi.MVP(design3d.aphi.id_edge_a) = ...
-                     MVPPhi(1:length(design3d.aphi.id_edge_a));
-            %--------------------------------------------------------------
-        end
     end
 end
 

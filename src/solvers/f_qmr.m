@@ -28,7 +28,7 @@ fprintf('Solving system ... ');
 tic
 % ---
 precon = sqrt(diag(diag(S)));
-[solution,flag,relres,niter,resvec] = qmr(S,F,sol_option.tolerance,sol_option.nb_iter,precon,precon.');
+[solution,flag,relres,niter,resvec] = qmr(S,F,sol_option.tolerance,sol_option.nb_iter,precon.',precon);
 % ---
 % precon = ichol(S, struct('type','ict','droptol',1e-2));
 % [solution,flag,relres,niter,resvec] = pcg(S,F,sol_option.tolerance,sol_option.nb_iter,precon,precon.');

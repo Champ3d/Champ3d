@@ -46,6 +46,7 @@ if isfield(design3d,'coil')
                 cfield = f_build_coil_type_3(design3d.mesh,design3d.coil(i),design3d.bcon(design3d.coil(i).id_bcon));
                 %dom3d.coil(i).N  = cfield.N;
                 design3d.aphi.Alpha{i} = cfield.Alpha;
+                design3d.coil(i).Js = cfield.Js;
                 if strcmpi(design3d.coil(i).coil_mode,'transmitter')
                     %dom3d.coil(i).Js = cfield.Js;
                     for j = 1:length(design3d.coil(i).petrode)
@@ -59,6 +60,7 @@ if isfield(design3d,'coil')
                 cfield = f_build_coil_type_4(design3d.mesh,design3d.coil(i),design3d.bcon(design3d.coil(i).id_bcon));
                 %dom3d.coil(i).N  = cfield.N;
                 design3d.aphi.Alpha{i} = cfield.Alpha;
+                design3d.coil(i).Js = cfield.Js;
                 if strcmpi(design3d.coil(i).coil_mode,'transmitter')
                     %dom3d.coil(i).Js = cfield.Js;
                     for j = 1:length(design3d.coil(i).petrode)

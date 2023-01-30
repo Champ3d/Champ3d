@@ -128,8 +128,9 @@ if isfield(design3d,'coil')
                 end
             case 't3transmitter'
                 design3d.aphi.ICoil(idom) = -((design3d.aphi.SWeWe * design3d.aphi.EMF).')*(design3d.mesh.G * design3d.aphi.Alpha{idom});
-                %design3d.aphi.VCoil(idom) = design3d.aphi.Voltage(idom);
-                %design3d.aphi.ZCoil(idom) = design3d.aphi.VCoil(idom)/design3d.aphi.ICoil(idom);
+                design3d.aphi.VCoil(idom) = mean(design3d.aphi.V(design3d.coil(idom).petrode(1).id_node)) - ...
+                                            mean(design3d.aphi.V(design3d.coil(idom).netrode(1).id_node));
+                design3d.aphi.ZCoil(idom) = design3d.aphi.VCoil(idom)/design3d.aphi.ICoil(idom);
             case 't4transmitter'
                 design3d.aphi.ICoil(idom) = -((design3d.aphi.SWeWe * design3d.aphi.EMF).')*(design3d.mesh.G * design3d.aphi.Alpha{idom});
                 design3d.aphi.VCoil(idom) = design3d.coil(idom).v_petrode - design3d.coil(idom).v_netrode;
