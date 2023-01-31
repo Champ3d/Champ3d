@@ -19,7 +19,7 @@ nbFace = design3d.mesh.nbFace;
 nbNode = design3d.mesh.nbNode;
 con = f_connexion(design3d.mesh.elem_type);
 %---------------------- Source - RHS - Coil -------------------------------
-iNoPhi = [];
+iNoPhi2Remove = [];
 %--------------------------------------------------------------------------
 design3d.aphi.coilRHS = zeros(nbEdge,1);
 design3d.aphi.Alpha   = [];
@@ -51,11 +51,11 @@ if isfield(design3d,'coil')
                     %dom3d.coil(i).Js = cfield.Js;
                     for j = 1:length(design3d.coil(i).petrode)
                         %iNoPhi = setdiff(iNoPhi,design3d.coil(i).petrode(j).id_node);
-                        iNoPhi = [iNoPhi design3d.coil(i).petrode(j).id_node];
+                        iNoPhi2Remove = [iNoPhi2Remove design3d.coil(i).petrode(j).id_node];
                     end
                     for j = 1:length(design3d.coil(i).netrode)
                         %iNoPhi = setdiff(iNoPhi,design3d.coil(i).netrode(j).id_node);
-                        iNoPhi = [iNoPhi design3d.coil(i).netrode(j).id_node];
+                        iNoPhi2Remove = [iNoPhi2Remove design3d.coil(i).netrode(j).id_node];
                     end
                 end
             case 't4'
@@ -66,10 +66,10 @@ if isfield(design3d,'coil')
                 if strcmpi(design3d.coil(i).coil_mode,'transmitter')
                     %dom3d.coil(i).Js = cfield.Js;
                     for j = 1:length(design3d.coil(i).petrode)
-                        iNoPhi = [iNoPhi design3d.coil(i).petrode(j).id_node];
+                        iNoPhi2Remove = [iNoPhi2Remove design3d.coil(i).petrode(j).id_node];
                     end
                     for j = 1:length(design3d.coil(i).netrode)
-                        iNoPhi = [iNoPhi design3d.coil(i).netrode(j).id_node];
+                        iNoPhi2Remove = [iNoPhi2Remove design3d.coil(i).netrode(j).id_node];
                     end
                 end
             otherwise
@@ -77,9 +77,8 @@ if isfield(design3d,'coil')
     end
 end
 %--------------------------------------------------------------------------
-iNoPhi = unique(iNoPhi);
-design3d.aphi.id_node_phi = unique(setdiff(design3d.aphi.id_node_phi, iNoPhi));
-%design3d.aphi.id_node_phi = unique([design3d.aphi.id_node_phi iNoPhi]);
+iNoPhi2Remove = unique(iNoPhi2Remove);
+design3d.aphi.id_node_phi = unique(setdiff(design3d.aphi.id_node_phi, iNoPhi2Remove));
 %--------------------------------------------------------------------------
 
 
