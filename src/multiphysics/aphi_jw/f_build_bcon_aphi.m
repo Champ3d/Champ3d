@@ -21,7 +21,7 @@ con = f_connexion(design3d.mesh.elem_type);
 
 %---------------------- Boundary condition --------------------------------
 iEdAfixed = [];
-iNoPhi = [];
+iNoPhi2Remove = [];
 design3d.aphi.fixedRHS = zeros(nbEdge,1);
 %-----
 if isfield(design3d.aphi,'id_bcon_for_a')
@@ -60,7 +60,8 @@ if isfield(design3d.aphi,'id_bcon_sibc')
         iNoinBCdom = unique(iNoinBCdom);
         iNoinBCdom(iNoinBCdom == 0) = [];
         iNo2Remove = setdiff(iNoinBCdom,design3d.bcon(id_bcon).id_node);
-        iNoPhi = setdiff(iNoPhi,iNo2Remove);
+        %iNoPhi = setdiff(iNoPhi,iNo2Remove);
+        iNoPhi2Remove = [iNoPhi2Remove iNo2Remove];
         %----- face
         if isfield(design3d.bcon(id_bcon),'cparam')
             design3d.aphi.SWeWe = design3d.aphi.SWeWe + ...
@@ -79,7 +80,8 @@ if isfield(design3d.aphi,'id_bcon_sibc')
     end
 end
 %--------------------------------------------------------------------------
-design3d.aphi.id_node_phi = unique([design3d.aphi.id_node_phi iNoPhi]);
+iNoPhi2Remove = unique(iNoPhi2Remove);
+design3d.aphi.id_node_phi = unique(setdiff(design3d.aphi.id_node_phi, iNoPhi2Remove));
 %--------------------------------------------------------------------------
 
 iEdA = setdiff(1:nbEdge,iEdAfixed);

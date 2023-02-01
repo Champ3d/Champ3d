@@ -63,7 +63,13 @@ else
     design3d.econductor(iec+1).id_elem  = id_elem;
 end
 
-design3d.econductor(iec+1).sigma = sigma;
+if ~isnumeric(sigma)
+    design3d.econductor(iec+1).sigma = sigma;
+else
+    design3d.econductor(iec+1).sigma = ...
+        f_make_gtensor('type','gtensor','main_value',sigma,'ort1_value',sigma,'ort2_value',sigma,...
+                       'main_dir',[1 0 0],'ort1_dir',[0 1 0],'ort2_dir',[0 0 1]);
+end
 
 end
 

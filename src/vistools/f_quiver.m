@@ -115,7 +115,7 @@ if strcmpi(vtype,'equal')
     patch(patchinfo); hold on; axis equal; alpha(1);
     h = colorbar;
     h.Label.String = 'Enter Unit';
-    f_colormap; view(3);
+    f_colormap; view(3); axis equal; axis tight;
     box on;
     xlabel('x (m)'); ylabel('y (m)'); zlabel('z (m)');
 else
@@ -177,7 +177,7 @@ else
     patch(patchinfo); hold on; axis equal; alpha(1);
     h = colorbar;
     h.Label.String = 'Enter Unit';
-    f_colormap; view(3);
+    f_colormap; view(3); axis equal; axis tight;
     box on;
     xlabel('x (m)'); ylabel('y (m)'); zlabel('z (m)');
 end

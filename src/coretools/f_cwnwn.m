@@ -57,7 +57,7 @@ for iG = 1:con.nbG
         for j = i:nbNo_inEl % !!! i
             SWnWn(i,id_elem,j) = SWnWn(i,id_elem,j) + ...
                 f_multrowv(con.Weigh(iG).*mesh.detJ{iG}(id_elem),...
-                matCoef(1,1,id_elem).*mesh.Wn{iG}(i,id_elem).*mesh.Wn{iG}(j,id_elem));
+                squeeze(matCoef(1,1,id_elem)).'.*mesh.Wn{iG}(i,id_elem).*mesh.Wn{iG}(j,id_elem));
         end
     end
 end

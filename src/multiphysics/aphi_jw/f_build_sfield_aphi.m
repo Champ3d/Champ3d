@@ -1,15 +1,12 @@
 function design3d = f_build_sfield_aphi(design3d,varargin)
-% F_MAKEMAGNET returns the r.h.s matrix related to magnets.
+% F_BUILD_SFIELD_APHI returns the r.h.s matrix related to Bs field.
 %--------------------------------------------------------------------------
-% mRHS = F_MAKESFIELD(dom3D);
+% design3d = F_BUILD_SFIELD_APHI(design3d, option);
 %--------------------------------------------------------------------------
-% Questions and inquiries can be addressed to the author:
-% Dr. H-K. Bui
-% Lab. IREENA
-% Dep. Mesures Physiques, IUT of Saint Nazaire, University of Nantes
-% 37, boulevard de l?Universit?, 44600 Saint Nazaire, France
-% Email : huu-kien.bui@univ-nantes.fr
-% Copyright (c) 2019 Huu-Kien Bui. All Rights Reserved.
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
 
 % for i = 1:(nargin-1)/2

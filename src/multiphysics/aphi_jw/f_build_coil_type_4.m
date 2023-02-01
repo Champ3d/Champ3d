@@ -40,7 +40,7 @@ end
 IDNode_Alpha = setdiff(coil.id_node,IDNode_etrode);
 
 %--------------------------------------------------------------------------
-GradGrad = mesh.G.' * f_coefWeWe(mesh,'id_elem',IDElem) * mesh.G;
+GradGrad = mesh.G.' * f_cwewe(mesh,'id_elem',IDElem) * mesh.G;
 AlphaRHS  = - GradGrad * Alpha;
 GradGrad = GradGrad(IDNode_Alpha,IDNode_Alpha);
 AlphaRHS  = AlphaRHS(IDNode_Alpha,1);
@@ -54,10 +54,10 @@ vJs(:,IDElem) = f_postpro3d(mesh,Ecoil,'W1','id_elem',IDElem);
 vJs = f_normalize(vJs);     % Nomalized Field direction
 
 %--------------------------------------------------------------------------
-figure
-IDElem = unique(mesh.face_in_elem(1:5,coil.id_elem));
-f_viewthings('type','face','node',mesh.node,'face',mesh.face(:,IDElem),...
-             'elem_type',mesh.elem_type,'node_field',Alpha);
+% figure
+% IDElem = unique(mesh.face_in_elem(1:5,coil.id_elem));
+% f_viewthings('type','face','node',mesh.node,'face',mesh.face(:,IDElem),...
+%              'elem_type',mesh.elem_type,'node_field',Alpha);
 %--------------------------------------------------------------------------
 % figure
 % f_quiver(mesh.cnode,vJs,'sfactor',1);
@@ -68,7 +68,7 @@ f_viewthings('type','face','node',mesh.node,'face',mesh.face(:,IDElem),...
 % source voltage field
 cfield.Alpha = Alpha;
 % current density vector field
-% cfield.Js = vJs .* coil.j_coil;
+cfield.Js = vJs .* coil.j_coil;
 
 
 

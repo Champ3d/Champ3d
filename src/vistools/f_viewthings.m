@@ -103,17 +103,17 @@ switch type
                 if strcmpi(color,'non')
                     patchinfo.EdgeColor = 'k';
                 else
-                    patchinfo.EdgeColor = 'non';
+                    patchinfo.EdgeColor = [80 80 80]./255; %'non';
                 end
                 alpha(0.5);
             elseif ~exist('node_field','var')
                 patchinfo.FaceColor = 'flat';
                 patchinfo.FaceVertexCData = f_tocolv(field(id_face{i}));
-                patchinfo.EdgeColor = 'non';
+                patchinfo.EdgeColor = [80 80 80]./255; %'non';
             else
                 patchinfo.FaceColor = 'interp';
                 patchinfo.FaceVertexCData = f_tocolv(node_field);
-                patchinfo.EdgeColor = 'non';
+                patchinfo.EdgeColor = [80 80 80]./255; %'non';
             end
             patch(patchinfo); hold on;
             h = colorbar;

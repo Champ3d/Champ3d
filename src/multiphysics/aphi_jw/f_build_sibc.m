@@ -1,14 +1,12 @@
 function SYsibcWeWe = f_build_sibc(mesh,varargin)
-% F_MAKESIBC ...
+% F_BUILD_SIBC ...
 %--------------------------------------------------------------------------
-% SWeWeS = F_MAKESIBC(mesh,'id_face',id_face,'fr',fr,'gtsigma',gtsigma,'gtsigma',gtmur)
+% SWeWeS = F_BUILD_SIBC(mesh,'id_face',id_face,'fr',fr,'gtsigma',gtsigma,'gtsigma',gtmur)
 %--------------------------------------------------------------------------
-% Questions and inquiries can be addressed to the author:
-% Dr. H-K. Bui
-% Lab. IREENA
-% Dep. Mesures Physiques, IUT of St-Nazaire, University of Nantes, France
-% Email : huu-kien.bui@univ-nantes.fr
-% Copyright (c) 2019 Huu-Kien Bui. All Rights Reserved.
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
 
 for i = 1:(nargin-1)/2
@@ -72,7 +70,7 @@ for i = 1:length(face)
         idgEdge(id_ledge) = id_gedge;
     end
     mesh_sibc = f_intkit2d(mesh_sibc,'flatnode',flatnode);
-    SYsibcWeWe(idgEdge,idgEdge) = SYsibcWeWe(idgEdge,idgEdge) + f_coefWeWe(mesh_sibc,'coef',1/Zsibc,'dim',2);
+    SYsibcWeWe(idgEdge,idgEdge) = SYsibcWeWe(idgEdge,idgEdge) + f_cwewe(mesh_sibc,'coef',1/Zsibc,'dim',2);
     % nuWfWfS(idgFace) = 1/mu .* mesh_sibc.elem_size .* skindepth;
     % SnuWfWfS(1:nbFace+1:end) = SnuWfWfS(1:nbFace+1:end) + nuWfWfS;
 end

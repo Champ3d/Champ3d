@@ -34,7 +34,6 @@ arglist = {'cvalue','fr','form','time','a'};
 form  = 'cos';
 fr    = 0;
 time  = [];
-a     = [];
 
 % --- check and update input
 for i = 1:(nargin-1)/2
@@ -46,17 +45,24 @@ for i = 1:(nargin-1)/2
 end
 
 %--------------------------------------------------------------------------
-if isempty(time) & isempty(a) & fr == 0
+if isempty(time) & fr == 0
     error([mfilename ' : frequency, time (or phase angle) must be given !']);
 end
 
 if isempty(time)
-    time = a/360*1/fr;
+    time = 0;
 end
 %--------------------------------------------------------------------------
+dim = min(size(cvalue,1),size(cvalue,2));
+len = max(size(cvalue,1),size(cvalue,2));
+rvalue = zeros(dim,len);
 switch form
     case 'sin'
-        rvalue = abs(cvalue) .* sin(2*pi*fr*time + angle(cvalue));
+        for i = 1:dim
+            rvalue(i,:) = abs(cvalue(i,:)) .* sin(2*pi*fr*time + angle(cvalue(i,:)));
+        end
     case 'cos'
-        rvalue = abs(cvalue) .* cos(2*pi*fr*time + angle(cvalue));
+        for i = 1:dim
+            rvalue(i,:) = abs(cvalue(i,:)) .* cos(2*pi*fr*time + angle(cvalue(i,:)));
+        end
 end

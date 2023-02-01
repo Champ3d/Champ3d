@@ -1,10 +1,15 @@
-function design3d = f_solve_thermic(design3d,varargin)
+function design3d = f_solve_thermic_nonlinsolver(design3d,varargin)
+%---24/01/2023
+% just updated in each time step not iterated
+% based on f_solve_thermic
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
 % Huu-Kien.Bui@univ-nantes.fr
 % Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
+
+
 for i = 1:(nargin-1)/2
     datin.(lower(varargin{2*i-1})) = varargin{2*i};
 end
@@ -13,8 +18,10 @@ end
 design3d.Thermic.svolumic_in = datin.svolumic_in;
 design3d.Thermic.sfrom   = datin.sfrom;
 design3d.Thermic.id_bcon_temp = datin.id_bcon_temp;
-design3d.Thermic.delta_t = [design3d.Thermic.delta_t datin.delta_t];
-
+%design3d.Thermic.delta_t = [design3d.Thermic.delta_t datin.delta_t];
+design3d.Thermic.delta_t = datin.delta_t;
+design3d.Thermic.time = 0;
+design3d.Thermic.step = 0;
 
 nbElem = design3d.mesh.nbElem;
 nbEdge = design3d.mesh.nbEdge;
@@ -90,7 +97,7 @@ for istep = 1:datin.nb_heat_step
                 end
                 
                 SWnWn = SWnWn + ...
-                    f_coefWnWn(design3d.mesh,'coef',design3d.tconductor(i).rho .* design3d.tconductor(i).cp ./ design3d.Thermic.delta_t,...
+                    f_cWnWn(design3d.mesh,'coef',design3d.tconductor(i).rho .* design3d.tconductor(i).cp ./ design3d.Thermic.delta_t,...
                     'id_elem',design3d.tconductor(i).id_elem,'elem_type',design3d.mesh.elem_type);
                 
             end
@@ -129,7 +136,7 @@ for istep = 1:datin.nb_heat_step
                 end
                 design3d.tconductor(i).gtensor = gtensor;
                 SWeWe = SWeWe + ...
-                    f_coefWeWe(design3d.mesh,'coef',design3d.tconductor(i).gtensor,...
+                    f_cWeWe(design3d.mesh,'coef',design3d.tconductor(i).gtensor,...
                     'id_elem',design3d.tconductor(i).id_elem,'elem_type',design3d.mesh.elem_type);
             end
         end
@@ -146,7 +153,7 @@ for istep = 1:datin.nb_heat_step
                     case 'neumann'
                         %----- face
                         hWnWn = hWnWn + ...
-                            f_coefWnsWns(design3d.mesh,'id_face',design3d.bcon(id_bcon).id_face,...
+                            f_cWnsWns(design3d.mesh,'id_face',design3d.bcon(id_bcon).id_face,...
                             'coef',design3d.bcon(id_bcon).bc_coef);
                 end
             end
@@ -156,17 +163,17 @@ for istep = 1:datin.nb_heat_step
         pWn = sparse(nbNode,1);
         
         if ~isempty(iFa_sFlux)
-            if strcmpi(design3d.Thermic.sfrom,'aphijw')
+            if strcmpi(design3d.Thermic.sfrom,'aphi')
                 pWn = pWn + ...
-                    f_coefWns(design3d.mesh,'id_face',iFa_sFlux,...
-                    'coef',design3d.APhijw.pS);
+                    f_cWns(design3d.mesh,'id_face',iFa_sFlux,...
+                    'coef',design3d.aphi.pS);
             end
         end
         if ~isempty(iEl_sVolumic)
-            if strcmpi(design3d.Thermic.sfrom,'aphijw')
+            if strcmpi(design3d.Thermic.sfrom,'aphi')
                 pWn = pWn + ...
-                    f_coefWn(design3d.mesh,'id_elem',iEl_sVolumic,...
-                    'coef',design3d.APhijw.pV);
+                    f_cWn(design3d.mesh,'id_elem',iEl_sVolumic,...
+                    'coef',design3d.aphi.pV);
             end
         end
         

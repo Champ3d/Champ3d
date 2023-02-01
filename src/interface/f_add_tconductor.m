@@ -7,7 +7,9 @@ function design3d = f_add_tconductor(design3d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'design3d','id_tconductor','id_dom3d','id_elem','flambda','frho','fcp'};
+arglist = {'design3d','id_tconductor','id_dom3d','id_elem',...
+           'flambda','frho','fcp',...
+           'lambda','rho','cp'};
 
 % --- default input value
 if isempty(design3d)
@@ -18,6 +20,9 @@ id_elem  = [];
 flambda  = [];
 frho     = [];
 fcp      = [];
+lambda  = [];
+rho     = [];
+cp      = [];
 
 %--------------------------------------------------------------------------
 if ~isfield(design3d,'tconductor')
@@ -63,11 +68,13 @@ if isempty(id_elem)
 else
     design3d.tconductor(iec+1).id_elem  = id_elem;
 end
-design3d.tconductor(iec+1).flambda   = flambda;
-
 %--------------------------------------------------------------------------
+design3d.tconductor(iec+1).flambda = flambda;
 design3d.tconductor(iec+1).frho = frho;
-design3d.tconductor(iec+1).fcp  = fcp;
+design3d.tconductor(iec+1).fcp = fcp;
+design3d.tconductor(iec+1).lambda = lambda;
+design3d.tconductor(iec+1).rho = rho;
+design3d.tconductor(iec+1).cp = cp;
 
 end
 

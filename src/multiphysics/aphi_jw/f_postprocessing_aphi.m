@@ -1,15 +1,12 @@
 function design3d = f_postprocessing_aphi(design3d,varargin)
-% F_BUILD_APHI_JW returns the matrix system related to A-phi formulation. 
+% F_POSTPROCESSING_APHI returns the matrix system related to A-phi formulation. 
 %--------------------------------------------------------------------------
-% System = F_BUILD_APHI_JW(dom3D,option);
+% design3d = F_POSTPROCESSING_APHI(design3d,option);
 %--------------------------------------------------------------------------
-% Questions and inquiries can be addressed to the author:
-% Dr. H-K. Bui
-% Lab. IREENA (Institut de recherche en Energie Electrique de Nantes Atlantique)
-% Dep. Mesures Physiques, IUT of Saint Nazaire, University of Nantes
-% 37, boulevard de l Universite, 44600 Saint Nazaire, France
-% Email : huu-kien.bui@univ-nantes.fr
-% Copyright (c) 2019 Huu-Kien Bui. All Rights Reserved.
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
 
 % --- Electric Scalar Potential (V) ---------------------------------------
@@ -89,7 +86,7 @@ if isfield(design3d,'bcon')
     nb_bcon = length(design3d.bcon);
     for i = 1:nb_bcon
         if strcmpi(design3d.bcon(i).bc_type,'sibc')
-            Js = f_postpro3d(design3d.mesh,EMF,'W1_onFace',...
+            Js = f_postpro3d(design3d.mesh,design3d.aphi.EMF,'W1_onFace',...
                 'id_face',design3d.bcon(i).id_face,...
                 'coef',design3d.bcon(i).gtsigma);
             mu0 = 4*pi*1e-7;
@@ -131,7 +128,8 @@ if isfield(design3d,'coil')
                 end
             case 't3transmitter'
                 design3d.aphi.ICoil(idom) = -((design3d.aphi.SWeWe * design3d.aphi.EMF).')*(design3d.mesh.G * design3d.aphi.Alpha{idom});
-                design3d.aphi.VCoil(idom) = design3d.aphi.Voltage(idom);
+                design3d.aphi.VCoil(idom) = mean(design3d.aphi.V(design3d.coil(idom).petrode(1).id_node)) - ...
+                                            mean(design3d.aphi.V(design3d.coil(idom).netrode(1).id_node));
                 design3d.aphi.ZCoil(idom) = design3d.aphi.VCoil(idom)/design3d.aphi.ICoil(idom);
             case 't4transmitter'
                 design3d.aphi.ICoil(idom) = -((design3d.aphi.SWeWe * design3d.aphi.EMF).')*(design3d.mesh.G * design3d.aphi.Alpha{idom});

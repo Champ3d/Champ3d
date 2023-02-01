@@ -23,7 +23,7 @@ end
 if nargin <= 1
     error('No boundary condition to add!');
 end
-
+%--------------------------------------------------------------------------
 datin = [];
 for i = 1:(nargin-1)/2
     datin.(lower(varargin{2*i-1})) = varargin{2*i};
@@ -87,17 +87,23 @@ end
 %--------------------------------------------------------------------------
 con = f_connexion(design3d.mesh.elem_type);
 nbNo_inFa_max = max(con.nbNo_inFa);
-
 if isfield(datin,'defined_on')
     design3d.bcon(iec+1).defined_on = datin.defined_on;
 end
-
+%---------
 if isfield(datin,'id_elem')
     datin.id_elem = unique(datin.id_elem);
-    bcmesh = f_make_mds(design3d.mesh.node,design3d.mesh.elem(:,datin.id_elem),design3d.mesh.elem_type);
+else
+    datin.id_elem = [];
 end
-%dom3D.bcon(iec+1).mesh   = bcmesh;
-design3d.bcon(iec+1).id_elem = datin.id_elem;
+%---------
+if isfield(datin,'id_dom3d')
+    design3d.bcon(iec+1).id_elem  = design3d.dom3d.(datin.id_dom3d).id_elem;
+else
+    design3d.bcon(iec+1).id_elem  = datin.id_elem;
+end
+%---------
+bcmesh = f_make_mds(design3d.mesh.node,design3d.mesh.elem(:,design3d.bcon(iec+1).id_elem),design3d.mesh.elem_type);
 %--------------------------------------------------------------------------
 id_face = ...
     f_findvec(bcmesh.bound(1:nbNo_inFa_max,:),design3d.mesh.face(1:nbNo_inFa_max,:));
