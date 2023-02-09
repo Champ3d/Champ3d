@@ -93,9 +93,13 @@ switch type
             return
         end
         %------------------------------------------------------------------
+        allnode = [];
         [filface,id_face] = f_filterface(face);
         for i = 1:length(filface)
             f = filface{i};
+            for ii = 1:size(f,1)
+                allnode = [allnode f(ii,:)];
+            end
             patchinfo.Vertices = node.';
             patchinfo.Faces = f.';
             if ~exist('field','var') & ~exist('node_field','var')
@@ -129,6 +133,8 @@ switch type
             end
             patch(patchinfo); hold on;
             h = colorbar;
+            allnode = unique(allnode);
+            caxis([min(node_field(allnode)) max(node_field(allnode))]);
             h.Label.String = 'Enter Unit';
             f_colormap;
         end
