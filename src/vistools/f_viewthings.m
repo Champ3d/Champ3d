@@ -10,7 +10,7 @@ node = [];
 edge = [];
 face = [];
 elem = [];
-
+edge_color = [];
 for i = 1:nargin/2
     eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
 end
@@ -93,9 +93,13 @@ switch type
             return
         end
         %------------------------------------------------------------------
+        allnode = [];
         [filface,id_face] = f_filterface(face);
         for i = 1:length(filface)
             f = filface{i};
+            for ii = 1:size(f,1)
+                allnode = [allnode f(ii,:)];
+            end
             patchinfo.Vertices = node.';
             patchinfo.Faces = f.';
             if ~exist('field','var') & ~exist('node_field','var')
@@ -103,20 +107,36 @@ switch type
                 if strcmpi(color,'non')
                     patchinfo.EdgeColor = 'k';
                 else
-                    patchinfo.EdgeColor = [80 80 80]./255; %'non';
+                    if isempty(edge_color)
+                        patchinfo.EdgeColor = [80 80 80]./255; %'non';
+                    else
+                        patchinfo.EdgeColor = edge_color;
+                    end
                 end
                 alpha(0.5);
             elseif ~exist('node_field','var')
                 patchinfo.FaceColor = 'flat';
                 patchinfo.FaceVertexCData = f_tocolv(field(id_face{i}));
-                patchinfo.EdgeColor = [80 80 80]./255; %'non';
+                if isempty(edge_color)
+                    patchinfo.EdgeColor = [80 80 80]./255; %'non';
+                else
+                    patchinfo.EdgeColor = edge_color;
+                end
+                cax = [min(patchinfo.FaceVertexCData) max(patchinfo.FaceVertexCData)];
             else
                 patchinfo.FaceColor = 'interp';
                 patchinfo.FaceVertexCData = f_tocolv(node_field);
-                patchinfo.EdgeColor = [80 80 80]./255; %'non';
+                if isempty(edge_color)
+                    patchinfo.EdgeColor = [80 80 80]./255; %'non';
+                else
+                    patchinfo.EdgeColor = edge_color;
+                end
+                cax = [min(node_field(allnode)) max(node_field(allnode))];
             end
             patch(patchinfo); hold on;
             h = colorbar;
+            allnode = unique(allnode);
+            caxis(cax);
             h.Label.String = 'Enter Unit';
             f_colormap;
         end
@@ -159,9 +179,9 @@ switch type
         IDElem = IDElem(iIDElem);
         if ~exist('field','var')
             f_viewthings('type','face','node',mesh.node,...
-                         'face',mesh.face,'color',color);
+                         'face',mesh.face,'color',color,'edge_color',edge_color);
         else
-            f_viewthings('type','face','node',mesh.node,...
+            f_viewthings('type','face','node',mesh.node,'edge_color',edge_color, ...
                          'face',mesh.face(:,IDFace),'field',f_tocolv(field(IDElem)));
         end
     otherwise

@@ -13,7 +13,8 @@ function gtensor = f_make_gtensor(varargin)
 
 % --- valid argument list (to be updated each time modifying function)
 arglist = {'type','value','x_value','y_value','z_value','angle_value',...
-           'main_value','ort1_value','ort2_value','main_dir','ort1_dir','ort2_dir'};
+           'main_value','ort1_value','ort2_value','main_dir','ort1_dir','ort2_dir',...
+           'rot_axis','angle'};
 
 % --- valid values of type
 type_valid = {'isotropic','scalar','tensoroxy','gtensor'};
@@ -31,6 +32,8 @@ datin.ort2_value = 0;
 datin.main_dir = 0;
 datin.ort1_dir = 0;
 datin.ort2_dir = 0;
+datin.rot_axis = [];
+datin.angle = [];
         
 %--------------------------------------------------------------------------
 % --- check and update input
@@ -72,9 +75,15 @@ switch lower(datin.type)
         gtensor.main_value = datin.main_value;
         gtensor.ort1_value = datin.ort1_value;
         gtensor.ort2_value = datin.ort2_value;
-        gtensor.main_dir = datin.main_dir;
-        gtensor.ort1_dir = datin.ort1_dir;
-        gtensor.ort2_dir = datin.ort2_dir;
+        if isempty(datin.rot_axis) || isempty(datin.angle)
+            gtensor.main_dir = datin.main_dir;
+            gtensor.ort1_dir = datin.ort1_dir;
+            gtensor.ort2_dir = datin.ort2_dir;
+        else
+            gtensor.main_dir = f_rotaroundaxis(datin.main_dir,'rot_axis',datin.rot_axis,'angle',datin.angle);
+            gtensor.ort1_dir = f_rotaroundaxis(datin.ort1_dir,'rot_axis',datin.rot_axis,'angle',datin.angle);
+            gtensor.ort2_dir = f_rotaroundaxis(datin.ort2_dir,'rot_axis',datin.rot_axis,'angle',datin.angle);
+        end
 end
 
 

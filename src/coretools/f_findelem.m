@@ -66,10 +66,17 @@ switch mesher
                 for ifind = 1:lenId_dom2d
                     temp = id_layer{ifind};
                     if iscell(temp)
-                        for j = 1:length(id_layer{ifind})
-                            codeLayer = f_str2code(id_layer{ifind}(j));
+                        for j = 1:length(temp)
+                            codeLayer = f_str2code(temp{j});
                             for i = 1:length(id_dom2d{ifind})
-                                iElem = [iElem find(elem(con.nbNo_inEl+1,:) == id_dom2d{ifind}(i)+ codeLayer)];
+                                temp2 = id_dom2d{ifind}(i);
+                                if iscell(temp2)
+                                    temp2 = cell2mat(temp2);
+                                end
+                                for k = 1:length(temp2)
+                                    %fprintf('id2d = %d, idlay = %s', temp2(k), temp(j))
+                                    iElem = [iElem find(elem(con.nbNo_inEl+1,:) == temp2(k)+ codeLayer)];
+                                end
                             end
                         end
                     else

@@ -52,7 +52,7 @@ id_dom3d = strrep(id_dom3d,' ','');
 
 
 %--------------------------------------------------------------------------
-
+design3d.dom3d.(id_dom3d) = [];
 if ~isempty(id_dom2d) && ~isempty(id_layer)
     design3d.dom3d.(id_dom3d).id_elem = f_findelem(design3d.mesh,...
                                              'id_dom2d',id_dom2d,...

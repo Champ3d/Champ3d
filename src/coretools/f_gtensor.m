@@ -53,19 +53,17 @@ for iten = 1:length(ltensor.main_value)
     tensor = [main_value 0           0; ...
                0          ort1_value  0; ...
                0          0           ort2_value];
-
-    lix = main_dir./norm(main_dir);
-    liy = ort1_dir./norm(ort1_dir);
-    liz = ort2_dir./norm(ort2_dir);
+           
+    lix = [1 0 0];
+    liy = [0 1 0];
+    liz = [0 0 1];
     lcoor = [lix; liy; liz];
-
     %--------------------------------------------------------------------------
     % global coordinates system
-    gix = [1 0 0];
-    giy = [0 1 0];
-    giz = [0 0 1];
+    gix = main_dir./norm(main_dir);
+    giy = ort1_dir./norm(ort1_dir);
+    giz = ort2_dir./norm(ort2_dir);
     gcoor = [gix; giy; giz];
-
     %--------------------------------------------------------------------------
     % transformation matrix local --> global
     TM = zeros(3,3);

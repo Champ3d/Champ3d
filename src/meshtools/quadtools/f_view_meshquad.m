@@ -16,3 +16,6 @@ msh.Faces = t2d(1:4,idElem).';
 msh.FaceColor = color;
 msh.EdgeColor = 'k';
 patch(msh); axis equal; alpha(0.5);
+node1x = mean(p2d(1,t2d(1:4,idElem(1))));
+node1y = mean(p2d(2,t2d(1:4,idElem(1))));
+text(node1x, node1y, strrep(inputname(3),'_',''));

@@ -66,6 +66,8 @@ if ~isfield(design3d,'coil')
 else
     iec = length(design3d.coil);
 end
+
+%design3d.coil(iec+1).id_coil
 design3d.coil(iec+1).id_dom3d = [];
 design3d.coil(iec+1).id_elem  = [];
 design3d.coil(iec+1).id_node  = [];
