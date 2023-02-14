@@ -102,6 +102,7 @@ switch type
             end
             patchinfo.Vertices = node.';
             patchinfo.Faces = f.';
+            cax = [];
             if ~exist('field','var') & ~exist('node_field','var')
                 patchinfo.FaceColor = color;
                 if strcmpi(color,'non')
@@ -136,7 +137,7 @@ switch type
             patch(patchinfo); hold on;
             h = colorbar;
             allnode = unique(allnode);
-            caxis(cax);
+            if ~isempty(cax); caxis(cax); end
             h.Label.String = 'Enter Unit';
             f_colormap;
         end
