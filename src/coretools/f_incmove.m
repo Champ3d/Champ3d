@@ -1,4 +1,4 @@
-function [field, node, id_node] = f_incmove(field,node,varargin)
+function [fieldOut, node, id_node] = f_incmove(fieldIn,node,varargin)
 % F_INCREMENTALMOVE returns ... related to an incremental move in x, y or z
 % direction.
 % field : [1 x nbElem]
@@ -31,49 +31,61 @@ end
 
 %--------------------------------------------------------------------------
 if isempty(id_node)
-    id_node = 1:length(field);
+    id_node = 1:length(fieldIn);
 end
 %--------------------------------------------------------------------------
 if strcmpi(direction,'x')
     [node, id] = f_multisort(node,'sort_order',[1 2 3]);
     cmov       = node(1,:);
     id_node    = id_node(id);
-    field      = field(id);
+    fieldOut   = fieldIn(id);
 elseif strcmpi(direction,'y')
     [node, id] = f_multisort(node,'sort_order',[2 1 3]);
     cmov       = node(2,:);
     id_node    = id_node(id);
-    field      = field(id);
+    fieldOut   = fieldIn(id);
 elseif strcmpi(direction,'z')
     [node, id] = f_multisort(node,'sort_order',[3 1 2]);
     cmov       = node(3,:);
     id_node    = id_node(id);
-    field      = field(id);
+    fieldOut   = fieldIn(id);
 end
 %--------------------------------------------------------------------------
 dcz = [1  find(diff(cmov))+1];
 %--------------------------------------------------------------------------
-nb_cmov = length(dcz) - 1;
+nb_cmov = length(dcz);
 for i = 1 : nb_cmov
-    iP{i} = dcz(i) : dcz(i+1)-1; % all have same cmov
-    f{i}  = field(iP{i});
+    if i <= nb_cmov - 1
+        iP{i} = dcz(i) : dcz(i+1)-1; % all have same cmov
+        f{i}  = fieldOut(iP{i});
+    else
+        iP{i} = dcz(i) : length(cmov); % all have same cmov
+        f{i}  = fieldOut(iP{i});
+    end
 end
 %--------------------------------------------------------------------------
 if ~cyclic_move
     i0 = (1:nb_cmov).';
     imov = circshift(i0,nb_step);
-    for i = 1 : nb_cmov
-        if nb_step > 0
-            if i >= nb_step
-                field(iP{i}) = f{imov(i)};
-            else
-                field(iP{i}) = 0;
-            end
-        else
-            if i <= nb_cmov - abs(nb_step)
-                field(iP{i}) = f{imov(i)};
-            else
-                field(iP{i}) = 0;
+    if abs(nb_step) >= nb_cmov
+        for i = 1 : nb_cmov
+                fieldOut(iP{i}) = 0;
+        end
+    else
+        for i = 1 : nb_cmov
+            if nb_step > 0
+                if i >= nb_step + 1
+                    fieldOut(iP{i}) = f{imov(i)};
+                else
+                    fieldOut(iP{i}) = 0;
+                end
+            elseif nb_step < 0
+                if i <= nb_cmov - abs(nb_step)
+                    i
+                    fieldOut(iP{i}) = f{imov(i)};
+                else
+                    fieldOut(iP{i}) = 0;
+                end
             end
         end
     end
@@ -81,7 +93,7 @@ else
     i0 = (1:nb_cmov).';
     imov = circshift(i0,nb_step);
     for i = 1 : nb_cmov
-        field(iP{i}) = f{imov(i)};
+        fieldOut(iP{i}) = f{imov(i)};
     end
 end
 

@@ -40,8 +40,12 @@ c2 = c2(iz);
 c3 = c3(iz);
 id = id(iz);
 dcz = [1  find(diff(c1))+1];
-for i = 1 : length(dcz)-1
-    ix = dcz(i) : dcz(i+1)-1;
+for i = 1 : length(dcz)
+    if i <= length(dcz) - 1
+        ix = dcz(i) : dcz(i+1)-1;
+    else
+        ix = dcz(i) : length(c1);
+    end
     xc = c2(ix);
     [xc, ixc] = sort(xc);
     ixc = ix(ixc);
@@ -49,8 +53,12 @@ for i = 1 : length(dcz)-1
     c3(ix) = c3(ixc);
     id(ix) = id(ixc);
     dcx = [1  find(diff(xc))+1];
-    for j = 1 : length(dcx)-1
-        iy = dcx(j) : dcx(j+1)-1;
+    for j = 1 : length(dcx)
+        if j <= length(dcx)-1
+            iy = ixc(dcx(j) : dcx(j+1)-1);
+        else
+            iy = ixc(dcx(j) : length(xc));
+        end
         yc = c3(iy);
         [yc, iyc] = sort(yc);
         iyc = iy(iyc);
