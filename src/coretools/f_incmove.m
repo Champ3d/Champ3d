@@ -81,7 +81,6 @@ if ~cyclic_move
                 end
             elseif nb_step < 0
                 if i <= nb_cmov - abs(nb_step)
-                    i
                     fieldOut(iP{i}) = f{imov(i)};
                 else
                     fieldOut(iP{i}) = 0;
