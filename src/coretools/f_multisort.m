@@ -39,26 +39,18 @@ c3 = node(sort_order(3),id);
 c2 = c2(iz);
 c3 = c3(iz);
 id = id(iz);
-dcz = [1  find(diff(c1))+1];
-for i = 1 : length(dcz)
-    if i <= length(dcz) - 1
-        ix = dcz(i) : dcz(i+1)-1;
-    else
-        ix = dcz(i) : length(c1);
-    end
+dcz = find(diff([c1(1)+1   c1   c1(end)+1]));
+for i = 1 : length(dcz)-1
+    ix = dcz(i) : dcz(i+1)-1;
     xc = c2(ix);
     [xc, ixc] = sort(xc);
     ixc = ix(ixc);
     c2(ix) = xc;
     c3(ix) = c3(ixc);
     id(ix) = id(ixc);
-    dcx = [1  find(diff(xc))+1];
-    for j = 1 : length(dcx)
-        if j <= length(dcx)-1
-            iy = ixc(dcx(j) : dcx(j+1)-1);
-        else
-            iy = ixc(dcx(j) : length(xc));
-        end
+    dcx = find(diff([xc(1)+1   xc  xc(end)+1]));
+    for j = 1 : length(dcx)-1
+        iy = ix(dcx(j) : dcx(j+1)-1);
         yc = c3(iy);
         [yc, iyc] = sort(yc);
         iyc = iy(iyc);
