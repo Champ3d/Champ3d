@@ -20,7 +20,7 @@ function design3d = f_add_dom3d(design3d,varargin)
 
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'design3d','id_dom3d','defined_on','id_dom2d','id_layer','id'};
+arglist = {'design3d','id_dom3d','defined_on','id_dom2d','id_layer','id','id_elem'};
 
 % --- default input value
 if isfield(design3d,'dom3d')
@@ -37,6 +37,7 @@ id_dom3d = ['d3d' num2str(design3d.dom3d.nbDom)];
 id_dom2d = [];
 id_layer = [];
 id = []; % id in the imported meshes
+id_elem = [];
 
 % --- check and update input
 for i = 1:(nargin-1)/2
@@ -61,7 +62,7 @@ elseif ~isempty(id)
     design3d.dom3d.(id_dom3d).id_elem = f_findelem(design3d.mesh,...
                                              'id_dom3d',id);
 else
-    design3d.dom3d.(id_dom3d).id_elem = [];
+    design3d.dom3d.(id_dom3d).id_elem = id_elem;
 end
 
 
