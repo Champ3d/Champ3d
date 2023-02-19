@@ -22,10 +22,13 @@ con = f_connexion(design3d.mesh.elem_type);
 %---------------------- no mesh region ------------------------------------
 iEd2Remove = [];
 iNo2Remove = [];
+id_elem_nomesh = [];
 %-----
 if isfield(design3d,'nomesh')
     nb_nomesh = length(design3d.nomesh);
     for i = 1:nb_nomesh
+        %--- bound of no mesh region
+        id_elem_nomesh = [id_elem_nomesh design3d.nomesh(i).id_elem];
         %--- bound of no mesh region
         bcmesh = f_make_mds(...
                     design3d.mesh.node,...
@@ -57,7 +60,8 @@ design3d.aphi.id_node_phi = unique(setdiff(design3d.aphi.id_node_phi, iNo2Remove
 iEd2Remove = unique(iEd2Remove);
 design3d.aphi.id_edge_a = unique(setdiff(design3d.aphi.id_edge_a, iEd2Remove));
 %--------------------------------------------------------------------------
-
+id_elem_nomesh = unique(id_elem_nomesh);
+design3d.aphi.id_elem_nomesh = unique([design3d.aphi.id_elem_nomesh id_elem_nomesh]);
 
 
 
