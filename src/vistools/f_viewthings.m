@@ -109,7 +109,7 @@ switch type
                     patchinfo.EdgeColor = 'k';
                 else
                     if isempty(edge_color)
-                        patchinfo.EdgeColor = [80 80 80]./255; %'non';
+                        patchinfo.EdgeColor = 'non';%[80 80 80]./255; %'non';
                     else
                         patchinfo.EdgeColor = edge_color;
                     end
@@ -119,7 +119,7 @@ switch type
                 patchinfo.FaceColor = 'flat';
                 patchinfo.FaceVertexCData = f_tocolv(field(id_face{i}));
                 if isempty(edge_color)
-                    patchinfo.EdgeColor = [80 80 80]./255; %'non';
+                    patchinfo.EdgeColor = 'non';%[80 80 80]./255; %'non';
                 else
                     patchinfo.EdgeColor = edge_color;
                 end
@@ -128,7 +128,7 @@ switch type
                 patchinfo.FaceColor = 'interp';
                 patchinfo.FaceVertexCData = f_tocolv(node_field);
                 if isempty(edge_color)
-                    patchinfo.EdgeColor = [80 80 80]./255; %'non';
+                    patchinfo.EdgeColor = 'non';%[80 80 80]./255; %'non';
                 else
                     patchinfo.EdgeColor = edge_color;
                 end
