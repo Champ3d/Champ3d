@@ -50,20 +50,29 @@ if isfield(design3d,'econductor')
             %---------------------------------------------
             fprintf(['Building econ ' design3d.econductor(i).id_dom3d '\n']);
             %---------------------------------------------
-            iNoPhi = [iNoPhi reshape(design3d.mesh.elem(1:con.nbNo_inEl,design3d.econductor(i).id_elem),...
-                                     1,con.nbNo_inEl*length(design3d.econductor(i).id_elem))];
+            IDElem = design3d.econductor(i).id_elem;
+            iNoPhi = [iNoPhi reshape(design3d.mesh.elem(1:con.nbNo_inEl,IDElem),...
+                                     1,con.nbNo_inEl*length(IDElem))];
             %---------------------------------------------
-            ltensor.main_value = f_calparam(design3d,design3d.econductor(i).sigma.main_value,'id_elem',design3d.econductor(i).id_elem);
-            ltensor.ort1_value = f_calparam(design3d,design3d.econductor(i).sigma.ort1_value,'id_elem',design3d.econductor(i).id_elem);
-            ltensor.ort2_value = f_calparam(design3d,design3d.econductor(i).sigma.ort2_value,'id_elem',design3d.econductor(i).id_elem);
-            ltensor.main_dir = f_calparam(design3d,design3d.econductor(i).sigma.main_dir,'id_elem',design3d.econductor(i).id_elem);
-            ltensor.ort1_dir = f_calparam(design3d,design3d.econductor(i).sigma.ort1_dir,'id_elem',design3d.econductor(i).id_elem);
-            ltensor.ort2_dir = f_calparam(design3d,design3d.econductor(i).sigma.ort2_dir,'id_elem',design3d.econductor(i).id_elem);
-            gtensor = f_gtensor(ltensor);
-            design3d.econductor(i).gtensor = gtensor;
-            design3d.aphi.SWeWe = design3d.aphi.SWeWe + ...
-                    f_cwewe(design3d.mesh,'coef',design3d.econductor(i).gtensor,...
-                      'id_elem',design3d.econductor(i).id_elem);
+            sig = design3d.econductor(i).sigma;
+            if isstruct(sig)
+                ltensor.main_value = f_calparam(design3d,sig.main_value,'id_elem',IDElem);
+                ltensor.ort1_value = f_calparam(design3d,sig.ort1_value,'id_elem',IDElem);
+                ltensor.ort2_value = f_calparam(design3d,sig.ort2_value,'id_elem',IDElem);
+                ltensor.main_dir   = f_calparam(design3d,sig.main_dir,'id_elem',IDElem);
+                ltensor.ort1_dir   = f_calparam(design3d,sig.ort1_dir,'id_elem',IDElem);
+                ltensor.ort2_dir   = f_calparam(design3d,sig.ort2_dir,'id_elem',IDElem);
+                gtensor = f_gtensor(ltensor);
+                design3d.econductor(i).gtensor = gtensor;
+                design3d.aphi.SWeWe = design3d.aphi.SWeWe + ...
+                        f_cwewe(design3d.mesh,'coef',design3d.econductor(i).gtensor,...
+                          'id_elem',IDElem);
+            elseif numel(sig) == 9
+                design3d.econductor(i).gtensor = sig;
+                design3d.aphi.SWeWe = design3d.aphi.SWeWe + ...
+                        f_cwewe(design3d.mesh,'coef',design3d.econductor(i).gtensor,...
+                          'id_elem',IDElem);
+            end
         end
     else
         for i = 1:nb_dom
@@ -71,20 +80,29 @@ if isfield(design3d,'econductor')
                 %---------------------------------------------
                 fprintf(['Building econ ' design3d.econductor(i).id_dom3d '\n']);
                 %---------------------------------------------
-                iNoPhi = [iNoPhi reshape(design3d.mesh.elem(1:con.nbNo_inEl,design3d.econductor(i).id_elem),...
-                                         1,con.nbNo_inEl*length(design3d.econductor(i).id_elem))];
+                IDElem = design3d.econductor(i).id_elem;
+                iNoPhi = [iNoPhi reshape(design3d.mesh.elem(1:con.nbNo_inEl,IDElem),...
+                                         1,con.nbNo_inEl*length(IDElem))];
                 %---------------------------------------------
-                ltensor.main_value = f_calparam(design3d,design3d.econductor(i).sigma.main_value,'id_elem',design3d.econductor(i).id_elem);
-                ltensor.ort1_value = f_calparam(design3d,design3d.econductor(i).sigma.ort1_value,'id_elem',design3d.econductor(i).id_elem);
-                ltensor.ort2_value = f_calparam(design3d,design3d.econductor(i).sigma.ort2_value,'id_elem',design3d.econductor(i).id_elem);
-                ltensor.main_dir = f_calparam(design3d,design3d.econductor(i).sigma.main_dir,'id_elem',design3d.econductor(i).id_elem);
-                ltensor.ort1_dir = f_calparam(design3d,design3d.econductor(i).sigma.ort1_dir,'id_elem',design3d.econductor(i).id_elem);
-                ltensor.ort2_dir = f_calparam(design3d,design3d.econductor(i).sigma.ort2_dir,'id_elem',design3d.econductor(i).id_elem);
-                gtensor = f_gtensor(ltensor);
-                design3d.econductor(i).gtensor = gtensor;
-                design3d.aphi.SWeWe = design3d.aphi.SWeWe + ...
-                        f_cwewe(design3d.mesh,'coef',design3d.econductor(i).gtensor,...
-                          'id_elem',design3d.econductor(i).id_elem);
+                sig = design3d.econductor(i).sigma;
+                if isstruct(sig)
+                    ltensor.main_value = f_calparam(design3d,sig.main_value,'id_elem',IDElem);
+                    ltensor.ort1_value = f_calparam(design3d,sig.ort1_value,'id_elem',IDElem);
+                    ltensor.ort2_value = f_calparam(design3d,sig.ort2_value,'id_elem',IDElem);
+                    ltensor.main_dir   = f_calparam(design3d,sig.main_dir,'id_elem',IDElem);
+                    ltensor.ort1_dir   = f_calparam(design3d,sig.ort1_dir,'id_elem',IDElem);
+                    ltensor.ort2_dir   = f_calparam(design3d,sig.ort2_dir,'id_elem',IDElem);
+                    gtensor = f_gtensor(ltensor);
+                    design3d.econductor(i).gtensor = gtensor;
+                    design3d.aphi.SWeWe = design3d.aphi.SWeWe + ...
+                            f_cwewe(design3d.mesh,'coef',design3d.econductor(i).gtensor,...
+                              'id_elem',IDElem);
+                elseif numel(sig) == 9
+                    design3d.econductor(i).gtensor = sig;
+                    design3d.aphi.SWeWe = design3d.aphi.SWeWe + ...
+                            f_cwewe(design3d.mesh,'coef',design3d.econductor(i).gtensor,...
+                              'id_elem',IDElem);
+                end
             end
         end
     end
