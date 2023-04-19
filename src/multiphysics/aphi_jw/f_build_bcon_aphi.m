@@ -95,20 +95,20 @@ iEdAfixed = unique(iEdAfixed);
 design3d.aphi.id_edge_a = unique(setdiff(design3d.aphi.id_edge_a,iEdAfixed));
 %--------------------------------------------------------------------------
 
-figure
-edge = design3d.mesh.edge(1:2,iEdAfixed);
-node = design3d.mesh.node;
-for i = 1:length(iEdAfixed)
-    plot3([node(1,edge(1,i)) node(1,edge(2,i))],...
-          [node(2,edge(1,i)) node(2,edge(2,i))],...
-          [node(3,edge(1,i)) node(3,edge(2,i))],...
-          ['-b'],'lineWidth',1);
-    hold on
-end
-
-figure
-f_viewthings('node',design3d.mesh.node,...
-             'edge',design3d.mesh.edge(1:2,iEdAfixed),...
-             'type','edge');
+% figure
+% edge = design3d.mesh.edge(1:2,iEdAfixed);
+% node = design3d.mesh.node;
+% for i = 1:length(iEdAfixed)
+%     plot3([node(1,edge(1,i)) node(1,edge(2,i))],...
+%           [node(2,edge(1,i)) node(2,edge(2,i))],...
+%           [node(3,edge(1,i)) node(3,edge(2,i))],...
+%           ['-b'],'lineWidth',1);
+%     hold on
+% end
+% 
+% figure
+% f_viewthings('node',design3d.mesh.node,...
+%              'edge',design3d.mesh.edge(1:2,iEdAfixed),...
+%              'type','edge');
 
 
