@@ -11,7 +11,7 @@ end
 
 if nargin <= 1
     
-    disp('No layer to add!')
+    warning('No layer to add!');
     
 else
     
