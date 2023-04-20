@@ -60,7 +60,7 @@ mi_drawline(d2(1),d2(2),d3(1),d3(2));
 mi_drawline(d3(1),d3(2),d4(1),d4(2));
 mi_drawline(d4(1),d4(2),d1(1),d1(2));
 % -------------------------------------------------------------------------
-s_factor = 1 - 1e3;
+s_factor = 1 - 1e-3;
 bottomright = center - diagvec1*s_factor + ocenter;
 upperright  = center - diagvec2*s_factor + ocenter;
 bottomleft  = center + diagvec1*s_factor + ocenter;
