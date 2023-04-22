@@ -11,7 +11,7 @@ function layer = f_add_layer(layer,varargin)
 arglist = {'id_layer','thickness','nb_slice','z_type'};
 %--------------------------------------------------------------------------
 if nargin <= 1
-    error([mfilename ': No conductor to add!']);
+    error([mfilename ': No layer to add!']);
 end
 %--------------------------------------------------------------------------
 % --- default input value
