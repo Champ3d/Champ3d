@@ -10,19 +10,15 @@ function design3d = f_add_econductor(design3d,varargin)
 arglist = {'design3d','id_econductor','id_dom3d','id_elem','sigma'};
 
 % --- default input value
-if isempty(design3d)
-    design3d.econductor = [];
-end
 id_dom3d = [];
 id_elem  = [];
 sigma    = 0;
+id_econductor = [];
 
 %--------------------------------------------------------------------------
 if ~isfield(design3d,'econductor')
     design3d.econductor = [];
 end
-%--------------------------------------------------------------------------
-id_econductor = [];
 %--------------------------------------------------------------------------
 if nargin <= 1
     error([mfilename ': No econductor to add!']);
