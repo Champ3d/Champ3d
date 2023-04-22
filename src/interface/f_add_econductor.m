@@ -25,7 +25,7 @@ end
 id_econductor = [];
 %--------------------------------------------------------------------------
 if nargin <= 1
-    error([mfilename ': No conductor to add!']);
+    error([mfilename ': No econductor to add!']);
 end
 %--------------------------------------------------------------------------
 % --- check and update input
