@@ -2,6 +2,7 @@
 *.mat
 *.~m
 *.~*
+*.asv
 *.DS_Store
 *.Lnk
 *alias
