@@ -1,0 +1,46 @@
+function geo = f_add_geo1d(geo,varargin)
+% F_ADD_GEO1D ...
+%--------------------------------------------------------------------------
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
+%--------------------------------------------------------------------------
+
+% --- valid argument list (to be updated each time modifying function)
+arglist = {'geo1d_axis','id','d','dtype','dnum'};
+
+% --- default input value
+geo1d_axis = []; % or 'y', 'z'
+d = 0;
+dtype = 'lin';
+dnum = '1';
+id = [];
+
+% --- check and update input
+for i = 1:(nargin-1)/2
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    else
+        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+    end
+end
+%--------------------------------------------------------------------------
+if isempty(id)
+    error([mfilename ' : #id must be given !']);
+end
+if isempty(geo1d_axis)
+    error([mfilename ' : #geo1d_axis must be given !']);
+end
+%--------------------------------------------------------------------------
+% --- Output
+geo.geo1d.(geo1d_axis).(id).d = d;
+geo.geo1d.(geo1d_axis).(id).dtype = dtype;
+geo.geo1d.(geo1d_axis).(id).dnum = dnum;
+% --- Log message
+fprintf(['Add ' geo1d_axis '-1d : #' id ' - done \n']);
+
+
+
+
+

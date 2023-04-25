@@ -1,0 +1,134 @@
+function [node, elem, ct2d, e2d, iKit] = f_mesh2dgeo1d(geo1d,varargin)
+%--------------------------------------------------------------------------
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
+%--------------------------------------------------------------------------
+
+% --- valid argument list (to be updated each time modifying function)
+arglist = {'flog','id_mesh2d'};
+
+% --- default input value
+flog = 1.05; % log factor when making log mesh
+
+
+% --- check and update input
+for i = 1:(nargin-1)/2
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    else
+        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+    end
+end
+
+% -------------------------------------------------------------------------
+
+tic;
+fprintf('Making mesh2d from geo1d ...')
+
+% -------------------------------------------------------------------------
+xDom    = [];
+id_xdom = []; 
+for ix = 1:length(geo1d.x)
+    d     = geo1d.x{ix}{1};
+    dnum  = geo1d.x{ix}{2};
+    dtype = geo1d.x{ix}{3};
+    if strcmpi(dtype,'lin')
+        ratio = dnum;
+        x = d/ratio .* ones(1,ratio);
+    end
+    if strcmpi(geo1d.x{ix}{3},'log+')
+        ratio = logspace(0,flog,dnum)./sum(logspace(0,flog,dnum));
+        x = d .* ratio;
+    end
+    if strcmpi(geo1d.x{ix}{3},'log-')
+        ratio = logspace(0,flog,dnum)./sum(logspace(0,flog,dnum));
+        x = d .* ratio;
+        x = x(end:-1:1);
+    end
+    if strcmpi(geo1d.x{ix}{3},'log+-') || strcmpi(geo1d.x{ix}{3},'log=')
+        dnum  = dnum * 2;
+        ratio = logspace(0,flog,dnum)./sum(logspace(0,flog,dnum));
+        x = d/2 .* ratio;
+        x = [x, x(end:-1:1)];
+    end
+    xDom = [xDom x];
+    id_xdom = [id_xdom    ix.*ones(1,length(x))];
+end
+xMesh = [0 cumsum(xDom)];
+% -------------------------------------------------------------------------
+yDom  = [];
+id_ydom = []; 
+for ix = 1:length(geo1d.y)
+    d     = geo1d.y{ix}{1};
+    dnum  = geo1d.y{ix}{2};
+    dtype = geo1d.y{ix}{3};
+    if strcmpi(dtype,'lin')
+        ratio = dnum;
+        x = d/ratio .* ones(1,ratio);
+    end
+    if strcmpi(dtype,'log+')
+        ratio = logspace(0,flog,dnum)./sum(logspace(0,flog,dnum));
+        x = d .* ratio;
+    end
+    if strcmpi(dtype,'log-')
+        ratio = logspace(0,flog,dnum)./sum(logspace(0,flog,dnum));
+        x = d .* ratio;
+        x = x(end:-1:1);
+    end
+    if strcmpi(dtype,'log+-')
+        dnum  = dnum * 2;
+        ratio = logspace(0,flog,dnum)./sum(logspace(0,flog,dnum));
+        x = d/2 .* ratio;
+        x = [x, x(end:-1:1)];
+    end
+    yDom = [yDom x];
+    id_ydom = [id_ydom    ix.*ones(1,length(x))];
+end
+yMesh = [0 cumsum(yDom)];
+
+% -------------- meshing --------------------------------------------------
+
+[x1,y1] = meshgrid(xMesh,yMesh);
+x2=[]; y2=[];
+
+for ik = 1:size(x1,1)
+    x2 = [x2 x1(ik,:)];
+end
+
+for ik = 1:size(y1,1)
+    y2 = [y2 y1(ik,:)];
+end
+
+%----- centering
+% x2 = x2 - (max(x2) - min(x2))/2;
+% y2 = y2 - (max(y2) - min(y2))/2;
+
+%-----
+node = [x2;y2];
+
+%-----
+elem = zeros(4,(size(x1,1)-1)*(size(x1,2)-1));
+iElem = 0;
+for iy = 1:size(x1,1)-1      % number of layer y
+    for ix = 1:size(x1,2)-1  % number of layer x
+        iElem = iElem+1;
+        elem(1:4,iElem) = [size(x1,2)*(iy-1)+ix; ...
+                          size(x1,2)*(iy-1)+ix+1; ...
+                          size(x1,2)*iy+ix+1; ...
+                          size(x1,2)*iy+ix];
+        mesh2d = id_xdom(ix); % id_xdom
+        mesh2d = id_ydom(iy); % id_ydom
+    end
+end
+%--------------------------------------------------------------------------
+% --- Output
+mesh2d.node = node;
+mesh2d.elem = elem;
+mesh2d.elem_type = 'quad';
+% --- Log message
+fprintf('done ----- in %.2f s \n',toc);
+
+
+
