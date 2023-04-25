@@ -26,12 +26,6 @@ tsigPlate = f_make_gtensor('type','gtensor',...
 
 %% 2D mesh
 msize = 3;
-% ---
-mesOpt.x{1}  = {lPlate, msize, 'log-'};
-mesOpt.x{2}  = {lPlate/2 - lCoil/2, 5*msize, 'log-'};
-mesOpt.x{3}  = {lCoil, 2*msize, 'lin'};
-mesOpt.x{4}  = {lPlate/2 - lCoil/2, 5*msize, 'log+'};
-mesOpt.x{5}  = {lPlate, msize, 'log+'};
 
 geo = [];
 geo = f_add_geo1d(geo,'geo1d_axis','x','id','xair_a','d',lPlate,'dnum',msize,'dtype','log-');
@@ -39,6 +33,7 @@ geo = f_add_geo1d(geo,'geo1d_axis','x','id','xplate_a','d',lPlate/2 - lCoil/2,'d
 geo = f_add_geo1d(geo,'geo1d_axis','x','id','xcoil_a','d',lCoil,'dnum',2*msize,'dtype','lin');
 geo = f_add_geo1d(geo,'geo1d_axis','x','id','xplate_b','d',lPlate/2 - lCoil/2,'dnum',5*msize,'dtype','log+');
 geo = f_add_geo1d(geo,'geo1d_axis','x','id','xair_b','d',lPlate,'dnum',msize,'dtype','log+');
+geo = f_add_x(geo,'id','xair_b2','d',lPlate,'dnum',msize,'dtype','log+');
 
 geo = f_add_geo1d(geo,'geo1d_axis','y','id','yair_a','d',lPlate,'dnum',msize,'dtype','log-');
 geo = f_add_geo1d(geo,'geo1d_axis','y','id','yplate_a','d',hPlate-esurf,'dnum',2*msize,'dtype','lin');
@@ -46,6 +41,7 @@ geo = f_add_geo1d(geo,'geo1d_axis','y','id','yplate_esurf','d',esurf,'dnum',1,'d
 geo = f_add_geo1d(geo,'geo1d_axis','y','id','yagap','d',agap,'dnum',msize,'dtype','lin');
 geo = f_add_geo1d(geo,'geo1d_axis','y','id','ycoil','d',hCoil,'dnum',msize,'dtype','lin');
 geo = f_add_geo1d(geo,'geo1d_axis','y','id','yair_b','d',lPlate,'dnum',2*msize,'dtype','log+');
+geo = f_add_y(geo,'id','yair_b2','d',lPlate,'dnum',msize,'dtype','log+');
 
 geo = f_add_geo1d(geo,'geo1d_axis','z','id','zlayer_a','d',lPlate,'dnum',5,'dtype','lin');
 geo = f_add_geo1d(geo,'geo1d_axis','z','id','zlLine','d',1e-6,'dnum',1,'dtype','lin');

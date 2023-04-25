@@ -11,7 +11,7 @@ function geo = f_add_geo1d(geo,varargin)
 arglist = {'geo1d_axis','id','d','dtype','dnum'};
 
 % --- default input value
-geo1d_axis = []; % or 'y', 'z'
+geo1d_axis = []; % or 'y', 'layer'
 d = 0;
 dtype = 'lin';
 dnum = '1';

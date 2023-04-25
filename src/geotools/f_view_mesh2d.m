@@ -1,5 +1,4 @@
-function geo = f_add_geo1d(geo,varargin)
-% F_ADD_GEO1D ...
+function f_view_mesh2d(geo,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -8,15 +7,14 @@ function geo = f_add_geo1d(geo,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'geo1d_axis','id','d','dtype','dnum'};
+arglist = {'id_mesh2d','id_dom2d','id_x','id_y','color'};
 
 % --- default input value
-geo1d_axis = []; % or 'y', 'layer'
-d = 0;
-dtype = 'lin';
-dnum = '1';
-id = [];
-
+id_mesh2d = [];
+id_dom2d = [];
+id_x = [];
+id_y = [];
+color = 'w';
 % --- check and update input
 for i = 1:(nargin-1)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
@@ -25,21 +23,28 @@ for i = 1:(nargin-1)/2
         error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
     end
 end
+
 %--------------------------------------------------------------------------
-if isempty(id)
-    error([mfilename ' : #id must be given !']);
+if isempty(id_mesh2d)
+    id_mesh2d = fieldnames(geo.geo2d.mesh2d);
+    id_mesh2d = id_mesh2d{1};
 end
-if isempty(geo1d_axis)
-    error([mfilename ' : #geo1d_axis must be given !']);
+if isempty(id_dom2d)
+    id_dom2d = {''};
+    id_elem = 1:geo.geo2d.mesh2d.(id_mesh2d).nb_elem;
+    disptext = {'all-elem'};
+else
+    id_elem = geo.geo2d.dom2d.(id_dom2d).id_elem;
+    disptext = id_dom2d;
 end
 %--------------------------------------------------------------------------
-% --- Output
-geo.geo1d.(geo1d_axis).(id).d = d;
-geo.geo1d.(geo1d_axis).(id).dtype = dtype;
-geo.geo1d.(geo1d_axis).(id).dnum = dnum;
-% --- 
-
-
-
-
+clear msh;
+msh.Vertices = geo.geo2d.mesh2d.(id_mesh2d).node.';
+msh.Faces = geo.geo2d.mesh2d.(id_mesh2d).elem(:,id_elem).';
+msh.FaceColor = color;
+msh.EdgeColor = 'k';
+patch(msh); axis equal; alpha(0.5); hold on
+node1x = geo.geo2d.mesh2d.(id_mesh2d).cnode(1,id_elem(1));
+node1y = geo.geo2d.mesh2d.(id_mesh2d).cnode(2,id_elem(1));
+text(node1x, node1y, disptext);
 

@@ -7,12 +7,12 @@ function mesh2d = f_mesh2dgeo1d(geo1d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'flog','xlayer','ylayer'};
+arglist = {'flog','id_x','id_y'};
 
 % --- default input value
 flog = 1.05; % log factor when making log mesh
-xlayer = [];
-ylayer = [];
+id_x = [];
+id_y = [];
 
 % --- check and update input
 for i = 1:(nargin-1)/2
@@ -24,12 +24,12 @@ for i = 1:(nargin-1)/2
 end
 
 % -------------------------------------------------------------------------
-if isempty(xlayer)
-    xlayer = fieldnames(geo1d.x);
+if isempty(id_x)
+    id_x = fieldnames(geo1d.x);
 end
 %--------------------------------------------------------------------------
-if isempty(ylayer)
-    ylayer = fieldnames(geo1d.y);
+if isempty(id_y)
+    id_y = fieldnames(geo1d.y);
 end
 % -------------------------------------------------------------------------
 
@@ -39,11 +39,11 @@ fprintf('Making mesh2d from geo1d ...')
 % -------------------------------------------------------------------------
 xDom    = [];
 id_xdom = [];
-lenx    = numel(xlayer);
+lenx    = numel(id_x);
 for ilay = 1:lenx
-    d     = geo1d.x.(xlayer{ilay}).d;
-    dnum  = geo1d.x.(xlayer{ilay}).dnum;
-    dtype = geo1d.x.(xlayer{ilay}).dtype;
+    d     = geo1d.x.(id_x{ilay}).d;
+    dnum  = geo1d.x.(id_x{ilay}).dnum;
+    dtype = geo1d.x.(id_x{ilay}).dtype;
     if strcmpi(dtype,'lin')
         ratio = dnum;
         x = d/ratio .* ones(1,ratio);
@@ -70,11 +70,11 @@ xMesh = [0 cumsum(xDom)];
 % -------------------------------------------------------------------------
 yDom    = [];
 id_ydom = []; 
-leny    = numel(ylayer);
+leny    = numel(id_y);
 for ilay = 1:leny
-    d     = geo1d.y.(ylayer{ilay}).d;
-    dnum  = geo1d.y.(ylayer{ilay}).dnum;
-    dtype = geo1d.y.(ylayer{ilay}).dtype;
+    d     = geo1d.y.(id_y{ilay}).d;
+    dnum  = geo1d.y.(id_y{ilay}).dnum;
+    dtype = geo1d.y.(id_y{ilay}).dtype;
     if strcmpi(dtype,'lin')
         ratio = dnum;
         x = d/ratio .* ones(1,ratio);
@@ -120,24 +120,43 @@ end
 node = [x2; y2];
 
 %-----
-elem = zeros(4,(size(x1,1)-1)*(size(x1,2)-1));
-iElem = 0;
-for iy = 1:size(x1,1)-1      % number of layer y
-    for ilay = 1:size(x1,2)-1  % number of layer x
+nblayx = size(x1,2) - 1; % number of layers x
+nblayy = size(x1,1) - 1; % number of layers y
+elem   = zeros(4, nblayx * nblayy);
+iElem  = 0;
+idx_elem = zeros(1, nblayx * nblayy);
+idy_elem = zeros(1, nblayx * nblayy);
+all_id_elem = 1:nblayx * nblayy;
+
+for iy = 1 : nblayy      
+    for ix = 1 : nblayx  
         iElem = iElem+1;
-        elem(1:4,iElem) = [size(x1,2)*(iy-1)+ilay; ...
-                          size(x1,2)*(iy-1)+ilay+1; ...
-                          size(x1,2)*iy+ilay+1; ...
-                          size(x1,2)*iy+ilay];
-        %mesh2d = id_xdom(ilay); % id_xdom
-        %mesh2d = id_ydom(iy); % id_ydom
+        elem(1:4,iElem) = [size(x1,2) * (iy-1) + ix; ...
+                           size(x1,2) * (iy-1) + ix+1; ...
+                           size(x1,2) *  iy    + ix+1; ...
+                           size(x1,2) *  iy    + ix];
+        idx_elem(iElem) = id_xdom(ix); % id_xdom
+        idy_elem(iElem) = id_ydom(iy); % id_ydom
     end
 end
+
+nb_node = size(node,2);
+nb_elem = size(elem,2);
 %--------------------------------------------------------------------------
 % --- Output
 mesh2d.node = node;
+mesh2d.nb_node = nb_node;
 mesh2d.elem = elem;
+mesh2d.nb_elem = nb_elem;
 mesh2d.elem_type = 'quad';
+for i = 1:lenx
+    mesh2d.(id_x{i}).id_elem = all_id_elem(idx_elem == i);
+end
+for i = 1:leny
+    mesh2d.(id_y{i}).id_elem = all_id_elem(idy_elem == i);
+end
+mesh2d.cnode(1,:) = mean(reshape(node(1,elem(1:4,:)),4,nb_elem));
+mesh2d.cnode(2,:) = mean(reshape(node(2,elem(1:4,:)),4,nb_elem));
 % --- Log message
 fprintf('done ----- in %.2f s \n',toc);
 
