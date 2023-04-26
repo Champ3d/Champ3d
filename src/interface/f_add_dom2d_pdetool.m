@@ -1,4 +1,4 @@
-function dom2d = f_add_dom2d(dom2d,varargin)
+function dom2d = f_add_dom2d_pdetool(dom2d,varargin)
 %--------------------------------------------------------------------------
 % Operator accepted : 
 %           '+' : union

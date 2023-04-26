@@ -7,7 +7,7 @@ function geo = f_add_y(geo,varargin)
 % Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
 
-geo = f_add_x(geo,'geo1d_axis','y',varargin{:});
+geo = f_add_geo1d(geo,'geo1d_axis','y',varargin{:});
 
 
 

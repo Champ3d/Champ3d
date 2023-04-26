@@ -1,4 +1,5 @@
 clear
+close all
 clc
 
 %% main parameters
@@ -30,7 +31,7 @@ msize = 5;
 geo = [];
 geo = f_add_x(geo,'id_x','xair_a','d',lPlate,'dnum',msize,'dtype','log-');
 geo = f_add_x(geo,'id_x','xplate_a','d',lPlate/2 - lCoil/2,'dnum',5*msize,'dtype','log-');
-geo = f_add_x(geo,'id_x','xcoil_a','d',lCoil,'dnum',2*msize,'dtype','lin');
+geo = f_add_x(geo,'id_x','xcoil','d',lCoil,'dnum',2*msize,'dtype','lin');
 geo = f_add_x(geo,'id_x','xplate_b','d',lPlate/2 - lCoil/2,'dnum',5*msize,'dtype','log+');
 geo = f_add_x(geo,'id_x','xair_b','d',lPlate,'dnum',msize,'dtype','log+');
 
@@ -47,48 +48,22 @@ geo = f_add_layer(geo,'id_layer','layer_b','d',lPlate,'dnum',5,'dtype','lin');
 
 
 geo = f_add_mesh2d(geo,'id_mesh2d','mesh2d_light','build_from','geo1d',...
-        'id_x', {'xair_a','xplate_a','xcoil_a','xplate_b','xair_b'},...
+        'id_x', {'xair_a','xplate_a','xcoil','xplate_b','xair_b'},...
         'id_y', {'yair_a','yplate_a','yplate_esurf','yagap','ycoil','yair_b'});
 
-geo = f_add_dom2d(geo,'id_mesh2d','mesh2d_light','build_from','geo1d',...
-        'id_x', {'xair_a','xplate_a','xcoil_a','xplate_b','xair_b'},...
-        'id_y', {'yair_a','yplate_a','yplate_esurf','yagap','ycoil','yair_b'});
+geo = f_add_dom2d(geo,'id_mesh2d','mesh2d_light',...
+        'id_dom2d','plate2d', ...
+        'id_x', {'xplate_a','xcoil','xplate_b'},...
+        'id_y', {'yplate_a','yplate_esurf'});
 
-f_view_mesh2d(geo);
-return
+
 figure
-f_view_meshquad(geo.geo2d.mesh2d.mesh2d_light.node,geo.geo2d.mesh2d.mesh2d_light.elem,':',f_randcolor); hold on
-
-
+f_view_mesh2d(geo,'color',f_color(10)); hold on
+f_view_mesh2d(geo,'id_dom2d','plate2d','color',f_color(2));
 
 
 return
 
-% ---
-[p2d, t2d, ~, ~, ~] = f_make_mesh_xy(mesOpt);
-nb_p = size(p2d,2);
-nb_t = size(t2d,2);
-% ---
-i_elem_2d_plate = f_find_dom_xy(t2d,{[2 3 4]},{[2 3]});
-i_elem_2d_esurf = f_find_dom_xy(t2d,{[2 3 4]},{[3]});
-i_elem_2d_coil  = f_find_dom_xy(t2d,{[3]},{[5]});
-% ---
-id_dom2d_plate = 100;
-id_dom2d_esurf = 101;
-id_dom2d_coil  = 200;
-t2d(5,i_elem_2d_plate) = id_dom2d_plate;
-t2d(5,i_elem_2d_esurf) = id_dom2d_esurf;
-t2d(5,i_elem_2d_coil)  = id_dom2d_coil;
-% ---
-dom2d.mesh.node = p2d;
-dom2d.mesh.elem = t2d;
-dom2d.mesh.elem_type = 'quad';
-
-%% Layer
-layer = [];
-layer = f_add_layer(layer,'id_layer','allLayer1','thickness',lPlate,'nb_slice',5,'z_type','lin');
-layer = f_add_layer(layer,'id_layer','lLine','thickness',1e-6,'nb_slice',1,'z_type','lin');
-layer = f_add_layer(layer,'id_layer','allLayer2','thickness',lPlate,'nb_slice',5,'z_type','lin');
 
 %% Make mesh 3D
 

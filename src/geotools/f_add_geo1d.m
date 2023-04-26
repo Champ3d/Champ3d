@@ -8,14 +8,16 @@ function geo = f_add_geo1d(geo,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'geo1d_axis','id','d','dtype','dnum'};
+arglist = {'geo1d_axis','id_x','id_y','id_layer','d','dtype','dnum'};
 
 % --- default input value
-geo1d_axis = []; % or 'y', 'layer'
+geo1d_axis = 'x'; % or 'y', 'layer'
 d = 0;
 dtype = 'lin';
 dnum = '1';
-id = [];
+id_x = [];
+id_y = [];
+id_layer = [];
 
 % --- check and update input
 for i = 1:(nargin-1)/2
@@ -26,11 +28,16 @@ for i = 1:(nargin-1)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(id)
+if isempty(id_x) && isempty(id_y) && isempty(id_layer)
     error([mfilename ' : #id must be given !']);
 end
-if isempty(geo1d_axis)
-    error([mfilename ' : #geo1d_axis must be given !']);
+%--------------------------------------------------------------------------
+if ~isempty(id_x)
+    id = id_x;
+elseif ~isempty(id_y)
+    id = id_y;
+elseif ~isempty(id_layer)
+    id = id_layer;
 end
 %--------------------------------------------------------------------------
 % --- Output

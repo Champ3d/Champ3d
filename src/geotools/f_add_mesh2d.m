@@ -8,11 +8,11 @@ function geo = f_add_mesh2d(geo,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'build_from','id','flog','id_x','id_y'};
+arglist = {'build_from','id_mesh2d','flog','id_x','id_y'};
 
 % --- default input value
 build_from = 'geo1d'; % 'geo1d', 'geoquad'
-id = [];
+id_mesh2d = [];
 flog = 1.05; % log factor when making log mesh
 id_x = [];
 id_y = [];
@@ -29,8 +29,8 @@ end
 if ~strcmpi(build_from,'geo1d') && ~strcmpi(build_from,'geoquad')
     error([mfilename ' : #build_from should be #geo1d or #geoquad !']);
 end
-if isempty(id)
-    error([mfilename ' : #id must be given !']);
+if isempty(id_mesh2d)
+    error([mfilename ' : #id_mesh2d must be given !']);
 end
 %--------------------------------------------------------------------------
 if strcmpi(build_from,'geo1d')
@@ -41,12 +41,15 @@ if strcmpi(build_from,'geo1d')
         argtopass{2*i-1} = keeparg{i};
         argtopass{2*i}   = eval(keeparg{i});
     end
-end
     % --- Output
-    geo.geo2d.mesh2d.(id) = f_mesh2dgeo1d(geo.geo1d,argtopass{:});
+    geo.geo2d.mesh2d.(id_mesh2d) = f_mesh2dgeo1d(geo.geo1d,argtopass{:});
     % --- Log message
-    fprintf(['Add mesh2d #' id ' - done \n']);
+    fprintf(['Add mesh2d #' id_mesh2d ' - done \n']);
+
+elseif strcmpi(build_from,'geoquad')
+    % TODO
 end
+
 
 
 
