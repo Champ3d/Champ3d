@@ -47,26 +47,47 @@ switch geo.geo2d.mesh2d.(id_mesh2d).mesher
         id_y = f_to_dcellargin(id_y);
         [id_x, id_y] = f_pairing_cellargin(id_x, id_y);
         %------------------------------------------------------------------
-        id_elem_x = [];
-        id_elem_y = [];
+        id_all_elem = 1:geo.geo2d.mesh2d.(id_mesh2d).nb_elem;
+        elem_code = geo.geo2d.mesh2d.(id_mesh2d).elem_code;
+        id_elem = [];
         for i = 1:length(id_x)
             for j = 1:length(id_x{i})
-                id_elem_x = [id_elem_x ...
-                       geo.geo2d.mesh2d.(id_mesh2d).(id_x{i}{j}).id_elem];
-            end
-            for j = 1:length(id_y{i})
-                id_elem_y = [id_elem_y ...
-                       geo.geo2d.mesh2d.(id_mesh2d).(id_y{i}{j}).id_elem];
+                codeidx = f_str2code(id_x{i}{j});
+                for k = 1:length(id_y{i})
+                    codeidy = f_str2code(id_y{i}{k});
+                    id_elem = [id_elem ...
+                               id_all_elem(elem_code == codeidx * codeidy)];
+                end
             end
         end
-        id_elem_x = unique(id_elem_x);
-        id_elem_y = unique(id_elem_y);
+        id_elem = unique(id_elem);
         %------------------------------------------------------------------
-        geo.geo2d.dom2d.(id_dom2d).id_elem = intersect(id_elem_x,id_elem_y);
+        geo.geo2d.dom2d.(id_dom2d).id_elem = id_elem;
         %------------------------------------------------------------------
     case 'quadmesh'
     case 'triangle-femm'
 end
 %--------------------------------------------------------------------------
-
+%------------------------------------------------------------------
+% id_x = f_to_dcellargin(id_x);
+% id_y = f_to_dcellargin(id_y);
+% [id_x, id_y] = f_pairing_cellargin(id_x, id_y);
+% %------------------------------------------------------------------
+% id_elem_x = [];
+% id_elem_y = [];
+% for i = 1:length(id_x)
+%     for j = 1:length(id_x{i})
+%         id_elem_x = [id_elem_x ...
+%                geo.geo2d.mesh2d.(id_mesh2d).(id_x{i}{j}).id_elem];
+%     end
+%     for j = 1:length(id_y{i})
+%         id_elem_y = [id_elem_y ...
+%                geo.geo2d.mesh2d.(id_mesh2d).(id_y{i}{j}).id_elem];
+%     end
+% end
+% id_elem_x = unique(id_elem_x);
+% id_elem_y = unique(id_elem_y);
+% %------------------------------------------------------------------
+% geo.geo2d.dom2d.(id_dom2d).id_elem = intersect(id_elem_x,id_elem_y);
+% %------------------------------------------------------------------
 

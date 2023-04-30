@@ -8,7 +8,7 @@ function geo = f_add_geo1d(geo,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'geo1d_axis','id_x','id_y','id_layer','d','dtype','dnum'};
+arglist = {'geo1d_axis','id_x','id_y','id_layer','d','dtype','dnum','flog'};
 
 % --- default input value
 geo1d_axis = 'x'; % or 'y', 'layer'
@@ -18,6 +18,7 @@ dnum = '1';
 id_x = [];
 id_y = [];
 id_layer = [];
+flog = 1.05;
 
 % --- check and update input
 for i = 1:(nargin-1)/2
@@ -44,6 +45,7 @@ end
 geo.geo1d.(geo1d_axis).(id).d = d;
 geo.geo1d.(geo1d_axis).(id).dtype = dtype;
 geo.geo1d.(geo1d_axis).(id).dnum = dnum;
+geo.geo1d.(geo1d_axis).(id).flog = flog;
 % --- Log message
 fprintf(['Add ' geo1d_axis '-1d : #' id ' - done \n']);
 

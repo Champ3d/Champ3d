@@ -26,12 +26,12 @@ tsigPlate = f_make_gtensor('type','gtensor',...
     'main_dir',[0 0 1],'ort1_dir',[1 0 0],'ort2_dir',[0 1 0]);
 
 %% 2D mesh
-msize = 5;
+msize = 2;
 
 geo = [];
 geo = f_add_x(geo,'id_x','xair_a','d',lPlate,'dnum',msize,'dtype','log-');
 geo = f_add_x(geo,'id_x','xplate_a','d',lPlate/2 - lCoil/2,'dnum',5*msize,'dtype','log-');
-geo = f_add_x(geo,'id_x','xcoil','d',lCoil,'dnum',2*msize,'dtype','lin');
+geo = f_add_x(geo,'id_x','xcoil','d',lCoil,'dnum',msize,'dtype','log+-');
 geo = f_add_x(geo,'id_x','xplate_b','d',lPlate/2 - lCoil/2,'dnum',5*msize,'dtype','log+');
 geo = f_add_x(geo,'id_x','xair_b','d',lPlate,'dnum',msize,'dtype','log+');
 
@@ -59,13 +59,15 @@ geo = f_add_dom2d(geo,'id_mesh2d','mesh2d_light',...
 geo = f_add_dom2d(geo,'id_dom2d','coil2d','id_x','xcoil','id_y',{'ycoil'});
 geo = f_add_dom2d(geo,'id_dom2d','esurf2d','id_x',{'xplate_a','xcoil','xplate_b'},'id_y','yplate_esurf');
 
-figure
-f_view_mesh2d(geo,'color','w'); hold on
-f_view_mesh2d(geo,'id_dom2d','plate2d','color',f_color(1));
-f_view_mesh2d(geo,'id_dom2d','coil2d','color',f_color(2));
-f_view_mesh2d(geo,'id_dom2d','esurf2d','color',f_color(3));
+% figure
+% f_view_mesh2d(geo,'color','w'); hold on
+% f_view_mesh2d(geo,'id_dom2d','plate2d','color',f_color(1));
+% f_view_mesh2d(geo,'id_dom2d','coil2d','color',f_color(2));
+% f_view_mesh2d(geo,'id_dom2d','esurf2d','color',f_color(3));
 
 
+geo = f_add_mesh3d(geo,'id_mesh3d','mesh1','mesher','champ3d_hexa',...
+                       'id_mesh2d',{'mesh2d_light'},'id_layer',{'layer_a','lLine','layer_b'});
 
 return
 

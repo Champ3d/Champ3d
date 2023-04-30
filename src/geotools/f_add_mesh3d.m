@@ -35,22 +35,13 @@ end
 switch mesher
     case 'champ3d_hexa'
         %------------------------------------------------------------------
-        if isempty(id_mesh2d)
-            error([mfilename ' : #id_mesh2d must be given !']);
-        end
-        if isempty(id_layer)
-            error([mfilename ' : #id_layer must be given !']);
-        end
-        %------------------------------------------------------------------
-        mesh = f_hexa2dto3d(dom2d,layer);
-        mesh = f_intkit3d(mesh);
-        mesh.mesher = 'hexa2dto3d';
+        geo = f_champ3d_hexa(geo,varargin{:});
+        %mesh = f_intkit3d(mesh);
         %------------------------------------------------------------------
     case 'champ3d_prism'
         % TODO
         %mesh = f_prism2dto3d(dom2d,layer);
         %mesh = f_intkit3d(mesh);
-        %mesh.mesher = 'prism2dto3d';
     case 'gmsh'
         % TODO
 end

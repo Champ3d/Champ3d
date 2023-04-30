@@ -41,63 +41,39 @@ xDom    = [];
 id_xdom = [];
 lenx    = numel(id_x);
 for ilay = 1:lenx
-    d     = geo1d.x.(id_x{ilay}).d;
-    dnum  = geo1d.x.(id_x{ilay}).dnum;
-    dtype = geo1d.x.(id_x{ilay}).dtype;
-    if strcmpi(dtype,'lin')
-        ratio = dnum;
-        x = d/ratio .* ones(1,ratio);
+    % ---
+    x     = f_div1d(geo1d.x.(id_x{ilay}));
+    xDom  = [xDom x];
+    % ---
+    id = [];
+    for j = 1:length(x)
+        id{j} = id_x{ilay};
     end
-    if strcmpi(dtype,'log+')
-        ratio = logspace(0,flog,dnum)./sum(logspace(0,flog,dnum));
-        x = d .* ratio;
-    end
-    if strcmpi(dtype,'log-')
-        ratio = logspace(0,flog,dnum)./sum(logspace(0,flog,dnum));
-        x = d .* ratio;
-        x = x(end:-1:1);
-    end
-    if strcmpi(dtype,'log+-') || strcmpi(dtype,'log=')
-        dnum  = dnum * 2;
-        ratio = logspace(0,flog,dnum)./sum(logspace(0,flog,dnum));
-        x = d/2 .* ratio;
-        x = [x, x(end:-1:1)];
-    end
-    xDom = [xDom x];
-    id_xdom = [id_xdom    ilay.*ones(1,length(x))];
+    % ---
+    id_xdom = [id_xdom id];
+    %id_xdom = [id_xdom    ilay.*ones(1,length(x))];
 end
 xMesh = [0 cumsum(xDom)];
+codeidx = f_str2code(id_xdom);
+
 % -------------------------------------------------------------------------
 yDom    = [];
 id_ydom = []; 
 leny    = numel(id_y);
 for ilay = 1:leny
-    d     = geo1d.y.(id_y{ilay}).d;
-    dnum  = geo1d.y.(id_y{ilay}).dnum;
-    dtype = geo1d.y.(id_y{ilay}).dtype;
-    if strcmpi(dtype,'lin')
-        ratio = dnum;
-        x = d/ratio .* ones(1,ratio);
+    y     = f_div1d(geo1d.y.(id_y{ilay}));
+    yDom = [yDom y];
+    % ---
+    id = [];
+    for j = 1:length(y)
+        id{j} = id_y{ilay};
     end
-    if strcmpi(dtype,'log+')
-        ratio = logspace(0,flog,dnum)./sum(logspace(0,flog,dnum));
-        x = d .* ratio;
-    end
-    if strcmpi(dtype,'log-')
-        ratio = logspace(0,flog,dnum)./sum(logspace(0,flog,dnum));
-        x = d .* ratio;
-        x = x(end:-1:1);
-    end
-    if strcmpi(dtype,'log+-')
-        dnum  = dnum * 2;
-        ratio = logspace(0,flog,dnum)./sum(logspace(0,flog,dnum));
-        x = d/2 .* ratio;
-        x = [x, x(end:-1:1)];
-    end
-    yDom = [yDom x];
-    id_ydom = [id_ydom    ilay.*ones(1,length(x))];
+    % ---
+    id_ydom = [id_ydom id];
+    %id_ydom = [id_ydom    ilay.*ones(1,length(y))];
 end
 yMesh = [0 cumsum(yDom)];
+codeidy = f_str2code(id_ydom);
 
 % -------------- meshing --------------------------------------------------
 
@@ -124,19 +100,18 @@ nblayx = size(x1,2) - 1; % number of layers x
 nblayy = size(x1,1) - 1; % number of layers y
 elem   = zeros(4, nblayx * nblayy);
 iElem  = 0;
-idx_elem = zeros(1, nblayx * nblayy);
+elem_code = zeros(1, nblayx * nblayy);
 idy_elem = zeros(1, nblayx * nblayy);
 all_id_elem = 1:nblayx * nblayy;
 
 for iy = 1 : nblayy      
     for ix = 1 : nblayx  
         iElem = iElem+1;
-        elem(1:4,iElem) = [size(x1,2) * (iy-1) + ix; ...
-                           size(x1,2) * (iy-1) + ix+1; ...
-                           size(x1,2) *  iy    + ix+1; ...
-                           size(x1,2) *  iy    + ix];
-        idx_elem(iElem) = id_xdom(ix); % id_xdom
-        idy_elem(iElem) = id_ydom(iy); % id_ydom
+        elem(1:4,iElem)  = [size(x1,2) * (iy-1) + ix; ...
+                            size(x1,2) * (iy-1) + ix+1; ...
+                            size(x1,2) *  iy    + ix+1; ...
+                            size(x1,2) *  iy    + ix];
+        elem_code(iElem) = codeidx(ix) * codeidy(iy); % id_xdom * id_ydom
     end
 end
 
@@ -149,14 +124,15 @@ mesh2d.node = node;
 mesh2d.nb_node = nb_node;
 mesh2d.elem = elem;
 mesh2d.nb_elem = nb_elem;
+mesh2d.elem_code = elem_code;
 mesh2d.elem_type = 'quad';
 % ---
-for i = 1:lenx
-    mesh2d.(id_x{i}).id_elem = all_id_elem(idx_elem == i);
-end
-for i = 1:leny
-    mesh2d.(id_y{i}).id_elem = all_id_elem(idy_elem == i);
-end
+% for i = 1:lenx
+%     mesh2d.(id_x{i}).id_elem = all_id_elem(elem_code == i);
+% end
+% for i = 1:leny
+%     mesh2d.(id_y{i}).id_elem = all_id_elem(idy_elem == i);
+% end
 % ---
 mesh2d.cnode(1,:) = mean(reshape(node(1,elem(1:4,:)),4,nb_elem));
 mesh2d.cnode(2,:) = mean(reshape(node(2,elem(1:4,:)),4,nb_elem));

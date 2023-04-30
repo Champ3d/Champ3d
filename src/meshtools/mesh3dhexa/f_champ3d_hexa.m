@@ -8,7 +8,7 @@ function geo = f_champ3d_hexa(geo,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_mesh2d','id_layer'};
+arglist = {'id_mesh2d','id_layer','id_mesh3d','mesher'};
 
 % --- default input value
 id_mesh2d = [];
@@ -30,70 +30,97 @@ end
 if isempty(id_layer)
     error([mfilename ' : #id_layer must be given !']);
 end
-
+%--------------------------------------------------------------------------
+while iscell(id_mesh2d)
+    id_mesh2d = id_mesh2d{1};
+end
 %--------------------------------------------------------------------------
 tic;
 fprintf('Making hexa mesh3d  ... ');
 
 %--------------------------------------------------------------------------
-Lthickness = [];
-nbLayers = 0;
-IDLayer = [];
-for i = 1:length(layer)
+divlay   = [];
+nb_layer = 0;
+IDLayer  = [];
+for i = 1:length(id_layer)
     %-----
-    Lthickness = [Lthickness layer(i).thickness];
+    divlay_i = f_div1d(geo.geo1d.layer.(id_layer{i}));
+    divlay   = [divlay divlay_i];
+    %-----
+    nbL = length(divlay_i);
+    nb_layer = nb_layer + nbL;
     %-----
     id = [];
-    nbL = length(layer(i).thickness);
-    nbLayers = nbLayers + nbL;
     for j = 1:nbL
-        id{j} = layer(i).id_layer;
+        id{j} = id_layer{i};
     end
+    %-----
     IDLayer = [IDLayer id];
 end
-
-codeLayer = f_str2code(IDLayer);
+%--------------------------------------------------------------------------
+codeidl = f_str2code(IDLayer);
 
 %--------------------------------------------------------------------------
+% build vertices (nodes) in 3D
 
-% build vertices (node) in 3D
-
-nbNode2D = size(dom2d.mesh.node,2);
-node = zeros(3,nbNode2D*(nbLayers+1));
-node(1:2,:) = repmat(dom2d.mesh.node,1,nbLayers+1);
-for i = 1:nbLayers
-   node(3,i*nbNode2D+1:(i+1)*nbNode2D) = sum(Lthickness(1:i)) .* ones(1,nbNode2D);
+nbNode2D = geo.geo2d.mesh2d.(id_mesh2d).nb_node;
+nb_node  = nbNode2D*(nb_layer+1);
+node = zeros(3,nb_node);
+node(1:2,:) = repmat(geo.geo2d.mesh2d.(id_mesh2d).node,1,nb_layer+1);
+for i = 1:nb_layer
+   node(3,i*nbNode2D+1:(i+1)*nbNode2D) = sum(divlay(1:i)) .* ones(1,nbNode2D);
 end
 
-% dom3D.mesh.node = node;
-% dom3D.mesh.nbnode = size(node,2);  % number of nodes
-
-%%
-
+%--------------------------------------------------------------------------
 % build volume elements (elem) in 3D
-nbElem2D = size(dom2d.mesh.elem,2);
-nt=0;
-for k=1:nbLayers	% k : current layer
+nbElem2D = geo.geo2d.mesh2d.(id_mesh2d).nb_elem;
+nb_elem = nbElem2D * nb_layer;
+elem = zeros(8, nb_elem);
+elem_code = zeros(1, nb_elem);
+
+ie0 = 0;
+for k = 1:nb_layer	% k : current layer
     % lower face
-    elem(1,nt+1:nt+nbElem2D) = dom2d.mesh.elem(1,:) + nbNode2D * (k-1);
-    elem(2,nt+1:nt+nbElem2D) = dom2d.mesh.elem(2,:) + nbNode2D * (k-1);
-    elem(3,nt+1:nt+nbElem2D) = dom2d.mesh.elem(3,:) + nbNode2D * (k-1);
-    elem(4,nt+1:nt+nbElem2D) = dom2d.mesh.elem(4,:) + nbNode2D * (k-1);
+    elem(1,ie0+1 : ie0+nbElem2D) = geo.geo2d.mesh2d.(id_mesh2d).elem(1,:) + nbNode2D * (k-1);
+    elem(2,ie0+1 : ie0+nbElem2D) = geo.geo2d.mesh2d.(id_mesh2d).elem(2,:) + nbNode2D * (k-1);
+    elem(3,ie0+1 : ie0+nbElem2D) = geo.geo2d.mesh2d.(id_mesh2d).elem(3,:) + nbNode2D * (k-1);
+    elem(4,ie0+1 : ie0+nbElem2D) = geo.geo2d.mesh2d.(id_mesh2d).elem(4,:) + nbNode2D * (k-1);
     % upper face
-    elem(5,nt+1:nt+nbElem2D) = dom2d.mesh.elem(1,:) + nbNode2D * k;
-    elem(6,nt+1:nt+nbElem2D) = dom2d.mesh.elem(2,:) + nbNode2D * k;
-    elem(7,nt+1:nt+nbElem2D) = dom2d.mesh.elem(3,:) + nbNode2D * k;
-    elem(8,nt+1:nt+nbElem2D) = dom2d.mesh.elem(4,:) + nbNode2D * k;
-    % zone 3D
-    % elem(7,nt+1:nt+nbElem2D) = dom2D.mesh.elem(4,:) + k * pi;
-    elem(9,nt+1:nt+nbElem2D)  = dom2d.mesh.elem(5,:) + codeLayer(k);
-    % zone 2D
-    elem(10,nt+1:nt+nbElem2D) = dom2d.mesh.elem(5,:);
-    % layer id
-    elem(11,nt+1:nt+nbElem2D) = k;
-    % go to the next zone
-    nt=nt+nbElem2D;
+    elem(5,ie0+1 : ie0+nbElem2D) = geo.geo2d.mesh2d.(id_mesh2d).elem(1,:) + nbNode2D * k;
+    elem(6,ie0+1 : ie0+nbElem2D) = geo.geo2d.mesh2d.(id_mesh2d).elem(2,:) + nbNode2D * k;
+    elem(7,ie0+1 : ie0+nbElem2D) = geo.geo2d.mesh2d.(id_mesh2d).elem(3,:) + nbNode2D * k;
+    elem(8,ie0+1 : ie0+nbElem2D) = geo.geo2d.mesh2d.(id_mesh2d).elem(4,:) + nbNode2D * k;
+    % elem code --> encoded id (id_x, id_y, id_layer)
+    elem_code(1,ie0+1 : ie0+nbElem2D)  = geo.geo2d.mesh2d.(id_mesh2d).elem_code * codeidl(k);
+    % go to the next layer
+    ie0 = ie0 + nbElem2D;
 end
 
-mesh = f_mdshexa(node,elem,'full');
+%--------------------------------------------------------------------------
+% --- Output
+geo.geo3d.mesh3d.(id_mesh3d).node = node;
+geo.geo3d.mesh3d.(id_mesh3d).nb_node = nb_node;
+geo.geo3d.mesh3d.(id_mesh3d).elem = elem;
+geo.geo3d.mesh3d.(id_mesh3d).nb_elem = nb_elem;
+geo.geo3d.mesh3d.(id_mesh3d).elem_code = elem_code;
+geo.geo3d.mesh3d.(id_mesh3d).elem_type = 'hexa';
+% ---
+% for i = 1:lenx
+%     mesh2d.(id_x{i}).id_elem = all_id_elem(elem_code == i);
+% end
+% for i = 1:leny
+%     mesh2d.(id_y{i}).id_elem = all_id_elem(idy_elem == i);
+% end
+% ---
+geo.geo3d.mesh3d.(id_mesh3d).cnode(1,:) = mean(reshape(node(1,elem(1:8,:)),8,nb_elem));
+geo.geo3d.mesh3d.(id_mesh3d).cnode(2,:) = mean(reshape(node(2,elem(1:8,:)),8,nb_elem));
+geo.geo3d.mesh3d.(id_mesh3d).cnode(3,:) = mean(reshape(node(3,elem(1:8,:)),8,nb_elem));
+% ---
+%mesh = f_mdshexa(node,elem,'full');
+
+% --- Log message
+fprintf('done ----- in %.2f s \n',toc);
+
+
+
 
