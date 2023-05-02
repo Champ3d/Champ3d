@@ -55,7 +55,10 @@ c3dobj = f_add_dom2d(c3dobj,'id_mesh2d','mesh2d_light',...
         'id_dom2d','plate2d', ...
         'id_x', {'xplate_a','xcoil','xplate_b'},...
         'id_y', {'yplate_a','yplate_esurf'});
-    
+c3dobj = f_add_dom2d(c3dobj,'id_mesh2d','mesh2d_light',...
+        'id_dom2d','lcorner', ...
+        'elem_code', 26.419095566573130);
+
 c3dobj = f_add_dom2d(c3dobj,'id_dom2d','coil2d','id_x','xcoil','id_y',{'ycoil'});
 c3dobj = f_add_dom2d(c3dobj,'id_dom2d','esurf2d','id_x',{'xplate...','xcoil'},'id_y','yplate_esurf');
 
@@ -64,7 +67,7 @@ f_view_mesh2d(c3dobj,'color','w'); hold on
 f_view_mesh2d(c3dobj,'id_dom2d','plate2d','color',f_color(1));
 f_view_mesh2d(c3dobj,'id_dom2d','coil2d','color',f_color(2));
 f_view_mesh2d(c3dobj,'id_dom2d','esurf2d','color',f_color(3));
-
+f_view_mesh2d(c3dobj,'id_dom2d','lcorner','color',f_color(4));
 
 c3dobj = f_add_mesh3d(c3dobj,'id_mesh3d','mesh1','mesher','c3d_hexamesh',...
                        'id_mesh2d',{'mesh2d_light'},'id_layer',{'layer_a','lLine','layer_b'});
