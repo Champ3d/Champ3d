@@ -49,16 +49,38 @@ switch c3dobj.geo2d.mesh2d.(id_mesh2d).mesher
         %------------------------------------------------------------------
         id_all_elem = 1:c3dobj.geo2d.mesh2d.(id_mesh2d).nb_elem;
         all_elem_code = c3dobj.geo2d.mesh2d.(id_mesh2d).elem_code;
+        all_id_x = fieldnames(c3dobj.geo1d.x);
+        all_id_y = fieldnames(c3dobj.geo1d.y);
         id_elem = [];
         elem_code = [];
         for i = 1:length(id_x)
             for j = 1:length(id_x{i})
-                codeidx = f_str2code(id_x{i}{j});
-                for k = 1:length(id_y{i})
-                    codeidy = f_str2code(id_y{i}{k});
-                    id_elem = [id_elem ...
-                               id_all_elem(all_elem_code == codeidx * codeidy)];
-                    elem_code = [elem_code codeidx * codeidy];
+                %----------------------------------------------------------
+                id_xij = id_x{i}{j};
+                id_xij = replace(id_xij,'...','');
+                % checking validity
+                idxvalid = regexp(all_id_x,[id_xij '\w*']);
+                % ---
+                for m = 1:length(idxvalid)
+                    if sum(idxvalid{m}) >= 1
+                        codeidx = f_str2code(all_id_x{m});
+                        for k = 1:length(id_y{i})
+                            %----------------------------------------------
+                            id_yik = id_y{i}{k};
+                            id_yik = replace(id_yik,'...','');
+                            % checking validity
+                            idyvalid = regexp(all_id_y,[id_yik '\w*']);
+                            % ---
+                            for l = 1:length(idyvalid)
+                                if sum(idyvalid{l}) >= 1
+                                    codeidy = f_str2code(all_id_y{l});
+                                    id_elem = [id_elem ...
+                                               id_all_elem(all_elem_code == codeidx * codeidy)];
+                                    elem_code = [elem_code codeidx * codeidy];
+                                end
+                            end
+                        end
+                    end
                 end
             end
         end

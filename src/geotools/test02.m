@@ -26,7 +26,7 @@ tsigPlate = f_make_gtensor('type','gtensor',...
     'main_dir',[0 0 1],'ort1_dir',[1 0 0],'ort2_dir',[0 1 0]);
 
 %% 2D mesh
-msize = 100;
+msize = 5;
 
 c3dobj = [];
 c3dobj = f_add_x(c3dobj,'id_x','xair_a','d',lPlate,'dnum',msize,'dtype','log-');
@@ -55,9 +55,9 @@ c3dobj = f_add_dom2d(c3dobj,'id_mesh2d','mesh2d_light',...
         'id_dom2d','plate2d', ...
         'id_x', {'xplate_a','xcoil','xplate_b'},...
         'id_y', {'yplate_a','yplate_esurf'});
-
+    
 c3dobj = f_add_dom2d(c3dobj,'id_dom2d','coil2d','id_x','xcoil','id_y',{'ycoil'});
-c3dobj = f_add_dom2d(c3dobj,'id_dom2d','esurf2d','id_x',{'xplate_a','xcoil','xplate_b'},'id_y','yplate_esurf');
+c3dobj = f_add_dom2d(c3dobj,'id_dom2d','esurf2d','id_x',{'xplate...','xcoil'},'id_y','yplate_esurf');
 
 figure
 f_view_mesh2d(c3dobj,'color','w'); hold on
@@ -73,7 +73,7 @@ c3dobj = f_add_dom3d(c3dobj,'id_dom3d','coil', 'id_mesh3d','mesh1', ...
                       'id_dom2d','coil2d','id_layer',{'layer_a','lLine','layer_b'});
                   
 c3dobj = f_add_dom3d(c3dobj,'id_dom3d','plate', ...
-                      'id_dom2d',{'plate2d','esurf2d'},'id_layer',{'layer_a','lLine','layer_b'});
+                      'id_dom2d',{'plate2d','esurf2d'},'id_layer',{'layer_...','lLine'});
 
 
 % figure

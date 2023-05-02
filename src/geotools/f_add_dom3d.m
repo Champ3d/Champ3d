@@ -50,6 +50,7 @@ switch c3dobj.geo3d.mesh3d.(id_mesh3d).mesher
         [id_dom2d, id_layer] = f_pairing_cellargin(id_dom2d, id_layer);
         %------------------------------------------------------------------
         id_all_elem = 1:c3dobj.geo3d.mesh3d.(id_mesh3d).nb_elem;
+        all_id_lay  = fieldnames(c3dobj.geo1d.layer);
         elem_code   =   c3dobj.geo3d.mesh3d.(id_mesh3d).elem_code;
         id_elem = [];
         for i = 1:length(id_dom2d)
@@ -58,9 +59,18 @@ switch c3dobj.geo3d.mesh3d.(id_mesh3d).mesher
                 %codeidd2d = f_str2code(id_dom2d{i}{j});
                 for m = 1:length(codeidd2d)
                     for k = 1:length(id_layer{i})
-                        codeidlay = f_str2code(id_layer{i}{k});
-                        id_elem = [id_elem ...
-                                   id_all_elem(elem_code == codeidd2d(m) * codeidlay)];
+                        id_lik = id_layer{i}{k};
+                        id_lik = replace(id_lik,'...','');
+                        % checking validity
+                        idlvalid = regexp(all_id_lay,[id_lik '\w*']);
+                        % ---
+                        for l = 1:length(idlvalid)
+                            if sum(idlvalid{l}) >= 1
+                                codeidlay = f_str2code(all_id_lay{l});
+                                id_elem = [id_elem ...
+                                           id_all_elem(elem_code == codeidd2d(m) * codeidlay)];
+                            end
+                        end
                     end
                 end
             end

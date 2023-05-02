@@ -44,9 +44,10 @@ msh.Faces = c3dobj.geo2d.mesh2d.(id_mesh2d).elem(:,id_elem).';
 msh.FaceColor = color;
 msh.EdgeColor = 'k'; % [0.7 0.7 0.7] --> gray
 patch(msh); axis equal; alpha(0.5); hold on
-node1x = mean(c3dobj.geo2d.mesh2d.(id_mesh2d).node(1, ...
-              c3dobj.geo2d.mesh2d.(id_mesh2d).elem(1:4,id_elem(1))));
-node1y = mean(c3dobj.geo2d.mesh2d.(id_mesh2d).node(2, ...
-              c3dobj.geo2d.mesh2d.(id_mesh2d).elem(1:4,id_elem(1))));
-text(node1x, node1y, disptext, 'color', 'blue', 'HorizontalAlignment', 'center');
-
+if ~isempty(id_elem)
+    node1x = mean(c3dobj.geo2d.mesh2d.(id_mesh2d).node(1, ...
+                  c3dobj.geo2d.mesh2d.(id_mesh2d).elem(1:4,id_elem(1))));
+    node1y = mean(c3dobj.geo2d.mesh2d.(id_mesh2d).node(2, ...
+                  c3dobj.geo2d.mesh2d.(id_mesh2d).elem(1:4,id_elem(1))));
+    text(node1x, node1y, disptext, 'color', 'blue', 'HorizontalAlignment', 'center');
+end

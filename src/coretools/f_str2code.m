@@ -18,14 +18,17 @@ switch typestr
         lencell = length(str);
         code = zeros(1,lencell);
         for i = 1:lencell
-            lenstr = length(str{i});
+            mystr = replace(str{i},'...','');
+            lenstr = length(mystr);
             for j = 1:lenstr
-                code(i) = code(i) + pi^j * str{i}(j);
+                code(i) = code(i) + pi^j * mystr(j);
             end
         end
     case 'char'
         code = 0;
-        for i = 1:length(str)
+        str = replace(str,'...','');
+        lenstr = length(str);
+        for i = 1:lenstr
             code = code + pi^i * str(i);
         end
 end
