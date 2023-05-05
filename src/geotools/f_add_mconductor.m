@@ -1,4 +1,4 @@
-function design3d = f_add_mconductor(design3d,varargin)
+function c3dobj = f_add_mconductor(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,19 +7,14 @@ function design3d = f_add_mconductor(design3d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'design3d','id_mconductor','id_dom3d','id_elem','mur'};
+arglist = {'id_design3d','id_mconductor','id_dom3d','mur'};
 
 % --- default input value
-
+id_design3d = [];
 id_dom3d = [];
-id_elem  = [];
 mur      = 1;
 id_mconductor = [];
 
-%--------------------------------------------------------------------------
-if ~isfield(design3d,'mconductor')
-    design3d.mconductor = [];
-end
 %--------------------------------------------------------------------------
 if nargin <= 1
     error([mfilename ': No mconductor to add!']);
@@ -35,29 +30,25 @@ for i = 1:(nargin-1)/2
 end
 %--------------------------------------------------------------------------
 
+if isempty(id_design3d)
+    id_design3d = fieldnames(c3dobj.design3d);
+    id_design3d = id_design3d{1};
+end
+
 if isempty(id_mconductor)
     error([mfilename ': id_mconductor must be defined !'])
 end
 
-if ~isfield(design3d,'dom3d')
-    error([mfilename ': dom3d is not defined !']);
+if isempty(id_dom3d)
+    error([mfilename ': id_dom3d must be given !'])
 end
 
-if isempty(id_dom3d) && isempty(id_elem)
-    error([mfilename ': id_dom3d or id_elem must be defined !'])
-end
-
-%--------------------------------------------------------------------------
-if ~isempty(id_dom3d)
-    id_elem = design3d.dom3d.(id_dom3d).id_elem;
-end
 %--------------------------------------------------------------------------
 % --- Output
-design3d.mconductor.(id_mconductor).id_dom3d = id_dom3d;
-design3d.mconductor.(id_mconductor).id_elem  = id_elem;
-design3d.mconductor.(id_mconductor).mur = mur;
+c3dobj.design3d.(id_design3d).mconductor.(id_mconductor).id_dom3d = id_dom3d;
+c3dobj.design3d.(id_design3d).mconductor.(id_mconductor).sigma = mur;
 % --- info message
-fprintf(['Add mcon ' id_mconductor '\n']);
+fprintf(['Add mcon #' id_mconductor ' to design3d #' id_design3d '\n']);
 
 
 

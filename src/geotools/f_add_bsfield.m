@@ -1,4 +1,4 @@
-function c3dobj = f_add_econductor(c3dobj,varargin)
+function c3dobj = f_add_bsfield(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,17 +7,17 @@ function c3dobj = f_add_econductor(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_design3d','id_econductor','id_dom3d','sigma'};
+arglist = {'id_design3d','id_sfield','id_dom3d','Bs'};
 
 % --- default input value
 id_design3d = [];
-id_dom3d = [];
-sigma    = 0;
-id_econductor = [];
+id_dom3d    = [];
+Bs          = 0;
+id_bsfield  = [];
 
 %--------------------------------------------------------------------------
 if nargin <= 1
-    error([mfilename ': No econductor to add!']);
+    error([mfilename ': No bsfield to add!']);
 end
 %--------------------------------------------------------------------------
 % --- check and update input
@@ -35,8 +35,8 @@ if isempty(id_design3d)
     id_design3d = id_design3d{1};
 end
 
-if isempty(id_econductor)
-    error([mfilename ': id_econductor must be defined !'])
+if isempty(id_bsfield)
+    error([mfilename ': id_bsfield must be defined !'])
 end
 
 if isempty(id_dom3d)
@@ -45,9 +45,10 @@ end
 
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.design3d.(id_design3d).econductor.(id_econductor).id_dom3d = id_dom3d;
-c3dobj.design3d.(id_design3d).econductor.(id_econductor).sigma = sigma;
+c3dobj.design3d.(id_design3d).bsfield.(id_bsfield).id_dom3d = id_dom3d;
+c3dobj.design3d.(id_design3d).bsfield.(id_bsfield).Bs = Bs;
 % --- info message
-fprintf(['Add econ #' id_econductor ' to design3d #' id_design3d '\n']);
+fprintf(['Add bsfield #' id_bsfield ' to design3d #' id_design3d '\n']);
+
 
 
