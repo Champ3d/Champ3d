@@ -1,4 +1,4 @@
-function c3dobj = f_add_open_coil(c3dobj,varargin)
+function c3dobj = f_add_open_jscoil(c3dobj,varargin)
 % F_ADD_COIL ...
 %--------------------------------------------------------------------------
 % FIXED INPUT
