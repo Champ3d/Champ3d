@@ -1,4 +1,4 @@
-function c3dobj = f_add_open_jscoil(c3dobj,varargin)
+function c3dobj = f_add_close_jscoil(c3dobj,varargin)
 % F_ADD_COIL ...
 %--------------------------------------------------------------------------
 % FIXED INPUT
@@ -64,8 +64,7 @@ id_emdesign3d = [];
 id_coil       = [];
 id_dom3d      = [];
 coil_mode     = 'transmitter'; % or 'tx'; 'receiver' or 'rx'
-petrode_equation = [];
-netrode_equation = [];
+cs_equation   = [];
 v_petrode = 1;
 v_netrode = 0;
 stype     = [];
@@ -100,9 +99,9 @@ if isempty(id_coil)
     error([mfilename ' : #id_coil must be given !']);
 end
 
-if isempty(petrode_equation) || isempty(netrode_equation)
+if isempty(cs_equation)
     if isempty(field_vector_o) || isempty(field_vector_v)
-        error([mfilename ' : #petrode_equation and #netrode_equation or #field_vector_o and #field_vector_v must be given !']);
+        error([mfilename ' : #cs_equation or #field_vector_o and #field_vector_v must be given !']);
     end
 end
 
@@ -112,47 +111,40 @@ id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
 node = c3dobj.mesh3d.(id_mesh3d).node;
 elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
 elem_type = c3dobj.mesh3d.(id_mesh3d).elem_type;
+con = f_connexion(elem_type);
+id_node = f_uniquenode(elem,'nb_vertices',con.EdNo_inEl);
 %--------------------------------------------------------------------------
-if ~isempty(petrode_equation)
-    %----------------------------------------------------------------------
-    if ~iscell(petrode_equation)
-        petrode_equation{1} = petrode_equation;
+if ~isempty(cs_equation)
+    if ~iscell(cs_equation)
+        cs_equation{1} = cs_equation;
     end
-    %----------------------------------------------------------------------
-    for itrod = 1:length(petrode_equation)
-        geo = f_findnode(node, elem, 'elem_type', elem_type,...
-                         'cut_equation', petrode_equation{itrod});
-        geo.id_elem = id_elem(geo.id_elem); % !!!
-        %------
-        petrode(itrod) = geo;
-        %------
-    end
-end
-%--------------------------------------------------------------------------
-if ~isempty(netrode_equation)
-    %----------------------------------------------------------------------
-    if ~iscell(netrode_equation)
-        netrode_equation{1} = netrode_equation;
-    end
-    %----------------------------------------------------------------------
-    for itrod = 1:length(netrode_equation)
-        geo = f_findnode(node, elem, 'elem_type', elem_type,...
-                         'cut_equation', netrode_equation{itrod});
-        geo.id_elem = id_elem(geo.id_elem); % !!!
-        %------
-        netrode(itrod) = geo;
-        %------
-    end
+    geo = f_cutdom(node, elem, 'elem_type', elem_type,...
+                   'cut_equation', cs_equation{1});
+    geo.id_elem = id_elem(geo.id_elem); % !!!
+    %------
+    etrode = geo;
+    petrode.id_elem = geo.id_elem;
+    petrode.id_node = geo.node_positive;
+    netrode.id_elem = geo.id_elem;
+    netrode.id_node = geo.node_negative;
+    id_elem = setdiff(id_elem,geo.id_elem);
+    cutnode = f_uniquenode(c3dobj.mesh.elem(:,geo.id_elem),...
+                           'nb_vertices',con.EdNo_inEl);
+    id_node = setdiff(id_node,cutnode);
+    %------
 end
 %--------------------------------------------------------------------------
 % --- Output
 % -
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).etrode  = etrode;
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_elem = id_elem;
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_node = id_node;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).petrode = petrode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode = netrode;
 % -
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_dom3d  = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_mode = coil_mode;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_type = 'open_jscoil';
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_type = 'close_jscoil';
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).petrode_equation = [];
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode_equation = [];
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).v_petrode = v_petrode;
@@ -166,5 +158,5 @@ c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).field_vector_o = field_vector_o
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).field_vector_v = field_vector_v;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).field_vector_rounding = field_vector_rounding;
 % --- info message
-fprintf(['Add open-jscoil #' id_coil ' to emdesign3d #' id_emdesign3d '\n']);
+fprintf(['Add close-jscoil #' id_coil ' to emdesign3d #' id_emdesign3d '\n']);
 

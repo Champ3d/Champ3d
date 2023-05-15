@@ -27,6 +27,7 @@ function c3dobj = f_add_coil(c3dobj,varargin)
 % 'field_vector_o' : coordinates of the origine of the field vector
 % 'field_vector_v' : the field vector that indicates approximatively
 %                    the orientation of the source field
+% 'field_vector_rounding' : rounding or not corner and straight edge
 %--------------------------------------------------------------------------
 % OUTPUT
 % emdesign3d with added coil

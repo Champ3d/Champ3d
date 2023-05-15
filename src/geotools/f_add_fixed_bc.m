@@ -46,7 +46,6 @@ if isempty(id_dom3d)
 end
 
 %--------------------------------------------------------------------------
-% --- Output
 if ~isempty(id_emdesign3d)
     design3d = 'emdesign3d';
     id_design3d = id_emdesign3d;

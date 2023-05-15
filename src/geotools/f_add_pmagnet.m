@@ -18,10 +18,6 @@ id_bcon  = [];
 id_pmagnet = [];
 mur = 1;
 %--------------------------------------------------------------------------
-if ~isfield(c3dobj,'pmagnet')
-    c3dobj.pmagnet = [];
-end
-%--------------------------------------------------------------------------
 if nargin <= 1
     error([mfilename ': No permanent magnet to add!']);
 end

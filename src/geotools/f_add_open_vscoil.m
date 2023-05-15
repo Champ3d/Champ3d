@@ -1,4 +1,4 @@
-function c3dobj = f_add_open_jscoil(c3dobj,varargin)
+function c3dobj = f_add_open_vscoil(c3dobj,varargin)
 % F_ADD_COIL ...
 %--------------------------------------------------------------------------
 % FIXED INPUT
@@ -63,19 +63,14 @@ arglist = {'id_emdesign3d','id_coil','id_dom3d','id_elem','etrode_type',...
 id_emdesign3d = [];
 id_coil       = [];
 id_dom3d      = [];
-coil_mode     = 'transmitter'; % or 'tx'; 'receiver' or 'rx'
+coil_mode     = 'tx'; % or 'tx'; 'receiver' or 'rx'
 petrode_equation = [];
 netrode_equation = [];
 v_petrode = 1;
 v_netrode = 0;
 stype     = [];
-cs_area   = 1;
-j_coil    = 1;
-i_coil    = 1;
-nb_turn   = 1;
-field_vector_o = [];
-field_vector_v = [];
-field_vector_rounding = 0;
+i_coil    = 0;
+v_coil    = 0;
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:(nargin-1)/2
@@ -101,9 +96,7 @@ if isempty(id_coil)
 end
 
 if isempty(petrode_equation) || isempty(netrode_equation)
-    if isempty(field_vector_o) || isempty(field_vector_v)
-        error([mfilename ' : #petrode_equation and #netrode_equation or #field_vector_o and #field_vector_v must be given !']);
-    end
+    error([mfilename ' : #petrode_equation and #netrode_equation must be given !']);
 end
 
 %--------------------------------------------------------------------------
@@ -152,19 +145,14 @@ c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode = netrode;
 % -
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_dom3d  = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_mode = coil_mode;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_type = 'open_jscoil';
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_type = 'open_vscoil';
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).petrode_equation = [];
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode_equation = [];
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).v_petrode = v_petrode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).v_netrode = v_netrode;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).stype     = 'js';
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).cs_area   = cs_area;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).j_coil    = j_coil;
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).stype     = 'vs';
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).i_coil    = i_coil;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).nb_turn   = nb_turn;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).field_vector_o = field_vector_o;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).field_vector_v = field_vector_v;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).field_vector_rounding = field_vector_rounding;
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).v_coil    = v_coil;
 % --- info message
-fprintf(['Add open-jscoil #' id_coil ' to emdesign3d #' id_emdesign3d '\n']);
+fprintf(['Add open-vscoil #' id_coil ' to emdesign3d #' id_emdesign3d '\n']);
 
