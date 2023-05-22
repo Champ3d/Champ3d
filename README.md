@@ -1,5 +1,5 @@
 # **Champ3d Project**
-_Code for Computational Physics_
+_Code for Computational Physics in Electrical Engineering_
 
 Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
 
