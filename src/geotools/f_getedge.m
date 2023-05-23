@@ -14,16 +14,7 @@ arglist = {'id_mesh3d','id_dom3d'};
 % --- default input value
 id_mesh3d = [];
 id_dom3d  = [];
-id_dom3d      = [];
-coil_mode     = 'transmitter'; % or 'tx'; 'receiver' or 'rx'
-cs_equation   = [];
-v_petrode = 1;
-v_netrode = 0;
-stype     = [];
-cs_area   = 1;
-j_coil    = [];
-i_coil    = [];
-v_coil    = [];
+
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:(nargin-1)/2
