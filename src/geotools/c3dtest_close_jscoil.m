@@ -207,5 +207,6 @@ f_viewthings('type','elem','node',node,'elem',elem(:,IDElem),...
 f_viewthings('type','node','node',node(:,geo.id_node),'color',f_color(2)); hold on;
 axis equal; axis tight; hold on
 
-
+f_viewthings('type','edge','node',node,'elem',edge(:,:),...
+             'elem_type','hex','color',f_color(1)); hold on;
 

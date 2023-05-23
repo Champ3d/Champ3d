@@ -5,92 +5,101 @@ function f_viewthings(varargin)
 % Huu-Kien.Bui@univ-nantes.fr
 % Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
-type = [];
+
+% --- valid argument list (to be updated each time modifying function)
+arglist = {'type','node','elem','edge','face','color','edge_color','linewidth', ...
+           'field','node_field'};
+       
+
+% --- default input value
+type = []; % 'node','elem','edge','face'
 node = [];
 edge = [];
 face = [];
 elem = [];
-edge_color = [];
+edge_color = 'none';
+color = 'b';
+linewidth = 2;
+field = [];
+node_field = [];
+%--------------------------------------------------------------------------
+% --- check and update input
 for i = 1:nargin/2
-    eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    else
+        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+    end
 end
 
-
-if ~exist('type','var')
-    disp('#type must be defined : #type = node, edge, face, elem !')
-    return
+%--------------------------------------------------------------------------
+if ~any(strcmpi(type,{'node','elem','edge','face'}))
+    error([mfilename ' : #type must be defined : #type = node, edge, face, elem !']);
 end
 
-if ~exist('linewidth','var')
-    linewidth = 2;
-end
-
+%--------------------------------------------------------------------------
 switch type
+    %----------------------------------------------------------------------
     case 'node'
-        if ~exist('color','var')
-            color = 'k';
-        end
+        % ---
         if isempty(node)
-            disp('#node must be given !')
-            return
+            error([mfilename ' : #node must be given !']);
         end
+        % ---
         if size(node,1) == 2
-            plot(node(1,:),node(2,:),['s' color],'MarkerFaceColor',color);
+            plot(node(1,:),node(2,:),['o' color],'MarkerFaceColor',color);
             axis tight; axis equal; box on;
             xlabel('x (m)'); ylabel('y (m)');
         elseif size(node,1) == 3
-            plot3(node(1,:),node(2,:),node(3,:),['s' color],'MarkerFaceColor',color);
+            plot3(node(1,:),node(2,:),node(3,:),['o' color],'MarkerFaceColor',color);
             axis tight; axis equal; box on; view(3);
             xlabel('x (m)'); ylabel('y (m)'); zlabel('z (m)'); 
         end
+    %----------------------------------------------------------------------
     case 'edge'
-        if ~exist('color','var')
-            color = 'k';
+        % ---
+        if isempty(node) || isempty(edge)
+            error([mfilename ' : #node and #edge must be given !']);
         end
-        if isempty(node)
-            disp('#node must be given !')
-            return
-        end
-        if isempty(edge)
-            disp('#edge must be given !')
-            return
-        end
+        % ---
         nbEdge = size(edge,2);
         dim = size(node,1);
         if dim == 2
-            for i = 1:nbEdge
-                plot([node(1,edge(1,i)) node(1,edge(2,i))],...
-                     [node(2,edge(1,i)) node(2,edge(2,i))],...
-                     ['-' color],'lineWidth',linewidth);
-                hold on
-            end
+            %xnode = zeros(2,nbEdge);
+            %ynode = zeros(2,nbEdge);
+            xnode = [node(1,edge(1,:)); node(1,edge(2,:))];
+            ynode = [node(2,edge(1,:)); node(2,edge(2,:))];
+            %for i = 1:nbEdge
+            %    plot([node(1,edge(1,i)) node(1,edge(2,i))],...
+            %         [node(2,edge(1,i)) node(2,edge(2,i))],...
+            %         ['-' color],'lineWidth',linewidth);
+            %    hold on
+            %end
+            plot(xnode,ynode,['-' color],'lineWidth',linewidth);
             alpha(0.5);
             axis tight; axis equal; box on;
             xlabel('x (m)'); ylabel('y (m)');
         elseif dim == 3
-            for i = 1:nbEdge
-                plot3([node(1,edge(1,i)) node(1,edge(2,i))],...
-                      [node(2,edge(1,i)) node(2,edge(2,i))],...
-                      [node(3,edge(1,i)) node(3,edge(2,i))],...
-                      ['-' color],'lineWidth',linewidth);
-                hold on
-            end
+            %for i = 1:nbEdge
+            %    plot3([node(1,edge(1,i)) node(1,edge(2,i))],...
+            %          [node(2,edge(1,i)) node(2,edge(2,i))],...
+            %          [node(3,edge(1,i)) node(3,edge(2,i))],...
+            %          ['-' color],'lineWidth',linewidth);
+            %    hold on
+            %end
+            xnode = [node(1,edge(1,:)); node(1,edge(2,:))];
+            ynode = [node(2,edge(1,:)); node(2,edge(2,:))];
+            znode = [node(3,edge(1,:)); node(3,edge(2,:))];
+            plot3(xnode,ynode,znode,['-' color],'lineWidth',linewidth);
             alpha(0.5);
             axis tight; axis equal; box on; view(3);
             xlabel('x (m)'); ylabel('y (m)'); zlabel('z (m)'); 
             hold off
         end
     case 'face'
-        if ~exist('color','var')
-            color = rand(1,3);
-        end
-        if isempty(node)
-            disp('#node must be given !')
-            return
-        end
-        if isempty(face)
-            disp('#face must be given !')
-            return
+        % ---
+        if isempty(node) || isempty(face)
+            error([mfilename ' : #node and #face must be given !']);
         end
         %------------------------------------------------------------------
         allnode = [];
@@ -103,7 +112,7 @@ switch type
             patchinfo.Vertices = node.';
             patchinfo.Faces = f.';
             cax = [];
-            if ~exist('field','var') & ~exist('node_field','var')
+            if ~exist('field','var') && ~exist('node_field','var')
                 patchinfo.FaceColor = color;
                 if strcmpi(color,'non')
                     patchinfo.EdgeColor = 'k';
