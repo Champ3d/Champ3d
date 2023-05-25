@@ -15,20 +15,21 @@ addpath(genpath('C:\femm42'));
 
 
 %% main parameters
-lPlate   = 100e-3;
-hPlate   = 3e-3;
-sigPlate = 40e3;
-murPlate = 1;
-lCoil    = 10e-3;
-hCoil    = 5e-3;
-sigCoil  = 58e6;
-agap     = 2e-3;
-abox     = lPlate * 2;
-Imax     = 1000;
-nb_turns = 1;
-fr       = 200e3;
-Iphase   = 'IA'; 
-Isign    = +1;
+x_plate   = 100e-3;
+y_plate   = 3e-3;
+sig_plate = 40e3;
+mur_plate = 1;
+x_coil    = 10e-3;
+y_coil    = 5e-3;
+sig_coil  = 58e6;
+agap      = 2e-3;
+x_airbox  = x_plate * 2;
+y_airbox  = x_plate * 2;
+Imax      = 1000;
+nb_turns  = 1;
+fr        = 200e3;
+Iphase    = 'IA'; 
+Isign     = +1;
 
 %% FEMM preparation
 closefemm
@@ -47,24 +48,24 @@ mi_probdef(fr,'meters','planar',1E-08,0,minAngle,1);
 %% Material list
 
 f_femm_addmaterial('material_name','air');
-f_femm_addmaterial('material_name','compos','mur',murPlate,'sigma',sigPlate);
-f_femm_addmaterial('material_name','copper','mur',1,'sigma',sigCoil);
+f_femm_addmaterial('material_name','compos','mur',mur_plate,'sigma',sig_plate);
+f_femm_addmaterial('material_name','copper','mur',1,'sigma',sig_coil);
 
 %% Trace out the domains
 
 draw2d = [];
 draw2d = f_femm_draw_straightrect(draw2d,'id_draw2d','plate',...
-            'center',[0 -hPlate/2],...
-            'r_len',lPlate,'theta_len',hPlate);
+            'center',[0 -y_plate/2],...
+            'r_len',x_plate,'theta_len',y_plate);
 draw2d = f_femm_draw_straightrect(draw2d,'id_draw2d','agap',...
             'center',[0 agap/2],...
-            'r_len',lPlate,'theta_len',agap);
+            'r_len',x_plate,'theta_len',agap);
 draw2d = f_femm_draw_straightrect(draw2d,'id_draw2d','coil',...
-            'center',[0 agap+hCoil/2],...
-            'r_len',lCoil,'theta_len',hCoil);
+            'center',[0 agap+y_coil/2],...
+            'r_len',x_coil,'theta_len',y_coil);
 draw2d = f_femm_draw_straightrect(draw2d,'id_draw2d','air',...
             'center',[0 0],...
-            'r_len',abox,'theta_len',abox);
+            'r_len',x_airbox,'theta_len',y_airbox);
 
 %% domain attribution
 f_femm_set_block(draw2d,'id_draw2d','air'  ,'method','bottomleft','block_name','air'  ,'meshsize',20*meshsize);
@@ -75,7 +76,7 @@ f_femm_set_block(draw2d,'id_draw2d','coil' ,'method','center','block_name','copp
                         'in_circuit',Iphase,'nb_turns',nb_turns);
 
 %% Boundary conditions
-f_femm_setbc_rect([0 0],[abox abox],'A=0');
+f_femm_setbc_rect([0 0],[x_airbox y_airbox],'A=0');
 
 
 %% Properties of boundary conditions and circuit
@@ -112,7 +113,7 @@ figure; f_view_mesh_2d(dom2d,'plotter','champ3d');
 %--- J surface plate
 nbp = 100;
 esurf  = 1e-4; 
-x_line = linspace(-lPlate/2+1e-6,lPlate/2-1e-6,nbp);
+x_line = linspace(-x_plate/2+1e-6,x_plate/2-1e-6,nbp);
 y_line = -(esurf/2) .* ones(1,nbp);
 J_co1 = zeros(1,nbp);
 for i = 1:nbp
