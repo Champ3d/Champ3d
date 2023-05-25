@@ -8,3 +8,8 @@
 	* bm_01_3d_sibc : 3d model with champ3d using surface impedance boundary condition
 
 2. bm_02
+
+
+
+## Links
+* femm : www.femm.info
