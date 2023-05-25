@@ -1,13 +1,22 @@
-# ignore all .xxx files
+# matlab
 *.mat
 *.~m
 *.~*
 *.asv
+
+# mac
 *.DS_Store
 *.Lnk
 *alias
 
-# ignore all files in any directory named xxx
+# femm
+*.ans
+*.fem
+
+# others
+*.bin
+
+# ignore all files in directory
 temp/
 private/
 inwork/
