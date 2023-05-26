@@ -26,7 +26,7 @@ tsig_plate = f_make_gtensor('type','gtensor',...
 
 
 %% build 1D mesh
-msize  = 3;
+msize  = 10;
 c3dobj = [];
 % ---
 c3dobj = f_add_x(c3dobj,'id_x','xair_l'   ,'d',x_airbox/2 - x_plate/2,'dnum',2*msize,'dtype','log-');
@@ -97,7 +97,7 @@ f_viewthings('type','elem','node',node,'elem',elem(:,IDElem),...
 
 %% build emdesign3d
 
-c3dobj = f_add_emdesign3d(c3dobj,'id_emdesign3d','bm_01_3d','id_mesh3d','my_mesh3d');
+c3dobj = f_add_emdesign3d(c3dobj,'id_emdesign3d','bm_01_3d','id_mesh3d',{'my_mesh3d','my_mesh3d'});
 
 c3dobj = f_add_econductor(c3dobj,'id_emdesign3d','bm_01_3d',...
                           'id_econductor','plate', ...

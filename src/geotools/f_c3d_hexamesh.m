@@ -94,18 +94,29 @@ nb_elem = nbElem2D * nb_layer;
 elem = zeros(8, nb_elem);
 elem_code = zeros(1, nb_elem);
 
+% ---
+elem2d = [c3dobj.mesh2d.(id_mesh2d).elem(1,:); ...
+          c3dobj.mesh2d.(id_mesh2d).elem(2,:); ...
+          c3dobj.mesh2d.(id_mesh2d).elem(3,:); ...
+          c3dobj.mesh2d.(id_mesh2d).elem(4,:)];
+% ---
 ie0 = 0;
 for k = 1:nb_layer	% k : current layer
+    % ---------------------------------------------------------------------
     % lower face
-    elem(1,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(1,:) + nbNode2D * (k-1);
-    elem(2,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(2,:) + nbNode2D * (k-1);
-    elem(3,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(3,:) + nbNode2D * (k-1);
-    elem(4,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(4,:) + nbNode2D * (k-1);
+    %elem(1,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(1,:) + nbNode2D * (k-1);
+    %elem(2,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(2,:) + nbNode2D * (k-1);
+    %elem(3,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(3,:) + nbNode2D * (k-1);
+    %elem(4,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(4,:) + nbNode2D * (k-1);
     % upper face
-    elem(5,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(1,:) + nbNode2D * k;
-    elem(6,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(2,:) + nbNode2D * k;
-    elem(7,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(3,:) + nbNode2D * k;
-    elem(8,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(4,:) + nbNode2D * k;
+    %elem(5,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(1,:) + nbNode2D * k;
+    %elem(6,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(2,:) + nbNode2D * k;
+    %elem(7,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(3,:) + nbNode2D * k;
+    %elem(8,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(4,:) + nbNode2D * k;
+    % ---------------------------------------------------------------------
+    elem(1:4,ie0+1 : ie0+nbElem2D) = elem2d + nbNode2D * (k-1);
+    elem(5:8,ie0+1 : ie0+nbElem2D) = elem2d + nbNode2D *  k;
+    % ---------------------------------------------------------------------
     % elem code --> encoded id (id_x, id_y, id_layer)
     elem_code(1,ie0+1 : ie0+nbElem2D)  = c3dobj.mesh2d.(id_mesh2d).elem_code * codeidl(k);
     % go to the next layer
