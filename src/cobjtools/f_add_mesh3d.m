@@ -40,7 +40,7 @@ switch mesher
         % --- Log message
         fprintf(['Add mesh3d #' id_mesh3d '\n']);
         %------------------------------------------------------------------
-    case 'champ3d_prism'
+    case {'c3d_prismmesh','c3d_prismesh'}
         % TODO
         %mesh = f_prism2dto3d(dom2d,layer);
         %mesh = f_intkit3d(mesh);
