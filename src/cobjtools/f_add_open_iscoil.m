@@ -115,33 +115,37 @@ elem_type = c3dobj.mesh3d.(id_mesh3d).elem_type;
 %--------------------------------------------------------------------------
 if ~isempty(petrode_equation)
     %----------------------------------------------------------------------
+    petrode = [];
+    %----------------------------------------------------------------------
     if ~iscell(petrode_equation)
         petrode_equation{1} = petrode_equation;
     end
     %----------------------------------------------------------------------
     for itrod = 1:length(petrode_equation)
-        geo = f_findnode(node, elem, 'elem_type', elem_type,...
-                         'cut_equation', petrode_equation{itrod});
-        geo.id_elem = id_elem(geo.id_elem); % !!!
-        %------
-        petrode(itrod) = geo;
-        %------
+        petrode(itrod).id_node = f_find_cutnode(node, elem, 'elem_type', elem_type,...
+                                                'cut_equation', petrode_equation{itrod});
+        idElem = f_find_cutelem(node, elem, 'elem_type', elem_type,...
+                                'cut_equation', petrode_equation{itrod});
+        idElem = id_elem(idElem);
+        petrode(itrod).id_elem = idElem;
     end
 end
 %--------------------------------------------------------------------------
 if ~isempty(netrode_equation)
+    %----------------------------------------------------------------------
+    netrode = [];
     %----------------------------------------------------------------------
     if ~iscell(netrode_equation)
         netrode_equation{1} = netrode_equation;
     end
     %----------------------------------------------------------------------
     for itrod = 1:length(netrode_equation)
-        geo = f_findnode(node, elem, 'elem_type', elem_type,...
-                         'cut_equation', netrode_equation{itrod});
-        geo.id_elem = id_elem(geo.id_elem); % !!!
-        %------
-        netrode(itrod) = geo;
-        %------
+        netrode(itrod).id_node = f_find_cutnode(node, elem, 'elem_type', elem_type,...
+                                                'cut_equation', netrode_equation{itrod});
+        idElem = f_find_cutelem(node, elem, 'elem_type', elem_type,...
+                                'cut_equation', netrode_equation{itrod});
+        idElem = id_elem(idElem);
+        netrode(itrod).id_elem = idElem;
     end
 end
 %--------------------------------------------------------------------------
