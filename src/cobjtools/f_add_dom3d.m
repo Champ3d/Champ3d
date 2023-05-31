@@ -37,31 +37,40 @@ if isempty(id_dom3d)
     error([mfilename ' : #id_dom3d must be given !']);
 end
 
+%--------------------------------------------------------------
+% output 1
+c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = defined_on;
 %--------------------------------------------------------------------------
-switch c3dobj.mesh3d.(id_mesh3d).mesher
-    case 'c3d_hexamesh'
-        if strcmpi(defined_on,'elem')
+mesher = c3dobj.mesh3d.(id_mesh3d).mesher;
+switch defined_on
+    case {'elem'}
+        %------------------------------------------------------------------
+        if strcmpi(mesher,'c3d_hexamesh')
             [id_elem, elem_code] = f_c3d_hexamesh_find_elem3d(c3dobj, ...
                 'id_mesh3d',id_mesh3d,'id_dom3d',id_dom3d,'id_dom2d',id_dom2d,...
                 'id_layer',id_layer,'elem_code',elem_code);
-            %--------------------------------------------------------------
-            % output
-            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = defined_on;
-            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem = id_elem;
-            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).elem_code = elem_code;
         end
-        if strcmpi(defined_on,'face')
-            [id_elem, elem_code] = f_c3d_hexamesh_find_elem3d(c3dobj, ...
-                'id_mesh3d',id_mesh3d,'id_dom3d',id_dom3d,'id_dom2d',id_dom2d,...
-                'id_layer',id_layer,'elem_code',elem_code);
-            %--------------------------------------------------------------
-            % output
-            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = defined_on;
-            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem = id_elem;
-            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).elem_code = elem_code;
+        %------------------------------------------------------------------
+        if strcmpi(mesher,'c3d_prismmesh')
+            
         end
-    case 'c3d_prismmesh'
-    case 'gmsh'
+        %------------------------------------------------------------------
+        if strcmpi(mesher,'gmsh')
+            
+        end
+        %------------------------------------------------------------------
+        % output
+        c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = defined_on;
+        c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem = id_elem;
+        c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).elem_code = elem_code;
+    case {'face','interface','bound_face'}
+        if strcmpi(mesher,'c3d_hexamesh')
+            
+        end
+    case {'edge','bound_edge'}
+        if strcmpi(mesher,'c3d_hexamesh')
+            
+        end
 end
 
 
