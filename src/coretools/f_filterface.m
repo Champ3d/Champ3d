@@ -20,11 +20,6 @@ function [filface,id_face] = f_filterface(face)
 % Huu-Kien.Bui@univ-nantes.fr
 % Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
-cr = copyright();
-if ~strcmpi(cr(1:49), 'Champ3d Project - Copyright (c) 2022 Huu-Kien Bui')
-    error(' must add copyright file :( ');
-end
-%--------------------------------------------------------------------------
 [r,c] = find(face == 0);
 nbFace = size(face,2);
 gr = {};
