@@ -9,20 +9,11 @@ function Vnormalized = f_normalize(V)
 % Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
 
-[dim,len] = size(V);
-
-VM = zeros(1,len);
-for i = 1:dim
-    VM = VM + V(i,:).^2;
-end
-VM = sqrt(VM);
-
-Vnormalized = zeros(dim,len);
-
-for i = 1:dim
-    Vnormalized(i,:)  = V(i,:)./VM;
-end
-
+VM = sqrt(sum(V.^2));
+Vnormalized = V ./ VM;
 Vnormalized(:,VM <= eps) = 0;
 
 end
+
+
+
