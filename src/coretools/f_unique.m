@@ -31,7 +31,7 @@ switch position
     case {1,'urow','row','r'}
         % ---
         position  = 1;
-        mat  = sort(mat, position);
+        tmat = sort(mat, position);
         smat = size(mat);
         mnum = sqrt(2);
         % ---
@@ -40,13 +40,13 @@ switch position
         for i = 2:dimm
             mvec(i) = mnum^(i-1);
         end
-        magicsum = sum(mat .* mvec);
+        magicsum = sum(tmat .* mvec);
         [~,imat] = unique(magicsum);
         mat = mat(:,imat);
     case {2,'ucol','col','c'}
         % ---
         position  = 2;
-        mat  = sort(mat, position);
+        tmat = sort(mat, position);
         smat = size(mat);
         mnum = sqrt(2);
         % ---
@@ -55,7 +55,7 @@ switch position
         for i = 2:dimm
             mvec(i) = mnum^(i-1);
         end
-        magicsum = sum(mat .* mvec, 2);
+        magicsum = sum(tmat .* mvec, 2);
         [~,imat] = unique(magicsum);
         mat = mat(imat,:);
 end
