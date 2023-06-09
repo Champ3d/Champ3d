@@ -1,4 +1,4 @@
-function  startup()
+function  set_up()
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
