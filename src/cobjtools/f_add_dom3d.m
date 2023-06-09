@@ -46,8 +46,9 @@ switch defined_on
     case {'elem'}
         %------------------------------------------------------------------
         if strcmpi(mesher,'c3d_hexamesh')
+            fprintf(['Add dom3d #' id_dom3d ' in mesh3d #' id_mesh3d]);
             [id_elem, elem_code] = f_c3d_hexamesh_find_elem3d(c3dobj, ...
-                'id_mesh3d',id_mesh3d,'id_dom3d',id_dom3d,'id_dom2d',id_dom2d,...
+                'id_mesh3d',id_mesh3d,'id_dom2d',id_dom2d,...
                 'id_layer',id_layer,'elem_code',elem_code);
         end
         %------------------------------------------------------------------
