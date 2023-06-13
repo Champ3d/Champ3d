@@ -43,7 +43,7 @@ c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = defined_on;
 %--------------------------------------------------------------------------
 mesher = c3dobj.mesh3d.(id_mesh3d).mesher;
 switch defined_on
-    case {'elem'}
+    case {'elem','el'}
         %------------------------------------------------------------------
         if strcmpi(mesher,'c3d_hexamesh')
             fprintf(['Add dom3d #' id_dom3d ' in mesh3d #' id_mesh3d]);
@@ -67,11 +67,11 @@ switch defined_on
         c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = defined_on;
         c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem = id_elem;
         c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).elem_code = elem_code;
-    case {'face','interface','bound_face'}
+    case {'face','interface','bound_face','fa'}
         if strcmpi(mesher,'c3d_hexamesh')
             
         end
-    case {'edge','bound_edge'}
+    case {'edge','bound_edge','ed'}
         if strcmpi(mesher,'c3d_hexamesh')
             
         end
