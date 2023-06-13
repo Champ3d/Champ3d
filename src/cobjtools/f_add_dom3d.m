@@ -80,44 +80,53 @@ switch defined_on
             %--------------------------------------------------------------
             msh.node = c3dobj.mesh3d.(id_mesh3d).node;
             msh.elem = [];
+            domlist  = '';
             for i = 1:length(of_dom3d)
                 for j = 1:length(of_dom3d{i})
                     msh.elem = [msh.elem ...
                                 c3dobj.mesh3d.(id_mesh3d).elem(:,...
-                                c3dobj.mesh3d.(id_mesh3d).dom3d.(of_dom3d{i}).id_elem)];
+                                c3dobj.mesh3d.(id_mesh3d).dom3d.(of_dom3d{i}{j}).id_elem)];
+                    domlist = [domlist '#' of_dom3d{i}{j} ' '];
                 end
             end
             msh = f_getboundface(msh);
-            %--------------------------------------------------------------
-            if length(of_dom3d) == 1
-                domlist = strjoin(of_dom3d{1});
-            else
-                domlist = strjoin(of_dom3d{:},' and ');
-            end
             %--------------------------------------------------------------
             % output
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = defined_on;
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face = msh.id_bound_face;
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).face = msh.bound_face;
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).info = ...
-                ['face with outward normal to ' domlist];
+                           ['bound_face with outward normal to ' domlist];
             %c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).elem_code = elem_code;
         end
     case {'interface'}
         if ~isfield(c3dobj.mesh3d.(id_mesh3d).dom3d, of_dom3d)
             error([mfilename ' : no dom3d #' of_dom3d ' exists !']);
         else
+            %--------------------------------------------------------------
+            of_dom3d = f_to_dcellargin(of_dom3d);
+            %--------------------------------------------------------------
             msh.node = c3dobj.mesh3d.(id_mesh3d).node;
-            msh.elem = c3dobj.mesh3d.(id_mesh3d).elem(:,...
-                       c3dobj.mesh3d.(id_mesh3d).dom3d.(of_dom3d).id_elem);
+            msh.elem = [];
+            domlist  = '';
+            for i = 1:length(of_dom3d)
+                for j = 1:length(of_dom3d{i})
+                    msh.elem = [msh.elem ...
+                                c3dobj.mesh3d.(id_mesh3d).elem(:,...
+                                c3dobj.mesh3d.(id_mesh3d).dom3d.(of_dom3d{i}{j}).id_elem)];
+                    if i == 1
+                        domlist = [domlist '#' of_dom3d{i}{j} ' '];
+                    end
+                end
+            end
             msh = f_getinterface(msh);
             %--------------------------------------------------------------
             % output
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = defined_on;
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face = msh.id_bound_face;
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).face = msh.bound_face;
-            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).info = ['face with outward normal to ' of_dom3d{1}];
-            %c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).elem_code = elem_code;
+            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).info = ...
+                           ['interface with outward normal to ' domlist];
         end
     case {'edge','bound_edge','ed'}
         if strcmpi(mesher,'c3d_hexamesh')
