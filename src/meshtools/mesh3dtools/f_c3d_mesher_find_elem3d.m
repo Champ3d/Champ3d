@@ -1,4 +1,4 @@
-function [id_elem, elem_code] = f_c3d_mesh_find_elem3d(c3dobj,varargin)
+function [id_elem, elem_code] = f_c3d_mesher_find_elem3d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'

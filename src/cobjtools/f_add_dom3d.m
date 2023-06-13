@@ -47,14 +47,14 @@ switch defined_on
         %------------------------------------------------------------------
         if strcmpi(mesher,'c3d_hexamesh')
             fprintf(['Add dom3d #' id_dom3d ' in mesh3d #' id_mesh3d]);
-            [id_elem, elem_code] = f_c3d_hexamesh_find_elem3d(c3dobj, ...
+            [id_elem, elem_code] = f_c3d_mesher_find_elem3d(c3dobj, ...
                 'id_mesh3d',id_mesh3d,'id_dom2d',id_dom2d,...
                 'id_layer',id_layer,'elem_code',elem_code);
         end
         %------------------------------------------------------------------
         if strcmpi(mesher,'c3d_prismmesh')
             fprintf(['Add dom3d #' id_dom3d ' in mesh3d #' id_mesh3d]);
-            [id_elem, elem_code] = f_c3d_hexamesh_find_elem3d(c3dobj, ...
+            [id_elem, elem_code] = f_c3d_mesher_find_elem3d(c3dobj, ...
                 'id_mesh3d',id_mesh3d,'id_dom2d',id_dom2d,...
                 'id_layer',id_layer,'elem_code',elem_code);
         end
@@ -67,10 +67,18 @@ switch defined_on
         c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = defined_on;
         c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem = id_elem;
         c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).elem_code = elem_code;
-    case {'face','interface','bound_face','fa'}
+    case {'face','fa'}
         if strcmpi(mesher,'c3d_hexamesh')
             
         end
+    case {'bound_face','boundface'}
+        if ~isfield(c3dobj.mesh3d.(id_mesh3d).dom3d, id_dom3d)
+            error([mfilename ' : no dom3d #' id_dom3d ' exists !']);
+        else
+            msh.node = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).node;
+            msh.elem = (c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem);
+        end
+    case {'interface'}
     case {'edge','bound_edge','ed'}
         if strcmpi(mesher,'c3d_hexamesh')
             
