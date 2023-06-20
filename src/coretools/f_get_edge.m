@@ -63,7 +63,7 @@ nbElem = size(elem,2);
 %--------------------------------------------------------------------------
 e = reshape([elem(EdNo_inEl(:,1),:); elem(EdNo_inEl(:,2),:)], ...
              nbEd_inEl, nbNo_inEd, nbElem);
-real_ori_edge_in_elem = squeeze(sign(diff(e, 1, 2)));
+%real_ori_edge_in_elem = squeeze(sign(diff(e, 1, 2)));
 e = sort(e, 2);
 %--------------------------------------------------------------------------
 edge = reshape(permute(e,[2 1 3]), nbNo_inEd, []);
@@ -74,7 +74,7 @@ edge = f_unique(edge);
 %--------------------------------------------------------------------------
 % --- Outputs
 mesh3d.edge = edge;
-mesh3d.real_ori_edge_in_elem = real_ori_edge_in_elem;
+%mesh3d.real_ori_edge_in_elem = real_ori_edge_in_elem;
 %mesh3d.edge_in_elem = edge_in_elem;
 %mesh3d.nbEdge = nbEdge;
 

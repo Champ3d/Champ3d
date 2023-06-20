@@ -123,7 +123,9 @@ c3dobj.mesh3d.(id_mesh3d).elem = elem;
 c3dobj.mesh3d.(id_mesh3d).nb_elem = nb_elem;
 c3dobj.mesh3d.(id_mesh3d).elem_code = elem_code;
 c3dobj.mesh3d.(id_mesh3d).elem_type = 'hexa';
-% ---
+%--------------------------------------------------------------------------
+c3dobj.mesh3d.(id_mesh3d) = f_get_edge(c3dobj.mesh3d.(id_mesh3d));
+%--------------------------------------------------------------------------
 % c3dobj.mesh3d.(id_mesh3d).cnode(1,:) = mean(reshape(node(1,elem(1:8,:)),8,nb_elem));
 % c3dobj.mesh3d.(id_mesh3d).cnode(2,:) = mean(reshape(node(2,elem(1:8,:)),8,nb_elem));
 % c3dobj.mesh3d.(id_mesh3d).cnode(3,:) = mean(reshape(node(3,elem(1:8,:)),8,nb_elem));

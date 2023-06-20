@@ -47,6 +47,8 @@ switch mesher
         fprintf(['Add mesh3d #' id_mesh3d '\n']);
     case 'gmsh'
         % TODO
+    case {'c3d_mixedmesh','c3d_mixedhexaprismmesh','c3d_mixedhexaprism'}
+        % TODO
 end
 
 
