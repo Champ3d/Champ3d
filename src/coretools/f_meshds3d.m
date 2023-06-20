@@ -74,8 +74,12 @@ end
 %----- D
 if any(strcmpi(get,{'all', 'D', 'Div'}))
     % ---
-    if ~all(isfield(mesh3d,{'face','elem','face_in_elem','sign_face_in_elem'}))
+    if ~all(isfield(mesh3d,{'face'}))
         mesh3d = f_get_face(mesh3d,'elem_type',mesh3d.elem_type);
+    end
+    % ---
+    if ~all(isfield(mesh3d,{'face_in_elem','sign_face_in_elem'}))
+        mesh3d = f_get_face_in_elem(mesh3d,'elem_type',mesh3d.elem_type);
     end
     % ---
     face_in_elem = mesh3d.face_in_elem;
@@ -94,13 +98,20 @@ end
 %----- R
 if any(strcmpi(get,{'all', 'R', 'Rot', 'Curl'}))
     % ---
-    if ~all(isfield(mesh3d,{'edge','face','edge_in_face','si_edge_in_face'}))
+    if ~all(isfield(mesh3d,{'edge'}))
         mesh3d = f_get_edge(mesh3d,'elem_type',mesh3d.elem_type);
+    end
+    % ---
+    if ~all(isfield(mesh3d,{'face'}))
         mesh3d = f_get_face(mesh3d,'elem_type',mesh3d.elem_type);
     end
     % ---
+    if ~all(isfield(mesh3d,{'edge_in_face','sign_edge_in_face'}))
+        mesh3d = f_get_edge_in_face(mesh3d,'elem_type',mesh3d.elem_type);
+    end
+    % ---
     edge_in_face = mesh3d.edge_in_face;
-    si_edge_in_face = mesh3d.si_edge_in_face;
+    sign_edge_in_face = mesh3d.sign_edge_in_face;
     nbEdge = size(mesh3d.edge, 2);
     nbFace = size(mesh3d.face, 2);
     con = f_connexion(elem_type);
@@ -117,14 +128,14 @@ if any(strcmpi(get,{'all', 'R', 'Rot', 'Curl'}))
                 iface = iquad;
         end
         for i = 1:nbEd_inFa{k}
-            mesh3d.R = mesh3d.R + sparse(iface,edge_in_face(i,iface),si_edge_in_face(i,iface),nbFace,nbEdge);
+            mesh3d.R = mesh3d.R + sparse(iface,edge_in_face(i,iface),sign_edge_in_face(i,iface),nbFace,nbEdge);
         end
     end
 end
 
 %----- G
 if any(strcmpi(get,{'all', 'G', 'Grad', 'Gradient'}))
-    if ~all(isfield(mesh3d,{'node','edge','edge_in_face','si_edge_in_face'}))
+    if ~all(isfield(mesh3d,{'node','edge','edge_in_face','sign_edge_in_face'}))
         mesh3d = f_get_edge(mesh3d,'elem_type',mesh3d.elem_type);
         mesh3d = f_get_face(mesh3d,'elem_type',mesh3d.elem_type);
     end
