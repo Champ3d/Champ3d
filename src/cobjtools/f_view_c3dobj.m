@@ -7,7 +7,7 @@ function f_view_c3dobj(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'face_color','edge_color','alpha_value', ...
+arglist = {'face_color','edge_color','alpha_value', 'text_color', 'text_size'...
            'id_mesh2d','id_dom2d',...
            'id_mesh3d','id_dom3d',...
            'id_emdesign3d','id_thdesign3d', ...
@@ -34,6 +34,8 @@ id_tcapacitor = [];
 edge_color = 'k'; % [0.7 0.7 0.7] --> gray
 face_color = 'w';
 alpha_value = 1;
+text_color = 'k';
+text_size = 14;
 % --- check and update input
 for i = 1:(nargin-1)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
@@ -172,7 +174,8 @@ if ~isempty(id_mesh2d)
     cnode = f_barrycenter(c3dobj.mesh2d.(id_mesh2d).node, ...
                           c3dobj.mesh2d.(id_mesh2d).elem(:,id_elem(1)));
     disptext = strrep(disptext,'_','-');
-    text(cnode(1), cnode(2), disptext, 'color', 'blue', 'HorizontalAlignment', 'center');
+    text(cnode(1), cnode(2), disptext, 'color', text_color, ...
+        'FontSize', text_size,'HorizontalAlignment', 'center');
 end
 %--------------------------------------------------------------------------
 if ~isempty(id_mesh3d)
@@ -186,7 +189,8 @@ if ~isempty(id_mesh3d)
     % Info
     cnode = f_barrycenter(node, elem(:,1));
     disptext = strrep(disptext,'_','-');
-    text(cnode(1), cnode(2), cnode(3), disptext, 'color', 'blue', 'HorizontalAlignment', 'center');
+    text(cnode(1), cnode(2), cnode(3), disptext, 'color', text_color, ...
+        'FontSize', text_size, 'HorizontalAlignment', 'center');
 end
 %--------------------------------------------------------------------------
 

@@ -71,7 +71,7 @@ celem = squeeze(celem);
 for i = 1:nbFa_inEl
     ft = elem(FaNo_inEl(i,1:nbNo_inFa(i)),:);
     % ---
-    [ft, ~] = f_sortori(ft);
+    [ft, si_ori] = f_sortori(ft);
     ft = [ft; zeros(maxnbNo_inFa-nbNo_inFa(i),nbElem)];
     f(i,:,:) = ft;
     % ---

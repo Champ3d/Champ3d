@@ -49,20 +49,20 @@ end
 con = f_connexion(elem_type);
 nbFa_inEl = con.nbFa_inEl;
 %--------------------------------------------------------------------------
-if ~isfield(mesh3d,'face_in_elem') || ~isfield(mesh3d,'si_face_in_elem')
+if ~isfield(mesh3d,'face_in_elem') || ~isfield(mesh3d,'sign_face_in_elem')
     mesh3d = f_get_face(mesh3d,'elem_type',elem_type);
 end
 %--------------------------------------------------------------------------
 face = mesh3d.face;
 face_in_elem = mesh3d.face_in_elem;
-si_face_in_elem = mesh3d.si_face_in_elem;
+sign_face_in_elem = mesh3d.sign_face_in_elem;
 nb_face = size(face,2);
 %--------------------------------------------------------------------------
 
 %-----
 elem_left_of_face = zeros(1,nb_face); % !!! convention
 for i = 1:nbFa_inEl
-    elem_left_of_face(face_in_elem(i,si_face_in_elem(i,:) > 0)) = find(si_face_in_elem(i,:) > 0);
+    elem_left_of_face(face_in_elem(i,sign_face_in_elem(i,:) > 0)) = find(sign_face_in_elem(i,:) > 0);
 end
 %-----
 dom_left_of_face = zeros(1,nb_face);
@@ -70,7 +70,7 @@ dom_left_of_face(elem_left_of_face > 0) = 1 ;%elem_code(elem_left_of_face(elem_l
 %-----
 elem_right_of_face = zeros(1,nb_face);
 for i = 1:nbFa_inEl
-    elem_right_of_face(face_in_elem(i,si_face_in_elem(i,:) < 0)) = find(si_face_in_elem(i,:) < 0);
+    elem_right_of_face(face_in_elem(i,sign_face_in_elem(i,:) < 0)) = find(sign_face_in_elem(i,:) < 0);
 end
 %-----
 dom_right_of_face = zeros(1,nb_face);
