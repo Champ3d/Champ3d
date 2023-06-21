@@ -7,14 +7,15 @@ function mesh3d = f_get_bound_face(mesh3d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem_type','n_direction','get','n_component'};
+arglist = {'elem_type','n_direction','get','n_component','of_dom3d'};
 
 % --- default input value
 elem_type = [];
 get = []; % 'ndecomposition' = 'ndec' = 'n-decomposition'
 n_direction = 'outward'; % 'outward' = 'out' = 'o', 'inward' = 'in' = 'i'
-                         % otherwise : 'automatic' = 'natural' = 'auto'
+                         %  otherwise : 'automatic' = 'natural' = 'auto'
 n_component = [];
+of_dom3d = [];
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:(nargin-1)/2
