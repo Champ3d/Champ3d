@@ -34,6 +34,10 @@ elseif isempty(mesh3d.edge)
     mesh3d = f_get_edge(mesh3d);
 end
 %--------------------------------------------------------------------------
+if isempty(elem_type) && isfield(mesh3d,'elem_type')
+    elem_type = mesh3d.elem_type;
+end
+%--------------------------------------------------------------------------
 if isempty(elem_type)
     nbnoinel = size(elem, 1);
     if any(strcmpi(defined_on,{'elem','el'}))

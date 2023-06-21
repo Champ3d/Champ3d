@@ -30,6 +30,10 @@ if isempty(elem_type) && isfield(mesh3d,'elem_type')
     elem_type = mesh3d.elem_type;
 end
 %--------------------------------------------------------------------------
+if isempty(elem_type) && isfield(mesh3d,'elem_type')
+    elem_type = mesh3d.elem_type;
+end
+%--------------------------------------------------------------------------
 if isempty(elem_type)
     nbnoinel = size(mesh3d.elem, 1);
     switch nbnoinel
