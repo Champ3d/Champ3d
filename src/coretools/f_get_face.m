@@ -1,4 +1,4 @@
-function mesh3d = f_get_face(mesh3d,varargin)
+function face = f_get_face(mesh3d,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -67,6 +67,6 @@ face = reshape(permute(f,[2 3 1]), maxnbNo_inFa, []);
 face = f_unique(face);
 %--------------------------------------------------------------------------
 % --- Outputs
-mesh3d.face = face;
+% mesh3d.face = face;
 
 end

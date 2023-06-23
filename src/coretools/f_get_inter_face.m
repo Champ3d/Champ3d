@@ -1,4 +1,4 @@
-function mesh3d = f_get_inter_face(mesh3d,varargin)
+function [inter_face, lid_inter_face] = f_get_inter_face(mesh3d,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -79,8 +79,8 @@ for i = 1:length(of_dom3d)
      bface{id3d} = msh.bound_face;
      id_bface{id3d} = msh.idl_bound_face;
 end
-id_inter_face = f_findvecnd(bface{2},bface{1});
-[id_inter_face,id_bfof1] = intersect(id_bface{1},id_bface{2});
+lid_inter_face = f_findvecnd(bface{2},bface{1});
+[lid_inter_face,id_bfof1] = intersect(id_bface{1},id_bface{2});
 inter_face = bface{1}(:,id_bfof1);
 
 
@@ -88,7 +88,7 @@ inter_face = bface{1}(:,id_bfof1);
 % --- bound with n-decomposition
 if any(strcmpi(get,{'nd','ndec','ndecomposition','n-decomposition'}))
     bf = inter_face;
-    id_bf = id_inter_face;
+    id_bf = lid_inter_face;
     nface = f_chavec(mesh3d.node,inter_face);
     if isempty(n_component)
         [~,~,inface] = f_unique(nface,'by','strict_value','get','groupsort');
@@ -97,14 +97,14 @@ if any(strcmpi(get,{'nd','ndec','ndecomposition','n-decomposition'}))
     end
     nb_gr = length(inface);
     inter_face = {};
-    id_inter_face = {};
+    lid_inter_face = {};
     for i = 1:nb_gr
         inter_face{i} = bf(:,inface{i});
-        id_inter_face{i} = id_bf(inface{i});
+        lid_inter_face{i} = id_bf(inface{i});
     end
 end
 
 %--------------------------------------------------------------------------
 % --- Outputs
-mesh3d.inter_face = inter_face;
-mesh3d.id_inter_face = id_inter_face;
+% mesh3d.inter_face = inter_face;
+% mesh3d.id_inter_face = lid_inter_face;

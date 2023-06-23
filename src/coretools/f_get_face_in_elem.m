@@ -1,4 +1,4 @@
-function mesh3d = f_get_face_in_elem(mesh3d,varargin)
+function [face_in_elem, sign_face_in_elem, ori_face_in_elem] = f_get_face_in_elem(mesh3d,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -44,9 +44,11 @@ if isempty(elem_type)
 end
 %--------------------------------------------------------------------------
 if ~isfield(mesh3d,'face')
-    mesh3d = f_get_face(mesh3d);
+    face = f_get_face(mesh3d);
 elseif isempty(mesh3d.face)
-    mesh3d = f_get_face(mesh3d);
+    face = f_get_face(mesh3d);
+else
+    face = mesh3d.face;
 end
 %--------------------------------------------------------------------------
 con = f_connexion(elem_type);
@@ -82,11 +84,11 @@ for i = 1:nbFa_inEl
     ori_face_in_elem(i,:) = si_ori;
 end
 %--------------------------------------------------------------------------
-face_in_elem = f_findvecnd(f,mesh3d.face,'position',2);
+face_in_elem = f_findvecnd(f,face,'position',2);
 %--------------------------------------------------------------------------
 % --- Outputs
-mesh3d.face_in_elem      = face_in_elem;
-mesh3d.sign_face_in_elem = sign_face_in_elem;
-mesh3d.ori_face_in_elem  = ori_face_in_elem;
+% mesh3d.face_in_elem      = face_in_elem;
+% mesh3d.sign_face_in_elem = sign_face_in_elem;
+% mesh3d.ori_face_in_elem  = ori_face_in_elem;
 
 end

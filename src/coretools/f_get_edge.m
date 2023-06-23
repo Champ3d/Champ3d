@@ -1,4 +1,4 @@
-function mesh3d = f_get_edge(mesh3d,varargin)
+function edge = f_get_edge(mesh3d,varargin)
 %------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -20,31 +20,6 @@ for i = 1:(nargin-1)/2
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
         error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
-    end
-end
-%------------------------------------------------------------------------
-if isempty(of_dom3d)
-    if any(strcmpi(defined_on,'elem'))
-        elem = mesh3d.elem;
-    elseif any(strcmpi(defined_on,'face'))
-        elem = mesh3d.face;
-    end
-else
-    if ~iscell(of_dom3d)
-        of_dom3d = {of_dom3d};
-    end
-    elem = [];
-    for i = 1:length(of_dom3d)
-        doncheck = mesh3d.dom3d.(of_dom3d{1}).defined_on;
-        defined_on = mesh3d.dom3d.(of_dom3d{i}).defined_on;
-        if ~strcmpi(doncheck,defined_on)
-            error([mfilename ': #of_dom3d list must defined_on same type (elem, face, edge)!']);
-        end
-        if any(strcmpi(defined_on,'elem'))
-            elem = [elem mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}).id_elem)];
-        elseif any(strcmpi(defined_on,'face'))
-            elem = [elem mesh3d.face(:,mesh3d.dom3d.(of_dom3d{i}).id_face)];
-        end
     end
 end
 %------------------------------------------------------------------------
@@ -83,6 +58,31 @@ nbNo_inEd = con.nbNo_inEd;
 nbEd_inEl = con.nbEd_inEl;
 EdNo_inEl = con.EdNo_inEl;
 %------------------------------------------------------------------------
+if isempty(of_dom3d)
+    if any(strcmpi(defined_on,'elem'))
+        elem = mesh3d.elem;
+    elseif any(strcmpi(defined_on,'face'))
+        elem = mesh3d.face;
+    end
+else
+    if ~iscell(of_dom3d)
+        of_dom3d = {of_dom3d};
+    end
+    elem = [];
+    for i = 1:length(of_dom3d)
+        doncheck = mesh3d.dom3d.(of_dom3d{1}).defined_on;
+        defined_on = mesh3d.dom3d.(of_dom3d{i}).defined_on;
+        if ~strcmpi(doncheck,defined_on)
+            error([mfilename ': #of_dom3d list must defined_on same type (elem, face, edge)!']);
+        end
+        if any(strcmpi(defined_on,'elem'))
+            elem = [elem mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}).id_elem)];
+        elseif any(strcmpi(defined_on,'face'))
+            elem = [elem mesh3d.face(:,mesh3d.dom3d.(of_dom3d{i}).id_face)];
+        end
+    end
+end
+%------------------------------------------------------------------------
 nbElem = size(elem,2);
 %------------------------------------------------------------------------
 e = reshape([elem(EdNo_inEl(:,1),:); elem(EdNo_inEl(:,2),:)], ...
@@ -93,12 +93,12 @@ edge = reshape(permute(e,[2 1 3]), nbNo_inEd, []);
 edge = f_unique(edge);
 %------------------------------------------------------------------------
 % --- Outputs
-if isempty(of_dom3d)
-    mesh3d.edge = edge;
-else
-    for i = 1:length(of_dom3d)
-        mesh3d.dom3d.(of_dom3d{i}).edge = edge;
-    end
-end
+% if isempty(of_dom3d)
+%     mesh3d.edge = edge;
+% else
+%     for i = 1:length(of_dom3d)
+%         mesh3d.dom3d.(of_dom3d{i}).edge = edge;
+%     end
+% end
 %------------------------------------------------------------------------
 end

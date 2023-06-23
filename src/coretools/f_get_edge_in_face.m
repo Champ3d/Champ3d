@@ -1,4 +1,4 @@
-function mesh3d = f_get_edge_in_face(mesh3d,varargin)
+function [edge_in_face, sign_edge_in_face] = f_get_edge_in_face(mesh3d,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -91,7 +91,7 @@ edge_in_face = f_findvecnd(fe,mesh3d.edge,'position',2);
 edge_in_face(isnan(edge_in_face)) = 0;
 %--------------------------------------------------------------------------
 % --- Outputs
-mesh3d.edge_in_face = edge_in_face;
-mesh3d.sign_edge_in_face = sign_edge_in_face;
+% mesh3d.edge_in_face = edge_in_face;
+% mesh3d.sign_edge_in_face = sign_edge_in_face;
 
 end

@@ -48,14 +48,14 @@ switch defined_on
         mshds.node = node;
         mshds.elem = elem;
         %mshds = f_meshds3d(mshds,'output_list','face');
-        mshds = f_get_bound_face(mshds,'elem_type',elem_type);
+        %mshds = f_get_bound_face(mshds,'elem_type',elem_type);
         % ---
         %face_in_elem = mshds.face_in_elem;
         %face = mshds.face;
         %id_face = reshape(face_in_elem, 1, []);
         %id_face = unique(id_face);
         % ---
-        face = mshds.bound_face;
+        face = f_get_bound_face(mshds,'elem_type',elem_type);
         id_face = 1:size(face,2);
         % ---
         % 1/ triangle
