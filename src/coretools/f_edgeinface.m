@@ -28,6 +28,12 @@ if isempty(elem_type)
     error([mfilename ' : #elem_type must be given !']);
 end
 %--------------------------------------------------------------------------
+if any(strcmpi(elem_type,{'quad','tri','triangle'}))
+    id_edge_in_face = [];
+    sign_edge_in_face = [];
+    return
+end
+%--------------------------------------------------------------------------
 con = f_connexion(elem_type);
 siEd_inFa = con.siEd_inFa;
 EdNo_inFa = con.EdNo_inFa;

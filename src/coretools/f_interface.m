@@ -7,7 +7,8 @@ function [inter_face, lid_inter_face, info] = f_interface(elem1,elem2,node,varar
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem_type','of_dom3d','get','n_component','n_direction'};
+arglist = {'elem_type','of_dom3d','get','n_component','n_direction', ...
+           'interface_of'};
 
 % --- default input value
 elem_type = [];
@@ -15,6 +16,7 @@ get = []; % 'ndecomposition' = 'ndec' = 'n-decomposition'
 n_direction = 'outward'; % 'outward' = 'out' = 'o', 'inward' = 'in' = 'i'
                          % otherwise : 'automatic' = 'natural' = 'auto'
 n_component = []; % 1, 2 or 3
+interface_of = 'bound_bound'; % 'bound_bound', 'bound_face'
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:(nargin-3)/2
@@ -31,22 +33,28 @@ end
 %--------------------------------------------------------------------------
 bface1 = f_boundface(elem1,node,'elem_type',elem_type,n_direction',n_direction);
 bface2 = [];
-if ~isempty(elem2)
-    bface2 = f_boundface(elem2,node,'elem_type',elem_type);
+if any(strcmpi(interface_of,{'bound_bound','b_b','bb'}))
+    if ~isempty(elem2)
+        bface2 = f_boundface(elem2,node,'elem_type',elem_type);
+    end
+elseif any(strcmpi(interface_of,{'bound_face','b_f','bf'}))
+    bface2 = elem2;
+else
+    error([mfilename ': #interface_of must be bound_bound or bound_face !']);
 end
 %--------------------------------------------------------------------------
 if ~isempty(bface2)
-    inter_face = f_intersectvec(bface1,bface2); % with bface{1} as ref
+    inter_face = f_intersectvec(bface1,bface2);
 else
-    inter_face = bface1; % with bface{1} as ref
+    inter_face = bface1;
 end
 %--------------------------------------------------------------------------
 lid_inter_face = [];
 id_bf = [];
 if any(strcmpi(get,{'local_id'}))
-    elem_type = f_elemtype(elem,'defined_on','elem');
-    face = f_face(elem,'elem_type',elem_type);
-    lid_inter_face = f_findvecnd(inter_face,bface1{1}); % with bface{1} as ref
+    elem_type = f_elemtype(elem1,'defined_on','elem');
+    face_list = f_face(elem1,'elem_type',elem_type);
+    lid_inter_face = f_findvecnd(inter_face,face_list); % with face as ref
     id_bf = lid_inter_face;
 end
 %--------------------------------------------------------------------------
@@ -59,11 +67,13 @@ end
 % --- bound with n-decomposition
 if any(strcmpi(get,{'nd','ndec','ndecomposition','n-decomposition'}))
     bf = inter_face;
-    nface = f_chavec(mesh3d.node,inter_face);
+    nface = f_chavec(node,inter_face);
     if isempty(n_component)
         [~,~,inface] = f_unique(nface,'by','strict_value','get','groupsort');
+        addinfo = [];
     elseif isnumeric(n_component)
         [~,inface] = f_groupsort(nface,'group_component',n_component);
+        addinfo = [' by ' n_component '-component'];
     end
     nb_gr = length(inface);
     inter_face = {};
@@ -72,5 +82,10 @@ if any(strcmpi(get,{'nd','ndec','ndecomposition','n-decomposition'}))
         inter_face{i} = bf(:,inface{i});
         lid_inter_face{i} = id_bf(inface{i});
     end
+    %----------------------------------------------------------------------
+    % Add information
+    if any(strcmpi(get,{'info'}))
+        info = [info ' with n-decomposition' addinfo];
+    end
 end
-
+%--------------------------------------------------------------------------

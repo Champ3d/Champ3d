@@ -7,7 +7,7 @@ function [bound_face, lid_bound_face, info] = f_boundface(elem,node,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = f_arglist('elem_type','get','n_direction','n_component');
+arglist = {'elem_type','get','n_direction','n_component'};
 
 % --- default input value
 elem_type = [];
@@ -30,7 +30,8 @@ if isempty(elem_type)
 end
 %------------------------------------------------------------------------
 face = f_face(elem,'elem_type',elem_type);
-[face_in_elem, sign_face_in_elem] = f_faceinelem(elem,node,face,'get','sign');
+[face_in_elem, sign_face_in_elem] = ...
+    f_faceinelem(elem,node,face,'elem_type',elem_type,'get','sign');
 %--------------------------------------------------------------------------
 nb_face = size(face,2);
 %--------------------------------------------------------------------------
