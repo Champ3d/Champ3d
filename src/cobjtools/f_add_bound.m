@@ -23,7 +23,7 @@ if nargin <= 1
     disp('No conductor to add!');
 else
     datin = [];
-    for i = 1:(nargin-1)/2
+    for i = 1:length(varargin)/2
         datin.(varargin{2*i-1}) = varargin{2*i};
         dom3D.bound(iec+1).(varargin{2*i-1}) = varargin{2*i};
     end

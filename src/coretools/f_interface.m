@@ -19,7 +19,7 @@ n_component = []; % 1, 2 or 3
 interface_of = 'bound_bound'; % 'bound_bound', 'bound_face'
 %--------------------------------------------------------------------------
 % --- check and update input
-for i = 1:(nargin-3)/2
+for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else

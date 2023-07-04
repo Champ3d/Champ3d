@@ -28,7 +28,7 @@ position = 1; % index of the dimension
 
 %--------------------------------------------------------------------------
 % --- check and update input
-for i = 1:(nargin-2)/2
+for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
@@ -52,8 +52,8 @@ end
 %--------------------------------------------------------------------------
 [vin, rp, rl] = f_flatvec(vin,'position',position);
 %--------------------------------------------------------------------------
-svin  = f_magicsum(vin,'position',position);
-svref = f_magicsum(vref,'position',position);
+svin  = f_magicsum(vin,'position',1);
+svref = f_magicsum(vref,'position',1);
 %--------------------------------------------------------------------------
 iref = 1:lenref;
 %-----

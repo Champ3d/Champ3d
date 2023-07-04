@@ -13,7 +13,7 @@ fprintf('Refining 2D mesh ... ');
 
 datin = [];
 
-for i = 1:(nargin-1)/2
+for i = 1:length(varargin)/2
     datin.(lower(varargin{2*i-1})) = varargin{2*i};
 end
 

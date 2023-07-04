@@ -15,7 +15,7 @@ function Y = f_postpro3d(mesh,X,field_type,varargin)
 %--------------------------------------------------------------------------
 
 datin = [];
-for i = 1:(nargin-3)/2
+for i = 1:length(varargin)/2
     datin.(lower(varargin{2*i-1})) = varargin{2*i};
 end
 

@@ -13,7 +13,7 @@ if mod(nargin,2) ~= 0
     error([mfilename ': Check function arguments : #node, #elem, #dim, #nb_vertices !']);
 end
 
-for i = 1:(nargin-2)/2
+for i = 1:length(varargin)/2
     eval([varargin{2*i-1} '= varargin{2*i};']);
 end
 

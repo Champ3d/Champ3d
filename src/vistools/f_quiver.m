@@ -18,7 +18,7 @@ if size(node,2) ~= size(vector,2)
     return
 end
 
-for i = 1:(nargin-2)/2
+for i = 1:length(varargin)/2
     eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
 end
 

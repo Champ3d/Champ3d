@@ -21,7 +21,7 @@ nb_step = 1;
 cyclic_move = 0;
 
 % --- check and update input
-for i = 1:(nargin-2)/2
+for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else

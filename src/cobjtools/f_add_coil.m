@@ -85,7 +85,7 @@ if nargin <= 1
 end
 %--------------------------------------------------------------------------
 % --- check and update input
-for i = 1:(nargin-1)/2
+for i = 1:length(varargin)/2
     if strcmpi(varargin{2*i-1},'coil_option')
         coil_option = varargin{2*i};
         c3dobj.coil(iec+1) = f_addtostruct(coil_option,c3dobj.coil(iec+1));
