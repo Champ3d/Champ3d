@@ -68,6 +68,6 @@ for i = 1:nbFa_inEl
     end
 end
 %--------------------------------------------------------------------------
-face_in_elem = f_findvecnd(f,face_list,'position',2);
+face_in_elem = f_findvecnd(f,face_list,'position',1);
 %--------------------------------------------------------------------------
 end

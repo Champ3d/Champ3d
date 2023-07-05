@@ -52,8 +52,8 @@ end
 %--------------------------------------------------------------------------
 [vin, rp, rl] = f_flatvec(vin,'position',position);
 %--------------------------------------------------------------------------
-svin  = f_magicsum(vin,'position',1);
-svref = f_magicsum(vref,'position',1);
+svin  = f_magicsum(vin,'position',position);
+svref = f_magicsum(vref,'position',position);
 %--------------------------------------------------------------------------
 iref = 1:lenref;
 %-----
