@@ -9,6 +9,11 @@ function arglist = f_arglist(arglistcase)
 % --- valid argument list
 
 switch arglistcase
+    case {'add_dom3d','adddom3d','f_add_dom3d'}
+        arglist = {'id_mesh3d','id_dom3d','id_dom2d','id_layer','elem_code', ...
+                   'defined_on','of_dom3d',...
+                   'get','n_direction','n_component'};
+               
     case {'getmeshobj','get_meshobj','f_get_meshobj'}
         arglist = {'id_mesh2d','id_dom2d',...
                    'id_mesh3d','id_dom3d',...
@@ -20,21 +25,28 @@ switch arglistcase
                    'id_tconductor','id_tcapacitor',...
                    'get',...
                    'n_direction','n_component'};
+               
     case {'getedge','get_edge','f_get_edge'}
         arglist = f_arglist('getmeshobj');
+        
     case {'getedgeinelem','get_edge_in_elem','f_get_edge_in_elem'}
         arglist = f_arglist('getmeshobj');
+        
     case {'getedgeinface','get_edge_in_face','f_get_edge_in_face'}
         arglist = f_arglist('getmeshobj');
+        
     case {'getface','get_face','f_get_face'}
         arglist = f_arglist('getmeshobj');
+        
     case {'getfaceinelem','get_face_in_elem','f_get_face_in_elem'}
         arglist = f_arglist('getmeshobj');
+        
     case {'get_bound_face','getboundface','f_get_bound_face'}
         arglist = f_arglist('getmeshobj');
-
-    case {}
-        arglist = {};
+        
+    case {'get_inter_face','getinterface','f_get_inter_face'}
+        arglist = f_arglist('getmeshobj');
+        
     case {}
         arglist = {};
     case {}

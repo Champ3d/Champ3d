@@ -24,29 +24,15 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(elem_type)
-    nbnoinel = size(elem, 1);
-    if any(strcmpi(defined_on,{'elem','el'}))
-        switch nbnoinel
-            case 4
-                elem_type = 'tet';
-            case 6
-                elem_type = 'prism';
-            case 8
-                elem_type = 'hex';
-        end
-    elseif any(strcmpi(defined_on,{'face','fa'}))
-        
-    end
-end
+elem_type = f_elemtype(elem,'defined_on',defined_on);
 %--------------------------------------------------------------------------
 transarg = {'edge_color',edge_color,'face_color',face_color,'alpha_value',alpha_value};
 %--------------------------------------------------------------------------
 switch defined_on
     case {'elem'}
         % ---
-        mshds.node = node;
-        mshds.elem = elem;
+        %mshds.node = node;
+        %mshds.elem = elem;
         %mshds = f_meshds3d(mshds,'output_list','face');
         %mshds = f_get_bound_face(mshds,'elem_type',elem_type);
         % ---
@@ -55,7 +41,7 @@ switch defined_on
         %id_face = reshape(face_in_elem, 1, []);
         %id_face = unique(id_face);
         % ---
-        face = f_get_bound_face(mshds,'elem_type',elem_type);
+        face = f_boundface(elem,node,'elem_type',elem_type);
         id_face = 1:size(face,2);
         % ---
         % 1/ triangle

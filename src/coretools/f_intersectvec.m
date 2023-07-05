@@ -1,4 +1,4 @@
-function vout = f_intersectvec(vin1,vin2,varargin)
+function [vout, ivout] = f_intersectvec(vin1,vin2,varargin)
 % F_FINDVEC returns the idx of vectors in a array of reference vectors
 %--------------------------------------------------------------------------
 % FIXED INPUT
@@ -55,7 +55,7 @@ svin2 = f_magicsum(vin2,'position',position);
 %--------------------------------------------------------------------------
 [~,ivout] = intersect(svin1,svin2);
 %--------------------------------------------------------------------------
-vout = vin1(ivout);
+vout = vin1(:,ivout);
 %--------------------------------------------------------------------------
 
 end

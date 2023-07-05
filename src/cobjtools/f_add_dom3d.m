@@ -7,8 +7,7 @@ function c3dobj = f_add_dom3d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_mesh3d','id_dom3d','id_dom2d','id_layer','elem_code',...
-           'defined_on','of_dom3d','n_direction'};
+arglist = f_arglist('add_dom3d');
 
 % --- default input value
 id_mesh3d = [];
@@ -18,6 +17,9 @@ id_layer = [];
 elem_code = [];
 defined_on = 'elem'; % 'face', 'interface', 'bound_face', 'edge', 'bound_edge'
 of_dom3d = [];
+get = [];
+n_direction = 'outward';
+n_component = []; % 1, 2 or 3
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
@@ -78,28 +80,25 @@ switch defined_on
             %--------------------------------------------------------------
             of_dom3d = f_to_dcellargin(of_dom3d);
             %--------------------------------------------------------------
-            msh.node = c3dobj.mesh3d.(id_mesh3d).node;
-            msh.elem = [];
             domlist  = '';
             for i = 1:length(of_dom3d)
                 for j = 1:length(of_dom3d{i})
-                    msh.elem = [msh.elem ...
-                                c3dobj.mesh3d.(id_mesh3d).elem(:,...
-                                c3dobj.mesh3d.(id_mesh3d).dom3d.(of_dom3d{i}{j}).id_elem)];
                     domlist = [domlist '#' of_dom3d{i}{j} ' '];
                 end
             end
-            msh = f_get_bound_face(msh);
+            [bound_face, lid_bound_face, info] = ...
+                f_get_bound_face(c3dobj,'id_mesh3d',id_mesh3d,'of_dom3d',of_dom3d,...
+                     'get',get,'n_direction',n_direction,'n_component',n_component);
             %--------------------------------------------------------------
             % output
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = {'face',defined_on};
-            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).lid_face = msh.lid_bound_face;
-            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).face = msh.bound_face;
+            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).lid_face = lid_bound_face;
+            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).face = bound_face;
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face = ...
-                f_findvecnd(msh.bound_face, ...
+                f_findvecnd(bound_face, ...
                             c3dobj.mesh3d.(id_mesh3d).face);
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).info = ...
-                           [msh.info ', normal w.r.t dom3d #' domlist];
+                           [info ', normal w.r.t dom3d #' domlist];
             %c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).elem_code = elem_code;
         end
     case {'interface'}
@@ -113,16 +112,17 @@ switch defined_on
                 of_dom3d = f_to_dcellargin(of_dom3d,'forced','on');
             end
             %--------------------------------------------------------------
-            msh.node = c3dobj.mesh3d.(id_mesh3d).node;
-            msh.elem = c3dobj.mesh3d.(id_mesh3d).elem;
-            msh.dom3d = c3dobj.mesh3d.(id_mesh3d).dom3d;
             domlist = ['#' of_dom3d{1}{1}];
-            msh = f_get_inter_face(msh,'of_dom3d',of_dom3d);
+            [inter_face, lid_inter_face, info] = ...
+                f_get_inter_face(c3dobj,'id_mesh3d',id_mesh3d,'of_dom3d',of_dom3d,...
+                     'get',get,'n_direction',n_direction,'n_component',n_component);
             %--------------------------------------------------------------
             % output
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = {'face',defined_on};
-            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face = msh.id_inter_face;
-            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).face = msh.inter_face;
+            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).lid_face = lid_inter_face;
+            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).face = ...
+                f_findvecnd(inter_face, ...
+                            c3dobj.mesh3d.(id_mesh3d).face);
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).info = ...
                            ['interface with outward normal to ' domlist];
         end

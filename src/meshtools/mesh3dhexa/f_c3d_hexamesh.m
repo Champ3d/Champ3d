@@ -124,8 +124,10 @@ c3dobj.mesh3d.(id_mesh3d).nb_elem = nb_elem;
 c3dobj.mesh3d.(id_mesh3d).elem_code = elem_code;
 c3dobj.mesh3d.(id_mesh3d).elem_type = 'hexa';
 %--------------------------------------------------------------------------
-c3dobj.mesh3d.(id_mesh3d).edge = f_get_edge(c3dobj.mesh3d.(id_mesh3d));
-c3dobj.mesh3d.(id_mesh3d).face = f_get_face(c3dobj.mesh3d.(id_mesh3d));
+c3dobj.mesh3d.(id_mesh3d).edge = f_edge(c3dobj.mesh3d.(id_mesh3d).elem, ...
+                            'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
+c3dobj.mesh3d.(id_mesh3d).face = f_face(c3dobj.mesh3d.(id_mesh3d).elem, ...
+                            'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
 %--------------------------------------------------------------------------
 % --- Log message
 fprintf(' --- in %.2f s \n',toc);

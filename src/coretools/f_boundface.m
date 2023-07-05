@@ -11,7 +11,7 @@ arglist = {'elem_type','get','n_direction','n_component'};
 
 % --- default input value
 elem_type = [];
-get = []; % 'ndecomposition' = 'ndec' = 'n-decomposition'
+get = []; % 'ndecomposition' = 'ndec' = 'n-decomposition',
 n_direction = 'outward'; % 'outward' = 'out' = 'o', 'inward' = 'in' = 'i'
                          %  otherwise : 'automatic' = 'natural' = 'auto'
 n_component = []; % 1, 2 or 3
@@ -76,10 +76,7 @@ if any(strcmpi(get,{'local_id'}))
 end
 %--------------------------------------------------------------------------
 % Add information
-info = [];
-if any(strcmpi(get,{'info'}))
-    info = ['bound_face with ' n_direction '-normal'];
-end
+info = ['bound_face with ' n_direction '-normal'];
 %--------------------------------------------------------------------------
 % --- bound with n-decomposition
 if any(strcmpi(get,{'ndec','ndecomposition','n-decomposition'}))
@@ -103,7 +100,5 @@ if any(strcmpi(get,{'ndec','ndecomposition','n-decomposition'}))
     end
     %----------------------------------------------------------------------
     % Add information
-    if any(strcmpi(get,{'info'}))
-        info = [info ' with n-decomposition' addinfo];
-    end
+    info = [info ' with n-decomposition' addinfo];
 end

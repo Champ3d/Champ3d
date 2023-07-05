@@ -1,4 +1,4 @@
-function [inter_face, lid_inter_face] = f_get_inter_face(mesh3d,varargin)
+function [inter_face, lid_inter_face, info] = f_get_inter_face(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,15 +7,15 @@ function [inter_face, lid_inter_face] = f_get_inter_face(mesh3d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem_type','of_dom3d','get','n_component','n_direction'};
+arglist = f_arglist('get_inter_face');
 
 % --- default input value
-elem_type = [];
-get = []; % 'ndecomposition' = 'ndec' = 'n-decomposition'
+id_mesh3d = [];
 of_dom3d = [];
-n_component = [];
+get = []; % 'ndecomposition' = 'ndec' = 'n-decomposition'
 n_direction = 'outward'; % 'outward' = 'out' = 'o', 'inward' = 'in' = 'i'
-                         % otherwise : 'automatic' = 'natural' = 'auto'
+                         %  otherwise : 'automatic' = 'natural' = 'auto'
+n_component = []; % 1, 2 or 3
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -26,74 +26,56 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(elem_type) && isfield(mesh3d,'elem_type')
-    elem_type = mesh3d.elem_type;
+if isempty(id_mesh3d)
+    id_mesh3d = fieldnames(c3dobj.mesh3d);
+    id_mesh3d = id_mesh3d{1};
 end
 %--------------------------------------------------------------------------
-if isempty(elem_type) && isfield(mesh3d,'elem_type')
-    elem_type = mesh3d.elem_type;
+if isempty(id_mesh3d)
+    error([mfilename ': no mesh3d found !']);
+else
+    mesh3d = c3dobj.mesh3d.(id_mesh3d);
 end
-%--------------------------------------------------------------------------
-if isempty(elem_type)
-    nbnoinel = size(mesh3d.elem, 1);
-    switch nbnoinel
-        case 4
-            elem_type = 'tet';
-        case 6
-            elem_type = 'prism';
-        case 8
-            elem_type = 'hex';
-    end
-    fprintf(['Get interface for ' elem_type ' mesh \n']);
-end
-%--------------------------------------------------------------------------
-if isempty(elem_type)
-    error([mfilename ' : #elem_type must be given !']);
-end
-%--------------------------------------------------------------------------
-con = f_connexion(elem_type);
-nbFa_inEl = con.nbFa_inEl;
 %--------------------------------------------------------------------------
 of_dom3d = f_to_dcellargin(of_dom3d,'forced','on');
-%--------------------------------------------------------------------------
-node = mesh3d.node;
-elem = {};
-for i = length(of_dom3d)
-    elem{i} = [];
-    for j = 1:length(of_dom3d{i})
-        elem{i} = [elem{i} ...
-                   mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}{j}).id_elem)];
-    end
+domlist  = '';
+for j = 1:length(of_dom3d{1})
+    domlist = [domlist '#' of_dom3d{1}{j} ' '];
 end
 %--------------------------------------------------------------------------
+bound_face = {};
+lid_bound_face = {};
 for i = 1:length(of_dom3d)
-    msh = [];
-    msh.node = mesh3d.node;
-    id3d = i;
-    if id3d > 2; id3d = 2; end
-    msh.elem = [];
+    bound_face{i} = [];
+    lid_bound_face{i} = [];
     for j = 1:length(of_dom3d{i})
-        msh.elem = [msh.elem  mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}{j}).id_elem)];
+        [bf, lid_bf] = ...
+            f_get_bound_face(c3dobj,'id_mesh3d',id_mesh3d,'of_dom3d',of_dom3d{i}{j},...
+              'get',get,'n_direction',n_direction,'n_component',n_component);
+        bound_face{i} = [bound_face{i} bf];
+        if i == 1
+            lid_bound_face{i} = [lid_bound_face{i} lid_bf];
+            info = ['inter_face with ' n_direction '-normal to ' domlist];
+        end
     end
-     msh = f_get_bound_face(msh,'n_direction',n_direction);
-     bface{id3d} = msh.bound_face;
-     id_bface{id3d} = msh.idl_bound_face;
 end
-lid_inter_face = f_findvecnd(bface{2},bface{1});
-[lid_inter_face,id_bfof1] = intersect(id_bface{1},id_bface{2});
-inter_face = bface{1}(:,id_bfof1);
-
+%--------------------------------------------------------------------------
+[inter_face,lid_inter_face] = f_intersectvec(bound_face{1},bound_face{2});
+%lid_inter_face = f_findvecnd(inter_face,bface{1});
+%[lid_inter_face,id_bfof1] = intersect(id_bface{1},id_bface{2});
 
 %--------------------------------------------------------------------------
 % --- bound with n-decomposition
 if any(strcmpi(get,{'nd','ndec','ndecomposition','n-decomposition'}))
     bf = inter_face;
     id_bf = lid_inter_face;
-    nface = f_chavec(mesh3d.node,inter_face);
+    nface = f_chavec(c3dobj.mesh3d.(id_mesh3d).node,inter_face);
     if isempty(n_component)
         [~,~,inface] = f_unique(nface,'by','strict_value','get','groupsort');
+        addinfo = [];
     elseif isnumeric(n_component)
         [~,inface] = f_groupsort(nface,'group_component',n_component);
+        addinfo = [' by ' n_component '-component'];
     end
     nb_gr = length(inface);
     inter_face = {};
@@ -102,5 +84,28 @@ if any(strcmpi(get,{'nd','ndec','ndecomposition','n-decomposition'}))
         inter_face{i} = bf(:,inface{i});
         lid_inter_face{i} = id_bf(inface{i});
     end
+    %----------------------------------------------------------------------
+    % Add information
+    info = [info ' with n-decomposition' addinfo];
 end
+%--------------------------------------------------------------------------
+% for i = 1:length(of_dom3d)
+%     msh = [];
+%     msh.node = mesh3d.node;
+%     id3d = i;
+%     if id3d > 2; id3d = 2; end
+%     msh.elem = [];
+%     for j = 1:length(of_dom3d{i})
+%         msh.elem = [msh.elem  mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}{j}).id_elem)];
+%     end
+%      msh = f_get_bound_face(msh,'n_direction',n_direction);
+%      bface{id3d} = msh.bound_face;
+%      id_bface{id3d} = msh.idl_bound_face;
+% end
+% lid_inter_face = f_findvecnd(bface{2},bface{1});
+% [lid_inter_face,id_bfof1] = intersect(id_bface{1},id_bface{2});
+% inter_face = bface{1}(:,id_bfof1);
+
+
+
 
