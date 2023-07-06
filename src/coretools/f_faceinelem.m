@@ -41,7 +41,7 @@ siFa_inEl = con.siFa_inEl;
 nbElem = size(elem,2);
 %--------------------------------------------------------------------------
 
-if any(elem_type,{'tri','quad','triangle'})
+if any(strcmpi(elem_type,{'tri','quad','triangle'}))
     %----------------------------------------------------------------------
     f = reshape([elem(FaNo_inEl(:,1),:); elem(FaNo_inEl(:,2),:)], ...
                  nbFa_inEl, nbNo_inFa, nbElem);
