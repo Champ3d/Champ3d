@@ -1,4 +1,4 @@
-function [id_edge_in_elem, ori_edge_in_elem] = f_edgeinelem(elem,edge_list,varargin)
+function [id_edge_in_elem, ori_edge_in_elem, sign_edge_in_elem] = f_edgeinelem(elem,edge_list,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -13,6 +13,10 @@ arglist = {'elem_type','get'};
 elem_type = [];
 get = [];
 
+% --- default output value
+id_edge_in_elem = [];
+ori_edge_in_elem = [];
+sign_edge_in_elem = [];
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -37,7 +41,6 @@ nbElem = size(elem,2);
 e = reshape([elem(EdNo_inEl(:,1),:); elem(EdNo_inEl(:,2),:)], ...
              nbEd_inEl, nbNo_inEd, nbElem);
 % ---
-ori_edge_in_elem = [];
 if any(strcmpi(get,{'topo','ori','orientation'}))
     ori_edge_in_elem = squeeze(sign(diff(e, 1, 2))); % with unsorted e !
 end
@@ -46,4 +49,9 @@ e = sort(e, 2);
 %--------------------------------------------------------------------------
 id_edge_in_elem = f_findvecnd(e,edge_list,'position',2);
 %--------------------------------------------------------------------------
+if any(elem_type,{'tri','quad'})
+
+end
+
+
 end

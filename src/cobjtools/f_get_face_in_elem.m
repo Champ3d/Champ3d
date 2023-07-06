@@ -1,4 +1,4 @@
-function [face_in_elem, sign_face_in_elem, ori_face_in_elem] = f_get_face_in_elem(c3dobj,varargin)
+function [face_in_elem, ori_face_in_elem, sign_face_in_elem] = f_get_face_in_elem(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -65,7 +65,7 @@ end
 %--------------------------------------------------------------------------
 elem_type = f_elemtype(elem,'defined_on',defined_on);
 %--------------------------------------------------------------------------
-[face_in_elem, sign_face_in_elem, ori_face_in_elem] = ...
+[face_in_elem, ori_face_in_elem, sign_face_in_elem] = ...
     f_faceinelem(elem,node,face_list,'elem_type',elem_type,'get',get);
 %--------------------------------------------------------------------------
 

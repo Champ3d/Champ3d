@@ -1,4 +1,4 @@
-function [face_in_elem, sign_face_in_elem, ori_face_in_elem] = f_faceinelem(elem,node,face_list,varargin)
+function [face_in_elem, ori_face_in_elem, sign_face_in_elem] = f_faceinelem(elem,node,face_list,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
