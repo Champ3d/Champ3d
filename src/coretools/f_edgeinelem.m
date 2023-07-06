@@ -14,7 +14,7 @@ elem_type = [];
 get = [];
 
 % --- default output value
-id_edge_in_elem = [];
+%id_edge_in_elem = [];
 ori_edge_in_elem = [];
 sign_edge_in_elem = [];
 %--------------------------------------------------------------------------
@@ -43,15 +43,13 @@ e = reshape([elem(EdNo_inEl(:,1),:); elem(EdNo_inEl(:,2),:)], ...
 % ---
 if any(strcmpi(get,{'topo','ori','orientation'}))
     ori_edge_in_elem = squeeze(sign(diff(e, 1, 2))); % with unsorted e !
+    if any(elem_type,{'tri','quad','triangle'})
+        sign_edge_in_elem = ori_edge_in_elem .* con.siEd_inEl.';
+    end
 end
 % ---
 e = sort(e, 2);
 %--------------------------------------------------------------------------
 id_edge_in_elem = f_findvecnd(e,edge_list,'position',2);
 %--------------------------------------------------------------------------
-if any(elem_type,{'tri','quad'})
-
-end
-
-
 end

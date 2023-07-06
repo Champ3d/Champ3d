@@ -12,7 +12,7 @@ flag = ones(1,size(elem,2));
 if size(elem,1) < 2
     return
 elseif size(elem,1) == 2
-    elem = sort(elem);
+    elem = sort(elem); % for 2d
     flag(:) = 1;
 else
     elem(elem == 0) = [];
