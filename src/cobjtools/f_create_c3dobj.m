@@ -23,6 +23,12 @@ end
 
 %--------------------------------------------------------------------------
 c3dobj.config.project_path = project_path;
+%--------------------------------------------------------------------------
+c3dobj.mesh1d = [];
+c3dobj.mesh2d = [];
+c3dobj.mesh3d = [];
+c3dobj.em_design3d = [];
+c3dobj.th_design3d = [];
 
 
 end

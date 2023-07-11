@@ -10,7 +10,7 @@ function f_save_c3dobj(c3dobj,varargin)
 arglist = f_arglist('save_c3dobj');
 
 % --- default input value
-options = [];
+options = 'minimum';
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -22,7 +22,12 @@ for i = 1:length(varargin)/2
 end
 
 %--------------------------------------------------------------------------
-
-
+fname = [c3dobj.config.project_path '/c3dobj.mat'];
+%--------------------------------------------------------------------------
+if any(strcmpi(options,{'minimum'}))
+    save(fname,'c3dobj','-v7.3');
+elseif any(strcmpi(options,{'full'}))
+    save(fname,'c3dobj','-v7.3');
+end
 
 end
