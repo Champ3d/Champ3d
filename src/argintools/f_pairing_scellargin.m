@@ -15,22 +15,18 @@ argin2p = [];
 argin1 = f_to_scellargin(argin1);
 argin2 = f_to_scellargin(argin2);
 %--------------------------------------------------------------------------
-if ~iscell(argin1) || ~iscell(argin2)
-    error([mfilename ' : #argin1, #argin2 msut be cell !']);
-end
-%--------------------------------------------------------------------------
 if length(argin1) > 1 && length(argin2) > 1
     % cannot pairing, return the same
     argin1p = argin1;
     argin2p = argin2;
 end
 %--------------------------------------------------------------------------
-if length(argin1) > 1
+if length(argin1) > 1 && length(argin2) == 1
     argin1p = argin1;
     for i = 1:length(argin1)
         argin2p{i} = argin2{1};
     end
-elseif length(argin2) > 1
+elseif length(argin2) > 1 && length(argin1) == 1
     argin2p = argin2;
     for i = 1:length(argin2)
         argin1p{i} = argin1{1};
