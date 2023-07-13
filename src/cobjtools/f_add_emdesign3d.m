@@ -7,11 +7,13 @@ function c3dobj = f_add_emdesign3d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_mesh3d','id_emdesign3d'};
+arglist = {'id_mesh3d','id_emdesign3d','model_type','frequency'};
 
 % --- default input value
 id_mesh3d = [];
 id_emdesign3d = [];
+model_type = 'frequency_domain'; % frequency_domain = fr_domain, time_domain = t_domain
+frequency = 0;
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -34,7 +36,10 @@ if isempty(id_emdesign3d)
 end
 
 %--------------------------------------------------------------------------
-c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d = id_mesh3d;
+c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d  = id_mesh3d;
+c3dobj.emdesign3d.(id_emdesign3d).model_type = model_type;
+c3dobj.emdesign3d.(id_emdesign3d).frequency  = frequency;
+
 % --- Log message
 if iscell(id_mesh3d)
     fprintf(['Add emdesign3d #' id_emdesign3d ' with mesh3d #' strjoin(id_mesh3d,', #') '\n']);

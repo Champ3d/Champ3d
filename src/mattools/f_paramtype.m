@@ -12,14 +12,25 @@ if isa(param,'numeric')
     else
         paramtype = 'num_iso_array';
     end
+elseif isa(param,'struct')
+    % ---------------------------------------------------------------------
+    if isfield(param,'main_value') && isfield(param,'main_dir')
+        
+    % ---------------------------------------------------------------------
+    elseif isfield(param,'f') && ~isfield(param,'main_value')
+        if isa(param.f,'function_handle')
+            paramtype = 'fun_iso_array';
+        end
+    end
+    % ---------------------------------------------------------------------
 elseif isa(param,'function_handle')
     paramtype = 'fun_iso_array';
 elseif isa(param,'struct')
-    paramtype = 'num_aniso_coef';
+    paramtype = 'num_tensor_coef';
     paramconfig = fieldnames(param);
     for i = 1:length(paramconfig)
         if isa(param.(paramconfig),'function_handle')
-            paramtype = 'fun_aniso_array';
+            paramtype = 'fun_tensor_array';
             break;
         end
     end

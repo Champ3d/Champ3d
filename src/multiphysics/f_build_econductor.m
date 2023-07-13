@@ -40,26 +40,28 @@ for iem3d = 1:length(id_emdesign3d)
     end
     for iec = 1:length(id_econductor)
         %------------------------------------------------------------------
-        fprintf(['Building econ ' id_econductor{iec}]);
+        fprintf(['Building econ ' id_econductor{iec} 'for emdesign3d #' id_emdesign3d{iem3d}]);
         tic;
         %------------------------------------------------------------------
-        econ = c3dobj.emdesign3d.(id_emdesign3d{iem3d}).econductor.(id_econductor{iec});
+        phydomobj = c3dobj.emdesign3d.(id_emdesign3d{iem3d}).econductor.(id_econductor{iec});
         %------------------------------------------------------------------
-        sig = econ.sigma;
-        param_type = f_paramtype(sig);
+        param_type = f_paramtype(phydomobj.sig);
+        parameter  = 'sigma';
         %------------------------------------------------------------------
         switch param_type
             case {'num_iso_coef'}
             case {'num_iso_array'}
             case {'fun_iso_array'}
-            case {'num_aniso_coef'}
-            case {'fun_aniso_array'}
-                ltensor.main_value = f_callparameter(c3dobj,sig.main_value,'id_elem',IDElem);
-                ltensor.ort1_value = f_callparameter(c3dobj,sig.ort1_value,'id_elem',IDElem);
-                ltensor.ort2_value = f_callparameter(c3dobj,sig.ort2_value,'id_elem',IDElem);
-                ltensor.main_dir   = f_callparameter(c3dobj,sig.main_dir,'id_elem',IDElem);
-                ltensor.ort1_dir   = f_callparameter(c3dobj,sig.ort1_dir,'id_elem',IDElem);
-                ltensor.ort2_dir   = f_callparameter(c3dobj,sig.ort2_dir,'id_elem',IDElem);
+            case {'num_tensor_coef'}
+            case {'fun_tensor_array'}
+                %ltensor.main_value = f_callparameter(c3dobj,'phydomobj',phydomobj,'parameter','sigma');
+                %ltensor.ort1_value = f_callparameter(c3dobj,'phydomobj',phydomobj,'parameter','sigma');
+                %ltensor.ort2_value = f_callparameter(c3dobj,'phydomobj',phydomobj,'parameter','sigma');
+                %ltensor.main_dir   = f_callparameter(c3dobj,'phydomobj',phydomobj,'parameter','sigma');
+                %ltensor.ort1_dir   = f_callparameter(c3dobj,'phydomobj',phydomobj,'parameter','sigma');
+                %ltensor.ort2_dir   = f_callparameter(c3dobj,'phydomobj',phydomobj,'parameter','sigma');
+                ltensor = f_callparameter(c3dobj,'phydomobj',phydomobj,...
+                              'parameter',parameter,'param_type',param_type);
                 gtensor = f_gtensor(ltensor);
         end
         %------------------------------------------------------------------
