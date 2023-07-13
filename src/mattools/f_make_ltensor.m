@@ -1,4 +1,4 @@
-function gtensor = f_make_gtensor(varargin)
+function gtensor = f_make_ltensor(varargin)
 % Allow to build a tensor from parameters with different dependency.
 % type
 % value

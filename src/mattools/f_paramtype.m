@@ -1,4 +1,7 @@
 function paramtype = f_paramtype(param)
+% F_PARAMTYPE
+% For use with single parameter.
+% Refer to f_coeftype to check physical behavior coefficient type.
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -6,32 +9,19 @@ function paramtype = f_paramtype(param)
 % Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
 
+paramtype = [];
+
 if isa(param,'numeric')
-    if numel(param) == 1
-        paramtype = 'num_iso_coef';
-    else
-        paramtype = 'num_iso_array';
-    end
-elseif isa(param,'struct')
+    paramtype = 'numeric';
+elseif isa(param,'struct') 
     % ---------------------------------------------------------------------
-    if isfield(param,'main_value') && isfield(param,'main_dir')
-        
-    % ---------------------------------------------------------------------
-    elseif isfield(param,'f') && ~isfield(param,'main_value')
+    if isfield(param,'f')
         if isa(param.f,'function_handle')
-            paramtype = 'fun_iso_array';
+            paramtype = 'function';
         end
     end
-    % ---------------------------------------------------------------------
-elseif isa(param,'function_handle')
-    paramtype = 'fun_iso_array';
-elseif isa(param,'struct')
-    paramtype = 'num_tensor_coef';
-    paramconfig = fieldnames(param);
-    for i = 1:length(paramconfig)
-        if isa(param.(paramconfig),'function_handle')
-            paramtype = 'fun_tensor_array';
-            break;
-        end
-    end
+else
+    fprintf('param = \n');
+    disp(param);
+    error([mfilename ': the parameter is not valid ! Use f_make_parameter !']);
 end

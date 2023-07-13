@@ -18,7 +18,7 @@ id_design3d = [];
 dom_type  = [];
 id_dom    = [];
 phydomobj = [];
-parameter = [];
+coefficient = [];
 parameter_type = [];
 
 % --- default output value
@@ -41,16 +41,16 @@ if isempty(phydomobj)
     end
 end
 %--------------------------------------------------------------------------
-paramstruct = phydomobj.(parameter);
+coef = phydomobj.(coefficient);
 %--------------------------------------------------------------------------
 if isempty(parameter_type)
-    if isfield(paramstruct,'main_value') && isfield(paramstruct,'main_dir')
+    if isfield(coef,'main_value') && isfield(coef,'main_dir')
         parameter_type = 'tensor';
     end
 end
 %--------------------------------------------------------------------------
-if ~isstruct(paramstruct)
-    error([mfilename ': #' parameter ' is not valid ! Use f_make_parameter !']);
+if ~isstruct(coef)
+    error([mfilename ': #' coefficient ' is not valid ! Use f_make_parameter !']);
 end
 % if ~isa(param.f,'function_handle')
 %     error([mfilename ': #' parameter '.f must be a function_handle ! Use f_make_parameter !']);
@@ -61,7 +61,7 @@ id_dom3d  = phydomobj.id_dom3d;
 id_elem   = c3dobj.mesh3d.(id_mesh3d).(id_dom3d).id_elem;
 nbElem    = length(id_elem);
 %--------------------------------------------------------------------------
-paramfields = fieldnames(phydomobj.(parameter));
+paramfields = fieldnames(phydomobj.(coefficient));
 %--------------------------------------------------------------------------
 for ipf = 1:length(paramfields)
 %--------------------------------------------------------------------------
