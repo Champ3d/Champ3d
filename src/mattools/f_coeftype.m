@@ -38,12 +38,15 @@ if isa(coef,'numeric')
 elseif isa(coef,'struct')
     % ---------------------------------------------------------------------
     if isfield(coef,'main_value') && isfield(coef,'main_dir')
-        coeftype = 'numeric_ltensor_value';
         paramconfig = fieldnames(coef);
         for i = 1:length(paramconfig)
-            if isa(coef.(paramconfig),'function_handle')
-                coeftype = 'function_ltensor_array';
-                break;
+            paramtype = f_paramtype(coef.(paramconfig{i}));
+            switch paramtype
+                case {'function'}
+                    coeftype = 'function_ltensor_array';
+                    break;
+                case {'numeric'}
+                    coeftype = 'numeric_ltensor_value';
             end
         end
     % ---------------------------------------------------------------------

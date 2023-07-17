@@ -1,5 +1,6 @@
 function gtensor = f_gtensor(ltensor)
 % F_GTENSOR returns the tensors of physical property in global coordinates.
+% o-- ltensor must be numeric
 %--------------------------------------------------------------------------
 % FIXED INPUT
 % ltensor : array of local tensor structure in local coordinates.

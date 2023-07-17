@@ -1,4 +1,4 @@
-function p_value = f_callparameter(c3dobj,varargin)
+function p_value = f_callcoefficient(c3dobj,varargin)
 % F_CALLPARAMETER calculates and returns parameter value according to its dependency.
 % p_value : array of values of the parameter computed for each element
 %--------------------------------------------------------------------------

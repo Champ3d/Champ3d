@@ -1,7 +1,8 @@
 function paramtype = f_paramtype(param)
 % F_PARAMTYPE
-% For use with single parameter.
-% Refer to f_coeftype to check physical behavior coefficient type.
+% o-- param must be single parameter.
+% r-- use f_make_parameter to make single param with dependency
+% l-- Refer to f_coeftype to check physical behavior coefficient type.
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'

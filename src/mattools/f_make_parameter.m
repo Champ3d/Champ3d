@@ -25,13 +25,13 @@ function parameter = f_make_parameter(varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'f','depend_on','from','id_design3d'};
+arglist = {'f','depend_on','from','id_cobj'};
 
 % --- default input value
 f = [];
 depend_on = [];
 from = [];
-id_design3d = [];
+id_cobj = [];
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -82,21 +82,21 @@ switch ptype
         %    id_design3d = f_to_scellargin(id_design3d);
         %end
         %------------------------------------------------------------------
-        id_design3d = f_to_scellargin(id_design3d);
+        id_cobj = f_to_scellargin(id_cobj);
         %------------------------------------------------------------------
         while ((length(depend_on) ~= length(from)) || ...
-               (length(depend_on) ~= length(id_design3d)) || ...
-               (length(from) ~= length(id_design3d)))
+               (length(depend_on) ~= length(id_cobj)) || ...
+               (length(from) ~= length(id_cobj)))
             [depend_on,from] = f_pairing_scellargin(depend_on,from);
-            [id_design3d,from] = f_pairing_scellargin(id_design3d,from);
-            [id_design3d,depend_on] = f_pairing_scellargin(id_design3d,depend_on);
+            [id_cobj,from] = f_pairing_scellargin(id_cobj,from);
+            [id_cobj,depend_on] = f_pairing_scellargin(id_cobj,depend_on);
         end
 end
 %--------------------------------------------------------------------------
 % --- Output
 parameter.f = f;
-parameter.design3d = from;
-parameter.id_design3d = id_design3d;
+parameter.from = from;
+parameter.id_cobj = id_cobj;
 parameter.field = depend_on;
 
 
