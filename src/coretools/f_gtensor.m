@@ -37,7 +37,7 @@ function gtensor = f_gtensor(ltensor)
 %--------------------------------------------------------------------------
 
 % --- default output value
-gtensor = zeros(3,3,length(ltensor.main_value));
+gtensor = zeros(length(ltensor.main_value),3,3);
 
 for iten = 1:length(ltensor.main_value)
 
@@ -49,7 +49,7 @@ for iten = 1:length(ltensor.main_value)
     ort1_dir = ltensor.ort1_dir(iten,:);
     ort2_dir = ltensor.ort2_dir(iten,:);
 
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     % local coordinates system
     tensor = [main_value 0           0; ...
                0          ort1_value  0; ...
@@ -59,13 +59,13 @@ for iten = 1:length(ltensor.main_value)
     liy = [0 1 0];
     liz = [0 0 1];
     lcoor = [lix; liy; liz];
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     % global coordinates system
     gix = main_dir./norm(main_dir);
     giy = ort1_dir./norm(ort1_dir);
     giz = ort2_dir./norm(ort2_dir);
     gcoor = [gix; giy; giz];
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     % transformation matrix local --> global
     TM = zeros(3,3);
     for i = 1:3
@@ -73,14 +73,8 @@ for iten = 1:length(ltensor.main_value)
             TM(i,j) = dot(gcoor(i,:),lcoor(j,:));
         end
     end
-
-    gtensor(:,:,iten) = TM' * tensor * TM;
-
+    %----------------------------------------------------------------------
+    gtensor(iten,:,:) = reshape(TM' * tensor * TM, 1, 3, 3);
+    %----------------------------------------------------------------------
 end
-
-% if length(ltensor.main_value) == 1
-%     gtensor(:,:) = TM' * ltensor * TM;
-% else
-%     gtensor(:,:,iten) = TM' * ltensor * TM;
-% end
 

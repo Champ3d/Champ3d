@@ -40,21 +40,30 @@ for iem3d = 1:length(id_emdesign3d)
     end
     for iec = 1:length(id_econductor)
         %------------------------------------------------------------------
-        fprintf(['Building econ ' id_econductor{iec} 'for emdesign3d #' id_emdesign3d{iem3d}]);
-        tic;
+        formulation = c3dobj.emdesign3d.(id_emdesign3d{iem3d}).formulation;
+        model_type  = c3dobj.emdesign3d.(id_emdesign3d{iem3d}).model_type;
         %------------------------------------------------------------------
-        phydomobj = c3dobj.emdesign3d.(id_emdesign3d{iem3d}).econductor.(id_econductor{iec});
-        %------------------------------------------------------------------
-        coef_name  = 'sigma';
-        %------------------------------------------------------------------
-        coef = f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
-                                           'coefficient',coef_name);
-        sigwewe = 
-        %------------------------------------------------------------------
-        % --- Output
-        c3dobj.emdesign3d.(id_emdesign3d{iem3d}).econductor.(id_econductor{iec}).aphi.sigwewe = sigwewe;
-        % --- Log message
-        fprintf(' --- in %.2f s \n',toc);
+        fprintf(['Building econ ' id_econductor{iec} ...
+                 ' in emdesign3d #' id_emdesign3d{iem3d} ...
+                 ' for ' formulation]);
+        switch formulation
+            case {'aphi'}
+                tic;
+                %------------------------------------------------------------------
+                phydomobj = c3dobj.emdesign3d.(id_emdesign3d{iem3d}).econductor.(id_econductor{iec});
+                %------------------------------------------------------------------
+                coef_name  = 'sigma';
+                %------------------------------------------------------------------
+                sigwewe = f_cwewe(c3dobj,'phydomobj',phydomobj,...
+                                         'coefficient',coef_name);
+                %------------------------------------------------------------------
+                % --- Output
+                c3dobj.emdesign3d.(id_emdesign3d{iem3d}).econductor.(id_econductor{iec}).aphi.sigwewe = sigwewe;
+                % --- Log message
+                fprintf(' --- in %.2f s \n',toc);
+            case {'tome'}
+                % TODO
+        end
     end
 end
 

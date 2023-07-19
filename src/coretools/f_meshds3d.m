@@ -12,7 +12,7 @@ arglist = {'elem_type','get'};
 
 % --- default input value
 elem_type = [];
-get = 'all'; % 'cnode' = 'center', 'edge', 'face', 'bound', 'interface'
+get = '_all'; % 'cnode' = 'center', 'edge', 'face', 'bound', 'interface'
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -55,24 +55,24 @@ fprintf('Making meshds3d');
 
 %--------------------------------------------------------------------------
 %----- barrycenter
-if any(strcmpi(get,{'all', 'cnode','center'}))
+if any(strcmpi(get,{'_all', 'cnode','center'}))
     con = f_connexion(elem_type);
     nbNo_inEl = con.nbNo_inEl;
     mesh3d.celem = squeeze(mean(reshape(mesh3d.node(:,mesh3d.elem(1:nbNo_inEl,:)),3,nbNo_inEl,size(mesh3d.elem,2)),2));
 end
 
 %----- edges
-if any(strcmpi(get,{'all', 'edge'}))
+if any(strcmpi(get,{'_all', 'edge'}))
     mesh3d = f_get_edge(mesh3d,'elem_type',mesh3d.elem_type);
 end
 
 %----- faces
-if any(strcmpi(get,{'all', 'face'}))
+if any(strcmpi(get,{'_all', 'face'}))
     mesh3d = f_get_face(mesh3d,'elem_type',mesh3d.elem_type);
 end
 
 %----- D
-if any(strcmpi(get,{'all', 'D', 'Div'}))
+if any(strcmpi(get,{'_all', 'D', 'Div'}))
     % ---
     if ~all(isfield(mesh3d,{'face'}))
         mesh3d = f_get_face(mesh3d,'elem_type',mesh3d.elem_type);
@@ -96,7 +96,7 @@ if any(strcmpi(get,{'all', 'D', 'Div'}))
 end
 
 %----- R
-if any(strcmpi(get,{'all', 'R', 'Rot', 'Curl'}))
+if any(strcmpi(get,{'_all', 'R', 'Rot', 'Curl'}))
     % ---
     if ~all(isfield(mesh3d,{'edge'}))
         mesh3d = f_get_edge(mesh3d,'elem_type',mesh3d.elem_type);
@@ -134,7 +134,7 @@ if any(strcmpi(get,{'all', 'R', 'Rot', 'Curl'}))
 end
 
 %----- G
-if any(strcmpi(get,{'all', 'G', 'Grad', 'Gradient'}))
+if any(strcmpi(get,{'_all', 'G', 'Grad', 'Gradient'}))
     if ~all(isfield(mesh3d,{'node','edge','edge_in_face','sign_edge_in_face'}))
         mesh3d = f_get_edge(mesh3d,'elem_type',mesh3d.elem_type);
         mesh3d = f_get_face(mesh3d,'elem_type',mesh3d.elem_type);

@@ -64,6 +64,7 @@ switch coeftype
         coef_array_type  = 'iso_array';
     case {'numeric_gtensor_value'}
         coef_array = reshape(repmat(coef,1,nb_elem),3,3,nb_elem);
+        coef_array = permute(coef_array,[3 1 2]);
         coef_array_type  = 'tensor_array';
     case {'numeric_gtensor_array'}
         coef_array = coef;
