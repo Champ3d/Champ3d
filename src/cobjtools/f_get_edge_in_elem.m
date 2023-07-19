@@ -1,4 +1,4 @@
-function [edge_in_elem, ori_edge_in_elem] = f_get_edge_in_elem(c3dobj,varargin)
+function [edge_in_elem, ori_edge_in_elem, sign_edge_in_elem] = f_get_edge_in_elem(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -64,7 +64,7 @@ end
 %--------------------------------------------------------------------------
 elem_type = f_elemtype(elem,'defined_on',defined_on);
 %--------------------------------------------------------------------------
-[edge_in_elem, ori_edge_in_elem] = ...
+[edge_in_elem, ori_edge_in_elem, sign_edge_in_elem] = ...
     f_edgeinelem(elem,edge_list,'elem_type',elem_type,'get',get);
 %--------------------------------------------------------------------------
 % --- Outputs

@@ -11,16 +11,17 @@ arglist = {'elem_type','get'};
 
 % --- default input value
 elem_type = [];
-get = [];
+get = '_all';
 
 % --- default ouput value
+id_face_in_elem   = [];
 sign_face_in_elem = [];
 ori_face_in_elem  = [];
 
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:length(varargin)/2
-    if any(strcmpi(arglist,varargin{2*i-1}))
+    if any(f_strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
@@ -41,16 +42,16 @@ siFa_inEl = con.siFa_inEl;
 nbElem = size(elem,2);
 %--------------------------------------------------------------------------
 
-if any(strcmpi(elem_type,{'tri','quad','triangle'}))
+if any(f_strcmpi(elem_type,{'tri','quad','triangle'}))
     %----------------------------------------------------------------------
     f = reshape([elem(FaNo_inEl(:,1),:); elem(FaNo_inEl(:,2),:)], ...
                  nbFa_inEl, nbNo_inFa, nbElem);
     % ---
-    if any(strcmpi(get,{'topo','ori','orientation'}))
+    if any(f_strcmpi(get,{'_all','topo','ori','orientation'}))
         ori_face_in_elem = squeeze(sign(diff(f, 1, 2))); % with unsorted e !
         
     end
-    if any(strcmpi(get,{'topo','sign','si'}))
+    if any(f_strcmpi(get,{'_all','topo','sign','si'}))
         sign_face_in_elem = ori_face_in_elem .* siFa_inEl.';
     end
     % ---
@@ -60,12 +61,12 @@ else
     maxnbNo_inFa = max(nbNo_inFa);
     f = zeros(nbFa_inEl,maxnbNo_inFa,nbElem);
     %---
-    if any(strcmpi(get,{'topo','sign','si'}))
+    if any(f_strcmpi(get,{'_all','topo','sign','si'}))
         celem = mean(reshape(node(:,elem(1:nbNo_inEl,:)),3,nbNo_inEl,nbElem),2);
         celem = squeeze(celem);
         sign_face_in_elem = zeros(nbFa_inEl,nbElem);
     end
-    if any(strcmpi(get,{'topo','ori','orientation'}))
+    if any(f_strcmpi(get,{'_all','topo','ori','orientation'}))
         ori_face_in_elem = zeros(nbFa_inEl,nbElem);
     end
     %----------------------------------------------------------------------
@@ -76,19 +77,25 @@ else
         ft = [ft; zeros(maxnbNo_inFa-nbNo_inFa(i),nbElem)];
         f(i,:,:) = ft;
         % ---
-        if any(strcmpi(get,{'topo','sign','si'}))
+        if any(f_strcmpi(get,{'_all','topo','sign','si'}))
             % ---
             cface = mean(reshape(node(1:3,ft(1:nbNo_inFa(i),:)),3,nbNo_inFa(i),[]),2);
             cface = squeeze(cface);
             % ---
             sign_face_in_elem(i,:) = sign(dot(cface-celem,f_chavec(node,ft,'face')));
         end
-        if any(strcmpi(get,{'topo','ori','orientation'}))
+        if any(f_strcmpi(get,{'_all','topo','ori','orientation'}))
             ori_face_in_elem(i,:) = si_ori;
         end
     end
 end
 %--------------------------------------------------------------------------
-id_face_in_elem = f_findvecnd(f,face_list,'position',2);
+if any(f_strcmpi(get,{'_all','id'}))
+    if ~isempty(face_list)
+        id_face_in_elem = f_findvecnd(f,face_list,'position',2);
+    else
+        id_face_in_elem = [];
+    end
+end
 %--------------------------------------------------------------------------
 end

@@ -11,16 +11,16 @@ arglist = {'elem_type','get'};
 
 % --- default input value
 elem_type = [];
-get = [];
+get = '_all';
 
 % --- default output value
-%id_edge_in_elem = [];
+id_edge_in_elem = [];
 ori_edge_in_elem = [];
 sign_edge_in_elem = [];
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:length(varargin)/2
-    if any(strcmpi(arglist,varargin{2*i-1}))
+    if any(f_strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
@@ -41,7 +41,7 @@ nbElem = size(elem,2);
 e = reshape([elem(EdNo_inEl(:,1),:); elem(EdNo_inEl(:,2),:)], ...
              nbEd_inEl, nbNo_inEd, nbElem);
 % ---
-if any(strcmpi(get,{'topo','ori','orientation'}))
+if any(f_strcmpi(get,{'_all','topo','ori','orientation'}))
     ori_edge_in_elem = squeeze(sign(diff(e, 1, 2))); % with unsorted e !
     if any(strcmpi(elem_type,{'tri','quad','triangle'}))
         sign_edge_in_elem = ori_edge_in_elem .* con.siEd_inEl.';
@@ -50,6 +50,12 @@ end
 % ---
 e = sort(e, 2);
 %--------------------------------------------------------------------------
-id_edge_in_elem = f_findvecnd(e,edge_list,'position',2);
+if any(f_strcmpi(get,{'_all','id'}))
+    if ~isempty(edge_list)
+        id_edge_in_elem = f_findvecnd(e,edge_list,'position',2);
+    else
+        id_edge_in_elem = []; 
+    end
+end
 %--------------------------------------------------------------------------
 end
