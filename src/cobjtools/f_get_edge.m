@@ -56,15 +56,7 @@ end
 %--------------------------------------------------------------------------
 elem_type = f_elemtype(elem,'defined_on',defined_on);
 %--------------------------------------------------------------------------
-edge = f_edge(elem,'elem_type',elem_type);
-%--------------------------------------------------------------------------
 % --- Outputs
-% if isempty(of_dom3d)
-%     mesh3d.edge = edge;
-% else
-%     for i = 1:length(of_dom3d)
-%         mesh3d.dom3d.(of_dom3d{i}).edge = edge;
-%     end
-% end
+edge = f_edge(elem,'elem_type',elem_type);
 %--------------------------------------------------------------------------
 end

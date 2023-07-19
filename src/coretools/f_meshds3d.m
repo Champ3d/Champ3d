@@ -23,25 +23,16 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
+if ~isfield(mesh3d,'node') || ~isfield(mesh3d,'elem')
+    error([mfilename ': #mesh3d struct must contain at least .node and .elem !' ]);
+end
+%--------------------------------------------------------------------------
 if isempty(elem_type) && isfield(mesh3d,'elem_type')
     elem_type = mesh3d.elem_type;
 end
 %--------------------------------------------------------------------------
 if isempty(elem_type)
-    nbnoinel = size(mesh3d.elem, 1);
-    switch nbnoinel
-        case 4
-            elem_type = 'tet';
-        case 6
-            elem_type = 'prism';
-        case 8
-            elem_type = 'hex';
-    end
-    fprintf(['Build meshds for ' elem_type ' \n']);
-end
-%--------------------------------------------------------------------------
-if isempty(elem_type)
-    error([mfilename ': #elem_type must be given !']);
+    elem_type = f_elemtype(mesh3d.elem,'defined_on','elem');
 end
 %--------------------------------------------------------------------------
 if ~isfield(mesh3d,'elem_type')
@@ -51,7 +42,6 @@ end
 
 tic
 fprintf('Making meshds3d');
-
 
 %--------------------------------------------------------------------------
 %----- barrycenter
