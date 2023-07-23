@@ -62,9 +62,13 @@ nbG = con.nbG;
 Weigh = con.Weigh;
 nbEd_inEl = con.nbEd_inEl;
 %--------------------------------------------------------------------------
+for iG = 1:nbG
+    We{iG} = c3dobj.mesh3d.(id_mesh3d).We{iG}(id_elem,:,:);
+    detJ{iG} = c3dobj.mesh3d.(id_mesh3d).detJ{iG}(id_elem,1);
+end
+%--------------------------------------------------------------------------
 coefwewe = zeros(nb_elem,nbEd_inEl,nbEd_inEl);
 %--------------------------------------------------------------------------
-
 if any(strcmpi(coef_array_type,{'iso_array'}))
     %----------------------------------------------------------------------
     coef_array = f_tocolv(coef_array);
@@ -116,6 +120,25 @@ elseif any(strcmpi(coef_array_type,{'tensor_array'}))
     end
     %----------------------------------------------------------------------
 end
+%--------------------------------------------------------------------------
+edge_in_elem = f_get_edge_in_elem(c3dobj,'of_dom3d',id_dom3d);
+nb_edge = numel(unique(edge_in_elem));
+%--------------------------------------------------------------------------
+CoefWeWe = sparse(nb_edge,nb_edge);
 
+for i = 1:nbEd_inEl
+    for j = i+1 : nbEd_inEl
+        CoefWeWe = CoefWeWe + ...
+            sparse(edge_in_elem(i,:),edge_in_elem(j,:),...
+                   coefwewe(i,:,j),nb_edge,nb_edge);
+    end
+end
 
+CoefWeWe = CoefWeWe + CoefWeWe.';
+
+for i = 1:nbEd_inEl
+    CoefWeWe = CoefWeWe + ...
+        sparse(edge_in_elem(i,:),edge_in_elem(i,:),...
+               coefwewe(i,:,i),nb_edge,nb_edge);
+end
 
