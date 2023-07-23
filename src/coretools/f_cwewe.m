@@ -120,25 +120,4 @@ elseif any(strcmpi(coef_array_type,{'tensor_array'}))
     end
     %----------------------------------------------------------------------
 end
-%--------------------------------------------------------------------------
-edge_in_elem = f_get_edge_in_elem(c3dobj,'of_dom3d',id_dom3d);
-nb_edge = numel(unique(edge_in_elem));
-%--------------------------------------------------------------------------
-CoefWeWe = sparse(nb_edge,nb_edge);
-
-for i = 1:nbEd_inEl
-    for j = i+1 : nbEd_inEl
-        CoefWeWe = CoefWeWe + ...
-            sparse(edge_in_elem(i,:),edge_in_elem(j,:),...
-                   coefwewe(i,:,j),nb_edge,nb_edge);
-    end
-end
-
-CoefWeWe = CoefWeWe + CoefWeWe.';
-
-for i = 1:nbEd_inEl
-    CoefWeWe = CoefWeWe + ...
-        sparse(edge_in_elem(i,:),edge_in_elem(i,:),...
-               coefwewe(i,:,i),nb_edge,nb_edge);
-end
 

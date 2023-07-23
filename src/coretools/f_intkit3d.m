@@ -19,19 +19,19 @@ function mesh3d = f_intkit3d(mesh3d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-%arglist = {'get'};
+arglist = {'get'};
 
 % --- default input value
 get = '_all';
 
 % --- check and update input
-% for i = 1:length(varargin)/2
-%     if any(strcmpi(arglist,varargin{2*i-1}))
-%         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
-%     else
-%         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
-%     end
-% end
+for i = 1:length(varargin)/2
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    else
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
+    end
+end
 %--------------------------------------------------------------------------
 if ~isfield(mesh3d,'node') || ~isfield(mesh3d,'elem')
     error([mfilename ' : #mesh3d struct must contain at least .node and .elem']);
