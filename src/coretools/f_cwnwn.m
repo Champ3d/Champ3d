@@ -1,19 +1,8 @@
-function CoefWnWn = f_cwnwn(mesh,varargin)
-% F_COEFWNWN computes the mass matrix int_v(coef x Wn x Wn x dv)
-%--------------------------------------------------------------------------
-% FIXED INPUT
-% mesh : mesh data structure
-%--------------------------------------------------------------------------
-% OPTIONAL INPUT
-% 'id_elem' : array of indices of elements in the mesh
-% 'coef' : coefficient (scalar, tensor or matrix)
-% 'elem_type' : element type ('prism','hex','tet', ...)
+function coefwnwn = f_cwnwn(c3dobj,varargin)
+% F_CWNWN computes the mass matrix int_v(coef x Wn x Wn x dv)
 %--------------------------------------------------------------------------
 % OUTPUT
-% CoefWnWn : nb_nodes_in_volume x nb_nodes_in_volume
-%--------------------------------------------------------------------------
-% EXAMPLE
-% CoefWnWn = F_COEFWNWN(mesh,'coef',3,'id_elem',[1 2 3],'elem_type','prism');
+% coefwnwn : nb_elem x nbNo_inEl x nbNo_inEl
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -22,11 +11,20 @@ function CoefWnWn = f_cwnwn(mesh,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'mesh','coef','id_elem'};
+arglist = {'design3d','id_design3d','dom_type','id_dom',...
+           'phydomobj','coefficient'};
 
 % --- default input value
-coef = 1;
-id_elem = [];
+design3d = [];
+id_design3d = [];
+dom_type  = [];
+id_dom    = [];
+phydomobj = [];
+coefficient = [];
+
+% --- default output value
+coef_array = [];
+
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
@@ -35,50 +33,66 @@ for i = 1:length(varargin)/2
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
-
 %--------------------------------------------------------------------------
-con = f_connexion(mesh.elem_type);
-nbNo_inEl = con.nbNo_inEl;
-nbElem    = mesh.nbElem;
-nbNode    = mesh.nbNode;
-
-if isempty(id_elem)
-    id_elem = 1:nbElem;
+if isempty(phydomobj)
+    if ~isempty(design3d) && ~isempty(id_design3d) && ~isempty(dom_type) && ~isempty(id_dom)
+        phydomobj = c3dobj.(design3d).(id_design3d).(dom_type).(id_dom);
+    else
+        return;
+    end
 end
 %--------------------------------------------------------------------------
-
-matCoef = f_cmatrix(coef,'id_elem',id_elem,'nb_elem',nbElem);
-
+id_mesh3d = phydomobj.id_mesh3d;
+id_dom3d  = phydomobj.id_dom3d;
+id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
+nb_elem   = length(id_elem);
 %--------------------------------------------------------------------------
-
-SWnWn = zeros(nbNo_inEl,nbElem,nbNo_inEl);
-for iG = 1:con.nbG
-    for i = 1:nbNo_inEl
-        for j = i:nbNo_inEl % !!! i
-            SWnWn(i,id_elem,j) = SWnWn(i,id_elem,j) + ...
-                f_multrowv(con.Weigh(iG).*mesh.detJ{iG}(id_elem),...
-                squeeze(matCoef(1,1,id_elem)).'.*mesh.Wn{iG}(i,id_elem).*mesh.Wn{iG}(j,id_elem));
+if isempty(coefficient)
+    coef_array = 1;
+    coef_array_type = 'iso_array';
+else
+    [coef_array, coef_array_type] = ...
+        f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
+                                 'coefficient',coefficient);
+end
+%--------------------------------------------------------------------------
+if isfield(c3dobj.mesh3d.(id_mesh3d),'elem_type')
+    elem_type = c3dobj.mesh3d.(id_mesh3d).elem_type;
+else
+    elem_type = f_elemtype(c3dobj.mesh3d.(id_mesh3d).elem,'defined_on','elem');
+end
+%--------------------------------------------------------------------------
+con = f_connexion(elem_type);
+nbG = con.nbG;
+Weigh = con.Weigh;
+nbNo_inEl = con.nbNo_inEl;
+%--------------------------------------------------------------------------
+for iG = 1:nbG
+    Wn{iG} = c3dobj.mesh3d.(id_mesh3d).Wn{iG}(id_elem,:);
+    detJ{iG} = c3dobj.mesh3d.(id_mesh3d).detJ{iG}(id_elem,1);
+end
+%--------------------------------------------------------------------------
+coefwnwn = zeros(nb_elem,nbNo_inEl,nbNo_inEl);
+%--------------------------------------------------------------------------
+if any(strcmpi(coef_array_type,{'iso_array'}))
+    %----------------------------------------------------------------------
+    coef_array = f_tocolv(coef_array);
+    %----------------------------------------------------------------------
+    for iG = 1:nbG
+        dJ    = f_tocolv(detJ{iG});
+        weigh = Weigh(iG);
+        for i = 1:nbNo_inEl
+            wni = Wn{iG}(:,i);
+            for j = i:nbNo_inEl % !!! i
+                wnj = Wn{iG}(:,j);
+                % ---
+                coefwnwn(:,i,j) = coefwnwn(:,i,j) + ...
+                    weigh .* dJ .* coef_array .* wni .* wnj;
+            end
         end
     end
-end
-%--------------------------------------------------------------------------
-
-CoefWnWn = sparse(nbNode,nbNode);
-
-for i = 1:nbNo_inEl
-    for j = i+1 : nbNo_inEl
-        CoefWnWn = CoefWnWn + ...
-            sparse(mesh.elem(i,:),mesh.elem(j,:),...
-                   SWnWn(i,:,j),nbNode,nbNode);
-    end
+    %----------------------------------------------------------------------
+else
+    error([mfilename ': #coefficient ' coefficient ' must be scalar !']);
 end
 
-CoefWnWn = CoefWnWn + CoefWnWn.';
-
-for i = 1:nbNo_inEl
-    CoefWnWn = CoefWnWn + ...
-        sparse(mesh.elem(i,:),mesh.elem(i,:),...
-               SWnWn(i,:,i),nbNode,nbNode);
-end
-
-end

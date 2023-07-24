@@ -1,8 +1,8 @@
-function coefwn = f_cwn(c3dobj,varargin)
-% F_CWN computes the mass matrix int_v(coef x Wn x dv)
+function coefwfvf = f_cwfvf(c3dobj,varargin)
+% F_CWFWF computes the mass matrix int_v(coef x Wf x Wf x dv)
 %--------------------------------------------------------------------------
 % OUTPUT
-% coefwn : nb_elem x nbNo_inEl
+% coefwfwf : nb_elem x nbFa_inEl x nbFa_inEl
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -12,7 +12,7 @@ function coefwn = f_cwn(c3dobj,varargin)
 
 % --- valid argument list (to be updated each time modifying function)
 arglist = {'design3d','id_design3d','dom_type','id_dom',...
-           'phydomobj','coefficient'};
+           'phydomobj','coefficient','vector_field'};
 
 % --- default input value
 design3d = [];
@@ -21,6 +21,7 @@ dom_type  = [];
 id_dom    = [];
 phydomobj = [];
 coefficient = [];
+vector_field = []; % must be nb_elem x 3
 
 % --- default output value
 coef_array = [];
@@ -65,14 +66,22 @@ end
 con = f_connexion(elem_type);
 nbG = con.nbG;
 Weigh = con.Weigh;
-nbNo_inEl = con.nbNo_inEl;
+nbFa_inEl = con.nbFa_inEl;
 %--------------------------------------------------------------------------
 for iG = 1:nbG
-    Wn{iG} = c3dobj.mesh3d.(id_mesh3d).Wn{iG}(id_elem,:);
+    Wf{iG} = c3dobj.mesh3d.(id_mesh3d).Wf{iG}(id_elem,:,:);
     detJ{iG} = c3dobj.mesh3d.(id_mesh3d).detJ{iG}(id_elem,1);
 end
 %--------------------------------------------------------------------------
-coefwn = zeros(nb_elem,nbNo_inEl);
+coefwfvf = zeros(nb_elem,nbFa_inEl);
+%--------------------------------------------------------------------------
+if isempty(vector_field)
+    return;
+else
+    vfx = vector_field(:,1);
+    vfy = vector_field(:,2);
+    vfz = vector_field(:,3);
+end
 %--------------------------------------------------------------------------
 if any(strcmpi(coef_array_type,{'iso_array'}))
     %----------------------------------------------------------------------
@@ -81,12 +90,37 @@ if any(strcmpi(coef_array_type,{'iso_array'}))
     for iG = 1:nbG
         dJ    = f_tocolv(detJ{iG});
         weigh = Weigh(iG);
-        for i = 1:nbNo_inEl
-            wni = Wn{iG}(:,i);
-            coefwn(:,i) = coefwn(:,i) + weigh .* dJ .* coef_array .* wni;
+        for i = 1:nbFa_inEl
+            wfix = Wf{iG}(:,1,i);
+            wfiy = Wf{iG}(:,2,i);
+            wfiz = Wf{iG}(:,3,i);
+            coefwfvf(:,i) = coefwfvf(:,i) + ...
+                weigh .* dJ .* ( coef_array .* ...
+                (wfix .* vfx + wfiy .* vfy + wfiz .* vfz) );
         end
     end
     %----------------------------------------------------------------------
-else
-    error([mfilename ': #coefficient ' coefficient ' must be scalar !']);
+elseif any(strcmpi(coef_array_type,{'tensor_array'}))
+    %----------------------------------------------------------------------
+    for iG = 1:nbG
+        dJ    = f_tocolv(detJ{iG});
+        weigh = Weigh(iG);
+        for i = 1:nbFa_inEl
+            wfix = Wf{iG}(:,1,i);
+            wfiy = Wf{iG}(:,2,i);
+            wfiz = Wf{iG}(:,3,i);
+            coefwfvf(:,i) = coefwfvf(:,i) + ...
+                weigh .* dJ .* (...
+                coef_array(:,1,1) .* wfix .* vfx +...
+                coef_array(:,1,2) .* wfiy .* vfx +...
+                coef_array(:,1,3) .* wfiz .* vfx +...
+                coef_array(:,2,1) .* wfix .* vfy +...
+                coef_array(:,2,2) .* wfiy .* vfy +...
+                coef_array(:,2,3) .* wfiz .* vfy +...
+                coef_array(:,3,1) .* wfix .* vfz +...
+                coef_array(:,3,2) .* wfiy .* vfz +...
+                coef_array(:,3,3) .* wfiz .* vfz );
+        end
+    end
+    %----------------------------------------------------------------------
 end

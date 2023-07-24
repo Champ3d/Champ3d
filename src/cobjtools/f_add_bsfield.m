@@ -7,13 +7,13 @@ function c3dobj = f_add_bsfield(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_sfield','id_mesh3d','id_dom3d','Bs'};
+arglist = {'id_emdesign3d','id_bsfield','id_mesh3d','id_dom3d','bs'};
 
 % --- default input value
 id_emdesign3d = [];
 id_mesh3d     = [];
 id_dom3d      = [];
-Bs            = 0;
+bs            = 0;
 id_bsfield    = [];
 
 %--------------------------------------------------------------------------
@@ -53,7 +53,7 @@ end
 % --- Output
 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).id_mesh3d = id_mesh3d;
 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).id_dom3d = id_dom3d;
-c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).Bs = Bs;
+c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).bs = bs;
 % --- info message
 fprintf(['Add bsfield #' id_bsfield ' to emdesign3d #' id_emdesign3d ' in mesh3d #' id_mesh3d '\n']);
 

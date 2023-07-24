@@ -1,7 +1,7 @@
-function c3dobj = f_build_econductor(c3dobj,varargin)
-% F_BUILD_ECONDUCTOR returns the em matrix system related to econductor. 
+function c3dobj = f_build_mconductor(c3dobj,varargin)
+% F_BUILD_MCONDUCTOR returns the em matrix system related to mconductor.
 %--------------------------------------------------------------------------
-% c3dobj = F_BUILD_ECONDUCTOR(c3dobj,option);
+% c3dobj = F_BUILD_mconductor(c3dobj,option);
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -10,11 +10,11 @@ function c3dobj = f_build_econductor(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_econductor'};
+arglist = {'id_emdesign3d','id_mconductor'};
 
 % --- default input value
 id_emdesign3d = [];
-id_econductor = '_all';
+id_mconductor = '_all';
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -33,46 +33,46 @@ if iscell(id_emdesign3d)
     id_emdesign3d = id_emdesign3d{1};
 end
 %--------------------------------------------------------------------------
-id_econductor = f_to_scellargin(id_econductor);
+id_mconductor = f_to_scellargin(id_mconductor);
 %--------------------------------------------------------------------------
-if any(strcmpi(id_econductor,{'_all'}))
-    id_econductor = fieldnames(c3dobj.emdesign3d.(id_emdesign3d).econductor);
+if any(strcmpi(id_mconductor,{'_all'}))
+    id_mconductor = fieldnames(c3dobj.emdesign3d.(id_emdesign3d).mconductor);
 end
 %--------------------------------------------------------------------------
-for iec = 1:length(id_econductor)
+for iec = 1:length(id_mconductor)
     %----------------------------------------------------------------------
     em_model = c3dobj.emdesign3d.(id_emdesign3d).em_model;
     %----------------------------------------------------------------------
-    fprintf(['Building econ ' id_econductor{iec} ...
+    fprintf(['Building mcon ' id_mconductor{iec} ...
              ' in emdesign3d #' id_emdesign3d ...
              ' for ' em_model]);
     switch em_model
         case {'aphijw'}
             tic;
             %--------------------------------------------------------------
-            phydomobj = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec});
+            phydomobj = c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec});
             %--------------------------------------------------------------
-            coef_name  = 'sigma';
+            coef_name  = 'mu_r';
             %--------------------------------------------------------------
-            sigwewe = f_cwewe(c3dobj,'phydomobj',phydomobj,...
+            murwfwf = f_cwfwf(c3dobj,'phydomobj',phydomobj,...
                                      'coefficient',coef_name);
             %--------------------------------------------------------------
             % --- Output
-            c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec}).aphijw.sigwewe = sigwewe;
+            c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec}).aphijw.murwfwf = murwfwf;
             % --- Log message
             fprintf(' --- in %.2f s \n',toc);
         case {'aphits'}
             tic;
             %--------------------------------------------------------------
-            phydomobj = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec});
+            phydomobj = c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec});
             %--------------------------------------------------------------
-            coef_name  = 'sigma';
+            coef_name  = 'mu_r';
             %--------------------------------------------------------------
-            sigwewe = f_cwewe(c3dobj,'phydomobj',phydomobj,...
+            murwfwf = f_cwfwf(c3dobj,'phydomobj',phydomobj,...
                                      'coefficient',coef_name);
             %--------------------------------------------------------------
             % --- Output
-            c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec}).aphits.sigwewe = sigwewe;
+            c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec}).aphits.murwfwf = murwfwf;
             % --- Log message
             fprintf(' --- in %.2f s \n',toc);
         case {'tomejw'}

@@ -2,7 +2,7 @@ function coefwewe = f_cwewe(c3dobj,varargin)
 % F_CWEWE computes the mass matrix int_v(coef x We x We x dv)
 %--------------------------------------------------------------------------
 % OUTPUT
-% CoefWeWe : nb_edges_in_volume x nb_edges_in_volume
+% coefwewe : nb_elem x nbEd_inEl x nbEd_inEl
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -42,14 +42,19 @@ if isempty(phydomobj)
     end
 end
 %--------------------------------------------------------------------------
-[coef_array, coef_array_type] = ...
-    f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
-                             'coefficient',coefficient);
-%--------------------------------------------------------------------------
 id_mesh3d = phydomobj.id_mesh3d;
 id_dom3d  = phydomobj.id_dom3d;
 id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
 nb_elem   = length(id_elem);
+%--------------------------------------------------------------------------
+if isempty(coefficient)
+    coef_array = 1;
+    coef_array_type = 'iso_array';
+else
+    [coef_array, coef_array_type] = ...
+        f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
+                                 'coefficient',coefficient);
+end
 %--------------------------------------------------------------------------
 if isfield(c3dobj.mesh3d.(id_mesh3d),'elem_type')
     elem_type = c3dobj.mesh3d.(id_mesh3d).elem_type;
@@ -74,16 +79,17 @@ if any(strcmpi(coef_array_type,{'iso_array'}))
     coef_array = f_tocolv(coef_array);
     %----------------------------------------------------------------------
     for iG = 1:nbG
+        dJ    = f_tocolv(detJ{iG});
+        weigh = Weigh(iG);
         for i = 1:nbEd_inEl
+            weix = We{iG}(:,1,i);
+            weiy = We{iG}(:,2,i);
+            weiz = We{iG}(:,3,i);
             for j = i:nbEd_inEl % !!! i
-                weix = We{iG}(:,1,i);
-                weiy = We{iG}(:,2,i);
-                weiz = We{iG}(:,3,i);
                 wejx = We{iG}(:,1,j);
                 wejy = We{iG}(:,2,j);
                 wejz = We{iG}(:,3,j);
-                dJ   = f_tocolv(detJ{iG});
-                weigh= Weigh(iG);
+                % ---
                 coefwewe(:,i,j) = coefwewe(:,i,j) + ...
                     weigh .* dJ .* ( coef_array .* ...
                     (weix .* wejx + weiy .* wejy + weiz .* wejz) );
@@ -94,16 +100,17 @@ if any(strcmpi(coef_array_type,{'iso_array'}))
 elseif any(strcmpi(coef_array_type,{'tensor_array'}))
     %----------------------------------------------------------------------
     for iG = 1:nbG
+        dJ    = f_tocolv(detJ{iG});
+        weigh = Weigh(iG);
         for i = 1:nbEd_inEl
+            weix = We{iG}(:,1,i);
+            weiy = We{iG}(:,2,i);
+            weiz = We{iG}(:,3,i);
             for j = i:nbEd_inEl % !!! i
-                weix = We{iG}(:,1,i);
-                weiy = We{iG}(:,2,i);
-                weiz = We{iG}(:,3,i);
                 wejx = We{iG}(:,1,j);
                 wejy = We{iG}(:,2,j);
                 wejz = We{iG}(:,3,j);
-                dJ   = f_tocolv(detJ{iG});
-                weigh= Weigh(iG);
+                % ---
                 coefwewe(:,i,j) = coefwewe(:,i,j) + ...
                     weigh .* dJ .* (...
                     coef_array(:,1,1) .* weix .* wejx +...
