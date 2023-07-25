@@ -53,9 +53,15 @@ for iec = 1:length(id_mconductor)
             phydomobj = c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec});
             %--------------------------------------------------------------
             coef_name  = 'mu_r';
+            [coef_array, coef_array_type] = ...
+                f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
+                                         'coefficient',coef_name);
+            %--------------------------------------------------------------
+            nu = f_invtensor(mu0 .* design3d.mconductor(idom).gtensor);
             %--------------------------------------------------------------
             muwfwf = f_cwfwf(c3dobj,'phydomobj',phydomobj,...
-                                     'coefficient',coef_name);
+                                    'coefficient',coef_name);
+            muwfwf = muwfwf .* (4*pi*1e-7);
             %--------------------------------------------------------------
             % --- Output
             c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec}).(em_model).muwfwf = muwfwf;

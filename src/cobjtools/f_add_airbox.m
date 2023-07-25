@@ -43,7 +43,8 @@ end
 %--------------------------------------------------------------------------
 % --- Output
 c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).id_emdesign3d = id_emdesign3d;
-c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).id_dom3d  = id_dom3d;
-c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).a_value   = a_value;
+c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).id_dom3d = id_dom3d;
+c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).mu_r = 1;
+c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).a_value = a_value;
 % --- info message
 fprintf(['Add airbox #' id_airbox ' to emdesign3d #' id_emdesign3d '\n']);

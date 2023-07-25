@@ -22,9 +22,6 @@ id_dom    = [];
 phydomobj = [];
 coefficient = [];
 
-% --- default output value
-coef_array = [];
-
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
@@ -52,13 +49,11 @@ id_dom3d  = phydomobj.id_dom3d;
 id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
 nb_elem   = length(id_elem);
 %--------------------------------------------------------------------------
+[coef_array, coef_array_type] = f_coef_array(coefficient);
+%--------------------------------------------------------------------------
 if isempty(coefficient)
     coef_array = 1;
     coef_array_type = 'iso_array';
-else
-    [coef_array, coef_array_type] = ...
-        f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
-                                 'coefficient',coefficient);
 end
 %--------------------------------------------------------------------------
 if isfield(c3dobj.mesh3d.(id_mesh3d),'elem_type')
@@ -80,8 +75,6 @@ end
 coefwewe = zeros(nb_elem,nbEd_inEl,nbEd_inEl);
 %--------------------------------------------------------------------------
 if any(strcmpi(coef_array_type,{'iso_array'}))
-    %----------------------------------------------------------------------
-    coef_array = f_tocolv(coef_array);
     %----------------------------------------------------------------------
     for iG = 1:nbG
         dJ    = f_tocolv(detJ{iG});
