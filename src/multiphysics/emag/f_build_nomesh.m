@@ -62,7 +62,9 @@ for iec = 1:length(id_nomesh)
             %--------------------------------------------------------------
             nb_elem   = length(id_elem);
             %--------------------------------------------------------------
-            
+            edge_list = f_edge(face,'defined_on',defined_on);
+            [id_edge_in_face, sign_edge_in_face] = ...
+                f_edgeinface(face,edge_list,'elem_type',elem_type,'get',get);
             %--------------------------------------------------------------
             % --- Output
             c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh{iec}).aphijw.id_elem = id_elem;

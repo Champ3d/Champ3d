@@ -36,10 +36,12 @@ if f_isempty(of_dom3d)
     elem = mesh3d.elem;
     defined_on = 'elem';
     %----------------------------------------------------------------------
+    elem_type = f_elemtype(elem,'defined_on',defined_on);
+    %----------------------------------------------------------------------
     if ~isfield(mesh3d,'edge')
-        edge_list = f_edge(elem,'defined_on',defined_on);
+        edge_list = f_edge(elem,'elem_type',elem_type);
     elseif isempty(mesh3d.edge)
-        edge_list = f_edge(elem,'defined_on',defined_on);
+        edge_list = f_edge(elem,'elem_type',elem_type);
     else
         edge_list = mesh3d.edge;
     end
@@ -56,7 +58,7 @@ else
         elem = [elem mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}).id_elem)];
     end
     %----------------------------------------------------------------------
-    elem_type = f_elemtype(mesh3d.elem,'defined_on',defined_on);
+    elem_type = f_elemtype(elem,'defined_on',defined_on);
     %----------------------------------------------------------------------
     edge_list = f_edge(elem,'elem_type',elem_type);
     %----------------------------------------------------------------------

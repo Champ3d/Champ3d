@@ -88,24 +88,3 @@ if any(strcmpi(get,{'nd','ndec','ndecomposition','n-decomposition'}))
     % Add information
     info = [info ' with n-decomposition' addinfo];
 end
-%--------------------------------------------------------------------------
-% for i = 1:length(of_dom3d)
-%     msh = [];
-%     msh.node = mesh3d.node;
-%     id3d = i;
-%     if id3d > 2; id3d = 2; end
-%     msh.elem = [];
-%     for j = 1:length(of_dom3d{i})
-%         msh.elem = [msh.elem  mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}{j}).id_elem)];
-%     end
-%      msh = f_get_bound_face(msh,'n_direction',n_direction);
-%      bface{id3d} = msh.bound_face;
-%      id_bface{id3d} = msh.idl_bound_face;
-% end
-% lid_inter_face = f_findvecnd(bface{2},bface{1});
-% [lid_inter_face,id_bfof1] = intersect(id_bface{1},id_bface{2});
-% inter_face = bface{1}(:,id_bfof1);
-
-
-
-

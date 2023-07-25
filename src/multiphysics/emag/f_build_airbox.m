@@ -51,11 +51,11 @@ for iec = 1:length(id_airbox)
             %--------------------------------------------------------------
             coef_name  = 'sigma';
             %--------------------------------------------------------------
-            sigwewe = f_cwewe(c3dobj,'phydomobj',phydomobj,...
-                                     'coefficient',coef_name);
+            %sigwewe = f_cwewe(c3dobj,'phydomobj',phydomobj,...
+            %                         'coefficient',coef_name);
             %--------------------------------------------------------------
             % --- Output
-            c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox{iec}).aphijw.sigwewe = sigwewe;
+            %c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox{iec}).aphijw.sigwewe = sigwewe;
             % --- Log message
             fprintf(' --- in %.2f s \n',toc);
         case {'tomejw','tomets'}
