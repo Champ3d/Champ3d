@@ -49,7 +49,7 @@ if isempty(id_mesh1d)
 end
 %--------------------------------------------------------------------------
 tic;
-fprintf(['Making c3d_prismmesh #' id_mesh3d]);
+fprintf(['Make c3d_prismmesh #' id_mesh3d]);
 
 %--------------------------------------------------------------------------
 divlay   = [];
