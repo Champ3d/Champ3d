@@ -25,7 +25,14 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-id_mesh3d = phydomobj.id_mesh3d;
+if isfield(phydomobj,'id_emdesign3d')
+    id_emdesign3d = phydomobj.id_emdesign3d;
+    id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
+elseif isfield(phydomobj,'id_thdesign3d')
+    id_thdesign3d = phydomobj.id_thdesign3d;
+    id_mesh3d = c3dobj.thdesign3d.(id_thdesign3d).id_mesh3d;
+end
+%--------------------------------------------------------------------------
 id_dom3d  = phydomobj.id_dom3d;
 id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
 nb_elem   = length(id_elem);
@@ -33,7 +40,7 @@ nb_elem   = length(id_elem);
 paramtype = f_paramtype(iso_function);
 %--------------------------------------------------------------------------
 if ~any(strcmpi(paramtype,{'c3d_parameter_function'}))
-    fprintf([mfilename ' : this iso_function is not supported. Use f_make_parameter !']);
+    fprintf([mfilename ' : this iso_function is not supported. Use f_make_parameter ! \n']);
     return
 end
 %--------------------------------------------------------------------------
@@ -41,10 +48,11 @@ nb_fargin = nargin(iso_function.f);
 %--------------------------------------------------------------------------
 alist = {};
 for ial = 1:nb_fargin
-    alist{ial} = ['c3dobj' ...
-                  '.' iso_function.from{ial} ...
-                  '.' iso_function.id_cobj{ial} ...
-                  '.' iso_function.field{ial}];
+    %alist{ial} = ['c3dobj' ...
+    %              '.' iso_function.from{ial} ...
+    %              '.' iso_function.id_cobj{ial} ...
+    %              '.' iso_function.field{ial}];
+    alist{ial} = iso_function.depend_on{ial};
 end
 %--------------------------------------------------------------------------
 for ial = 1:nb_fargin

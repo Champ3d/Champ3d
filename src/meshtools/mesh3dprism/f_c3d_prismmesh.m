@@ -119,12 +119,18 @@ c3dobj.mesh3d.(id_mesh3d).elem = elem;
 c3dobj.mesh3d.(id_mesh3d).nb_elem = nb_elem;
 c3dobj.mesh3d.(id_mesh3d).elem_code = elem_code;
 c3dobj.mesh3d.(id_mesh3d).elem_type = 'prism';
-% ---
-% c3dobj.mesh3d.(id_mesh3d).cnode(1,:) = mean(reshape(node(1,elem(1:8,:)),8,nb_elem));
-% c3dobj.mesh3d.(id_mesh3d).cnode(2,:) = mean(reshape(node(2,elem(1:8,:)),8,nb_elem));
-% c3dobj.mesh3d.(id_mesh3d).cnode(3,:) = mean(reshape(node(3,elem(1:8,:)),8,nb_elem));
+%--------------------------------------------------------------------------
+cnode = mean(reshape(node(:,elem(1:6,:)),3,6,nb_elem),2);
+c3dobj.mesh3d.(id_mesh3d).cnode = squeeze(cnode);
+%--------------------------------------------------------------------------
+c3dobj.mesh3d.(id_mesh3d).edge = f_edge(c3dobj.mesh3d.(id_mesh3d).elem, ...
+                            'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
+c3dobj.mesh3d.(id_mesh3d).face = f_face(c3dobj.mesh3d.(id_mesh3d).elem, ...
+                            'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
+%--------------------------------------------------------------------------
 % --- Log message
 fprintf(' --- in %.2f s \n',toc);
+
 
 
 
