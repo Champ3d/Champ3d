@@ -7,16 +7,15 @@ function c3dobj = f_add_pmagnet(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_dom3d','mur','br_value','br_ori','id_bcon'};
+arglist = {'id_emdesign3d','id_dom3d','br_value','br_dir','id_bcon'};
 
 % --- default input value
 id_emdesign3d = [];
 id_dom3d      = [];
 br_value      = 0;
-br_ori        = [];
+br_dir        = [];
 id_bcon       = [];
 id_pmagnet    = [];
-mur           = 1;
 %--------------------------------------------------------------------------
 if nargin <= 1
     error([mfilename ': No permanent magnet to add!']);
@@ -46,9 +45,8 @@ end
 %--------------------------------------------------------------------------
 c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).id_emdesign3d = id_emdesign3d;
 c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).id_dom3d = id_dom3d;
-c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).mur      = mur;
 c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).br_value = br_value;
-c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).br_ori   = br_ori;
+c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).br_dir   = br_dir;
 c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).id_bcon  = id_bcon;
 % --- status
 c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).to_be_rebuilt = 1;
