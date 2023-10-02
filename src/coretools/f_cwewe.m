@@ -12,7 +12,8 @@ function coefwewe = f_cwewe(c3dobj,varargin)
 
 % --- valid argument list (to be updated each time modifying function)
 arglist = {'design3d','id_design3d','dom_type','id_dom',...
-           'phydomobj','coefficient'};
+           'phydomobj','coefficient',...
+           'id_mesh3d','id_dom3d','id_elem'};
 
 % --- default input value
 design3d = [];
@@ -21,7 +22,9 @@ dom_type  = [];
 id_dom    = [];
 phydomobj = [];
 coefficient = [];
-
+id_mesh3d = [];
+id_dom3d = [];
+id_elem = [];
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
@@ -31,29 +34,43 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(phydomobj)
-    if ~isempty(design3d) && ~isempty(id_design3d) && ~isempty(dom_type) && ~isempty(id_dom)
-        phydomobj = c3dobj.(design3d).(id_design3d).(dom_type).(id_dom);
-    else
-        return;
+if isempty(id_mesh3d)
+    if isempty(phydomobj)
+        if ~isempty(design3d) && ~isempty(id_design3d) && ~isempty(dom_type) && ~isempty(id_dom)
+            phydomobj = c3dobj.(design3d).(id_design3d).(dom_type).(id_dom);
+        end
+    end
+    %--------------------------------------------------------------------------
+    if isfield(phydomobj,'id_emdesign3d')
+        id_mesh3d = c3dobj.emdesign3d.(phydomobj.id_emdesign3d).id_mesh3d;
+    elseif isfield(phydomobj,'id_thdesign3d')
+        id_mesh3d = c3dobj.thdesign3d.(phydomobj.id_thdesign3d).id_mesh3d;
     end
 end
 %--------------------------------------------------------------------------
-if isfield(phydomobj,'id_emdesign3d')
-    id_mesh3d = c3dobj.emdesign3d.(phydomobj.id_emdesign3d).id_mesh3d;
-elseif isfield(phydomobj,'id_thdesign3d')
-    id_mesh3d = c3dobj.thdesign3d.(phydomobj.id_thdesign3d).id_mesh3d;
+if isempty(id_dom3d)
+    if isfield(phydomobj,'id_dom3d')
+        id_dom3d = phydomobj.id_dom3d;
+    end
 end
 %--------------------------------------------------------------------------
-id_dom3d  = phydomobj.id_dom3d;
-id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
-nb_elem   = length(id_elem);
+if isempty(id_elem)
+    id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
+end
 %--------------------------------------------------------------------------
-[coef_array, coef_array_type] = f_coef_array(coefficient);
+nb_elem = length(id_elem);
+%--------------------------------------------------------------------------
+
+
+
+
+
 %--------------------------------------------------------------------------
 if isempty(coefficient)
     coef_array = 1;
     coef_array_type = 'iso_array';
+else
+    [coef_array, coef_array_type] = f_coef_array(coefficient);
 end
 %--------------------------------------------------------------------------
 if isfield(c3dobj.mesh3d.(id_mesh3d),'elem_type')
