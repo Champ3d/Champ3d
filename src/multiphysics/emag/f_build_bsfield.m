@@ -67,12 +67,15 @@ for iec = 1:length(id_bsfield)
                 tic;
                 %----------------------------------------------------------
                 if no_wfwf
-                    
+                    phydomobj.id_dom3d = 'all_domain'; 
+                    c3dobj.emdesign3d.(id_emdesign3d).emsys.wfwf = ...
+                        f_cwfwf(c3dobj,'phydomobj',phydomobj,...
+                                       'coefficient',1);
                 end
                 %----------------------------------------------------------
                 phydomobj = c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield{iec});
                 %----------------------------------------------------------
-                coef_name  = 'mu_r';
+                coef_name  = 'bs';
                 %----------------------------------------------------------
                 murwfwf = f_cwfwf(c3dobj,'phydomobj',phydomobj,...
                                          'coefficient',coef_name);

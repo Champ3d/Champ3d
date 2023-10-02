@@ -46,8 +46,10 @@ if isempty(phydomobj)
     end
 end
 %--------------------------------------------------------------------------
-if isempty(coefficient) || 
+if isempty(coefficient) 
     coef = 1;
+elseif isnumeric(coefficient)
+    coef = coefficient;
 else
     coef = phydomobj.(coefficient);
 end
