@@ -44,25 +44,39 @@ if any(strcmpi(id_bsfield,{'_all'}))
 end
 %--------------------------------------------------------------------------
 for iec = 1:length(id_bsfield)
+    %----------------------------------------------------------------------
+    no_wfwf = 0;
+    if ~isfield(c3dobj.emdesign3d.(id_emdesign3d),'emsys')
+        no_wfwf = 1;
+    elseif ~isfield(c3dobj.emdesign3d.(id_emdesign3d).emsys,'wfwf')
+        no_wfwf = 1;
+    elseif isempty(c3dobj.emdesign3d.(id_emdesign3d).emsys.wfwf)
+        no_wfwf = 1;
+    end
+    %----------------------------------------------------------------------
     to_be_rebuilt = c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield{iec}).to_be_rebuilt;
     if to_be_rebuilt
-        %----------------------------------------------------------------------
+        %------------------------------------------------------------------
         em_model = c3dobj.emdesign3d.(id_emdesign3d).em_model;
-        %----------------------------------------------------------------------
+        %------------------------------------------------------------------
         fprintf(['Build bsfield ' id_bsfield{iec} ...
                  ' in emdesign3d #' id_emdesign3d ...
                  ' for ' em_model]);
         switch em_model
             case {'aphijw','aphits'}
                 tic;
-                %--------------------------------------------------------------
+                %----------------------------------------------------------
+                if no_wfwf
+                    
+                end
+                %----------------------------------------------------------
                 phydomobj = c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield{iec});
-                %--------------------------------------------------------------
+                %----------------------------------------------------------
                 coef_name  = 'mu_r';
-                %--------------------------------------------------------------
+                %----------------------------------------------------------
                 murwfwf = f_cwfwf(c3dobj,'phydomobj',phydomobj,...
                                          'coefficient',coef_name);
-                %--------------------------------------------------------------
+                %----------------------------------------------------------
                 % --- Output
                 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield{iec}).murwfwf = murwfwf;
                 %----------------------------------------------------------

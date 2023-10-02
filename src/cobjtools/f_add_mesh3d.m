@@ -50,8 +50,10 @@ switch mesher
     case {'c3d_mixedmesh','c3d_mixedhexaprismmesh','c3d_mixedhexaprism'}
         % TODO
 end
-
-
+%--------------------------------------------------------------------------
+c3dobj.mesh3d.(id_mesh3d).dom3d.alldomain.defined_on = 'elem';
+c3dobj.mesh3d.(id_mesh3d).dom3d.alldomain.id_elem = 1:c3dobj.mesh3d.(id_mesh3d).nb_elem;
+c3dobj.mesh3d.(id_mesh3d).dom3d.alldomain.elem_code = unique(c3dobj.mesh3d.(id_mesh3d).elem_code);
 
 
 

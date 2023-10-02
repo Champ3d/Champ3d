@@ -46,7 +46,11 @@ if isempty(phydomobj)
     end
 end
 %--------------------------------------------------------------------------
-coef = phydomobj.(coefficient);
+if isempty(coefficient) || 
+    coef = 1;
+else
+    coef = phydomobj.(coefficient);
+end
 %--------------------------------------------------------------------------
 if isfield(phydomobj,'id_emdesign3d')
     id_mesh3d = c3dobj.emdesign3d.(phydomobj.id_emdesign3d).id_mesh3d;
