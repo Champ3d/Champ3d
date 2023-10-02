@@ -60,8 +60,8 @@ switch ptype
         %------------------------------------------------------------------
         depend_on = f_to_scellargin(depend_on);
         %------------------------------------------------------------------
-        if nargin(f)
-            if nargin(f) ~= length(depend_on)
+        if f_nargin(f)
+            if f_nargin(f) ~= length(depend_on)
                 error([mfilename ': Check number of f arguments !']);
             end
         end

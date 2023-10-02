@@ -50,7 +50,7 @@ for iltf = 1:length(ltfield__)
     %----------------------------------------------------------------------
     if any(strcmpi(paramtype,{'c3d_parameter_function'}))
         %------------------------------------------------------------------
-        nb_fargin = nargin(ltfield.f);
+        nb_fargin = f_nargin(ltfield.f);
         %------------------------------------------------------------------
         alist = {};
         for ial = 1:nb_fargin

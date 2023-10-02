@@ -44,7 +44,7 @@ if ~any(strcmpi(paramtype,{'c3d_parameter_function'}))
     return
 end
 %--------------------------------------------------------------------------
-nb_fargin = nargin(iso_function.f);
+nb_fargin = f_nargin(iso_function.f);
 %--------------------------------------------------------------------------
 alist = {};
 for ial = 1:nb_fargin
