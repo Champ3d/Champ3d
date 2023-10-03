@@ -25,7 +25,7 @@ function parameter = f_make_parameter(varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'f','depend_on'};
+arglist = {'f','depend_on',''};
 
 % --- default input value
 f = [];

@@ -1,4 +1,4 @@
-function coeftype = f_coeftype(coef)
+function coeftype = f_coeftype(coef,varargin)
 % F_COEFTYPE
 % coeftype supported :
 % + numeric_iso_value
@@ -15,51 +15,73 @@ function coeftype = f_coeftype(coef)
 % Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
 
+% --- valid argument list (to be updated each time modifying function)
+arglist = {'nb_elem','id_elem'};
 
+% --- default input value
+nb_elem = [];
+id_elem = [];
+
+% --- check and update input
+for i = 1:length(varargin)/2
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    else
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
+    end
+end
+%--------------------------------------------------------------------------
+no_nb_elem_info = 1;
+if isempty(id_elem) && isempty(nb_elem)
+    no_nb_elem_info = 0;
+elseif ~isempty(id_elem)
+    nb_elem = length(id_elem);
+end
 %--------------------------------------------------------------------------
 coeftype = [];
 %--------------------------------------------------------------------------
-sizecoef = size(coef);
-%--------------------------------------------------------------------------
-if isa(coef,'numeric')
-    if numel(coef) == 1
-        coeftype = 'numeric_iso_value';
-    elseif sizecoef(1) == 1 || sizecoef(2) == 1
-        coeftype = 'numeric_iso_array';
-    elseif sizecoef(1) == 3 && sizecoef(2) == 3 && length(sizecoef) == 2
-        coeftype = 'numeric_gtensor_value';
-    elseif sizecoef(1) == 3 && sizecoef(2) == 3 && length(sizecoef) > 2
-        coeftype = 'numeric_gtensor_array';
+if no_nb_elem_info
+    if isa(coef,'numeric')
+        sizecoef = size(coef);
+        if numel(coef) == 1
+            coeftype = 'numeric_iso_value';
+        elseif sizecoef(1) == 1 || sizecoef(2) == 1
+            coeftype = 'numeric_iso_array';
+        elseif sizecoef(1) == 3 && sizecoef(2) == 3 && length(sizecoef) == 2
+            coeftype = 'numeric_gtensor_value';
+        elseif sizecoef(1) == 3 && sizecoef(2) == 3 && length(sizecoef) > 2
+            coeftype = 'numeric_gtensor_array';
+        else
+            fprintf('coef = \n');
+            disp(coef);
+            error([mfilename ' : cannot define the type of the coefficient !']);
+        end
+    elseif isa(coef,'struct')
+        % ---------------------------------------------------------------------
+        if isfield(coef,'main_value') && isfield(coef,'main_dir')
+            paramconfig = fieldnames(coef);
+            for i = 1:length(paramconfig)
+                paramtype = f_paramtype(coef.(paramconfig{i}));
+                switch paramtype
+                    case {'function'}
+                        coeftype = 'function_ltensor_array';
+                        break;
+                    case {'numeric'}
+                        coeftype = 'numeric_ltensor_value';
+                end
+            end
+        % ---------------------------------------------------------------------
+        elseif isfield(coef,'f') && ~isfield(coef,'main_value')
+            if isa(coef.f,'function_handle')
+                coeftype = 'function_iso_array';
+            else
+                error([mfilename ' : #coefficient.f must be a function_handle !']);
+            end
+        end
+        % ---------------------------------------------------------------------
     else
         fprintf('coef = \n');
         disp(coef);
         error([mfilename ' : cannot define the type of the coefficient !']);
     end
-elseif isa(coef,'struct')
-    % ---------------------------------------------------------------------
-    if isfield(coef,'main_value') && isfield(coef,'main_dir')
-        paramconfig = fieldnames(coef);
-        for i = 1:length(paramconfig)
-            paramtype = f_paramtype(coef.(paramconfig{i}));
-            switch paramtype
-                case {'function'}
-                    coeftype = 'function_ltensor_array';
-                    break;
-                case {'numeric'}
-                    coeftype = 'numeric_ltensor_value';
-            end
-        end
-    % ---------------------------------------------------------------------
-    elseif isfield(coef,'f') && ~isfield(coef,'main_value')
-        if isa(coef.f,'function_handle')
-            coeftype = 'function_iso_array';
-        else
-            error([mfilename ' : #coefficient.f must be a function_handle !']);
-        end
-    end
-    % ---------------------------------------------------------------------
-else
-    fprintf('coef = \n');
-    disp(coef);
-    error([mfilename ' : cannot define the type of the coefficient !']);
 end
