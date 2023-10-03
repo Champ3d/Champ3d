@@ -18,7 +18,7 @@ arglist = {'type','value','x_value','y_value','z_value','angle_value',...
            'rot_axis','rot_angle'};
 
 % --- valid values of type
-type_valid = {'isotropic','scalar','tensoroxy','gtensor'};
+type_valid = {'isotropic','scalar','tensoroxy','ltensor'};
 
 % --- default input value
 type = [];
@@ -71,7 +71,7 @@ switch lower(type)
         ltensor.main_dir = [+cosd(angle_value) +sind(angle_value) 0];
         ltensor.ort1_dir = [-sind(angle_value) +cosd(angle_value) 0];
         ltensor.ort2_dir = [0 0 1];
-    case 'gtensor'
+    case 'ltensor'
         ltensor.main_value = main_value;
         ltensor.ort1_value = ort1_value;
         ltensor.ort2_value = ort2_value;
