@@ -81,7 +81,7 @@ end
 a = {};
 for i = 1:nb_fargin
     id_elem = 1;
-    eval(['a{i} = argument_array{i}' arg_pattern{i}]);
+    eval(['a{i} = argument_array{i}' arg_pattern{i} ';']);
 end
 %--------------------------------------------------------------------------
 if nb_fargin == 0
@@ -119,7 +119,7 @@ for id_elem = 1:nb_elem
     %----------------------------------------------------------------------
     a = {};
     for i = 1:nb_fargin
-        eval(['a{i} = argument_array{i}' arg_pattern{i}]);
+        eval(['a{i} = argument_array{i}' arg_pattern{i} ';']);
     end
     %----------------------------------------------------------------------
     if nb_fargin == 0
