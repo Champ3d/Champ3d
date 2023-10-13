@@ -40,6 +40,10 @@ if isempty(id_thdesign3d)
 end
 %--------------------------------------------------------------------------
 c3dobj.thdesign3d.(id_thdesign3d).id_mesh3d = id_mesh3d;
+% ---
+c3dobj.thdesign3d.(id_thdesign3d).fields.tempv = [];
+c3dobj.thdesign3d.(id_thdesign3d).fields.temps = [];
+%--------------------------------------------------------------------------
 % --- Log message
 if iscell(id_mesh3d)
     fprintf(['Add thdesign3d #' id_thdesign3d ' with mesh3d #' strjoin(id_mesh3d,', #') '\n']);

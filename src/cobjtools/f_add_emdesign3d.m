@@ -69,7 +69,25 @@ c3dobj.emdesign3d.(id_emdesign3d).em_model    = em_model;
 c3dobj.emdesign3d.(id_emdesign3d).formulation = formulation;
 c3dobj.emdesign3d.(id_emdesign3d).model_type  = model_type;
 c3dobj.emdesign3d.(id_emdesign3d).frequency   = frequency;
-
+% ---
+c3dobj.emdesign3d.(id_emdesign3d).fields.bv    = [];
+c3dobj.emdesign3d.(id_emdesign3d).fields.jv    = [];
+c3dobj.emdesign3d.(id_emdesign3d).fields.hv    = [];
+c3dobj.emdesign3d.(id_emdesign3d).fields.pv    = [];
+c3dobj.emdesign3d.(id_emdesign3d).fields.av    = [];
+c3dobj.emdesign3d.(id_emdesign3d).fields.phiv  = [];
+c3dobj.emdesign3d.(id_emdesign3d).fields.tv    = [];
+c3dobj.emdesign3d.(id_emdesign3d).fields.omev  = [];
+% ---
+c3dobj.emdesign3d.(id_emdesign3d).fields.bs    = [];
+c3dobj.emdesign3d.(id_emdesign3d).fields.js    = [];
+c3dobj.emdesign3d.(id_emdesign3d).fields.hs    = [];
+c3dobj.emdesign3d.(id_emdesign3d).fields.ps    = [];
+c3dobj.emdesign3d.(id_emdesign3d).fields.as    = [];
+c3dobj.emdesign3d.(id_emdesign3d).fields.phis  = [];
+c3dobj.emdesign3d.(id_emdesign3d).fields.ts    = [];
+c3dobj.emdesign3d.(id_emdesign3d).fields.omes  = [];
+%--------------------------------------------------------------------------
 % --- Log message
 if iscell(id_mesh3d)
     fprintf(['Add emdesign3d #' id_emdesign3d ' with mesh3d #' strjoin(id_mesh3d,', #') '\n']);
