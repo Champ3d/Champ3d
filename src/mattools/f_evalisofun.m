@@ -56,6 +56,7 @@ for ial = 1:nb_fargin
     end
 end
 %--------------------------------------------------------------------------
+argu = {};
 for ial = 1:nb_fargin
     argu{ial} = eval([alist{ial} '(:,id_elem);']);
 end

@@ -115,27 +115,35 @@ end
 vout_pattern(end) = [];
 vout_pattern = [vout_pattern ')'];
 %--------------------------------------------------------------------------
-for id_elem = 1:nb_elem
-    %----------------------------------------------------------------------
-    a = {};
-    for i = 1:nb_fargin
-        eval(['a{i} = argument_array{i}' arg_pattern{i} ';']);
-    end
-    %----------------------------------------------------------------------
+if isempty(nb_elem)
     if nb_fargin == 0
-        eval(['vout' vout_pattern  '= f();']);
-    elseif nb_fargin == 1
-        eval(['vout' vout_pattern '= f(a{1});']);
-    elseif nb_fargin == 2
-        eval(['vout' vout_pattern '= f(a{1},a{2});']);
-    elseif nb_fargin == 3
-        eval(['vout' vout_pattern '= f(a{1},a{2},a{3});']);
-    elseif nb_fargin == 4
-        eval(['vout' vout_pattern '= f(a{1},a{2},a{3},a{4});']);
-    elseif nb_fargin == 5
-        eval(['vout' vout_pattern '= f(a{1},a{2},a{3},a{4},a{5});']);
-    elseif nb_fargin == 6
-        eval(['vout' vout_pattern '= f(a{1},a{2},a{3},a{4},a{5},a{6});']);
+        vout = f();
+    else
+        vout = [];
+    end
+else
+    for id_elem = 1:nb_elem
+        %----------------------------------------------------------------------
+        a = {};
+        for i = 1:nb_fargin
+            eval(['a{i} = argument_array{i}' arg_pattern{i} ';']);
+        end
+        %----------------------------------------------------------------------
+        if nb_fargin == 0
+            eval(['vout' vout_pattern  '= f();']);
+        elseif nb_fargin == 1
+            eval(['vout' vout_pattern '= f(a{1});']);
+        elseif nb_fargin == 2
+            eval(['vout' vout_pattern '= f(a{1},a{2});']);
+        elseif nb_fargin == 3
+            eval(['vout' vout_pattern '= f(a{1},a{2},a{3});']);
+        elseif nb_fargin == 4
+            eval(['vout' vout_pattern '= f(a{1},a{2},a{3},a{4});']);
+        elseif nb_fargin == 5
+            eval(['vout' vout_pattern '= f(a{1},a{2},a{3},a{4},a{5});']);
+        elseif nb_fargin == 6
+            eval(['vout' vout_pattern '= f(a{1},a{2},a{3},a{4},a{5},a{6});']);
+        end
     end
 end
 %--------------------------------------------------------------------------
