@@ -17,7 +17,6 @@ id_mesh2d = [];
 id_mesh1d = [];
 id_layer  = [];
 centering = 0;
-origin_coordinates = [0, 0];
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -143,12 +142,9 @@ c3dobj.mesh3d.(id_mesh3d).elem_type = 'hexa';
 c3dobj.mesh3d.(id_mesh3d).celem = squeeze(celem);
 c3dobj.mesh3d.(id_mesh3d).face  = face;
 c3dobj.mesh3d.(id_mesh3d).cface = squeeze(cface);
-c3dobj.mesh3d.(id_mesh3d).origin_coordinates = origin_coordinates;
 %--------------------------------------------------------------------------
 c3dobj.mesh3d.(id_mesh3d).edge = f_edge(c3dobj.mesh3d.(id_mesh3d).elem, ...
                             'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
-%--------------------------------------------------------------------------
-c3dobj.mesh3d.(id_mesh3d) = f_intkit3d(c3dobj.mesh3d.(id_mesh3d));
 %--------------------------------------------------------------------------
 % --- Log message
 fprintf(' --- in %.2f s \n',toc);
