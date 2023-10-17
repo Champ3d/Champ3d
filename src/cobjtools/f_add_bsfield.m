@@ -39,7 +39,7 @@ if isempty(id_bsfield)
 end
 %--------------------------------------------------------------------------
 if isempty(id_dom3d)
-    error([mfilename ': id_dom3d must be given !'])
+    id_dom3d = 'all_domain';
 end
 %--------------------------------------------------------------------------
 % --- Output
