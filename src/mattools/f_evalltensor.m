@@ -49,37 +49,7 @@ for iltf = 1:length(ltfield__)
     paramtype = f_paramtype(ltfield);
     %----------------------------------------------------------------------
     if any(strcmpi(paramtype,{'c3d_parameter_function'}))
-        %------------------------------------------------------------------
-        nb_fargin = f_nargin(ltfield.f);
-        %------------------------------------------------------------------
-        alist = {};
-        for ial = 1:nb_fargin
-            %alist{ial} = ['c3dobj' ...
-            %              '.' ltfield.from{ial} ...
-            %              '.' ltfield.id_cobj{ial} ...
-            %              '.' ltfield.field{ial}];
-            alist{ial} = ltfield.depend_on{ial};
-        end
-        %------------------------------------------------------------------
-        for ial = 1:nb_fargin
-            argu{ial} = eval([alist{ial} '(:,id_elem);']);
-        end
-        %------------------------------------------------------------------
-        if nb_fargin == 0
-            param = feval(ltfield.f);
-        elseif nb_fargin == 1
-            param = feval(ltfield.f,argu{1});
-        elseif nb_fargin == 2
-            param = feval(ltfield.f,argu{1},argu{2});
-        elseif nb_fargin == 3
-            param = feval(ltfield.f,argu{1},argu{2},argu{3});
-        elseif nb_fargin == 4
-            param = feval(ltfield.f,argu{1},argu{2},argu{3},argu{4});
-        elseif nb_fargin == 5
-            param = feval(ltfield.f,argu{1},argu{2},argu{3},argu{4},argu{5});
-        elseif nb_fargin == 6
-            param = feval(ltfield.f,argu{1},argu{2},argu{3},argu{4},argu{5},argu{6});
-        end
+        param = f_evalisofun(c3dobj,'phydomobj',phydomobj,'iso_function',ltfield);
         %------------------------------------------------------------------
         % --- Output
         ltensor_array.(ltfield__{iltf}) = param;

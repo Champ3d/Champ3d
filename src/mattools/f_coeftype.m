@@ -63,7 +63,7 @@ if no_nb_elem_info
             for i = 1:length(paramconfig)
                 paramtype = f_paramtype(coef.(paramconfig{i}));
                 switch paramtype
-                    case {'function'}
+                    case {'c3d_parameter_function','function'}
                         coeftype = 'function_ltensor_array';
                         break;
                     case {'numeric'}

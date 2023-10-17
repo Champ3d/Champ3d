@@ -48,32 +48,19 @@ nb_fargin = f_nargin(iso_function.f);
 %--------------------------------------------------------------------------
 alist = {};
 for ial = 1:nb_fargin
-    %alist{ial} = ['c3dobj' ...
-    %              '.' iso_function.from{ial} ...
-    %              '.' iso_function.id_cobj{ial} ...
-    %              '.' iso_function.field{ial}];
-    alist{ial} = iso_function.depend_on{ial};
+    depon = iso_function.depend_on{ial};
+    if isempty(depon)
+        alist{ial} = depon;
+    else
+        alist{ial} = f_cargpath(c3dobj,'phydomobj',phydomobj,'arg_name',depon);
+    end
 end
 %--------------------------------------------------------------------------
 for ial = 1:nb_fargin
     argu{ial} = eval([alist{ial} '(:,id_elem);']);
 end
 %--------------------------------------------------------------------------
-if nb_fargin == 0
-    param = feval(iso_function.f);
-elseif nb_fargin == 1
-    param = feval(iso_function.f,argu{1});
-elseif nb_fargin == 2
-    param = feval(iso_function.f,argu{1},argu{2});
-elseif nb_fargin == 3
-    param = feval(iso_function.f,argu{1},argu{2},argu{3});
-elseif nb_fargin == 4
-    param = feval(iso_function.f,argu{1},argu{2},argu{3},argu{4});
-elseif nb_fargin == 5
-    param = feval(iso_function.f,argu{1},argu{2},argu{3},argu{4},argu{5});
-elseif nb_fargin == 6
-    param = feval(iso_function.f,argu{1},argu{2},argu{3},argu{4},argu{5},argu{6});
-end
+param = f_foreach(iso_function.f,'argument_array',argu);
 %--------------------------------------------------------------------------
 % --- Output
 if size(param,1) == 1 && size(param,2) ~= nb_elem
