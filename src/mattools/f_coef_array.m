@@ -31,9 +31,9 @@ switch lensize_gt
         elseif s1 == 3 && s2 == 3
             tensor_type = 'a_3x3_tensor';
         elseif s2 == 1 && s1 == 1
-            tensor_type = 'a_scalar';
+            tensor_type = 'a_1x1_tensor';
         elseif s2 == 1 && s1 > 1
-            tensor_type = 'a_scalar_array';
+            tensor_type = 'a_1x1_tensor_array';
         else
             error([mfilename ' : check input dimension !']);
         end
@@ -53,7 +53,7 @@ switch lensize_gt
 end
 %--------------------------------------------------------------------------
 switch tensor_type
-    case {'a_scalar','a_scalar_array'}
+    case {'a_1x1_tensor','a_scalar','a_1x1_tensor_array','a_scalar_array'}
         coef_array = f_tocolv(coef);
         coef_array_type = 'iso_array';
     case {'a_2x2_tensor','a_3x3_tensor'}

@@ -75,24 +75,23 @@ switch ptype
         f = str2func(['@()' num2str(f)]);
     case 'function'
         %------------------------------------------------------------------
-        if isempty(depend_on)
-            error([mfilename ' : #depend_on must be given !']);
-        end
-        %------------------------------------------------------------------
-        depend_on = f_to_scellargin(depend_on);
-        %------------------------------------------------------------------
-        for i = 1:length(depend_on)
-            dep_on = depend_on{i};
-            field_name = split(dep_on,'.');
-            field_name = field_name{end};
-            if ~any(strcmpi(field_name,valid_depend_on))
-                error([mfilename ' : #depend_on is not valid. Check field names : ' strjoin(valid_depend_on,', ') ' !']);
+        if ~isempty(depend_on)
+            %--------------------------------------------------------------
+            depend_on = f_to_scellargin(depend_on);
+            %--------------------------------------------------------------
+            for i = 1:length(depend_on)
+                dep_on = depend_on{i};
+                field_name = split(dep_on,'.');
+                field_name = field_name{end};
+                if ~any(strcmpi(field_name,valid_depend_on))
+                    error([mfilename ' : #depend_on is not valid. Check field names : ' strjoin(valid_depend_on,', ') ' !']);
+                end
             end
-        end
-        %------------------------------------------------------------------
-        if f_nargin(f)
-            if f_nargin(f) ~= length(depend_on)
-                error([mfilename ': Check number of f arguments !']);
+            %--------------------------------------------------------------
+            if f_nargin(f)
+                if f_nargin(f) ~= length(depend_on)
+                    error([mfilename ': Check number of f arguments !']);
+                end
             end
         end
 end

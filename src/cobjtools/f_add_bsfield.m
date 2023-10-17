@@ -7,12 +7,15 @@ function c3dobj = f_add_bsfield(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_bsfield','id_dom3d','bs'};
+arglist = {'id_emdesign3d','id_bsfield','id_dom3d',...
+           'bs_value','bs_dir','bs_array'};
 
 % --- default input value
 id_emdesign3d = [];
 id_dom3d      = [];
-bs            = 0;
+bs_value      = 0;
+bs_dir        = [];
+bs_array      = [];
 id_bsfield    = [];
 
 %--------------------------------------------------------------------------
@@ -45,7 +48,9 @@ end
 % --- Output
 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).id_emdesign3d = id_emdesign3d;
 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).id_dom3d = id_dom3d;
-c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).bs = bs;
+c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).bs_value = bs_value;
+c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).bs_dir   = bs_dir;
+c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).bs_array = bs_array;
 % --- status
 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).to_be_rebuilt = 1;
 % --- info message

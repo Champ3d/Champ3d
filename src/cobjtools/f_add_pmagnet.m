@@ -7,13 +7,15 @@ function c3dobj = f_add_pmagnet(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_dom3d','id_pmagnet','br_value','br_dir','id_bcon'};
+arglist = {'id_emdesign3d','id_dom3d','id_pmagnet','br_value','br_dir',...
+           'br_array','id_bcon'};
 
 % --- default input value
 id_emdesign3d = [];
 id_dom3d      = [];
 br_value      = 0;
 br_dir        = [];
+br_array      = [];
 id_bcon       = [];
 id_pmagnet    = [];
 %--------------------------------------------------------------------------
