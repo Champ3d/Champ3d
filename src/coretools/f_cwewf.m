@@ -49,11 +49,11 @@ id_dom3d  = phydomobj.id_dom3d;
 id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
 nb_elem   = length(id_elem);
 %--------------------------------------------------------------------------
-[coef_array, coef_array_type] = f_coef_array(coefficient);
-%--------------------------------------------------------------------------
 if isempty(coefficient)
     coef_array = 1;
     coef_array_type = 'iso_array';
+else
+    [coef_array, coef_array_type] = f_tensor_array(coefficient);
 end
 %--------------------------------------------------------------------------
 if isfield(c3dobj.mesh3d.(id_mesh3d),'elem_type')
