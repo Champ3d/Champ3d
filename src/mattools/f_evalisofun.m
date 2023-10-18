@@ -56,12 +56,16 @@ for ial = 1:nb_fargin
     end
 end
 %--------------------------------------------------------------------------
+varargin_list = iso_function.varargin_list;
+%--------------------------------------------------------------------------
 argu = {};
 for ial = 1:nb_fargin
     argu{ial} = eval([alist{ial} '(:,id_elem);']);
 end
 %--------------------------------------------------------------------------
-param = f_foreach(iso_function.f,'argument_array',argu);
+param = f_foreach(iso_function.f,'argument_array',argu,'varargin_list',varargin_list);
+%--------------------------------------------------------------------------
+param(isnan(param)) = 0;
 %--------------------------------------------------------------------------
 % --- Output
 if size(param,1) == 1 && size(param,2) ~= nb_elem

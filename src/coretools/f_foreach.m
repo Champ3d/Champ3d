@@ -8,11 +8,12 @@ function vout = f_foreach(f,varargin)
 
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'argument_array','nb_elem'};
+arglist = {'argument_array','nb_elem','varargin_list'};
 
 % --- default input value
 argument_array = {};
 nb_elem = [];
+varargin_list = {};
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -84,20 +85,38 @@ for i = 1:nb_fargin
     eval(['a{i} = argument_array{i}' arg_pattern{i} ';']);
 end
 %--------------------------------------------------------------------------
-if nb_fargin == 0
-    vtest = f();
-elseif nb_fargin == 1
-    vtest = f(a{1});
-elseif nb_fargin == 2
-    vtest = f(a{1},a{2});
-elseif nb_fargin == 3
-    vtest = f(a{1},a{2},a{3});
-elseif nb_fargin == 4
-    vtest = f(a{1},a{2},a{3},a{4});
-elseif nb_fargin == 5
-    vtest = f(a{1},a{2},a{3},a{4},a{5});
-elseif nb_fargin == 6
-    vtest = f(a{1},a{2},a{3},a{4},a{5},a{6});
+if isempty(varargin_list)
+    if nb_fargin == 0
+        vtest = f();
+    elseif nb_fargin == 1
+        vtest = f(a{1});
+    elseif nb_fargin == 2
+        vtest = f(a{1},a{2});
+    elseif nb_fargin == 3
+        vtest = f(a{1},a{2},a{3});
+    elseif nb_fargin == 4
+        vtest = f(a{1},a{2},a{3},a{4});
+    elseif nb_fargin == 5
+        vtest = f(a{1},a{2},a{3},a{4},a{5});
+    elseif nb_fargin == 6
+        vtest = f(a{1},a{2},a{3},a{4},a{5},a{6});
+    end
+else
+    if nb_fargin == 0
+        vtest = f(varargin_list{:});
+    elseif nb_fargin == 1
+        vtest = f(a{1},varargin_list{:});
+    elseif nb_fargin == 2
+        vtest = f(a{1},a{2},varargin_list{:});
+    elseif nb_fargin == 3
+        vtest = f(a{1},a{2},a{3},varargin_list{:});
+    elseif nb_fargin == 4
+        vtest = f(a{1},a{2},a{3},a{4},varargin_list{:});
+    elseif nb_fargin == 5
+        vtest = f(a{1},a{2},a{3},a{4},a{5},varargin_list{:});
+    elseif nb_fargin == 6
+        vtest = f(a{1},a{2},a{3},a{4},a{5},a{6},varargin_list{:});
+    end
 end
 %--------------------------------------------------------------------------
 sizev = size(vtest);
@@ -129,20 +148,38 @@ else
             eval(['a{i} = argument_array{i}' arg_pattern{i} ';']);
         end
         %----------------------------------------------------------------------
-        if nb_fargin == 0
-            eval(['vout' vout_pattern  '= f();']);
-        elseif nb_fargin == 1
-            eval(['vout' vout_pattern '= f(a{1});']);
-        elseif nb_fargin == 2
-            eval(['vout' vout_pattern '= f(a{1},a{2});']);
-        elseif nb_fargin == 3
-            eval(['vout' vout_pattern '= f(a{1},a{2},a{3});']);
-        elseif nb_fargin == 4
-            eval(['vout' vout_pattern '= f(a{1},a{2},a{3},a{4});']);
-        elseif nb_fargin == 5
-            eval(['vout' vout_pattern '= f(a{1},a{2},a{3},a{4},a{5});']);
-        elseif nb_fargin == 6
-            eval(['vout' vout_pattern '= f(a{1},a{2},a{3},a{4},a{5},a{6});']);
+        if isempty(varargin_list)
+            if nb_fargin == 0
+                eval(['vout' vout_pattern  '= f();']);
+            elseif nb_fargin == 1
+                eval(['vout' vout_pattern '= f(a{1});']);
+            elseif nb_fargin == 2
+                eval(['vout' vout_pattern '= f(a{1},a{2});']);
+            elseif nb_fargin == 3
+                eval(['vout' vout_pattern '= f(a{1},a{2},a{3});']);
+            elseif nb_fargin == 4
+                eval(['vout' vout_pattern '= f(a{1},a{2},a{3},a{4});']);
+            elseif nb_fargin == 5
+                eval(['vout' vout_pattern '= f(a{1},a{2},a{3},a{4},a{5});']);
+            elseif nb_fargin == 6
+                eval(['vout' vout_pattern '= f(a{1},a{2},a{3},a{4},a{5},a{6});']);
+            end
+        else
+            if nb_fargin == 0
+                eval(['vout' vout_pattern  '= f(varargin_list{:});']);
+            elseif nb_fargin == 1
+                eval(['vout' vout_pattern '= f(a{1},varargin_list{:});']);
+            elseif nb_fargin == 2
+                eval(['vout' vout_pattern '= f(a{1},a{2},varargin_list{:});']);
+            elseif nb_fargin == 3
+                eval(['vout' vout_pattern '= f(a{1},a{2},a{3},varargin_list{:});']);
+            elseif nb_fargin == 4
+                eval(['vout' vout_pattern '= f(a{1},a{2},a{3},a{4},varargin_list{:});']);
+            elseif nb_fargin == 5
+                eval(['vout' vout_pattern '= f(a{1},a{2},a{3},a{4},a{5},varargin_list{:});']);
+            elseif nb_fargin == 6
+                eval(['vout' vout_pattern '= f(a{1},a{2},a{3},a{4},a{5},a{6},varargin_list{:});']);
+            end
         end
     end
 end
