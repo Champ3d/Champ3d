@@ -17,13 +17,15 @@ function coef = f_make_coef(varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'f','depend_on','coef_size','coef_type','input_size'};
+arglist = {'f','depend_on','varargin_list',...
+           'coef_size','coef_type','input_size'};
 
 % --- default input value
 f = [];
 depend_on = [];
-coef_type = [];
+varargin_list = {};
 % -
+coef_type = [];
 coef_size = [];
 input_size = [];
 
@@ -98,9 +100,10 @@ end
 %--------------------------------------------------------------------------
 % --- Output
 coef.f = f;
-coef.depend_on  = depend_on;
-coef.coef_type  = coef_type;
+coef.depend_on = depend_on;
+coef.varargin_list = varargin_list;
 % -
+coef.coef_type  = coef_type;
 coef.coef_size  = coef_size;
 coef.input_size = input_size;
 
