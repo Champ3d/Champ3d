@@ -79,7 +79,7 @@ if ~isempty(id_nomesh)
     id_thing = id_nomesh;
 end
 if ~isempty(id_bsfield)
-    thing = 'bs_field';
+    thing = 'bsfield';
     id_thing = id_bsfield;
 end
 if ~isempty(id_pmagnet)
