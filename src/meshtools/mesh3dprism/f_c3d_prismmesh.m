@@ -54,7 +54,7 @@ if isempty(id_mesh1d)
 end
 %--------------------------------------------------------------------------
 tic;
-fprintf(['Make c3d_prismmesh #' id_mesh3d]);
+f_fprintf(0, 'Make c3d_prismmesh #', 1,id_mesh3d);
 
 %--------------------------------------------------------------------------
 divlay   = [];
@@ -150,7 +150,9 @@ c3dobj.mesh3d.(id_mesh3d).edge = f_edge(c3dobj.mesh3d.(id_mesh3d).elem, ...
                             'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
 %--------------------------------------------------------------------------
 % --- Log message
-fprintf(' --- in %.2f s \n',toc);
+f_fprintf(0, '--- in',...
+          1, toc, ...
+          0, 's \n');
 
 
 

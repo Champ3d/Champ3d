@@ -52,12 +52,12 @@ if strcmpi(build_from,'mesh1d')
     % --- Output
     c3dobj = f_mesh2dgeo1d(c3dobj,varargin{:});
     % --- Log message
-    fprintf(['Add mesh2d #' id_mesh2d '\n']);
+    f_fprintf(0,'Add #mesh2d',1,id_mesh2d,0,'\n');
 
 elseif strcmpi(build_from,'femm')
     c3dobj = f_femm_loadmeshfile(c3dobj,varargin{:});
     % --- Log message
-    fprintf(['Add mesh2d #' id_mesh2d '\n']);
+    f_fprintf(0,'Add #mesh2d',1,id_mesh2d,0,'\n');
     
 elseif strcmpi(build_from,'geoquad')
     % TODO

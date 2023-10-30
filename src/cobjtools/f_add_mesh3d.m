@@ -39,18 +39,15 @@ if isempty(id_mesh3d)
     error([mfilename ' : #id_mesh3d must be given !']);
 end
 %--------------------------------------------------------------------------
+f_fprintf(0,'Add #mesh3d',...
+          1,id_mesh3d,...
+          0,'\n');
+%--------------------------------------------------------------------------
 switch mesher
     case 'c3d_hexamesh'
-        %------------------------------------------------------------------
         c3dobj = f_c3d_hexamesh(c3dobj,varargin{:});
-        % --- Log message
-        fprintf(['Add mesh3d #' id_mesh3d '\n']);
-        %------------------------------------------------------------------
     case {'c3d_prismmesh','c3d_prismesh'}
-        c3dobj = f_c3d_prismmesh(c3dobj,'id_mesh3d',id_mesh3d,'id_mesh2d',id_mesh2d,...
-                                        'id_layer',id_layer);
-        % --- Log message
-        fprintf(['Add mesh3d #' id_mesh3d '\n']);
+        c3dobj = f_c3d_prismmesh(c3dobj,varargin{:});
     case 'gmsh'
         % TODO
     case {'c3d_mixedmesh','c3d_mixedhexaprismmesh','c3d_mixedhexaprism'}

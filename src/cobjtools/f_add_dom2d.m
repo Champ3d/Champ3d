@@ -93,9 +93,6 @@ switch c3dobj.mesh2d.(id_mesh2d).mesher
             %--------------------------------------------------------------
             c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).id_elem = id_elem;
             c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).elem_code = elem_code;
-            %--------------------------------------------------------------
-            fprintf(['Add dom2d #' id_dom2d ' - ' num2str(length(id_elem)) ' elem \n']);
-            %--------------------------------------------------------------
         else
             id_elem = [];
             for i = 1:length(elem_code)
@@ -106,9 +103,6 @@ switch c3dobj.mesh2d.(id_mesh2d).mesher
             %--------------------------------------------------------------
             c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).id_elem = id_elem;
             c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).elem_code = elem_code;
-            %--------------------------------------------------------------
-            fprintf(['Add dom2d #' id_dom2d ' - ' num2str(length(id_elem)) ' elem \n']);
-            %--------------------------------------------------------------
         end
     case 'quadmesh'
     case 'triangle_femm'
@@ -121,11 +115,16 @@ switch c3dobj.mesh2d.(id_mesh2d).mesher
         %------------------------------------------------------------------
         c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).id_elem = id_elem;
         c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).elem_code = elem_code;
-        %------------------------------------------------------------------
-        fprintf(['Add dom2d #' id_dom2d ' - ' num2str(length(id_elem)) ' elem \n']);
-        %------------------------------------------------------------------
-
 end
+%------------------------------------------------------------------
+f_fprintf(0,'Add #dom2d',...
+          1, id_dom2d,...
+          0,'-',...
+          1,length(id_elem),...
+          0,' elem \n');
+%------------------------------------------------------------------
+
+
 %--------------------------------------------------------------------------
 %------------------------------------------------------------------
 % id_x = f_to_dcellargin(id_x);

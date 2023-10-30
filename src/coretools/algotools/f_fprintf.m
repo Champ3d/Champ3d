@@ -55,7 +55,11 @@ for i = 1:len/2
     s = str{i};
     switch f
         case 0
-            fprintf([' ' s ' ']);
+            if isempty(strfind(s,'\n'))
+                fprintf([' ' s ' ']);
+            else
+                fprintf([' ' s]);
+            end
         case 1
             fprintf(2,[' ' s ' ']);
         case 2

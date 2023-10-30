@@ -57,7 +57,7 @@ if ~strcmpi(id_mesh1d,c3dobj.mesh2d.(id_mesh2d).id_mesh1d)
 end
 %--------------------------------------------------------------------------
 tic;
-fprintf(['Make c3d_hexamesh #' id_mesh3d]);
+f_fprintf(0,'Make c3d_hexamesh #', 1, id_mesh3d);
 
 %--------------------------------------------------------------------------
 divlay   = [];
@@ -150,7 +150,9 @@ c3dobj.mesh3d.(id_mesh3d).edge = f_edge(c3dobj.mesh3d.(id_mesh3d).elem, ...
                             'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
 %--------------------------------------------------------------------------
 % --- Log message
-fprintf(' --- in %.2f s \n',toc);
+f_fprintf(0, '--- in',...
+          1, toc, ...
+          0, 's \n');
 %--------------------------------------------------------------------------
 % c3dobj.mesh3d.(id_mesh3d).cnode(1,:) = mean(reshape(node(1,elem(1:8,:)),8,nb_elem));
 % c3dobj.mesh3d.(id_mesh3d).cnode(2,:) = mean(reshape(node(2,elem(1:8,:)),8,nb_elem));

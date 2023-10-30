@@ -29,7 +29,6 @@ end
 
 %--------------------------------------------------------------------------
 if isempty(elem_code)
-    tic;
     %--------------------------------------------------------------
     if isempty(id_dom2d) || isempty(id_layer)
         error([mfilename ' : #id_dom2d and #id_layer must be given !']);
@@ -68,10 +67,6 @@ if isempty(elem_code)
     id_elem = unique(id_elem);
     %--------------------------------------------------------------
     elem_code = unique(c3dobj.mesh3d.(id_mesh3d).elem_code(id_elem));
-    %--------------------------------------------------------------
-    % --- Log message
-    fprintf(' - %d elem --- in %.2f s \n',length(id_elem),toc);
-    %--------------------------------------------------------------
 else
     tic;
     %--------------------------------------------------------------
@@ -81,8 +76,4 @@ else
             find(c3dobj.mesh3d.(id_mesh3d).elem_code == elem_code(i))];
     end
     id_elem = unique(id_elem);
-    %--------------------------------------------------------------
-    % --- Log message
-    fprintf(' - %d elem --- in %.2f s \n',length(id_elem),toc);
-    %--------------------------------------------------------------
 end

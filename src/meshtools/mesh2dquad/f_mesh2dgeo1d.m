@@ -49,9 +49,9 @@ end
 % -------------------------------------------------------------------------
 
 tic;
-fprintf(['Make mesh2d #' id_mesh2d ' from mesh1d with : \n']);
-fprintf(['id_x #' strjoin(id_x,', #') '\n']);
-fprintf(['id_y #' strjoin(id_y,', #')])
+f_fprintf(0, 'Make mesh2d #', 1, id_mesh2d, 0,' from mesh1d with : \n');
+f_fprintf(0, '#id_x :', 1, strjoin(id_x,', '), 0, '\n');
+f_fprintf(0, '#id_y :', 1, strjoin(id_y,', '), 0, '\n');
 
 % -------------------------------------------------------------------------
 xDom    = [];
@@ -153,7 +153,9 @@ c3dobj.mesh2d.(id_mesh2d).origin_coordinates = origin_coordinates;
 % ---
 % c3dobj.mesh2d.(id_mesh2d).id_elemdom = -1; % <-- old t4 from femm, t5 from quad
 % --- Log message
-fprintf(' --- in %.2f s \n',toc);
+f_fprintf(0, '--- in',...
+          1, toc, ...
+          0, 's \n');
 
 
 
