@@ -57,7 +57,7 @@ if ~strcmpi(id_mesh1d,c3dobj.mesh2d.(id_mesh2d).id_mesh1d)
 end
 %--------------------------------------------------------------------------
 tic;
-f_fprintf(0,'Make c3d_hexamesh #', 1, id_mesh3d);
+f_fprintf(0,'Make #c3d_hexamesh',1,id_mesh3d);
 
 %--------------------------------------------------------------------------
 divlay   = [];
