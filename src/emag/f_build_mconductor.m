@@ -69,11 +69,11 @@ for iec = 1:length(id_mconductor)
                 mu0 = 4 * pi * 1e-7;
                 nu0nur = f_invtensor(mu0 .* coef_array);
                 %--------------------------------------------------------------
-                nuwfwf = f_cwfwf(c3dobj,'phydomobj',phydomobj,...
+                nu0nurwfwf = f_cwfwf(c3dobj,'phydomobj',phydomobj,...
                                         'coefficient',nu0nur);
                 %--------------------------------------------------------------
                 % --- Output
-                c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_phydom).nuwfwf = nuwfwf;
+                c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_phydom).nu0nurwfwf = nu0nurwfwf;
                 %----------------------------------------------------------
                 coeftype = f_coeftype(phydomobj.(coef_name));
                 switch coeftype

@@ -11,7 +11,8 @@ function c3dobj = f_add_bsfield(c3dobj,varargin)
 
 % --- valid argument list (to be updated each time modifying function)
 arglist = {'id_emdesign3d','id_bsfield','id_dom3d',...
-           'bs_value','bs_dir','bs'};
+           'bs_value','bs_dir','bs',...
+           'id_airbox'};
 
 % --- default input value
 id_emdesign3d = [];
@@ -20,7 +21,7 @@ bs_value      = 0;
 bs_dir        = [];
 bs            = [];
 id_bsfield    = [];
-
+id_airbox     = [];
 %--------------------------------------------------------------------------
 if nargin <= 1
     error([mfilename ': No bsfield to add!']);
@@ -48,12 +49,17 @@ if isempty(id_dom3d)
     id_dom3d = 'all_domain';
 end
 %--------------------------------------------------------------------------
+if iscell(id_airbox)
+    id_airbox = id_airbox{1};
+end
+%--------------------------------------------------------------------------
 % --- Output
 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).id_emdesign3d = id_emdesign3d;
-c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).id_dom3d = id_dom3d;
-c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).bs_value = bs_value;
-c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).bs_dir   = bs_dir;
-c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).bs       = bs;
+c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).id_dom3d  = id_dom3d;
+c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).bs_value  = bs_value;
+c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).bs_dir    = bs_dir;
+c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).bs        = bs;
+c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).id_airbox = id_airbox;
 % --- status
 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).to_be_rebuilt = 1;
 % --- info message

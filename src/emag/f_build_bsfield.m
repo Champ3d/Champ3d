@@ -35,12 +35,6 @@ end
 if iscell(id_emdesign3d)
     id_emdesign3d = id_emdesign3d{1};
 end
-
-
-% id_emdesign3d = 'em_multicubes';
-% id_bsfield = 'bsfield';
-
-
 %--------------------------------------------------------------------------
 id_bsfield = f_to_scellargin(id_bsfield);
 %--------------------------------------------------------------------------
@@ -54,15 +48,6 @@ end
 %--------------------------------------------------------------------------
 for iec = 1:length(id_bsfield)
     %----------------------------------------------------------------------
-    no_wfwf = 0;
-    if ~isfield(c3dobj.emdesign3d.(id_emdesign3d),'matrix')
-        no_wfwf = 1;
-    elseif ~isfield(c3dobj.emdesign3d.(id_emdesign3d).matrix,'wfwf')
-        no_wfwf = 1;
-    elseif isempty(c3dobj.emdesign3d.(id_emdesign3d).matrix.wfwf)
-        no_wfwf = 1;
-    end
-    %----------------------------------------------------------------------
     id_phydom = id_bsfield{iec};
     to_be_rebuilt = c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_phydom).to_be_rebuilt;
     if to_be_rebuilt
@@ -75,14 +60,6 @@ for iec = 1:length(id_bsfield)
         switch em_model
             case {'fem_aphijw','fem_aphits'}
                 tic;
-                %----------------------------------------------------------
-                if no_wfwf
-                    phydomobj.id_dom3d = 'all_domain';
-                    phydomobj.id_emdesign3d = id_emdesign3d;
-                    c3dobj.emdesign3d.(id_emdesign3d).matrix.wfwf = ...
-                        f_cwfwf(c3dobj,'phydomobj',phydomobj,...
-                                       'coefficient',1);
-                end
                 %----------------------------------------------------------
                 phydomobj = c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_phydom);
                 %----------------------------------------------------------
