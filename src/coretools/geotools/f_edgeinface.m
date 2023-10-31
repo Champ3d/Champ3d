@@ -13,7 +13,6 @@ function [id_edge_in_face, ori_edge_in_face, sign_edge_in_face] = f_edgeinface(f
 arglist = {'get'};
 
 % --- default input value
-get = '_all';
 
 %--------------------------------------------------------------------------
 % --- check and update input
@@ -38,7 +37,7 @@ sign_edge_in_face = zeros(maxnbEd_inFa,nb_face);
 if ~isempty(itria)
     face_ = face(1:3,itria);
     [id_ed, ori_edge, sign_edge] = ...
-        f_edgeinelem(face_,edge_list,'defined_on','face','get',get);
+        f_edgeinelem(face_,edge_list,'defined_on','face');
     id_edge_in_face(1:3,itria) = id_ed;
     ori_edge_in_face(1:3,itria) = ori_edge;
     sign_edge_in_face(1:3,itria) = sign_edge;
@@ -47,7 +46,7 @@ end
 if ~isempty(iquad)
     face_ = face(1:4,iquad);
     [id_ed, ori_edge, sign_edge] = ...
-        f_edgeinelem(face_,edge_list,'defined_on','face','get',get);
+        f_edgeinelem(face_,edge_list,'defined_on','face');
     id_edge_in_face(1:4,iquad) = id_ed;
     ori_edge_in_face(1:4,iquad) = ori_edge;
     sign_edge_in_face(1:4,iquad) = sign_edge;

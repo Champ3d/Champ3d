@@ -10,16 +10,14 @@ function [id_edge_in_elem, ori_edge_in_elem, sign_edge_in_elem] = f_edgeinelem(e
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem_type','defined_on','get'};
+arglist = {'elem_type','defined_on'};
 
 % --- default input value
 elem_type = [];
-get = '_all';
 defined_on = 'elem';
 
 % --- default output value
 id_edge_in_elem = [];
-ori_edge_in_elem = [];
 sign_edge_in_elem = [];
 %--------------------------------------------------------------------------
 % --- check and update input
@@ -45,21 +43,16 @@ nbElem = size(elem,2);
 e = reshape([elem(EdNo_inEl(:,1),:); elem(EdNo_inEl(:,2),:)], ...
              nbEd_inEl, nbNo_inEd, nbElem);
 % ---
-if any(f_strcmpi(get,{'_all','topo','ori','orientation'}))
-    ori_edge_in_elem = squeeze(sign(diff(e, 1, 2))); % with unsorted e !
-    if any(strcmpi(elem_type,{'tri','quad','triangle'}))
-        sign_edge_in_elem = ori_edge_in_elem .* con.siEd_inEl;
-    end
+ori_edge_in_elem = squeeze(sign(diff(e, 1, 2))); % with unsorted e !
+if any(strcmpi(elem_type,{'tri','quad','triangle'}))
+    sign_edge_in_elem = ori_edge_in_elem .* con.siEd_inEl;
 end
 % ---
 e = sort(e, 2);
 %--------------------------------------------------------------------------
-if any(f_strcmpi(get,{'_all','id'}))
-    if ~isempty(edge_list)
-        id_edge_in_elem = f_findvecnd(e,edge_list,'position',2);
-    else
-        id_edge_in_elem = []; 
-    end
+if ~isempty(edge_list)
+    id_edge_in_elem = f_findvecnd(e,edge_list,'position',2);
 end
+
 %--------------------------------------------------------------------------
 end
