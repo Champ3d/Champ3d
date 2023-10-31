@@ -10,7 +10,7 @@ function [id_edge_in_face, ori_edge_in_face, sign_edge_in_face] = f_edgeinface(f
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'get'};
+arglist = {''};
 
 % --- default input value
 
