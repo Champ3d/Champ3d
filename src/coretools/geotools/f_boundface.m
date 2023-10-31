@@ -34,7 +34,7 @@ end
 %------------------------------------------------------------------------
 face = f_face(elem,'elem_type',elem_type);
 [face_in_elem, ~, sign_face_in_elem] = ...
-    f_faceinelem(elem,node,face,'elem_type',elem_type,'get',{'id','sign'});
+    f_faceinelem(elem,node,face,'elem_type',elem_type);
 %--------------------------------------------------------------------------
 nb_face = size(face,2);
 %--------------------------------------------------------------------------
