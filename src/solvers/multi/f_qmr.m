@@ -34,7 +34,7 @@ precon = sqrt(diag(diag(S)));
 [solution,flag,relres,niter,resvec] = qmr(S,F,sol_option.tolerance,sol_option.nb_iter,precon.',precon);
 % ---
 f_fprintf(0,'--- in',1,toc,0,'s \n');
-f_fprintf(0,'------ niter',1,niter,0,'relres',1,relres,0,'\n');
+f_fprintf(0,'------ niter',1,niter,0,', relres',1,relres,0,'\n');
 
 
 
