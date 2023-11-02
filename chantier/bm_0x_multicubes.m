@@ -79,7 +79,7 @@ br_value = 1;
 
 
 %% build 1D mesh
-msize  = 3;
+msize  = 6;
 c3dobj = [];
 % ---
 c3dobj = f_add_x(c3dobj,'id_x','xair_l','d',x_airbox,'dnum',msize,'dtype','log-');

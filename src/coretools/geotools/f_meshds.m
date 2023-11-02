@@ -70,7 +70,7 @@ if any(strcmpi(get,{'_all', 'celem','center'}))
 end
 %--------------------------------------------------------------------------
 %----- edges
-if any(strcmpi(get,{'_all', 'edge'}))
+if any(strcmpi(get,{'_all','edge','id_edge_in_elem'}))
     if ~isfield(mesh,'edge')
         mesh.edge = f_edge(elem,'elem_type',elem_type);
     end
@@ -85,9 +85,18 @@ if any(strcmpi(get,{'_all', 'edge'}))
 end
 %--------------------------------------------------------------------------
 %----- faces
-if any(strcmpi(get,{'_all', 'face'}))
+if any(strcmpi(get,{'_all','face','id_face_in_elem','sign_face_in_elem'}))
     if ~isfield(mesh,'face')
         mesh.face = f_face(elem,'elem_type',elem_type);
+    end
+    % ---
+    if ~all(isfield(mesh,{'id_face_in_elem','sign_face_in_elem'}))
+        [id_face_in_elem, ori_face_in_elem, sign_face_in_elem] = ...
+            f_faceinelem(elem,node,mesh.face,'elem_type',elem_type);
+        % ---
+        mesh.id_face_in_elem   = id_face_in_elem;
+        mesh.ori_face_in_elem  = ori_face_in_elem;
+        mesh.sign_face_in_elem = sign_face_in_elem;
     end
 end
 %--------------------------------------------------------------------------

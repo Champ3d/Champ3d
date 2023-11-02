@@ -1,4 +1,4 @@
-function field_wf = f_field_wf(gvalue,mesh,varargin)
+function field_wf = f_field_wf(val_on_f,mesh,varargin)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
@@ -49,73 +49,62 @@ end
 %--------------------------------------------------------------------------
 con = f_connexion(elem_type);
 nbG = con.nbG;
-nbNo_inEl = con.nbNo_inEl;
-%--------------------------------------------------------------------------
-if any(strcmpi(options,{'on_center'}))
-    Wf = mesh.intkit.cWf{1}(id_elem,:);
-    fi = zeros(length(id_elem),1);
-    for i = 1:nbNo_inEl
-        wni = Wn(:,i);
-        fi = fi + coef_array .* wni .* gvalue;
-    end
-    % ---
-    field_wf = sparse(id_elem,1,fi,nb_elem,1);
-    % ---
-elseif any(strcmpi(options,{'on_gauss_points'}))
-    % TODO
-end
+nbFa_inEl = con.nbFa_inEl;
 %--------------------------------------------------------------------------
 if any(strcmpi(coef_array_type,{'iso_array'}))
-    
-    
     %----------------------------------------------------------------------
-    for iG = 1:nbG
-        dJ    = f_tocolv(detJ{iG});
-        weigh = Weigh(iG);
-        for i = 1:nbEd_inEl
-            weix = We{iG}(:,1,i);
-            weiy = We{iG}(:,2,i);
-            weiz = We{iG}(:,3,i);
-            for j = i:nbEd_inEl % !!! i
-                wejx = We{iG}(:,1,j);
-                wejy = We{iG}(:,2,j);
-                wejz = We{iG}(:,3,j);
-                % ---
-                coefwewe(:,i,j) = coefwewe(:,i,j) + ...
-                    weigh .* dJ .* ( coef_array .* ...
-                    (weix .* wejx + weiy .* wejy + weiz .* wejz) );
-            end
+    if any(strcmpi(options,{'on_center'}))
+        if ~isfield(mesh,'id_face_in_elem')
+            mesh = f_meshds(mesh,'get','id_face_in_elem');
         end
+        id_face_in_elem = mesh.id_face_in_elem;
+        %------------------------------------------------------------------
+        Wf = mesh.intkit.cWf{1}(id_elem,:,:);
+        fi = zeros(length(id_elem),3);
+        %------------------------------------------------------------------
+        for i = 1:nbFa_inEl
+            wfix = Wf(:,1,i);
+            wfiy = Wf(:,2,i);
+            wfiz = Wf(:,3,i);
+            id_face = id_face_in_elem(i,:);
+            fi(:,1) = fi(:,1) + coef_array .* wfix .* val_on_f(id_face);
+            fi(:,2) = fi(:,2) + coef_array .* wfiy .* val_on_f(id_face);
+            fi(:,3) = fi(:,3) + coef_array .* wfiz .* val_on_f(id_face);
+        end
+        %------------------------------------------------------------------
+        %field_wf = sparse(id_elem,1:3,fi,nb_elem,3);
+        field_wf = sparse(3,nb_elem);
+        field_wf(1:3,id_elem) = fi.';
+    %----------------------------------------------------------------------
+    elseif any(strcmpi(options,{'on_gauss_points'}))
+        % --- TODO
     end
     %----------------------------------------------------------------------
 elseif any(strcmpi(coef_array_type,{'tensor_array'}))
     %----------------------------------------------------------------------
-    for iG = 1:nbG
-        dJ    = f_tocolv(detJ{iG});
-        weigh = Weigh(iG);
-        for i = 1:nbEd_inEl
-            weix = We{iG}(:,1,i);
-            weiy = We{iG}(:,2,i);
-            weiz = We{iG}(:,3,i);
-            for j = i:nbEd_inEl % !!! i
-                wejx = We{iG}(:,1,j);
-                wejy = We{iG}(:,2,j);
-                wejz = We{iG}(:,3,j);
-                % ---
-                coefwewe(:,i,j) = coefwewe(:,i,j) + ...
-                    weigh .* dJ .* (...
-                    coef_array(:,1,1) .* weix .* wejx +...
-                    coef_array(:,1,2) .* weiy .* wejx +...
-                    coef_array(:,1,3) .* weiz .* wejx +...
-                    coef_array(:,2,1) .* weix .* wejy +...
-                    coef_array(:,2,2) .* weiy .* wejy +...
-                    coef_array(:,2,3) .* weiz .* wejy +...
-                    coef_array(:,3,1) .* weix .* wejz +...
-                    coef_array(:,3,2) .* weiy .* wejz +...
-                    coef_array(:,3,3) .* weiz .* wejz );
-            end
+    if any(strcmpi(options,{'on_center'}))
+        Wf = mesh.intkit.cWf{1}(id_elem,:);
+        fi = zeros(3,length(id_elem));
+        %------------------------------------------------------------------
+        for i = 1:nbFa_inEl
+            wfix = Wf(:,1,i);
+            wfiy = Wf(:,2,i);
+            wfiz = Wf(:,3,i);
+            fi(1,:) = fi(1,:) + (coef_array(:,1,1) .* wfix + ...
+                                 coef_array(:,1,2) .* wfiy + ...
+                                 coef_array(:,1,3) .* wfiz) .* val_on_f ;
+            fi(2,:) = fi(2,:) + (coef_array(:,2,1) .* wfix + ...
+                                 coef_array(:,2,2) .* wfiy + ...
+                                 coef_array(:,2,3) .* wfiz) .* val_on_f ;
+            fi(3,:) = fi(3,:) + (coef_array(:,3,1) .* wfix + ...
+                                 coef_array(:,3,2) .* wfiy + ...
+                                 coef_array(:,3,3) .* wfiz) .* val_on_f ;
         end
+        %------------------------------------------------------------------
+        field_wf = sparse(1:3,id_elem,fi,3,nb_elem);
+    %----------------------------------------------------------------------
+    elseif any(strcmpi(options,{'on_gauss_points'}))
+        % --- TODO
     end
     %----------------------------------------------------------------------
 end
-

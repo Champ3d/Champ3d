@@ -316,7 +316,12 @@ end
 
 mflux = c3dobj.mesh3d.(id_mesh3d).rot * a_bsfield;
 
+bs = f_field_wf(mflux,c3dobj.mesh3d.(id_mesh3d));
 
+node = c3dobj.mesh3d.(id_mesh3d).celem;
+vf = bs;
+figure
+f_quiver(node,full(vf));
 
 
 

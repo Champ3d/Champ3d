@@ -1,4 +1,4 @@
-function field_wn = f_field_wn(gvalue,mesh,varargin)
+function field_wn = f_field_wn(val_on_n,mesh,varargin)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
@@ -60,7 +60,7 @@ if any(strcmpi(options,{'on_center'}))
     fi = zeros(length(id_elem),1);
     for i = 1:nbNo_inEl
         wni = Wn(:,i);
-        fi = fi + coef_array .* wni .* gvalue;
+        fi = fi + coef_array .* wni .* val_on_n(id_elem);
     end
     % ---
     field_wn = sparse(id_elem,1,fi,nb_elem,1);
@@ -74,7 +74,7 @@ elseif any(strcmpi(options,{'on_gauss_points'}))
     for iG = 1:nbG
         for i = 1:nbNo_inEl
             wni = Wn{iG}(:,i);
-            fi(:,iG) = fi(:,iG) + coef_array .* wni .* gvalue;
+            fi(:,iG) = fi(:,iG) + coef_array .* wni .* val_on_n(id_elem);
         end
     end
     % ---
