@@ -28,11 +28,6 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(id_emdesign3d)
-    id_emdesign3d = fieldnames(c3dobj.emdesign3d);
-    id_emdesign3d = id_emdesign3d{1};
-end
-%--------------------------------------------------------------------------
 if isempty(phydomobj)
     error([mfilename ' : #phydomobj must be given !']);
 end
@@ -41,12 +36,15 @@ if ~all(isfield(phydomobj,{'id_dom3d','id_emdesign3d'}))
     error([mfilename ' : phydomobj must contains #id_dom3d and #id_emdesign3d!']);
 end
 %--------------------------------------------------------------------------
-id_emdesign3d = phydomobj.id_emdesign3d;
-id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
+if isfield(phydomobj,'id_emdesign3d')
+    id_emdesign3d = phydomobj.id_emdesign3d;
+    id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
+elseif isfield(phydomobj,'id_thdesign3d')
+    id_thdesign3d = phydomobj.id_thdesign3d;
+    id_mesh3d = c3dobj.thdesign3d.(id_thdesign3d).id_mesh3d;
+end
 id_dom3d = phydomobj.id_dom3d;
 id_dom3d = f_to_scellargin(id_dom3d);
-%--------------------------------------------------------------------------
-
 %--------------------------------------------------------------------------
 for i = 1:length(id_dom3d)
     defined_on = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).defined_on;
@@ -64,8 +62,12 @@ for i = 1:length(id_dom3d)
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).id_node];
     end
 end
-
-
+%--------------------------------------------------------------------------
+% --- Output
+phydomobj.id_elem = id_elem;
+phydomobj.id_face = id_face;
+phydomobj.id_edge = id_edge;
+phydomobj.id_node = id_node;
 
 
 

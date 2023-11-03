@@ -63,7 +63,7 @@ else
     elem = [];
     for i = 1:length(of_dom3d)
         defined_on = mesh3d.dom3d.(of_dom3d{i}).defined_on;
-        if ~any(strcmpi('elem',defined_on))
+        if ~any(f_strcmpi(defined_on,'elem'))
             error([mfilename ': #of_dom3d list must defined_on elem !']);
         end
         elem = [elem mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}).id_elem)];

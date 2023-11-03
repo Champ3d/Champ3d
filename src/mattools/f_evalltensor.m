@@ -32,16 +32,8 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if isfield(phydomobj,'id_emdesign3d')
-    id_emdesign3d = phydomobj.id_emdesign3d;
-    id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
-elseif isfield(phydomobj,'id_thdesign3d')
-    id_thdesign3d = phydomobj.id_thdesign3d;
-    id_mesh3d = c3dobj.thdesign3d.(id_thdesign3d).id_mesh3d;
-end
-%--------------------------------------------------------------------------
-id_dom3d  = phydomobj.id_dom3d;
-id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
+phydomobj = f_get_id(c3dobj,phydomobj);
+id_elem   = phydomobj.id_elem;
 nb_elem   = length(id_elem);
 %--------------------------------------------------------------------------
 ltfield__ = fieldnames(ltensor);
