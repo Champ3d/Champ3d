@@ -51,13 +51,14 @@ con = f_connexion(elem_type);
 nbG = con.nbG;
 nbEd_inEl = con.nbEd_inEl;
 %--------------------------------------------------------------------------
+if ~isfield(mesh,'id_edge_in_elem')
+    mesh = f_meshds(mesh,'get','id_edge_in_elem');
+end
+id_edge_in_elem = mesh.id_edge_in_elem;
+%--------------------------------------------------------------------------
 if any(strcmpi(coef_array_type,{'iso_array'}))
     %----------------------------------------------------------------------
     if any(strcmpi(options,{'on_center'}))
-        if ~isfield(mesh,'id_face_in_elem')
-            mesh = f_meshds(mesh,'get','id_face_in_elem');
-        end
-        id_face_in_elem = mesh.id_face_in_elem;
         %------------------------------------------------------------------
         Wx = mesh.intkit.cWe{1}(id_elem,:,:);
         fi = zeros(length(id_elem),3);
@@ -66,10 +67,10 @@ if any(strcmpi(coef_array_type,{'iso_array'}))
             wix = Wx(:,1,i);
             wiy = Wx(:,2,i);
             wiz = Wx(:,3,i);
-            id_face = id_face_in_elem(i,:);
-            fi(:,1) = fi(:,1) + coef_array .* wix .* val_on_e(id_face);
-            fi(:,2) = fi(:,2) + coef_array .* wiy .* val_on_e(id_face);
-            fi(:,3) = fi(:,3) + coef_array .* wiz .* val_on_e(id_face);
+            id_edge = id_edge_in_elem(i,:);
+            fi(:,1) = fi(:,1) + coef_array .* wix .* val_on_e(id_edge);
+            fi(:,2) = fi(:,2) + coef_array .* wiy .* val_on_e(id_edge);
+            fi(:,3) = fi(:,3) + coef_array .* wiz .* val_on_e(id_edge);
         end
         %------------------------------------------------------------------
         %field_wf = sparse(id_elem,1:3,fi,nb_elem,3);
@@ -83,6 +84,8 @@ if any(strcmpi(coef_array_type,{'iso_array'}))
 elseif any(strcmpi(coef_array_type,{'tensor_array'}))
     %----------------------------------------------------------------------
     if any(strcmpi(options,{'on_center'}))
+        %------------------------------------------------------------------
+        id_edge_in_elem = mesh.id_edge_in_elem;
         Wx = mesh.intkit.cWe{1}(id_elem,:);
         fi = zeros(3,length(id_elem));
         %------------------------------------------------------------------
@@ -90,15 +93,16 @@ elseif any(strcmpi(coef_array_type,{'tensor_array'}))
             wix = Wx(:,1,i);
             wiy = Wx(:,2,i);
             wiz = Wx(:,3,i);
+            id_edge = id_edge_in_elem(i,:);
             fi(1,:) = fi(1,:) + (coef_array(:,1,1) .* wix + ...
                                  coef_array(:,1,2) .* wiy + ...
-                                 coef_array(:,1,3) .* wiz) .* val_on_e ;
+                                 coef_array(:,1,3) .* wiz) .* val_on_e(id_edge) ;
             fi(2,:) = fi(2,:) + (coef_array(:,2,1) .* wix + ...
                                  coef_array(:,2,2) .* wiy + ...
-                                 coef_array(:,2,3) .* wiz) .* val_on_e ;
+                                 coef_array(:,2,3) .* wiz) .* val_on_e(id_edge) ;
             fi(3,:) = fi(3,:) + (coef_array(:,3,1) .* wix + ...
                                  coef_array(:,3,2) .* wiy + ...
-                                 coef_array(:,3,3) .* wiz) .* val_on_e ;
+                                 coef_array(:,3,3) .* wiz) .* val_on_e(id_edge) ;
         end
         %------------------------------------------------------------------
         field_we = sparse(1:3,id_elem,fi,3,nb_elem);
