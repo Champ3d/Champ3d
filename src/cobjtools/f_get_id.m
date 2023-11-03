@@ -1,4 +1,4 @@
-function id_out = f_get_id(c3dobj,phydomobj,varargin)
+function phydomobj = f_get_id(c3dobj,phydomobj,varargin)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
