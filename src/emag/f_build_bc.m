@@ -1,4 +1,4 @@
-function c3dobj = f_build_bcon(c3dobj,varargin)
+function c3dobj = f_build_bc(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.

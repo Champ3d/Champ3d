@@ -65,6 +65,7 @@ for iec = 1:length(id_nomesh)
         id_elem = [];
         id_face = [];
         id_edge = [];
+        bound_face = [];
         for i = 1:length(id_dom3d)
             defined_on = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).defined_on;
             if f_strcmpi(defined_on,'elem')
