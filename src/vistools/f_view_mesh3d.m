@@ -15,9 +15,9 @@ arglist = {'elem_type','defined_on','face_color','edge_color','alpha_value'};
 % --- default input value
 elem_type   = '';
 defined_on  = 'elem'; % elem, face, edge, 'node'
-edge_color  = 'none';
-face_color  = 'w';
-alpha_value = 1;
+edge_color  = 'k';
+face_color  = 'c';
+alpha_value = 0.9;
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
