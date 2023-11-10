@@ -44,11 +44,13 @@ nbElem = size(elem,2);
 
 if any(f_strcmpi(elem_type,{'tri','quad','triangle'}))
     %----------------------------------------------------------------------
+    nbNo_inFa = 2;
+    %----------------------------------------------------------------------
     f = reshape([elem(FaNo_inEl(:,1),:); elem(FaNo_inEl(:,2),:)], ...
                  nbFa_inEl, nbNo_inFa, nbElem);
     % ---
     ori_face_in_elem = squeeze(sign(diff(f, 1, 2))); % with unsorted e !
-    sign_face_in_elem = ori_face_in_elem .* siFa_inEl.';
+    sign_face_in_elem = ori_face_in_elem .* siFa_inEl;
     % ---
     f = sort(f, 2);
 else

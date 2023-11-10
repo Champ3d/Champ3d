@@ -106,11 +106,13 @@ end
 %--------------------------------------------------------------------------
 if ~for3d
     %----------------------------------------------------------------------
-    f_view_mesh2d(c3dobj.mesh2d.(id_mesh2d).node, ...
+    f_view_mesh3d(c3dobj.mesh2d.(id_mesh2d).node, ...
                   c3dobj.mesh2d.(id_mesh2d).elem(:,id_elem), ...
+                  'defined_on','face', ...
                   'elem_type',elem_type, ...
                   'face_color',face_color,'edge_color',edge_color,...
                   'alpha_value',alpha_value); hold on
+    view(2);
     %----------------------------------------------------------------------
     % Info
     cnode = f_barrycenter(c3dobj.mesh2d.(id_mesh2d).node, ...
@@ -171,19 +173,21 @@ end
 c3name = '$\overrightarrow{champ}{3d}$';
 c3_already = 0;
 %--------------------------------------------------------------------------
-% ztchamp3d = findobj(gcf, 'Type', 'Text');
-% ztchamp3d = ztchamp3d.String;
-% if iscell(ztchamp3d)
-%     for i = 1:length(ztchamp3d)
-%         if strcmpi(ztchamp3d{i},c3name)
-%             c3_already = 1;
-%         end
-%     end
-% elseif ischar(ztchamp3d)
-%     if strcmpi(ztchamp3d,c3name)
-%         c3_already = 1;
-%     end
-% end
+ztchamp3d = findobj(gcf, 'Type', 'Text');
+if isfield(ztchamp3d,'String')
+    ztchamp3d = ztchamp3d.String;
+    if iscell(ztchamp3d)
+        for i = 1:length(ztchamp3d)
+            if strcmpi(ztchamp3d{i},c3name)
+                c3_already = 1;
+            end
+        end
+    elseif ischar(ztchamp3d)
+        if strcmpi(ztchamp3d,c3name)
+            c3_already = 1;
+        end
+    end
+end
 %--------------------------------------------------------------------------
 if ~c3_already
     texpos = get(gca, 'OuterPosition');

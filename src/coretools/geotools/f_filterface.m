@@ -1,4 +1,4 @@
-function [filface,id_face] = f_filterface(face)
+function [filface,id_face,elem_type] = f_filterface(face)
 % F_FILTERFACE returns arrays of faces with separated face type.
 %--------------------------------------------------------------------------
 % FIXED INPUT
@@ -40,12 +40,20 @@ if ~isempty(r)
         iElem = c(gr{i}); % c is index of face
         filface{i} = face(1:ir(i)-1,iElem); % work only with 0 last
         id_face{i} = iElem;
+        elem_type{i} = 'tri';
     end
     % /normal/ faces
     n = setdiff(1:nbFace,c);
     filface{nb_gr+1} = face(:,n);
     id_face{nb_gr+1} = n;
+    elem_type{nb_gr+1} = 'quad';
 else
     filface{1} = face;
     id_face{1} = 1:nbFace;
+    nbNo_inFa  = size(face,1);
+    if nbNo_inFa == 3
+        elem_type{1} = 'tri';
+    elseif nbNo_inFa == 4
+        elem_type{1} = 'quad';
+    end
 end

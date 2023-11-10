@@ -24,13 +24,25 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
+maxnbNo_inFa = size(face,1);
 nb_face = size(face,2);
 %--------------------------------------------------------------------------
-itria = find(face(4,:) == 0);
-iquad = setdiff(1:nb_face,itria);
+ixxxx = [];
+itria = [];
+iquad = [];
+if maxnbNo_inFa == 2
+    
+elseif maxnbNo_inFa == 3
+    itria = 1:nb_face;
+    iquad = [];
+    maxnbEd_inFa = 3;
+elseif maxnbNo_inFa == 4
+    itria = find(face(4,:) == 0);
+    iquad = setdiff(1:nb_face,itria);
+    maxnbEd_inFa = 4;
+end
 %--------------------------------------------------------------------------
-maxnbEd_inFa = 4;
-id_edge_in_face = zeros(maxnbEd_inFa,nb_face);
+id_edge_in_face   = zeros(maxnbEd_inFa,nb_face);
 ori_edge_in_face  = zeros(maxnbEd_inFa,nb_face);
 sign_edge_in_face = zeros(maxnbEd_inFa,nb_face);
 %--------------------------------------------------------------------------

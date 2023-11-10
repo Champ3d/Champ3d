@@ -84,3 +84,56 @@ elseif any(f_strcmpi(defined_on,{'node'}))
         xlabel('x (m)'); ylabel('y (m)'); zlabel('z (m)'); 
     end
 end
+%--------------------------------------------------------------------------
+if any(f_strcmpi(options,{'show_id_node'}))
+    id_node = f_uniquenode(elem);
+    nb_node = length(id_node);
+    x = node(1,id_node);
+    y = node(2,id_node);
+    showtext = cell(1,nb_node);
+    for i = 1:nb_node
+        showtext{i} = num2str(id_node(i));
+    end
+    % ---
+    hold on;
+    if size(node) == 2
+        text(x,y,showtext,'FontSize',10,'Color','blue');
+    elseif size(node) > 2
+        z = node(3,id_node);
+        text(x,y,z,showtext,'FontSize',10,'Color','blue');
+    end
+end
+%--------------------------------------------------------------------------
+c3name = '$\overrightarrow{champ}{3d}$';
+c3_already = 0;
+%--------------------------------------------------------------------------
+ztchamp3d = findobj(gcf, 'Type', 'Text');
+if isfield(ztchamp3d,'String')
+    ztchamp3d = ztchamp3d.String;
+    if iscell(ztchamp3d)
+        for i = 1:length(ztchamp3d)
+            if strcmpi(ztchamp3d{i},c3name)
+                c3_already = 1;
+            end
+        end
+    elseif ischar(ztchamp3d)
+        if strcmpi(ztchamp3d,c3name)
+            c3_already = 1;
+        end
+    end
+end
+%--------------------------------------------------------------------------
+if ~c3_already
+    texpos = get(gca, 'OuterPosition');
+    hold on;
+    text(texpos(1),texpos(2)+1.05, ...
+         c3name, ...
+         'FontSize',10, ...
+         'FontWeight','bold',...
+         'Color','blue', ...
+         'Interpreter','latex',...
+         'Units','normalized', ...
+         'VerticalAlignment', 'baseline', ...
+         'HorizontalAlignment', 'right');
+end
+%--------------------------------------------------------------------------

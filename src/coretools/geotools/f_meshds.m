@@ -11,12 +11,13 @@ function mesh = f_meshds(mesh,varargin)
 % --------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem_type','get','defined_on'};
+arglist = {'elem_type','get','defined_on','flat_node'};
 
 % --- default input value
 elem_type = [];
 get = '_all'; % 'cnode' = 'center', 'edge', 'face', 'bound', 'interface'
 defined_on = [];
+flat_node = [];
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -52,6 +53,12 @@ tic
 f_fprintf(0,'Make #meshds');
 
 %--------------------------------------------------------------------------
+% if isempty(flat_node)
+%     
+% else
+% 
+% end
+% ---
 node = mesh.node;
 elem = mesh.elem;
 nb_elem = size(elem,2);
@@ -65,7 +72,8 @@ siNo_inEd = con.siNo_inEd;
 %----- barrycenter
 if any(strcmpi(get,{'_all', 'celem','center'}))
     if ~isfield(mesh,'celem')
-        mesh.celem = mean(reshape(node(:,elem(1:nbNo_inEl,:)),3,nbNo_inEl,nb_elem),2);
+        dim = size(node,1);
+        mesh.celem = mean(reshape(node(:,elem(1:nbNo_inEl,:)),dim,nbNo_inEl,nb_elem),2);
     end
 end
 %--------------------------------------------------------------------------
