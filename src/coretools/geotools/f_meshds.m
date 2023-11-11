@@ -186,9 +186,17 @@ if any(f_strcmpi(get,{'_all', 'R', 'Rot', 'Curl'}))
         % ---
         nbEdge = size(mesh.edge, 2);
         nbFace = size(mesh.face, 2);
-        % ---
-        itria = find(mesh.face(4,:) == 0);
-        iquad = setdiff(1:nbFace,itria);
+        %------------------------------------------------------------------
+        maxnbNo_inFa = size(mesh.face,1);
+        itria = [];
+        iquad = [];
+        if maxnbNo_inFa == 3
+            itria = 1:nbFace;
+            iquad = [];
+        elseif maxnbNo_inFa == 4
+            itria = find(mesh.face(4,:) == 0);
+            iquad = setdiff(1:nbFace,itria);
+        end
         % ---
         mesh.rot = sparse(nbFace,nbEdge);
         for k = 1:2 %---- 2 faceType

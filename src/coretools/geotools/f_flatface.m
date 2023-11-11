@@ -30,7 +30,7 @@ if any(face(end,:) == 0)
     face = filterface{1};
 end
 flatface  = face;
-nvec      = f_chavec(node,face,'face');
+nvec      = f_chavec(node,face,'defined_on','face');
 nbNo_inFa = size(face,1);
 nbFace    = size(face,2);
 %--------------------------------------------------------------------------

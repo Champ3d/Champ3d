@@ -15,8 +15,8 @@ flag = ones(1,size(elem,2));
 if size(elem,1) < 2
     return
 elseif size(elem,1) == 2
+    flag = sign(diff(elem));
     elem = sort(elem); % for 2d
-    flag(:) = 1;
 else
     elem(elem == 0) = [];
     dim = size(elem,1); len = size(elem,2);
