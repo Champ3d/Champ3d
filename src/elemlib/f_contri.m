@@ -24,8 +24,7 @@ con.EdNo_inFa = [];
 con.FaEd_inEl = [];
 con.siEd_inEl = [1; -1; 1];
 con.siFa_inEl = con.siEd_inEl; % upperface convention
-con.siEd_inFa{1} = [];
-con.siEd_inFa{2} = [];
+con.siEd_inFa = [];
 %-----
 con.nbEd_inEl = size(con.EdNo_inEl,1);
 con.nbFa_inEl = size(con.FaNo_inEl,1);
