@@ -75,6 +75,7 @@ if any(f_strcmpi(get,{'_all', 'celem','center'}))
     if ~isfield(mesh,'celem')
         dim = size(node,1);
         mesh.celem = mean(reshape(node(:,elem(1:nbNo_inEl,:)),dim,nbNo_inEl,nb_elem),2);
+        mesh.celem = squeeze(mesh.celem);
     end
 end
 %--------------------------------------------------------------------------
@@ -222,10 +223,21 @@ if any(f_strcmpi(get,{'_all', 'G', 'Grad', 'Gradient'}))
 end
 %--------------------------------------------------------------------------
 %----- check
-
 if any(f_strcmpi(elem_type,{'tri', 'triangle', 'quad'}))
-    
-    
+    if isfield(mesh,'div') && isfield(mesh,'rot') 
+        if any(any(mesh.div - mesh.rot))
+            error([mfilename ': error on mesh entry, Div and Rot are not equal!']);
+        end
+    end
+    % ---
+    if isfield(mesh,'rot') && isfield(mesh,'grad') 
+        if any(any(mesh.rot * mesh.grad))
+            error([mfilename ': error on mesh entry, RotGrad is not null !']);
+        end
+    end
+    %----------------------------------------------------------------------
+    %--- Log message
+    f_fprintf(0,'--- check ok');
 else
     if isfield(mesh,'div') && isfield(mesh,'rot') 
         if any(any(mesh.div * mesh.rot))
@@ -238,6 +250,9 @@ else
             error([mfilename ': error on mesh entry, RotGrad is not null !']);
         end
     end
+    %--------------------------------------------------------------------------
+    %--- Log message
+    f_fprintf(0,'--- check ok');
 end
 
 %--------------------------------------------------------------------------
