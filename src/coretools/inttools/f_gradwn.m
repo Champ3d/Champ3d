@@ -1,4 +1,4 @@
-function [gradWn, gradF] = f_gradwn(mesh3d,U,V,W,varargin)
+function [gradWn, gradF] = f_gradwn(mesh,varargin)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
@@ -10,11 +10,19 @@ function [gradWn, gradF] = f_gradwn(mesh3d,U,V,W,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'jinv','get'};
+arglist = {'u','v','w','flat_node','elem_type','jinv','get'};
 
 % --- default input value
+u = [];
+v = [];
+w = [];
+flat_node = [];
+elem_type = [];
 jinv = [];
 get = []; % 'gradF'
+
+% --- default output value
+
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -25,24 +33,30 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if ~isfield(mesh3d,'elem')
-    error([mfilename ' : #mesh3d struct must contain .elem']);
+if ~isfield(mesh,'elem')
+    error([mfilename ' : #mesh3d/2d struct must contain .elem']);
 end
 %--------------------------------------------------------------------------
-elem = mesh3d.elem;
+elem = mesh.elem;
 %--------------------------------------------------------------------------
-if isfield(mesh3d,'elem_type')
-    elem_type = mesh3d.elem_type;
+if isfield(mesh,'elem_type')
+    elem_type = mesh.elem_type;
 else
     elem_type = f_elemtype(elem,'defined_on','elem');
 end
 %--------------------------------------------------------------------------
-if (numel(U) ~= numel(V)) || (numel(U) ~= numel(W))
-    error([mfilename ': U, V, W do not have same size !']);
+if ~isempty(w)
+    if (numel(u) ~= numel(v)) || (numel(u) ~= numel(w))
+        error([mfilename ': u, v, w do not have same size !']);
+    end
+else
+    if (numel(u) ~= numel(v))
+        error([mfilename ': u, v do not have same size !']);
+    end
 end
 %--------------------------------------------------------------------------
 if isempty(jinv)
-    [~, jinv] = f_jacobien(mesh3d,U,V,W,'elem_type',elem_type);
+    [~, jinv] = f_jacobien(mesh,'u',u,'v',v,'w',w,'elem_type',elem_type,'flat_node',flat_node);
 end
 %--------------------------------------------------------------------------
 con = f_connexion(elem_type);
@@ -55,19 +69,22 @@ fgradNz = con.gradNz;
 %--------------------------------------------------------------------------
 nb_elem = size(elem,2);
 %--------------------------------------------------------------------------
-for i = 1:length(U)
+lenu   = length(u);
+gradWn = cell(1,lenu);
+gradF  = cell(1,lenu);
+for i = 1:length(u)
     gradWn{i} = zeros(nb_elem,3,nbNo_inEl);
     gradF{i}  = zeros(nb_elem,3,nbFa_inEl);
 end
 %--------------------------------------------------------------------------
-for i = 1:length(U)
-    u = U(i).*ones(1,nb_elem);
-    v = V(i).*ones(1,nb_elem);
-    w = W(i).*ones(1,nb_elem);
+for i = 1:lenu
+    u_ = u(i).*ones(1,nb_elem);
+    v_ = v(i).*ones(1,nb_elem);
+    w_ = w(i).*ones(1,nb_elem);
     % ---
-    gradNx = fgradNx(u,v,w); gradNx = gradNx.';
-    gradNy = fgradNy(u,v,w); gradNy = gradNy.';
-    gradNz = fgradNz(u,v,w); gradNz = gradNz.';
+    gradNx = fgradNx(u_,v_,w_); gradNx = gradNx.';
+    gradNy = fgradNy(u_,v_,w_); gradNy = gradNy.';
+    gradNz = fgradNz(u_,v_,w_); gradNz = gradNz.';
     % ---
     fgradwn = zeros(nb_elem,3,nbNo_inEl);
     Jinv1 = [jinv{i}(:,1,1), jinv{i}(:,1,2), jinv{i}(:,1,3)];

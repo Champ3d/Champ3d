@@ -10,13 +10,15 @@ function [detJ, Jinv] = f_jacobien(mesh,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'u','v','w','get'};
+arglist = {'u','v','w','flat_node','get','elem_type'};
 
 % --- default input value
 u = [];
 v = [];
 w = [];
+flat_node = [];
 get = '_all';
+elem_type = [];
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -35,13 +37,15 @@ end
 node = mesh.node;
 elem = mesh.elem;
 %--------------------------------------------------------------------------
-if isfield(mesh,'elem_type')
-    elem_type = mesh.elem_type;
-else
-    elem_type = f_elemtype(elem,'defined_on','elem');
+if isempty(elem_type)
+    if isfield(mesh,'elem_type')
+        elem_type = mesh.elem_type;
+    else
+        elem_type = f_elemtype(mesh.elem,'defined_on','elem');
+    end
 end
 %--------------------------------------------------------------------------
-if isempty(w)
+if ~isempty(w)
     if (numel(u) ~= numel(v)) || (numel(u) ~= numel(w))
         error([mfilename ': u, v, w do not have same size !']);
     end
@@ -54,10 +58,56 @@ end
 con = f_connexion(elem_type);
 nbNo_inEl = con.nbNo_inEl;
 %--------------------------------------------------------------------------
-
 if any(f_strcmpi(elem_type,{'tri','triangle','quad'}))
-    
+    dim = 2;
+    fgradNx = con.gradNx;
+    fgradNy = con.gradNy;
+    %----------------------------------------------------------------------
+    nb_elem = size(elem,2);
+    %----------------------------------------------------------------------
+    if isempty(flat_node)
+        x = permute(reshape(node(1,elem(:,:)),nbNo_inEl,nb_elem),[2 1]);
+        y = permute(reshape(node(2,elem(:,:)),nbNo_inEl,nb_elem),[2 1]);
+    else
+        x = 1;
+        y = 1;
+    end
+    %----------------------------------------------------------------------
+    lenu = length(u);
+    detJ = cell(1,lenu);
+    Jinv = cell(1,lenu);
+    for i = 1:length(u)
+        detJ{i} = zeros(nb_elem,1);
+        Jinv{i} = zeros(nb_elem,dim,dim);
+    end
+    %----------------------------------------------------------------------
+    for i = 1:lenu
+        u_ = u(i).*ones(1,nb_elem);
+        v_ = v(i).*ones(1,nb_elem);
+        %------------------------------------------------------------------
+        gradNx = fgradNx(u_,v_); gradNx = gradNx.';
+        gradNy = fgradNy(u_,v_); gradNy = gradNy.';
+        % ---
+        J11 = sum(gradNx.*x,2);
+        J12 = sum(gradNx.*y,2);
+        % ---
+        J21 = sum(gradNy.*x,2);
+        J22 = sum(gradNy.*y,2);
+        % ---
+        dJ = J11.*J22 - J21.*J12;
+        % ---
+        Ji = zeros(nb_elem,dim,dim);
+        Ji(:,1,1) =  1./dJ.*J22;
+        Ji(:,1,2) = -1./dJ.*J12;
+        Ji(:,2,1) = -1./dJ.*J21;
+        Ji(:,2,2) =  1./dJ.*J11;
+        % ---
+        detJ{i} = dJ;
+        Jinv{i} = Ji;
+    end
+    %----------------------------------------------------------------------
 elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
+    dim = 3;
     fgradNx = con.gradNx;
     fgradNy = con.gradNy;
     fgradNz = con.gradNz;
@@ -71,12 +121,12 @@ elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
     lenu = length(u);
     detJ = cell(1,lenu);
     Jinv = cell(1,lenu);
-    for i = 1:length(u)
+    for i = 1:lenu
         detJ{i} = zeros(nb_elem,1);
-        Jinv{i} = zeros(nb_elem,3,3);
+        Jinv{i} = zeros(nb_elem,dim,dim);
     end
     %----------------------------------------------------------------------
-    for i = 1:length(u)
+    for i = 1:lenu
         u_ = u(i).*ones(1,nb_elem);
         v_ = v(i).*ones(1,nb_elem);
         w_ = w(i).*ones(1,nb_elem);
@@ -110,7 +160,7 @@ elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
         dJ = J11.*J22.*J33 + J21.*J32.*J13 + J31.*J12.*J23 - ...
              J11.*J32.*J23 - J31.*J22.*J13 - J21.*J12.*J33;
         % ---
-        Ji = zeros(nb_elem,3,3);
+        Ji = zeros(nb_elem,dim,dim);
         Ji(:,1,1) = 1./dJ.*A11;
         Ji(:,1,2) = 1./dJ.*A12;
         Ji(:,1,3) = 1./dJ.*A13;

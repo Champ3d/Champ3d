@@ -1,4 +1,4 @@
-function We = f_we(mesh3d,U,V,W,varargin)
+function We = f_we(mesh,varargin)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
@@ -10,12 +10,17 @@ function We = f_we(mesh3d,U,V,W,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'wn','gradf','jinv'};
+arglist = {'u','v','w','flat_node','get','wn','gradf','jinv','elem_type'};
 
 % --- default input value
+u = [];
+v = [];
+w = [];
+flat_node = [];
 wn = [];
 jinv = [];
 gradf = [];
+elem_type = [];
 
 % --- default output value
 
@@ -28,39 +33,47 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if ~isfield(mesh3d,'node') || ~isfield(mesh3d,'elem')
-    error([mfilename ' : #mesh3d struct must contain at least .node and .elem']);
+if ~isfield(mesh,'node') || ~isfield(mesh,'elem')
+    error([mfilename ' : #mesh3d/2d struct must contain at least .node and .elem']);
 end
 %--------------------------------------------------------------------------
-node = mesh3d.node;
-elem = mesh3d.elem;
+node = mesh.node;
+elem = mesh.elem;
 %--------------------------------------------------------------------------
-if isfield(mesh3d,'elem_type')
-    elem_type = mesh3d.elem_type;
-else
-    elem_type = f_elemtype(elem,'defined_on','elem');
+if isempty(elem_type)
+    if isfield(mesh,'elem_type')
+        elem_type = mesh.elem_type;
+    else
+        elem_type = f_elemtype(mesh.elem,'defined_on','elem');
+    end
 end
 %--------------------------------------------------------------------------
-if isfield(mesh3d,'ori_edge_in_elem')
-    ori_edge_in_elem = mesh3d.ori_edge_in_elem;
+if isfield(mesh,'ori_edge_in_elem')
+    ori_edge_in_elem = mesh.ori_edge_in_elem;
 else
     [~, ori_edge_in_elem, ~] = ...
         f_edgeinelem(elem,[],'elem_type',elem_type);
 end
 %--------------------------------------------------------------------------
-if (numel(U) ~= numel(V)) || (numel(U) ~= numel(W))
-    error([mfilename ': U, V, W do not have same size !']);
+if ~isempty(w)
+    if (numel(u) ~= numel(v)) || (numel(u) ~= numel(w))
+        error([mfilename ': u, v, w do not have same size !']);
+    end
+else
+    if (numel(u) ~= numel(v))
+        error([mfilename ': u, v do not have same size !']);
+    end
 end
 %--------------------------------------------------------------------------
 if isempty(wn)
-    wn = f_wn(mesh3d,U,V,W);
+    wn = f_wn(mesh,'u',u,'v',v,'w',w);
 end
 %--------------------------------------------------------------------------
 if isempty(gradf)
     if isempty(jinv)
-        [~, gradf] = f_gradwn(mesh3d,U,V,W,'get','gradF');
+        [~, gradf] = f_gradwn(mesh,'u',u,'v',v,'w',w,'get','gradF');
     else
-        [~, gradf] = f_gradwn(mesh3d,U,V,W,'Jinv',jinv,'get','gradF');
+        [~, gradf] = f_gradwn(mesh,'u',u,'v',v,'w',w,'Jinv',jinv,'get','gradF');
     end
 end
 %--------------------------------------------------------------------------
@@ -71,12 +84,12 @@ NoFa_ofEd = con.NoFa_ofEd;
 %--------------------------------------------------------------------------
 nb_elem = size(elem,2);
 %--------------------------------------------------------------------------
-We = cell(1,length(U));
-for i = 1:length(U)
+We = cell(1,length(u));
+for i = 1:length(u)
     We{i} = zeros(nb_elem,3,nbEd_inEl);
 end
 %--------------------------------------------------------------------------
-for i = 1:length(U)
+for i = 1:length(u)
     % ---
     fwe = zeros(nb_elem,3,nbEd_inEl);
     for j = 1:nbEd_inEl

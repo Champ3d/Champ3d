@@ -1,4 +1,4 @@
-function Wn = f_wn(mesh3d,U,V,W,varargin)
+function Wn = f_wn(mesh,varargin)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
@@ -9,21 +9,49 @@ function Wn = f_wn(mesh3d,U,V,W,varargin)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
+% --- valid argument list (to be updated each time modifying function)
+arglist = {'u','v','w','flat_node','get','elem_type'};
+
+% --- default input value
+u = [];
+v = [];
+w = [];
+elem_type = [];
+flat_node = [];
+get = '_all';
+
+% --- check and update input
+for i = 1:length(varargin)/2
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    else
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
+    end
+end
+
 %--------------------------------------------------------------------------
-if ~isfield(mesh3d,'elem')
-    error([mfilename ' : #mesh3d struct must contain .elem']);
+if ~isfield(mesh,'elem')
+    error([mfilename ' : #mesh3d/2d struct must contain .elem']);
 end
 %--------------------------------------------------------------------------
-elem = mesh3d.elem;
+elem = mesh.elem;
 %--------------------------------------------------------------------------
-if isfield(mesh3d,'elem_type')
-    elem_type = mesh3d.elem_type;
+if isempty(elem_type)
+    if isfield(mesh,'elem_type')
+        elem_type = mesh.elem_type;
+    else
+        elem_type = f_elemtype(mesh.elem,'defined_on','elem');
+    end
+end
+%--------------------------------------------------------------------------
+if ~isempty(w)
+    if (numel(u) ~= numel(v)) || (numel(u) ~= numel(w))
+        error([mfilename ': u, v, w do not have same size !']);
+    end
 else
-    elem_type = f_elemtype(elem,'defined_on','elem');
-end
-%--------------------------------------------------------------------------
-if (numel(U) ~= numel(V)) || (numel(U) ~= numel(W))
-    error([mfilename ': U, V, W do not have same size !']);
+    if (numel(u) ~= numel(v))
+        error([mfilename ': u, v do not have same size !']);
+    end
 end
 %--------------------------------------------------------------------------
 con = f_connexion(elem_type);
@@ -32,19 +60,19 @@ fN = con.N;
 %--------------------------------------------------------------------------
 nb_elem = size(elem,2);
 %--------------------------------------------------------------------------
-Wn = cell(1,length(U));
-for i = 1:length(U)
+Wn = cell(1,length(u));
+for i = 1:length(u)
     Wn{i} = zeros(nb_elem,nbNo_inEl);
 end
 %--------------------------------------------------------------------------
-for i = 1:length(U)
-    u = U(i).*ones(nb_elem,1);
-    v = V(i).*ones(nb_elem,1);
-    w = W(i).*ones(nb_elem,1);
+for i = 1:length(u)
+    u_ = u(i).*ones(nb_elem,1);
+    v_ = v(i).*ones(nb_elem,1);
+    w_ = w(i).*ones(nb_elem,1);
     % ---
     fwn = zeros(nb_elem,nbNo_inEl);
     for j = 1:length(fN)
-        fwn(:,j) = fN{j}(u,v,w);
+        fwn(:,j) = fN{j}(u_,v_,w_);
     end
     % ---
     Wn{i} = fwn;
