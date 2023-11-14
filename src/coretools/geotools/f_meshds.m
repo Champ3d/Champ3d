@@ -33,19 +33,18 @@ if ~isfield(mesh,'node') || ~isfield(mesh,'elem')
 end
 %--------------------------------------------------------------------------
 if isempty(elem_type) && isfield(mesh,'elem_type')
-    elem_type = mesh.elem_type;
+    if ~isempty(mesh.elem_type)
+        elem_type = mesh.elem_type;
+    end
 end
 %--------------------------------------------------------------------------
 if isempty(elem_type)
     if ~isempty(defined_on)
         elem_type = f_elemtype(mesh.elem,'defined_on','elem');
+        mesh.elem_type = elem_type;
     else
         error([mfilename ': #elem_type or #defined_on must be given !' ]);
     end
-end
-%--------------------------------------------------------------------------
-if ~isfield(mesh,'elem_type')
-    mesh.elem_type = elem_type;
 end
 %--------------------------------------------------------------------------
 
