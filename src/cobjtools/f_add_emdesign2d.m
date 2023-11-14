@@ -53,7 +53,7 @@ if ~any(strcmpi(em_model,valid_em_model))
     error([mfilename ': #em_model ' em_model ' is not valid. Chose : ' strjoin(valid_em_model,', ') ' !']);
 end
 %--------------------------------------------------------------------------
-if any(strcmpi(em_model,{'fem_bem_aphijw', 'fem_bem_aphits', 'fem_bem_tomejw', 'fem_bem_tomets'}))
+if any(strcmpi(em_model,{'2d_fem_bem_aphijw', '2d_fem_bem_aphits', '2d_fem_bem_tomejw', '2d_fem_bem_tomets'}))
     if isempty(from)
         error([mfilename ': #from must be given !']);
     end
@@ -106,6 +106,7 @@ end
 %--------------------------------------------------------------------------
 c3dobj.emdesign.(id_emdesign).id_mesh2d      = id_mesh2d;
 c3dobj.emdesign.(id_emdesign).em_model       = em_model;
+c3dobj.emdesign.(id_emdesign).dimension      = 2;
 c3dobj.emdesign.(id_emdesign).formulation    = formulation;
 c3dobj.emdesign.(id_emdesign).model_type     = model_type;
 c3dobj.emdesign.(id_emdesign).discretization = discretization;

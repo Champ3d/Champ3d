@@ -42,6 +42,7 @@ if isempty(id_thdesign)
 end
 %--------------------------------------------------------------------------
 c3dobj.thdesign.(id_thdesign).id_mesh3d = id_mesh3d;
+c3dobj.emdesign.(id_emdesign).dimension = 3;
 % ---
 c3dobj.thdesign.(id_thdesign).fields.tempv = [];
 c3dobj.thdesign.(id_thdesign).fields.temps = [];
