@@ -56,6 +56,9 @@ else
 end
 %--------------------------------------------------------------------------
 phydomobj  = f_get_id(c3dobj,phydomobj);
+%--------------------------------------------------------------------------
+dim  = phydomobj.dimension;
+%--------------------------------------------------------------------------
 defined_on = phydomobj.defined_on;
 if any(f_strcmpi(defined_on,'elem'))
     id_elem = phydomobj.id_elem;
@@ -81,7 +84,11 @@ switch coeftype
         coef_array = coef;
         coef_array_type  = 'iso_array';
     case {'numeric_gtensor_value'}
-        coef_array = reshape(repmat(coef,1,nb_elem),3,3,nb_elem);
+        if dim == 3
+            coef_array = reshape(repmat(coef,1,nb_elem),3,3,nb_elem);
+        elseif dim == 2
+            coef_array = reshape(repmat(coef,1,nb_elem),2,2,nb_elem);
+        end
         coef_array = permute(coef_array,[3 1 2]);
         coef_array_type  = 'tensor_array';
     case {'numeric_gtensor_array'}

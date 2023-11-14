@@ -52,7 +52,11 @@ if no_nb_elem_info
             coeftype = 'numeric_iso_array';
         elseif sizecoef(1) == 3 && sizecoef(2) == 3 && length(sizecoef) == 2
             coeftype = 'numeric_gtensor_value';
+        elseif sizecoef(1) == 2 && sizecoef(2) == 2 && length(sizecoef) == 2
+            coeftype = 'numeric_gtensor_value';
         elseif sizecoef(2) == 3 && sizecoef(3) == 3 && length(sizecoef) >= 3
+            coeftype = 'numeric_gtensor_array';
+        elseif sizecoef(2) == 2 && sizecoef(3) == 2 && length(sizecoef) >= 3
             coeftype = 'numeric_gtensor_array';
         else
             fprintf('coef = \n');

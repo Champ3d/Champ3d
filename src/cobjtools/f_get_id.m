@@ -80,6 +80,7 @@ end
 %--------------------------------------------------------------------------
 % --- Output
 phydomobj.defined_on = defined_on;
+phydomobj.dimension  = dim;
 phydomobj.id_elem = id_elem;
 phydomobj.id_face = id_face;
 phydomobj.id_edge = id_edge;

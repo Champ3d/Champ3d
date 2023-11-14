@@ -10,13 +10,12 @@ function c3dobj = f_add_airbox(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign','id_airbox','id_dom3d','id_dom2d','a_value'};
+arglist = {'id_emdesign','id_airbox','id_dom3d','id_dom2d'};
 
 % --- default input value
 id_emdesign = [];
 id_dom3d    = [];
 id_dom2d    = [];
-a_value     = 0;
 id_airbox   = [];
 
 %--------------------------------------------------------------------------
@@ -51,7 +50,6 @@ c3dobj.emdesign.(id_emdesign).airbox.(id_airbox).id_emdesign = id_emdesign;
 c3dobj.emdesign.(id_emdesign).airbox.(id_airbox).id_dom3d = id_dom3d;
 c3dobj.emdesign.(id_emdesign).airbox.(id_airbox).id_dom2d = id_dom2d;
 c3dobj.emdesign.(id_emdesign).airbox.(id_airbox).mu_r = 1;
-c3dobj.emdesign.(id_emdesign).airbox.(id_airbox).a_value = a_value;
 % --- status
 c3dobj.emdesign.(id_emdesign).airbox.(id_airbox).to_be_rebuilt = 1;
 % --- info message
