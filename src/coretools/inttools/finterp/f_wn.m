@@ -40,7 +40,7 @@ if isempty(elem_type)
     if isfield(mesh,'elem_type')
         elem_type = mesh.elem_type;
     else
-        elem_type = f_elemtype(mesh.elem,'defined_on','elem');
+        elem_type = f_elemtype(mesh,'defined_on','elem');
     end
 end
 %--------------------------------------------------------------------------

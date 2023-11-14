@@ -1,4 +1,4 @@
-function elem_type = f_elemtype(elem,varargin)
+function elem_type = f_elemtype(meshorelem,varargin)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
@@ -13,6 +13,7 @@ function elem_type = f_elemtype(elem,varargin)
 arglist = {'defined_on'};
 
 % --- default input value
+defined_on = 'elem';
 elem_type  = [];
 
 % --- check and update input
@@ -24,15 +25,36 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-nbnoinel = size(elem, 1);
+if isstruct(meshorelem)
+    nbnoinel = size(meshorelem.elem, 1);
+    dim = 3;
+    if isfield(meshorelem,'node')
+        if ~isempty(meshorelem.node)
+            dim = size(meshorelem.node,1);
+        end
+    end
+else
+    nbnoinel = size(meshorelem, 1);
+    dim = 3;
+end
+%--------------------------------------------------------------------------
 if any(f_strcmpi(defined_on,{'elem'}))
-    switch nbnoinel
-        case 4
-            elem_type = 'tet';
-        case 6
-            elem_type = 'prism';
-        case 8
-            elem_type = 'hex';
+    if dim == 3
+        switch nbnoinel
+            case 4
+                elem_type = 'tet';
+            case 6
+                elem_type = 'prism';
+            case 8
+                elem_type = 'hex';
+        end
+    elseif dim == 2
+        switch nbnoinel
+            case 3
+                elem_type = 'tri';
+            case 4
+                elem_type = 'quad';
+        end
     end
 elseif any(f_strcmpi(defined_on,{'face'}))
     switch nbnoinel
