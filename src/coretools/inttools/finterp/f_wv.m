@@ -1,4 +1,4 @@
-function vol = f_volume(node,elem,varargin)
+function Wv = f_wv(mesh,varargin)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
@@ -14,8 +14,6 @@ arglist = {'cdetJ'};
 
 % --- default input value
 cdetJ = [];
-% --- default ouptu value
-vol = [];
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -25,32 +23,24 @@ for i = 1:length(varargin)/2
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
+
 %--------------------------------------------------------------------------
-elem_type = f_elemtype(elem,'defined_on','elem');
-%--------------------------------------------------------------------------
-if ~isempty(cdetJ)
-    con = f_connexion(elem_type);
-    cWeigh = con.cWeigh;
-    % ---
-    vol = cdetJ{1} .* cWeigh;
-    % ---
-    return
+if ~isfield(mesh,'elem') || ~isfield(mesh,'node')
+    error([mfilename ' : #mesh3d/2d struct must contain .elem and .node']);
 end
 %--------------------------------------------------------------------------
-if any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
-    con = f_connexion(elem_type);
-    cU  = con.cU;
-    cV  = con.cV;
-    cW  = con.cW;
-    cWeigh = con.cWeigh;
-    %----------------------------------------------------------------------
-    mesh.node = node;
-    mesh.elem = elem;
-    mesh.elem_type = elem_type;
-    [vol, ~] = f_jacobien(mesh,'u',cU,'v',cV,'w',cW);
-    %----------------------------------------------------------------------
-    vol = vol{1} .* cWeigh;
-    %----------------------------------------------------------------------
+if isfield(mesh,'elem_type')
+    elem_type = mesh.elem_type;
+else
+    error([mfilename ' : #mesh struct must contain .elem_type']);
 end
-
-
+%--------------------------------------------------------------------------
+node = mesh.node;
+elem = mesh.elem;
+%--------------------------------------------------------------------------
+if any(f_strcmpi(elem_type,{'tri','triangle','quad'}))
+    Wv{1} = 1./f_area(node,elem,'cdetJ',cdetJ);
+elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
+    Wv{1} = 1./f_volume(node,elem,'cdetJ',cdetJ);
+end
+%--------------------------------------------------------------------------

@@ -10,9 +10,10 @@ function area = f_area(node,face,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {};
+arglist = {'cdetJ'};
 
 % --- default input value
+cdetJ = [];
 
 % --- default ouptu value
 area = zeros(1,size(face,2));
@@ -24,6 +25,18 @@ for i = 1:length(varargin)/2
     else
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
+end
+%--------------------------------------------------------------------------
+if ~isempty(cdetJ)
+    % ---
+    elem_type = f_elemtype(face,'defined_on','face');
+    % ---
+    con = f_connexion(elem_type);
+    cWeigh = con.cWeigh;
+    % ---
+    area = cdetJ{1} .* cWeigh;
+    % ---
+    return
 end
 %--------------------------------------------------------------------------
 [grface,lid_face,face_elem_type] = f_filterface(face);
