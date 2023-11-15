@@ -10,14 +10,13 @@ function [gradWn, gradF] = f_gradwn(mesh,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'u','v','w','flat_node','elem_type','jinv','get'};
+arglist = {'u','v','w','flat_node','jinv','get'};
 
 % --- default input value
 u = [];
 v = [];
 w = [];
 flat_node = [];
-elem_type = [];
 jinv = [];
 get = []; % 'gradF'
 
@@ -42,7 +41,7 @@ elem = mesh.elem;
 if isfield(mesh,'elem_type')
     elem_type = mesh.elem_type;
 else
-    elem_type = f_elemtype(mesh,'defined_on','elem');
+    error([mfilename ' : #mesh struct must contain .elem_type']);
 end
 %--------------------------------------------------------------------------
 if ~isempty(w)

@@ -10,7 +10,7 @@ function Wf = f_wf(mesh,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'u','v','w','flat_node','wn','gradf','jinv'};
+arglist = {'u','v','w','flat_node','wn','gradf','jinv','we'};
 
 % --- default input value
 u = [];
@@ -20,7 +20,7 @@ flat_node = [];
 wn = [];
 jinv = [];
 gradf = [];
-elem_type = [];
+we = [];
 % --- default output value
 
 % --- check and update input
@@ -39,12 +39,10 @@ end
 node = mesh.node;
 elem = mesh.elem;
 %--------------------------------------------------------------------------
-if isempty(elem_type)
-    if isfield(mesh,'elem_type')
-        elem_type = mesh.elem_type;
-    else
-        elem_type = f_elemtype(mesh,'defined_on','elem');
-    end
+if isfield(mesh,'elem_type')
+    elem_type = mesh.elem_type;
+else
+    error([mfilename ' : #mesh struct must contain .elem_type']);
 end
 %--------------------------------------------------------------------------
 if isfield(mesh,'ori_face_in_elem')
@@ -70,14 +68,42 @@ end
 %--------------------------------------------------------------------------
 if isempty(gradf)
     if isempty(jinv)
-        [~, gradf] = f_gradwn(mesh,'u',u,'v',v,'w',w,'get','gradF');
+        [~, gradf] = f_gradwn(mesh,'u',u,'v',v,'w',w,'get','gradF','flat_node',flat_node);
     else
-        [~, gradf] = f_gradwn(mesh,'u',u,'v',v,'w',w,'Jinv',jinv,'get','gradF');
+        [~, gradf] = f_gradwn(mesh,'u',u,'v',v,'w',w,'Jinv',jinv,'get','gradF','flat_node',flat_node);
     end
 end
 %--------------------------------------------------------------------------
 if any(f_strcmpi(elem_type,{'tri','triangle','quad'}))
-    Wf = [];
+    %----------------------------------------------------------------------
+    if isempty(we)
+        we = f_we(mesh,'u',u,'v',v,'w',w,'wn',wn,'gradf',gradf,'jinv',jinv,'flat_node',flat_node);
+    end
+    %----------------------------------------------------------------------
+    dim = 2;
+    con = f_connexion(elem_type);
+    nbFa_inEl = con.nbFa_inEl;
+    %----------------------------------------------------------------------
+    nb_elem = size(elem,2);
+    %----------------------------------------------------------------------
+    Wf = cell(1,length(u));
+    for i = 1:length(u)
+        Wf{i} = zeros(nb_elem,dim,nbFa_inEl);
+    end
+    %----------------------------------------------------------------------
+    if nb_elem == 1
+        for i = 1:length(u)
+            Wf{i}(1,1,:) = - squeeze(we{i}(:,2,:)) .* ori_face_in_elem(:,:).';
+            Wf{i}(1,2,:) =   squeeze(we{i}(:,1,:)) .* ori_face_in_elem(:,:).';
+        end
+    else
+        for i = 1:length(u)
+            Wf{i}(:,1,:) = - squeeze(we{i}(:,2,:)) .* ori_face_in_elem(:,:).';
+            Wf{i}(:,2,:) =   squeeze(we{i}(:,1,:)) .* ori_face_in_elem(:,:).';
+        end
+    end
+    
+    %----------------------------------------------------------------------
 elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
     dim = 3;
     con = f_connexion(elem_type);
@@ -85,16 +111,16 @@ elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
     nbNo_inFa = con.nbNo_inFa;
     FaNo_inEl = con.FaNo_inEl;
     NoFa_ofFa = con.NoFa_ofFa;
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     nb_elem = size(elem,2);
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     Wf = cell(1,length(u));
     for i = 1:length(u)
         Wf{i} = zeros(nb_elem,dim,nbFa_inEl);
     end
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     for i = 1:length(u)
-        %----------------------------------------------------------------------
+        %------------------------------------------------------------------
         nbNodemax = max(nbNo_inFa);
         for j = 1:nbNodemax
             gradFxgradF{j} = zeros(nb_elem,dim,nbFa_inEl);
@@ -112,7 +138,7 @@ elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
                 gradFxgradF{k}(:,:,j) = cross(gradFk,gradFknext,2);
             end
         end
-        %----------------------------------------------------------------------
+        %------------------------------------------------------------------
         fwf = zeros(nb_elem,dim,nbFa_inEl);
         for j = 1:nbFa_inEl
             Wfxyz = zeros(nb_elem,dim);
@@ -125,5 +151,5 @@ elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
         % ---
         Wf{i} = fwf;
     end
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
 end

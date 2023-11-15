@@ -10,7 +10,7 @@ function [detJ, Jinv] = f_jacobien(mesh,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'u','v','w','flat_node','get','elem_type'};
+arglist = {'u','v','w','flat_node','get'};
 
 % --- default input value
 u = [];
@@ -37,12 +37,10 @@ end
 node = mesh.node;
 elem = mesh.elem;
 %--------------------------------------------------------------------------
-if isempty(elem_type)
-    if isfield(mesh,'elem_type')
-        elem_type = mesh.elem_type;
-    else
-        elem_type = f_elemtype(mesh,'defined_on','elem');
-    end
+if isfield(mesh,'elem_type')
+    elem_type = mesh.elem_type;
+else
+    error([mfilename ' : #mesh struct must contain .elem_type']);
 end
 %--------------------------------------------------------------------------
 if ~isempty(w)
@@ -69,8 +67,13 @@ if any(f_strcmpi(elem_type,{'tri','triangle','quad'}))
         x = permute(reshape(node(1,elem(:,:)),nbNo_inEl,nb_elem),[2 1]);
         y = permute(reshape(node(2,elem(:,:)),nbNo_inEl,nb_elem),[2 1]);
     else
-        x = 1;
-        y = 1;
+        if nb_elem == 1
+            x = squeeze(flat_node(1,:,:));
+            y = squeeze(flat_node(2,:,:));
+        else
+            x = permute(squeeze(flat_node(1,:,:)),[2 1]);
+            y = permute(squeeze(flat_node(2,:,:)),[2 1]);
+        end
     end
     %----------------------------------------------------------------------
     lenu = length(u);

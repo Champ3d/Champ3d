@@ -10,14 +10,12 @@ function Wn = f_wn(mesh,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'u','v','w','flat_node','get','elem_type'};
+arglist = {'u','v','w','flat_node','get'};
 
 % --- default input value
 u = [];
 v = [];
 w = [];
-elem_type = [];
-flat_node = [];
 get = '_all';
 
 % --- check and update input
@@ -36,12 +34,10 @@ end
 %--------------------------------------------------------------------------
 elem = mesh.elem;
 %--------------------------------------------------------------------------
-if isempty(elem_type)
-    if isfield(mesh,'elem_type')
-        elem_type = mesh.elem_type;
-    else
-        elem_type = f_elemtype(mesh,'defined_on','elem');
-    end
+if isfield(mesh,'elem_type')
+    elem_type = mesh.elem_type;
+else
+    error([mfilename ' : #mesh struct must contain .elem_type']);
 end
 %--------------------------------------------------------------------------
 if ~isempty(w)

@@ -11,13 +11,12 @@ function mesh = f_meshds(mesh,varargin)
 % --------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem_type','get','defined_on','flat_node'};
+arglist = {'elem_type','get','defined_on'};
 
 % --- default input value
 elem_type = [];
 get = '_all'; % 'cnode' = 'center', 'edge', 'face', 'bound', 'interface'
 defined_on = [];
-flat_node = [];
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -36,11 +35,13 @@ if isempty(elem_type) && isfield(mesh,'elem_type')
     if ~isempty(mesh.elem_type)
         elem_type = mesh.elem_type;
     end
+else
+    mesh.elem_type = elem_type;
 end
 %--------------------------------------------------------------------------
 if isempty(elem_type)
     if ~isempty(defined_on)
-        elem_type = f_elemtype(mesh.elem,'defined_on','elem');
+        elem_type = f_elemtype(mesh.elem,'defined_on',defined_on);
         mesh.elem_type = elem_type;
     else
         error([mfilename ': #elem_type or #defined_on must be given !' ]);

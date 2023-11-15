@@ -10,7 +10,7 @@ function We = f_we(mesh,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'u','v','w','flat_node','get','wn','gradf','jinv','elem_type'};
+arglist = {'u','v','w','flat_node','get','wn','gradf','jinv'};
 
 % --- default input value
 u = [];
@@ -20,7 +20,6 @@ flat_node = [];
 wn = [];
 jinv = [];
 gradf = [];
-elem_type = [];
 
 % --- default output value
 
@@ -40,12 +39,10 @@ end
 node = mesh.node;
 elem = mesh.elem;
 %--------------------------------------------------------------------------
-if isempty(elem_type)
-    if isfield(mesh,'elem_type')
-        elem_type = mesh.elem_type;
-    else
-        elem_type = f_elemtype(mesh,'defined_on','elem');
-    end
+if isfield(mesh,'elem_type')
+    elem_type = mesh.elem_type;
+else
+    error([mfilename ' : #mesh struct must contain .elem_type']);
 end
 %--------------------------------------------------------------------------
 if isfield(mesh,'ori_edge_in_elem')
@@ -71,9 +68,9 @@ end
 %--------------------------------------------------------------------------
 if isempty(gradf)
     if isempty(jinv)
-        [~, gradf] = f_gradwn(mesh,'u',u,'v',v,'w',w,'get','gradF');
+        [~, gradf] = f_gradwn(mesh,'u',u,'v',v,'w',w,'get','gradF','flat_node',flat_node);
     else
-        [~, gradf] = f_gradwn(mesh,'u',u,'v',v,'w',w,'Jinv',jinv,'get','gradF');
+        [~, gradf] = f_gradwn(mesh,'u',u,'v',v,'w',w,'Jinv',jinv,'get','gradF','flat_node',flat_node);
     end
 end
 %--------------------------------------------------------------------------
