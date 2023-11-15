@@ -93,8 +93,8 @@ if any(f_strcmpi(elem_type,{'tri','triangle','quad'}))
     %----------------------------------------------------------------------
     if nb_elem == 1
         for i = 1:length(u)
-            Wf{i}(1,1,:) = - squeeze(we{i}(:,2,:)) .* ori_face_in_elem(:,:).';
-            Wf{i}(1,2,:) =   squeeze(we{i}(:,1,:)) .* ori_face_in_elem(:,:).';
+            Wf{i}(1,1,:) = - squeeze(we{i}(:,2,:)).' .* ori_face_in_elem(:,:).';
+            Wf{i}(1,2,:) =   squeeze(we{i}(:,1,:)).' .* ori_face_in_elem(:,:).';
         end
     else
         for i = 1:length(u)
