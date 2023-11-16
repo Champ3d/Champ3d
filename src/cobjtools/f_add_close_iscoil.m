@@ -111,5 +111,5 @@ c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).v_coil    = v_coil;
 % --- status
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).to_be_rebuilt = 1;
 % --- info message
-fprintf(['Add close-jscoil #' id_coil ' to emdesign3d #' id_emdesign3d '\n']);
+f_fprintf(0,'Add #close-iscoil',1,id_coil,0,'to #emdesign3d',1,id_emdesign3d,0,'\n');
 

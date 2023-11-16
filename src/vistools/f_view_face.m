@@ -15,8 +15,8 @@ arglist = {'elem_type','face_color','edge_color','alpha_value'};
 % --- default input value
 elem_type   = '';
 edge_color  = 'none';
-face_color  = 'w';
-alpha_value = 1;
+face_color  = 'c';
+alpha_value = 0.9;
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
@@ -49,7 +49,19 @@ msh.EdgeColor = edge_color; % [0.7 0.7 0.7] --> gray
 patch(msh);
 xlabel('x (m)'); ylabel('y (m)'); if is3dface, zlabel('z (m)'); end
 axis equal; axis tight; alpha(alpha_value); hold on
-
+%--------------------------------------------------------------------------
+c3name = '$\overrightarrow{champ}{3d}$';
+texpos = get(gca, 'OuterPosition');
+hold on;
+text(texpos(1),texpos(2)+1.05, ...
+     c3name, ...
+     'FontSize',10, ...
+     'FontWeight','bold',...
+     'Color','blue', ...
+     'Interpreter','latex',...
+     'Units','normalized', ...
+     'VerticalAlignment', 'baseline', ...
+     'HorizontalAlignment', 'right');
 
 
 

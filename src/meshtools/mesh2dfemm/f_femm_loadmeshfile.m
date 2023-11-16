@@ -33,7 +33,11 @@ end
 
 %--------------------------------------------------------------------------
 tic;
-fprintf(['Loading mesh2d #' id_mesh2d ' from ' mesh_file ]);
+f_fprintf(0, 'Load mesh2d #',...
+          1, id_mesh2d,...
+          0, 'from',...
+          1, mesh_file,...
+          0, '\n');
 
 %--------------------------------------------------------------------------
 % ----- 1/ read all -----
@@ -79,6 +83,8 @@ c3dobj.mesh2d.(id_mesh2d).elem_type = 'tri';
 c3dobj.mesh2d.(id_mesh2d).data = data;
 c3dobj.mesh2d.(id_mesh2d).origin_coordinates = origin_coordinates;
 % --- Log message
-fprintf(' --- in %.2f s \n',toc);
+f_fprintf(0, '--- in', ...
+          1, toc, ...
+          0, 's \n');
 
 end

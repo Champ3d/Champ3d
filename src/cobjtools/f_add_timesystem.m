@@ -33,7 +33,7 @@ end
 c3dobj.timesystem.(id_timesystem).time_array   = time_array;
 
 % --- Log message
-fprintf(['Add timesystem #' id_timesystem '\n']);
+f_fprintf(0,'Add #timesystem',1,id_timesystem,0,'\n');
 
 
 

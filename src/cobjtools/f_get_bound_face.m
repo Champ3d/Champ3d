@@ -10,12 +10,22 @@ function [bound_face, lid_bound_face, info] = f_get_bound_face(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = f_arglist('get_bound_face');
+arglist = {'id_mesh2d','id_dom2d',...
+           'id_mesh3d','id_dom3d',...
+           'of_dom3d',...
+           'id_emdesign3d','id_thdesign3d', ...
+           'id_econductor','id_mconductor',...
+           'id_coil','id_bc','id_nomesh',...
+           'id_bsfield','id_pmagnet',...
+           'id_tconductor','id_tcapacitor',...
+           'get',...
+           'n_direction','n_component', ...
+           'for3d'};
 
 % --- default input value
 get = []; % 'ndecomposition' = 'ndec' = 'n-decomposition'
-n_direction = 'outward'; % 'outward' = 'out' = 'o', 'inward' = 'in' = 'i'
-                         %  otherwise : 'automatic' = 'natural' = 'auto'
+n_direction = 'auto'; % 'outward' = 'out' = 'o', 'inward' = 'in' = 'i'
+                      %  otherwise : 'automatic' = 'natural' = 'auto'
 n_component = []; % 1, 2 or 3
 %--------------------------------------------------------------------------
 % --- check and update input
@@ -37,6 +47,10 @@ else
     mesh3d = c3dobj.mesh3d.(id_mesh3d);
 end
 %--------------------------------------------------------------------------
+if isempty(n_direction)
+    n_direction = 'auto';
+end
+%--------------------------------------------------------------------------
 node = mesh3d.node;
 %--------------------------------------------------------------------------
 if f_isempty(of_dom3d)
@@ -49,7 +63,7 @@ else
     elem = [];
     for i = 1:length(of_dom3d)
         defined_on = mesh3d.dom3d.(of_dom3d{i}).defined_on;
-        if ~any(strcmpi('elem',defined_on))
+        if ~any(f_strcmpi(defined_on,'elem'))
             error([mfilename ': #of_dom3d list must defined_on elem !']);
         end
         elem = [elem mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}).id_elem)];

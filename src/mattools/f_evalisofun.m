@@ -28,23 +28,26 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if isfield(phydomobj,'id_emdesign3d')
-    id_emdesign3d = phydomobj.id_emdesign3d;
-    id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
-elseif isfield(phydomobj,'id_thdesign3d')
-    id_thdesign3d = phydomobj.id_thdesign3d;
-    id_mesh3d = c3dobj.thdesign3d.(id_thdesign3d).id_mesh3d;
+phydomobj = f_get_id(c3dobj,phydomobj);
+defined_on = phydomobj.defined_on;
+if any(f_strcmpi(defined_on,'elem'))
+    id_elem = phydomobj.id_elem;
+    nb_elem = length(id_elem);
+elseif any(f_strcmpi(defined_on,'face'))
+    id_elem = phydomobj.id_face;
+    nb_elem = length(id_elem);
+elseif any(f_strcmpi(defined_on,'edge'))
+    id_elem = phydomobj.id_edge;
+    nb_elem = length(id_elem);
+elseif any(f_strcmpi(defined_on,'node'))
+    id_elem = phydomobj.id_node;
+    nb_elem = length(id_elem);
 end
-%--------------------------------------------------------------------------
-id_dom3d  = phydomobj.id_dom3d;
-id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
-nb_elem   = length(id_elem);
 %--------------------------------------------------------------------------
 paramtype = f_paramtype(iso_function);
 %--------------------------------------------------------------------------
 if ~any(strcmpi(paramtype,{'c3d_parameter_function'}))
-    fprintf([mfilename ' : this iso_function is not supported. Use f_make_parameter ! \n']);
-    return
+    error([mfilename ' : this iso_function is not supported. Use f_make_parameter ! \n']);
 end
 %--------------------------------------------------------------------------
 nb_fargin = f_nargin(iso_function.f);

@@ -10,11 +10,11 @@ function c3dobj = f_add_thdesign3d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_mesh3d','id_thdesign3d'};
+arglist = {'id_mesh3d','id_thdesign'};
 
 % --- default input value
 id_mesh3d = [];
-id_thdesign3d = [];
+id_thdesign = [];
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -27,7 +27,7 @@ end
 
 %--------------------------------------------------------------------------
 if isempty(id_mesh3d)
-    id_mesh3d = fieldnames(c3dobj.geo3d.mesh3d);
+    id_mesh3d = fieldnames(c3dobj.mesh3d);
     id_mesh3d = id_mesh3d{1};
 end
 %--------------------------------------------------------------------------
@@ -37,23 +37,23 @@ if iscell(id_mesh3d)
     end
 end
 %--------------------------------------------------------------------------
-if isempty(id_thdesign3d)
-    id_thdesign3d = 'thdesign3d_01';
-    %error([mfilename ' : #id_thdesign3d must be given !']);
+if isempty(id_thdesign)
+    id_thdesign = 'thdesign_01';
 end
 %--------------------------------------------------------------------------
-c3dobj.thdesign3d.(id_thdesign3d).id_mesh3d = id_mesh3d;
+c3dobj.thdesign.(id_thdesign).id_mesh3d = id_mesh3d;
+c3dobj.emdesign.(id_emdesign).dimension = 3;
 % ---
-c3dobj.thdesign3d.(id_thdesign3d).fields.tempv = [];
-c3dobj.thdesign3d.(id_thdesign3d).fields.temps = [];
+c3dobj.thdesign.(id_thdesign).fields.tempv = [];
+c3dobj.thdesign.(id_thdesign).fields.temps = [];
 %--------------------------------------------------------------------------
 % --- Log message
 if iscell(id_mesh3d)
-    fprintf(['Add thdesign3d #' id_thdesign3d ' with mesh3d #' strjoin(id_mesh3d,', #') '\n']);
+    f_fprintf(0,'Add #thdesign',1,id_thdesign,0,'with #mesh3d',1,id_mesh3d,0,'\n');
 elseif ischar(id_mesh3d)
-    fprintf(['Add thdesign3d #' id_thdesign3d ' with mesh3d #' id_mesh3d '\n']);
+    f_fprintf(0,'Add #thdesign',1,id_thdesign,0,'with #mesh3d',1,id_mesh3d,0,'\n');
 else
-    fprintf(['Add thdesign3d #' id_thdesign3d '\n']);
+    f_fprintf(0,'Add #thdesign',1,id_thdesign,0,'\n');
 end
 
 

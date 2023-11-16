@@ -37,65 +37,60 @@ end
 if isempty(id_dom2d)
     error([mfilename ' : #id_dom2d must be given !']);
 end
-
 %--------------------------------------------------------------------------
 switch c3dobj.mesh2d.(id_mesh2d).mesher
     case 'mesh2dgeo1d'
         if isempty(elem_code)
             %--------------------------------------------------------------
             if isempty(id_x) || isempty(id_y)
-                error([mfilename ' : #id_x and #id_y must be given !']);
-            end
-            %--------------------------------------------------------------
-            id_x = f_to_dcellargin(id_x);
-            id_y = f_to_dcellargin(id_y);
-            [id_x, id_y] = f_pairing_dcellargin(id_x, id_y);
-            %--------------------------------------------------------------
-            id_all_elem = 1:c3dobj.mesh2d.(id_mesh2d).nb_elem;
-            all_elem_code = c3dobj.mesh2d.(id_mesh2d).elem_code;
-            all_id_x = fieldnames(c3dobj.mesh1d.(c3dobj.mesh2d.(id_mesh2d).id_mesh1d).x);
-            all_id_y = fieldnames(c3dobj.mesh1d.(c3dobj.mesh2d.(id_mesh2d).id_mesh1d).y);
-            id_elem = [];
-            elem_code = [];
-            for i = 1:length(id_x)
-                for j = 1:length(id_x{i})
-                    %------------------------------------------------------
-                    id_xij = id_x{i}{j};
-                    id_xij = replace(id_xij,'...','');
-                    % checking validity
-                    idxvalid = regexp(all_id_x,[id_xij '\w*']);
-                    % ---
-                    for m = 1:length(idxvalid)
-                        if sum(idxvalid{m}) >= 1
-                            codeidx = f_str2code(all_id_x{m});
-                            for k = 1:length(id_y{i})
-                                %------------------------------------------
-                                id_yik = id_y{i}{k};
-                                id_yik = replace(id_yik,'...','');
-                                % checking validity
-                                idyvalid = regexp(all_id_y,[id_yik '\w*']);
-                                % ---
-                                for l = 1:length(idyvalid)
-                                    if sum(idyvalid{l}) >= 1
-                                        codeidy = f_str2code(all_id_y{l});
-                                        id_elem = [id_elem ...
-                                                   id_all_elem(all_elem_code == codeidx * codeidy)];
-                                        elem_code = [elem_code codeidx * codeidy];
+                id_elem = 1:c3dobj.mesh2d.(id_mesh2d).nb_elem;
+                elem_code = c3dobj.mesh2d.(id_mesh2d).elem_code;
+            else
+                %----------------------------------------------------------
+                id_x = f_to_dcellargin(id_x);
+                id_y = f_to_dcellargin(id_y);
+                [id_x, id_y] = f_pairing_dcellargin(id_x, id_y);
+                %----------------------------------------------------------
+                id_all_elem = 1:c3dobj.mesh2d.(id_mesh2d).nb_elem;
+                all_elem_code = c3dobj.mesh2d.(id_mesh2d).elem_code;
+                all_id_x = fieldnames(c3dobj.mesh1d.(c3dobj.mesh2d.(id_mesh2d).id_mesh1d).x);
+                all_id_y = fieldnames(c3dobj.mesh1d.(c3dobj.mesh2d.(id_mesh2d).id_mesh1d).y);
+                id_elem = [];
+                elem_code = [];
+                for i = 1:length(id_x)
+                    for j = 1:length(id_x{i})
+                        %--------------------------------------------------
+                        id_xij = id_x{i}{j};
+                        id_xij = replace(id_xij,'...','');
+                        % checking validity
+                        idxvalid = regexp(all_id_x,[id_xij '\w*']);
+                        % ---
+                        for m = 1:length(idxvalid)
+                            if sum(idxvalid{m}) >= 1
+                                codeidx = f_str2code(all_id_x{m});
+                                for k = 1:length(id_y{i})
+                                    %--------------------------------------
+                                    id_yik = id_y{i}{k};
+                                    id_yik = replace(id_yik,'...','');
+                                    % checking validity
+                                    idyvalid = regexp(all_id_y,[id_yik '\w*']);
+                                    % ---
+                                    for l = 1:length(idyvalid)
+                                        if sum(idyvalid{l}) >= 1
+                                            codeidy = f_str2code(all_id_y{l});
+                                            id_elem = [id_elem ...
+                                                       id_all_elem(all_elem_code == codeidx * codeidy)];
+                                            elem_code = [elem_code codeidx * codeidy];
+                                        end
                                     end
                                 end
                             end
                         end
                     end
                 end
+                id_elem = unique(id_elem);
+                elem_code = unique(elem_code);
             end
-            id_elem = unique(id_elem);
-            elem_code = unique(elem_code);
-            %--------------------------------------------------------------
-            c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).id_elem = id_elem;
-            c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).elem_code = elem_code;
-            %--------------------------------------------------------------
-            fprintf(['Add dom2d #' id_dom2d ' - ' num2str(length(id_elem)) ' elem \n']);
-            %--------------------------------------------------------------
         else
             id_elem = [];
             for i = 1:length(elem_code)
@@ -103,12 +98,6 @@ switch c3dobj.mesh2d.(id_mesh2d).mesher
                     find(c3dobj.mesh2d.(id_mesh2d).elem_code == elem_code(i))];
             end
             id_elem = unique(id_elem);
-            %--------------------------------------------------------------
-            c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).id_elem = id_elem;
-            c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).elem_code = elem_code;
-            %--------------------------------------------------------------
-            fprintf(['Add dom2d #' id_dom2d ' - ' num2str(length(id_elem)) ' elem \n']);
-            %--------------------------------------------------------------
         end
     case 'quadmesh'
     case 'triangle_femm'
@@ -118,14 +107,20 @@ switch c3dobj.mesh2d.(id_mesh2d).mesher
                 find(c3dobj.mesh2d.(id_mesh2d).elem_code == elem_code(i))];
         end
         id_elem = unique(id_elem);
-        %------------------------------------------------------------------
-        c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).id_elem = id_elem;
-        c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).elem_code = elem_code;
-        %------------------------------------------------------------------
-        fprintf(['Add dom2d #' id_dom2d ' - ' num2str(length(id_elem)) ' elem \n']);
-        %------------------------------------------------------------------
-
 end
+%--------------------------------------------------------------
+c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).defined_on = {'2d','elem'};
+c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).id_elem = id_elem;
+c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).elem_code = elem_code;
+%------------------------------------------------------------------
+f_fprintf(0,'Add #dom2d',...
+          1, id_dom2d,...
+          0,'-',...
+          1,length(id_elem),...
+          0,' elem \n');
+%------------------------------------------------------------------
+
+
 %--------------------------------------------------------------------------
 %------------------------------------------------------------------
 % id_x = f_to_dcellargin(id_x);

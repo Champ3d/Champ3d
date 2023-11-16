@@ -14,37 +14,54 @@ function f_quiver(node,vector,varargin)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-%----- verifications
+% --- valid argument list (to be updated each time modifying function)
+arglist = {'vtype','afactor','sfactor','id_node','component','vsize'};
 
-if size(node,2) ~= size(vector,2)
-    disp([mfilename ' : check node and vector format and size !'])
-    return
-end
-
+% --- default input value
+vtype = 'proportional'; % 'proportional', 'equal'
+afactor = 5;
+sfactor = 1;
+id_node = [];
+component = [];
+vsize = [];
+%--------------------------------------------------------------------------
+% --- check and update input
 for i = 1:length(varargin)/2
-    eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    else
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
+    end
 end
-
-%----- equally sized vector
-if ~exist('vtype','var')
-    vtype = 'proportional'; % equal
+%--------------------------------------------------------------------------
+if ~isempty(id_node)
+    node = node(:,id_node);
 end
-%----- aspect factor
-if ~exist('afactor','var')
-    afactor = 5;
+%--------------------------------------------------------------------------
+if issparse(vector)
+    vector = full(vector);
 end
-%----- scale factor
-if ~exist('sfactor','var')
-    sfactor = 1;
-end
-%-----
+%--------------------------------------------------------------------------
 [dim, nbNode] = size(node);
+%--------------------------------------------------------------------------
+if size(vector,1) ~= dim
+    vector = vector.';
+end
+%---
+if size(vector,2) == 1
+    vector = repmat(vector,1,nbNode);
+end
+%---
+if size(vector,2) ~= nbNode
+    error([mfilename ' : check node and vector size !'])
+end
+%--------------------------------------------------------------------------
 if dim < 3
     node(3,:) = 0;
     vector(3,:) = 0;
 end
 %----- component
-if exist('component','var')
+if ~isempty(component)
     switch component
         case {1,'x'}
             vector(2,:) = 0;
@@ -57,7 +74,7 @@ if exist('component','var')
             vector(2,:) = 0;
     end
 end
-
+%--------------------------------------------------------------------------
 if strcmpi(vtype,'equal')
     %----- try to scale
     dmax = max(node(1,:)) - min(node(1,:));
@@ -65,7 +82,7 @@ if strcmpi(vtype,'equal')
         dmax = max(dmax, max(node(i,:)) - min(node(i,:)));
     end
     %----- size of arrows
-    if ~exist('vsize','var')
+    if isempty(vsize)
         vsize = sfactor * dmax / nbNode^(1/(dim));
     end
     %----- direction and lenght
@@ -184,14 +201,35 @@ else
     box on;
     xlabel('x (m)'); ylabel('y (m)'); zlabel('z (m)');
 end
-
-
-
-
-
-
-
-
-
-
-
+%--------------------------------------------------------------------------
+c3name = '$\overrightarrow{champ}{3d}$';
+c3_already = 0;
+%--------------------------------------------------------------------------
+% ztchamp3d = findobj(gcf, 'Type', 'Text');
+% ztchamp3d = ztchamp3d.String;
+% if iscell(ztchamp3d)
+%     for i = 1:length(ztchamp3d)
+%         if strcmpi(ztchamp3d{i},c3name)
+%             c3_already = 1;
+%         end
+%     end
+% elseif ischar(ztchamp3d)
+%     if strcmpi(ztchamp3d,c3name)
+%         c3_already = 1;
+%     end
+% end
+%--------------------------------------------------------------------------
+if ~c3_already
+    texpos = get(gca, 'OuterPosition');
+    hold on;
+    text(texpos(1),texpos(2)+1.05, ...
+         c3name, ...
+         'FontSize',10, ...
+         'FontWeight','bold',...
+         'Color','blue', ...
+         'Interpreter','latex',...
+         'Units','normalized', ...
+         'VerticalAlignment', 'baseline', ...
+         'HorizontalAlignment', 'right');
+end
+%--------------------------------------------------------------------------

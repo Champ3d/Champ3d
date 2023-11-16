@@ -10,13 +10,14 @@ function c3dobj = f_add_tcapacitor(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_thdesign3d','id_tcapacitor','id_dom3d','id_elem',...
+arglist = {'id_thdesign','id_tcapacitor','id_dom3d','id_dom2d','id_elem',...
            'flambda','frho','fcp','frhocp',...
            'lambda','rho','cp','rhocp'};
 
 % --- default input value
-id_thdesign3d = [];
+id_thdesign = [];
 id_dom3d = [];
+id_dom2d = [];
 frho     = [];
 fcp      = [];
 rho      = [];
@@ -38,31 +39,32 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(id_thdesign3d)
-    id_thdesign3d = fieldnames(c3dobj.thdesign3d);
-    id_thdesign3d = id_thdesign3d{1};
+if isempty(id_thdesign)
+    id_thdesign = fieldnames(c3dobj.thdesign);
+    id_thdesign = id_thdesign{1};
 end
 %--------------------------------------------------------------------------
 if isempty(id_tcapacitor)
     error([mfilename ': id_tcapacitor must be defined !'])
 end
 %--------------------------------------------------------------------------
-if isempty(id_dom3d)
-    error([mfilename ': id_dom3d must be given !'])
+if isempty(id_dom3d) && isempty(id_dom2d)
+    error([mfilename ': id_dom3d/id_dom2d must be given !'])
 end
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).id_thdesign3d = id_thdesign3d;
-c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).id_dom3d = id_dom3d;
-c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).frho = frho;
-c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).fcp = fcp;
-c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).rho = rho;
-c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).cp = cp;
-c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).rhocp = rhocp;
+c3dobj.thdesign.(id_thdesign).tcapacitor.(id_tcapacitor).id_thdesign = id_thdesign;
+c3dobj.thdesign.(id_thdesign).tcapacitor.(id_tcapacitor).id_dom3d = id_dom3d;
+c3dobj.thdesign.(id_thdesign).tcapacitor.(id_tcapacitor).id_dom2d = id_dom2d;
+c3dobj.thdesign.(id_thdesign).tcapacitor.(id_tcapacitor).frho = frho;
+c3dobj.thdesign.(id_thdesign).tcapacitor.(id_tcapacitor).fcp = fcp;
+c3dobj.thdesign.(id_thdesign).tcapacitor.(id_tcapacitor).rho = rho;
+c3dobj.thdesign.(id_thdesign).tcapacitor.(id_tcapacitor).cp = cp;
+c3dobj.thdesign.(id_thdesign).tcapacitor.(id_tcapacitor).rhocp = rhocp;
 % --- status
-c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).to_be_rebuilt = 1;
+c3dobj.thdesign.(id_thdesign).tcapacitor.(id_tcapacitor).to_be_rebuilt = 1;
 % --- info message
-fprintf(['Add tcon #' id_tcapacitor ' to thdesign3d #' id_thdesign3d '\n']);
+f_fprintf(0,'Add #tcapacitor',1,id_tcapacitor,0,'to #thdesign',1,id_thdesign,0,'\n');
 
 
 

@@ -10,12 +10,13 @@ function c3dobj = f_add_nomesh(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_dom3d','id_nomesh'};
+arglist = {'id_emdesign','id_dom3d','id_dom2d','id_nomesh'};
 
 % --- default input value
-id_emdesign3d = [];
-id_nomesh     = [];
-id_dom3d      = [];
+id_emdesign = [];
+id_nomesh   = [];
+id_dom3d    = [];
+id_dom2d    = [];
 
 %--------------------------------------------------------------------------
 % --- check and update input
@@ -27,24 +28,25 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(id_emdesign3d)
-    id_emdesign3d = fieldnames(c3dobj.emdesign3d);
-    id_emdesign3d = id_emdesign3d{1};
+if isempty(id_emdesign)
+    id_emdesign = fieldnames(c3dobj.emdesign);
+    id_emdesign = id_emdesign{1};
 end
 %--------------------------------------------------------------------------
 if isempty(id_nomesh)
     error([mfilename ': id_nomesh must be defined !'])
 end
 %--------------------------------------------------------------------------
-if isempty(id_dom3d)
-    error([mfilename ': id_dom3d must be defined !'])
+if isempty(id_dom3d) && isempty(id_dom2d)
+    error([mfilename ': id_dom3d/id_dom2d must be defined !'])
 end
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh).id_emdesign3d = id_emdesign3d;
-c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh).id_dom3d = id_dom3d;
+c3dobj.emdesign.(id_emdesign).nomesh.(id_nomesh).id_emdesign = id_emdesign;
+c3dobj.emdesign.(id_emdesign).nomesh.(id_nomesh).id_dom3d = id_dom3d;
+c3dobj.emdesign.(id_emdesign).nomesh.(id_nomesh).id_dom2d = id_dom2d;
 % --- status
-c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh).to_be_rebuilt = 1;
+c3dobj.emdesign.(id_emdesign).nomesh.(id_nomesh).to_be_rebuilt = 1;
 % --- info message
-fprintf(['Add nomesh #' id_nomesh ' to emdesign3d #' id_emdesign3d '\n']);
+f_fprintf(0,'Add #nomesh',1,id_nomesh,0,'to #emdesign',1,id_emdesign,0,'\n');
 

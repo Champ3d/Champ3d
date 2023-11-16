@@ -54,7 +54,7 @@ if isempty(id_mesh1d)
 end
 %--------------------------------------------------------------------------
 tic;
-fprintf(['Make c3d_prismmesh #' id_mesh3d]);
+f_fprintf(0,'Make #c3d_prismmesh',1,id_mesh3d);
 
 %--------------------------------------------------------------------------
 divlay   = [];
@@ -132,6 +132,10 @@ id_quad = setdiff(1:nb_face,id_tria);
 cface(:,id_tria) = mean(reshape(node(:,face(1:3,id_tria)),3,3,length(id_tria)),2);
 cface(:,id_quad) = mean(reshape(node(:,face(1:4,id_quad)),3,4,length(id_quad)),2);
 %--------------------------------------------------------------------------
+edge = f_edge(elem,'elem_type','prism');
+nb_edge = size(edge,2);
+cedge = mean(reshape(node(:,edge(1:2,:)),3,2,nb_edge),2);
+%--------------------------------------------------------------------------
 % --- Output
 c3dobj.mesh3d.(id_mesh3d).mesher = 'c3d_prismmesh';
 c3dobj.mesh3d.(id_mesh3d).id_mesh2d = id_mesh2d;
@@ -146,11 +150,16 @@ c3dobj.mesh3d.(id_mesh3d).celem = squeeze(celem);
 c3dobj.mesh3d.(id_mesh3d).face = face;
 c3dobj.mesh3d.(id_mesh3d).cface = squeeze(cface);
 %--------------------------------------------------------------------------
-c3dobj.mesh3d.(id_mesh3d).edge = f_edge(c3dobj.mesh3d.(id_mesh3d).elem, ...
-                            'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
+c3dobj.mesh3d.(id_mesh3d).edge  = edge;
+c3dobj.mesh3d.(id_mesh3d).cedge = squeeze(cedge);
 %--------------------------------------------------------------------------
 % --- Log message
-fprintf(' --- in %.2f s \n',toc);
+f_fprintf(0,'-', ...
+          1,nb_elem,...
+          0,'elem',...
+          0, '--- in',...
+          1, toc, ...
+          0, 's \n');
 
 
 

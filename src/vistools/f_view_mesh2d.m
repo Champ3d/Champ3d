@@ -14,9 +14,9 @@ arglist = {'elem_type','face_color','edge_color','alpha_value'};
 
 % --- default input value
 elem_type   = '';
-edge_color  = 'none';
-face_color  = [0.7 0.7 0.7];
-alpha_value = 1;
+edge_color  = 'k'; % [0.7 0.7 0.7] --> gray
+face_color  = 'c';
+alpha_value = 0.9;
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
@@ -40,7 +40,7 @@ switch elem_type
 end
 %--------------------------------------------------------------------------
 msh.FaceColor = face_color;
-msh.EdgeColor = edge_color; % [0.7 0.7 0.7] --> gray
+msh.EdgeColor = edge_color;
 patch(msh);
 xlabel('x (m)'); ylabel('y (m)');
 axis equal; alpha(alpha_value); hold on

@@ -58,7 +58,7 @@ for3d     = meshobj.for3d;
 additional= meshobj.additional;
 %--------------------------------------------------------------------------
 elem_type = [];
-defined_on = 'elem';
+defined_on = [];
 if ~for3d
     %----------------------------------------------------------------------
     if isempty(id_dom2d)
@@ -78,20 +78,23 @@ else
     %----------------------------------------------------------------------
     if ~isempty(id_dom3d)
         disptext = id_dom3d;
-        defined_on = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on{1};
-        switch defined_on
-            case {'elem'}
-                id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
-                elem    = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
-            case {'face'}
-                id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face;
-                elem    = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).face;
-            case {'edge'}
-                id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_edge;
-                elem    = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).edge;
-            case {'node'}
-                id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_node;
-                elem    = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).node;
+        defined_on = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on;
+        if any(f_strcmpi(defined_on,'elem'))
+            id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
+            elem    = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
+            defined_on = 'elem';
+        elseif any(f_strcmpi(defined_on,'face'))
+            id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face;
+            elem    = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).face;
+            defined_on = 'face';
+        elseif any(f_strcmpi(defined_on,'edge'))
+            id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_edge;
+            elem    = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).edge;
+            defined_on = 'edge';
+        elseif any(f_strcmpi(defined_on,'node'))
+            id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_node;
+            elem    = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).node;
+            defined_on = 'node';
         end
     else
         elem = c3dobj.mesh3d.(id_mesh3d).elem;
@@ -103,11 +106,13 @@ end
 %--------------------------------------------------------------------------
 if ~for3d
     %----------------------------------------------------------------------
-    f_view_mesh2d(c3dobj.mesh2d.(id_mesh2d).node, ...
+    f_view_mesh3d(c3dobj.mesh2d.(id_mesh2d).node, ...
                   c3dobj.mesh2d.(id_mesh2d).elem(:,id_elem), ...
+                  'defined_on','face', ...
                   'elem_type',elem_type, ...
                   'face_color',face_color,'edge_color',edge_color,...
                   'alpha_value',alpha_value); hold on
+    view(2);
     %----------------------------------------------------------------------
     % Info
     cnode = f_barrycenter(c3dobj.mesh2d.(id_mesh2d).node, ...
@@ -165,8 +170,39 @@ if for3d
         'FontSize', text_size, 'HorizontalAlignment', 'center');
 end
 %--------------------------------------------------------------------------
-
-
+c3name = '$\overrightarrow{champ}{3d}$';
+c3_already = 0;
+%--------------------------------------------------------------------------
+ztchamp3d = findobj(gcf, 'Type', 'Text');
+if isfield(ztchamp3d,'String')
+    ztchamp3d = ztchamp3d.String;
+    if iscell(ztchamp3d)
+        for i = 1:length(ztchamp3d)
+            if strcmpi(ztchamp3d{i},c3name)
+                c3_already = 1;
+            end
+        end
+    elseif ischar(ztchamp3d)
+        if strcmpi(ztchamp3d,c3name)
+            c3_already = 1;
+        end
+    end
+end
+%--------------------------------------------------------------------------
+if ~c3_already
+    texpos = get(gca, 'OuterPosition');
+    hold on;
+    text(texpos(1),texpos(2)+1.05, ...
+         c3name, ...
+         'FontSize',10, ...
+         'FontWeight','bold',...
+         'Color','blue', ...
+         'Interpreter','latex',...
+         'Units','normalized', ...
+         'VerticalAlignment', 'baseline', ...
+         'HorizontalAlignment', 'right');
+end
+%--------------------------------------------------------------------------
 
 
 

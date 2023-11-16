@@ -10,17 +10,19 @@ function c3dobj = f_add_pmagnet(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_dom3d','id_pmagnet','br_value','br_dir',...
+arglist = {'id_emdesign','id_dom3d','id_dom2d','id_pmagnet',...
+           'br_value','br_dir',...
            'br_array','id_bcon'};
 
 % --- default input value
-id_emdesign3d = [];
-id_dom3d      = [];
-br_value      = 0;
-br_dir        = [];
-br_array      = [];
-id_bcon       = [];
-id_pmagnet    = [];
+id_emdesign = [];
+id_dom3d    = [];
+id_dom2d    = [];
+br_value    = 0;
+br_dir      = [];
+br_array    = [];
+id_bcon     = [];
+id_pmagnet  = [];
 %--------------------------------------------------------------------------
 if nargin <= 1
     error([mfilename ': No permanent magnet to add!']);
@@ -35,28 +37,29 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(id_emdesign3d)
-    id_emdesign3d = fieldnames(c3dobj.emdesign3d);
-    id_emdesign3d = id_emdesign3d{1};
+if isempty(id_emdesign)
+    id_emdesign = fieldnames(c3dobj.emdesign);
+    id_emdesign = id_emdesign{1};
 end
 %--------------------------------------------------------------------------
 if isempty(id_pmagnet)
     error([mfilename ': id_pmagnet must be defined !'])
 end
 %--------------------------------------------------------------------------
-if isempty(id_dom3d)
-    error([mfilename ': id_dom3d must be given !'])
+if isempty(id_dom3d) && isempty(id_dom2d)
+    error([mfilename ': id_dom3d/id_dom2d must be given !'])
 end
 %--------------------------------------------------------------------------
-c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).id_emdesign3d = id_emdesign3d;
-c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).id_dom3d = id_dom3d;
-c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).br_value = br_value;
-c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).br_dir   = br_dir;
-c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).id_bcon  = id_bcon;
+c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).id_emdesign = id_emdesign;
+c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).id_dom3d = id_dom3d;
+c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).id_dom2d = id_dom2d;
+c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).br_value = br_value;
+c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).br_dir   = br_dir;
+c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).id_bcon  = id_bcon;
 % --- status
-c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).to_be_rebuilt = 1;
+c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).to_be_rebuilt = 1;
 % --- info message
-fprintf(['Add pmagnet #' id_pmagnet ' to emdesign3d #' id_emdesign3d '\n']);
+f_fprintf(0,'Add #pmagnet',1,id_pmagnet,0,'to #emdesign',1,id_emdesign,0,'\n');
 
 
 

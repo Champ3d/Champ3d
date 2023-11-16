@@ -10,7 +10,7 @@ function c3dobj = f_create_c3dobj(varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = f_arglist('create_c3dobj');
+arglist = {'project_path'};
 
 % --- default input value
 project_path = [];

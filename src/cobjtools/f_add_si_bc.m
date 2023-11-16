@@ -58,6 +58,6 @@ c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).cparam = cparam;
 % --- status
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).to_be_rebuilt = 1;
 % --- info message
-fprintf(['Add surface impedance bc #' id_bc ' to emdesign3d #' id_emdesign3d '\n']);
+f_fprintf(0,'Add surface impedance bc',1,id_bc,0,'to #emdesign3d',1,id_emdesign3d,0,'\n');
 
 

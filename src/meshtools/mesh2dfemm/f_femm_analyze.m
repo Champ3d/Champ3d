@@ -15,8 +15,10 @@ function f_femm_analyze(n)
 %--------------------------------------------------------------------------
 
 tic;
-fprintf('Solving 2d problem with FEMM');
+f_fprintf(0,'Solving 2d problem with FEMM',0,'\n');
 % ---
 mi_analyze(n);
 % --- Log message
-fprintf(' --- in %.2f s \n',toc);
+f_fprintf(0, '--- in',...
+          1, toc,...
+          0, 's \n');

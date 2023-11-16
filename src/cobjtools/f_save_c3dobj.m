@@ -10,7 +10,7 @@ function f_save_c3dobj(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = f_arglist('save_c3dobj');
+arglist = {'options'};
 
 % --- default input value
 options = 'minimum';

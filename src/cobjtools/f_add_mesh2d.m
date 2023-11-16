@@ -51,17 +51,21 @@ if strcmpi(build_from,'mesh1d')
     %----------------------------------------------------------------------
     % --- Output
     c3dobj = f_mesh2dgeo1d(c3dobj,varargin{:});
-    % --- Log message
-    fprintf(['Add mesh2d #' id_mesh2d '\n']);
-
 elseif strcmpi(build_from,'femm')
     c3dobj = f_femm_loadmeshfile(c3dobj,varargin{:});
-    % --- Log message
-    fprintf(['Add mesh2d #' id_mesh2d '\n']);
-    
 elseif strcmpi(build_from,'geoquad')
     % TODO
 end
+%--------------------------------------------------------------------------
+c3dobj.mesh2d.(id_mesh2d).origin_coordinates = origin_coordinates;
+c3dobj.mesh2d.(id_mesh2d).dom2d.all_domain.defined_on = {'2d','elem'};
+c3dobj.mesh2d.(id_mesh2d).dom2d.all_domain.id_elem = 1:c3dobj.mesh2d.(id_mesh2d).nb_elem;
+c3dobj.mesh2d.(id_mesh2d).dom2d.all_domain.elem_code = unique(c3dobj.mesh2d.(id_mesh2d).elem_code);
+% --- status
+c3dobj.mesh2d.(id_mesh2d).to_be_rebuilt = 1;
+%--------------------------------------------------------------------------
+% --- Log message
+f_fprintf(0,'Add #mesh2d',1,id_mesh2d,0,'\n');
 
 
 

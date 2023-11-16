@@ -10,12 +10,13 @@ function c3dobj = f_add_mconductor(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_mconductor','id_dom3d','mu_r'};
+arglist = {'id_emdesign','id_mconductor','id_dom3d','id_dom2d','mu_r'};
 
 % --- default input value
-id_emdesign3d = [];
+id_emdesign   = [];
 id_dom3d      = [];
-mu_r           = 1;
+id_dom2d      = [];
+mu_r          = 1;
 id_mconductor = [];
 
 %--------------------------------------------------------------------------
@@ -32,27 +33,27 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(id_emdesign3d)
-    id_emdesign3d = fieldnames(c3dobj.emdesign3d);
-    id_emdesign3d = id_emdesign3d{1};
+if isempty(id_emdesign)
+    id_emdesign = fieldnames(c3dobj.emdesign);
+    id_emdesign = id_emdesign{1};
 end
 %--------------------------------------------------------------------------
 if isempty(id_mconductor)
     error([mfilename ': id_mconductor must be defined !'])
 end
 %--------------------------------------------------------------------------
-if isempty(id_dom3d)
-    error([mfilename ': id_dom3d must be given !'])
+if isempty(id_dom3d) && isempty(id_dom2d)
+    error([mfilename ': id_dom3d/id_dom2d must be given !'])
 end
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor).id_emdesign3d = id_emdesign3d;
-c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor).id_dom3d = id_dom3d;
-c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor).mu_r = mu_r;
+c3dobj.emdesign.(id_emdesign).mconductor.(id_mconductor).id_emdesign = id_emdesign;
+c3dobj.emdesign.(id_emdesign).mconductor.(id_mconductor).id_dom3d = id_dom3d;
+c3dobj.emdesign.(id_emdesign).mconductor.(id_mconductor).mu_r = mu_r;
 % --- status
-c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor).to_be_rebuilt = 1;
+c3dobj.emdesign.(id_emdesign).mconductor.(id_mconductor).to_be_rebuilt = 1;
 % --- info message
-fprintf(['Add mcon #' id_mconductor ' to emdesign3d #' id_emdesign3d '\n']);
+f_fprintf(0,'Add #mcon',1,id_mconductor,0,'to #emdesign',1,id_emdesign,0,'\n');
 
 
 

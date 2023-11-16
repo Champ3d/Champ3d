@@ -56,9 +56,10 @@ if ~strcmpi(id_mesh1d,c3dobj.mesh2d.(id_mesh2d).id_mesh1d)
     warning(info_message);
 end
 %--------------------------------------------------------------------------
+id_layer = f_to_scellargin(id_layer);
+%--------------------------------------------------------------------------
 tic;
-fprintf(['Make c3d_hexamesh #' id_mesh3d]);
-
+f_fprintf(0,'Make #c3d_hexamesh',1,id_mesh3d);
 %--------------------------------------------------------------------------
 divlay   = [];
 nb_layer = 0;
@@ -132,6 +133,10 @@ face = f_face(elem,'elem_type','hexa');
 nb_face = size(face,2);
 cface = mean(reshape(node(:,face(1:4,:)),3,4,nb_face),2);
 %--------------------------------------------------------------------------
+edge = f_edge(elem,'elem_type','hexa');
+nb_edge = size(edge,2);
+cedge = mean(reshape(node(:,edge(1:2,:)),3,2,nb_edge),2);
+%--------------------------------------------------------------------------
 % --- Output
 c3dobj.mesh3d.(id_mesh3d).mesher = 'c3d_hexamesh';
 c3dobj.mesh3d.(id_mesh3d).id_mesh2d = id_mesh2d;
@@ -146,11 +151,16 @@ c3dobj.mesh3d.(id_mesh3d).celem = squeeze(celem);
 c3dobj.mesh3d.(id_mesh3d).face  = face;
 c3dobj.mesh3d.(id_mesh3d).cface = squeeze(cface);
 %--------------------------------------------------------------------------
-c3dobj.mesh3d.(id_mesh3d).edge = f_edge(c3dobj.mesh3d.(id_mesh3d).elem, ...
-                            'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
+c3dobj.mesh3d.(id_mesh3d).edge  = edge;
+c3dobj.mesh3d.(id_mesh3d).cedge = squeeze(cedge);
 %--------------------------------------------------------------------------
 % --- Log message
-fprintf(' --- in %.2f s \n',toc);
+f_fprintf(0,'-', ...
+          1,nb_elem,...
+          0,'elem',...
+          0, '--- in',...
+          1, toc, ...
+          0, 's \n');
 %--------------------------------------------------------------------------
 % c3dobj.mesh3d.(id_mesh3d).cnode(1,:) = mean(reshape(node(1,elem(1:8,:)),8,nb_elem));
 % c3dobj.mesh3d.(id_mesh3d).cnode(2,:) = mean(reshape(node(2,elem(1:8,:)),8,nb_elem));

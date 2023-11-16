@@ -12,22 +12,19 @@ con.nbNo_inEl = 3;
 con.nbNo_inEd = 2;
 con.EdNo_inEl = [1 2; 1 3; 2 3];
 con.siNo_inEd = [+1, -1]; % w.r.t edge
-con.FaNo_inEl = [1 2; 1 3; 2 3]; % face as edge
+con.FaNo_inEl = con.EdNo_inEl; % face as edge
 %-----
 con.NoFa_ofEd = [2 3; 1 3; 1 2]; % !!! F(i,~j) - circular
 %con.NoFa_ofFa = [6 3 4 5; 6 3 4 5; 6 1 4 2; 3 1 5 2; 4 1 6 2; 3 1 5 2]; % !!! F(i,~i+1) - circular
 %-----
-con.nbNo_inFa = [  2;   2;   2;   2];
-con.FaType    = [  1;   1;   1;   1];
-con.nbEd_inFa{1} = 1; % for FaType 1
-con.nbEd_inFa{2} = 1; % for FaType 2
-con.EdNo_inFa{1} = [1 2]; % for FaType 1
-con.EdNo_inFa{2} = [1 2]; % for FaType 2
+con.nbNo_inFa = [  2;   2;   2];
+con.FaType    = [  1;   1;   1];
+con.nbEd_inFa = [];
+con.EdNo_inFa = [];
 con.FaEd_inEl = [];
-con.siFa_inEl = [1; -1; 1]; % upperface convention
 con.siEd_inEl = [1; -1; 1];
-con.siEd_inFa{1} = [1]; % w.r.t face for FaType 1
-con.siEd_inFa{2} = [1]; % w.r.t face for FaType 2
+con.siFa_inEl = con.siEd_inEl; % upperface convention
+con.siEd_inFa = [];
 %-----
 con.nbEd_inEl = size(con.EdNo_inEl,1);
 con.nbFa_inEl = size(con.FaNo_inEl,1);
