@@ -71,6 +71,8 @@ nbG = con.nbG;
 Weigh = con.Weigh;
 nbFa_inEl = con.nbFa_inEl;
 %--------------------------------------------------------------------------
+Wf = cell(1,nbG);
+detJ = cell(1,nbG);
 for iG = 1:nbG
     Wf{iG} = c3dobj.mesh3d.(id_mesh3d).intkit.Wf{iG}(id_elem,:,:);
     detJ{iG} = c3dobj.mesh3d.(id_mesh3d).intkit.detJ{iG}(id_elem,1);
