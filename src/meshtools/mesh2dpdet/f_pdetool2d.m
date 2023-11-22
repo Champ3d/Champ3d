@@ -12,7 +12,7 @@ function c3dobj = f_pdetool2d(c3dobj,varargin)
 
 % --- valid argument list (to be updated each time modifying function)
 arglist = {'id_mesh2d','centering','origin_coordinates',...
-           'shape2d','hgrad','box','init','jiggle','jiggleiter','mesherversion'};
+           'shape2d','hgrad','hmax','box','init','jiggle','jiggleiter','mesherversion'};
 
 % --- default input value
 id_mesh2d = [];

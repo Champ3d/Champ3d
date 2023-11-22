@@ -100,7 +100,7 @@ switch c3dobj.mesh2d.(id_mesh2d).mesher
             id_elem = unique(id_elem);
         end
     case 'quadmesh'
-    case 'triangle_femm'
+    case {'triangle_femm','pdetool'}
         id_elem = [];
         for i = 1:length(elem_code)
             id_elem = [id_elem ...
