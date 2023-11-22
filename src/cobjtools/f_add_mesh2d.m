@@ -16,7 +16,7 @@ arglist = {'build_from','id_mesh2d','id_mesh1d','flog','id_x','id_y',...
            'mesh_file'};
 
 % --- default input value
-build_from = 'mesh1d'; % 'mesh1d', 'geoquad', 'femm'
+build_from = 'mesh1d'; % 'mesh1d', 'geoquad', 'femm', 'shape2d'
 id_mesh2d = [];
 id_mesh1d = [];
 flog = 1.05; % log factor when making log mesh
@@ -53,6 +53,8 @@ if strcmpi(build_from,'mesh1d')
     c3dobj = f_mesh2dgeo1d(c3dobj,varargin{:});
 elseif strcmpi(build_from,'femm')
     c3dobj = f_femm_loadmeshfile(c3dobj,varargin{:});
+elseif strcmpi(build_from,'shape2d')
+    
 elseif strcmpi(build_from,'geoquad')
     % TODO
 end
