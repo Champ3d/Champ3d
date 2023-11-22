@@ -53,6 +53,12 @@ end
 %--------------------------------------------------------------------------
 %----- check and correct mesh
 [node,elem]=f_reorg2d(node,elem);
+
+%----- centering
+if f_istrue(centering)
+    node(1,:) = node(1,:) - mean(node(1,:));
+    node(2,:) = node(2,:) - mean(node(2,:));
+end
 %--------------------------------------------------------------------------
 c3dobj.mesh2d.(id_mesh2d).mesher = 'pdetool';
 c3dobj.mesh2d.(id_mesh2d).dgeo = dgeo;
