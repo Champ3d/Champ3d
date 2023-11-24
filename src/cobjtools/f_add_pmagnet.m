@@ -21,6 +21,7 @@ id_dom2d    = [];
 br_value    = 0;
 br_dir      = [];
 br          = [];
+mu_r        = 1;
 id_pmagnet  = [];
 %--------------------------------------------------------------------------
 if nargin <= 1
@@ -55,6 +56,7 @@ c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).id_dom2d = id_dom2d;
 c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).br_value = br_value;
 c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).br_dir   = br_dir;
 c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).br       = br;
+c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).mu_r     = mu_r;
 % --- status
 c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).to_be_rebuilt = 1;
 % --- info message
