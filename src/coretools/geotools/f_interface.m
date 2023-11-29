@@ -34,7 +34,7 @@ if isempty(elem_type)
     error([mfilename ' : #elem_type must be given !']);
 end
 %--------------------------------------------------------------------------
-bface1 = f_boundface(elem1,node,'elem_type',elem_type,n_direction',n_direction);
+bface1 = f_boundface(elem1,node,'elem_type',elem_type,'n_direction',n_direction);
 bface2 = [];
 if any(strcmpi(interface_of,{'bound_bound','b_b','bb'}))
     if ~isempty(elem2)

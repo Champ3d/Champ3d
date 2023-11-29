@@ -21,7 +21,7 @@ n_component = []; % 1, 2 or 3
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:length(varargin)/2
-    if any(strcmpi(arglist,varargin{2*i-1}))
+    if any(f_strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
@@ -79,7 +79,7 @@ end
 % id_bound_face is local to mesh3d
 lid_bound_face = [];
 id_bf = [];
-if any(strcmpi(get,{'local_id'}))
+if any(f_strcmpi(get,{'local_id'}))
     lid_bound_face = [ibO ibI];
     id_bf = lid_bound_face;
 end
@@ -88,7 +88,7 @@ end
 info = ['bound_face with ' n_direction '-normal'];
 %--------------------------------------------------------------------------
 % --- bound with n-decomposition
-if any(strcmpi(get,{'ndec','ndecomposition','n-decomposition'}))
+if any(f_strcmpi(get,{'ndec','ndecomposition','n-decomposition'}))
     bf = bound_face;
     nface = f_chavec(node,bound_face);
     if isempty(n_component)

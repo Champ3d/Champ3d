@@ -125,6 +125,7 @@ if ~isempty(cs_equation)
     % ---
     geo = f_cutdom(node, elem, 'elem_type', elem_type,...
                    'cut_equation', cs_equation{1});
+    lid_elem    = geo.id_elem;
     geo.id_elem = id_elem(geo.id_elem); % !!!
     %------
     etrode = geo;
@@ -133,8 +134,7 @@ if ~isempty(cs_equation)
     netrode.id_elem = geo.id_elem;
     netrode.id_node = geo.node_negative;
     id_elem = setdiff(id_elem,geo.id_elem);
-    cutnode = f_uniquenode(c3dobj.mesh.elem(:,geo.id_elem),...
-                           'nb_vertices',con.EdNo_inEl);
+    cutnode = f_uniquenode(elem(:,lid_elem),'nb_vertices',con.EdNo_inEl);
     id_node = setdiff(id_node,cutnode);
     %------
 end

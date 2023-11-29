@@ -36,7 +36,7 @@ arglist = {'node','elem','cut_equation','elem_type'};
 
 % --- default input value
 cut_equation = '';
-elem_type = 'prism';
+elem_type = [];
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -122,14 +122,19 @@ if isempty(iElem)
     geo.node_negative = [];
     %----------------------------------------------------------------------
 else
-
-    elem(nbNo_inEl+1,:) = 1;
-    elem(nbNo_inEl+1,iElem) = 2;
-    mesh = f_make_mds(node,elem,elem_type);
-    
+    % ---
+    %elem(nbNo_inEl+1,:) = 1;
+    %elem(nbNo_inEl+1,iElem) = 2;
+    %mesh = f_make_mds(node,elem,elem_type);
+    % ---
+    elem1 = elem(:,iElem);
+    elem2 = elem(:,setdiff(1:nbElem,iElem));
+    inter_face = f_interface(elem1,elem2,node,'elem_type',elem_type);
+    % ---
     etrodeNode = [];
     for i = 1:max(con.nbNo_inFa)
-        etrodeNode = [etrodeNode mesh.interface(i,:)];
+        %etrodeNode = [etrodeNode mesh.interface(i,:)];
+        etrodeNode = [etrodeNode inter_face(i,:)];
     end
 
     etrodeNode(etrodeNode == 0) = [];
