@@ -28,7 +28,7 @@ circuit_type = 'parallel'; % 'parallel', 'series'
 % --- check and update input
 for k = 1:(nargin)/2
     if any(strcmpi(arglist,varargin{2*k-1}))
-        eval([lower(varargin{2*k-1}) '= varargin{2*i};']);
+        eval([lower(varargin{2*k-1}) '= varargin{2*k};']);
     else
         error([mfilename ': #' varargin{2*k-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
