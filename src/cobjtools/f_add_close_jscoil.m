@@ -133,7 +133,9 @@ if ~isempty(cs_equation)
     petrode.id_node = geo.node_positive;
     netrode.id_elem = geo.id_elem;
     netrode.id_node = geo.node_negative;
-    id_elem = setdiff(id_elem,geo.id_elem);
+    % ---
+    %id_elem = setdiff(id_elem,geo.id_elem);
+    % ---
     cutnode = f_uniquenode(elem(:,lid_elem),'nb_vertices',con.EdNo_inEl);
     id_node = setdiff(id_node,cutnode);
     %------
