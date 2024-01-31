@@ -16,7 +16,7 @@ arglist = {'id_mesh3d','id_emdesign',...
 % --- default input value
 id_mesh3d = [];
 id_emdesign = [];
-em_model = 'fem_aphijw'; % fem_aphijw, fem_aphits, fem_tomejw, fem_tomets;
+em_model = '3d_fem_aphijw'; % fem_aphijw, fem_aphits, fem_tomejw, fem_tomets;
 frequency = 0;
 from = [];
 
