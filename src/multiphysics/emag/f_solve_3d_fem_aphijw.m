@@ -179,8 +179,8 @@ for iec = 1:length(id_nomesh__)
     id_inner_node = c3dobj.emdesign.(id_emdesign).nomesh.(id_phydom).id_inner_node;
     %----------------------------------------------------------------------
     id_elem_nomesh = [id_elem_nomesh id_elem];
-    id_inner_edge_nomesh = [id_inner_edge_nomesh id_inner_edge];
-    id_inner_node_nomesh = [id_inner_node_nomesh id_inner_node];
+    id_inner_edge_nomesh = [id_inner_edge_nomesh f_torowv(id_inner_edge)];
+    id_inner_node_nomesh = [id_inner_node_nomesh f_torowv(id_inner_node)];
 end
 id_elem_nomesh = unique(id_elem_nomesh);
 id_inner_edge_nomesh = unique(id_inner_edge_nomesh);
@@ -858,7 +858,6 @@ end
 
 
 
-return
 
 %--------------------------------------------------------------------------
 av = f_field_we(int_oned_a,c3dobj.mesh3d.(id_mesh3d));
@@ -883,7 +882,7 @@ f_quiver(node,imag(vf));
 
 %--------------------------------------------------------------------------
 node = c3dobj.mesh3d.(id_mesh3d).node;
-id_dom = 'plate_5_surface';
+id_dom = 'plate_1_surface';
 if isfield(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom),'id_elem')
     if ~isempty(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_elem)
         id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_elem;
@@ -963,6 +962,29 @@ es = sparse(2,nb_face);
 js = sparse(2,nb_face);
 id_edge_in_face = c3dobj.mesh3d.(id_mesh3d).id_edge_in_face;
 
+%--------------------------------------------------------------------------
+dom_name = 'sibc1';
+sigma_array = c3dobj.emdesign.(id_emdesign).bc.(dom_name).sigma;
+skindepth = c3dobj.emdesign.(id_emdesign).bc.(dom_name).skindepth;
+facemesh = c3dobj.emdesign.(id_emdesign).bc.(dom_name).facemesh;
+gid_face = c3dobj.emdesign.(id_emdesign).bc.(dom_name).gid_face;
+lid_face = c3dobj.emdesign.(id_emdesign).bc.(dom_name).lid_face;
+for i = 1:length(facemesh)
+    face = facemesh{i}.elem;
+    elem_type = facemesh{i}.elem_type;
+    id_face = gid_face{i};
+    cWes = facemesh{i}.intkit.cWe{1};
+    if any(f_strcmpi(elem_type,'tri'))
+        dofe = int_oned_e(id_edge_in_face(1:3,id_face)).';
+    elseif any(f_strcmpi(elem_type,'quad'))
+        dofe = int_oned_e(id_edge_in_face(1:4,id_face)).';
+    end
+    es(1,id_face) = es(1,id_face) + sum(squeeze(cWes(:,1,:)) .* dofe,2).';
+    es(2,id_face) = es(2,id_face) + sum(squeeze(cWes(:,2,:)) .* dofe,2).';
+    js(1,id_face) = sigma_array .* es(1,id_face);
+    js(2,id_face) = sigma_array .* es(2,id_face);
+end
+%--------------------------------------------------------------------------
 dom_name = 'sibc2';
 sigma_array = c3dobj.emdesign.(id_emdesign).bc.(dom_name).sigma;
 skindepth = c3dobj.emdesign.(id_emdesign).bc.(dom_name).skindepth;
@@ -986,7 +1008,7 @@ for i = 1:length(facemesh)
 end
 %--------------------------------------------------------------------------
 node = c3dobj.mesh3d.(id_mesh3d).node;
-id_dom = 'plate_2_surface'; % 
+id_dom = 'plate_1_surface'; % 
 if isfield(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom),'id_elem')
     if ~isempty(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_elem)
         id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_elem;
@@ -1031,6 +1053,52 @@ if ~isempty(iquad)
     hold on
 end
 
+%--------------------------------------------------------------------------
+node = c3dobj.mesh3d.(id_mesh3d).node;
+id_dom = 'coil_surface'; % 
+if isfield(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom),'id_elem')
+    if ~isempty(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_elem)
+        id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_elem;
+        elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
+        face = f_boundface(elem,node,'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
+        id_face = f_findvecnd(face, ...
+                              c3dobj.mesh3d.(id_mesh3d).face);
+    end
+elseif isfield(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom),'id_face')
+    if ~isempty(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_face)
+        id_face = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_face;
+        face = c3dobj.mesh3d.(id_mesh3d).face(:,id_face);
+    end
+end
+sf   = f_magnitude(js);
+% ---
+% 1/ triangle
+itria = find(face(end, :) == 0);
+itria = id_face(itria);
+% 2/ quad
+iquad = find(face(end, :) ~= 0);
+iquad = id_face(iquad);
+% ---
+
+figure
+if ~isempty(itria)
+    msh = [];
+    msh.Faces = c3dobj.mesh3d.(id_mesh3d).face(1:3,itria).';
+    msh.Vertices = node.';
+    msh.FaceVertexCData = f_tocolv(full(sf(itria)));
+    msh.FaceColor = 'flat';
+    patch(msh); axis equal
+    hold on
+end
+if ~isempty(iquad)
+    msh = [];
+    msh.Faces = c3dobj.mesh3d.(id_mesh3d).face(1:4,iquad).';
+    msh.Vertices = node.';
+    msh.FaceVertexCData = f_tocolv(full(sf(iquad)));
+    msh.FaceColor = 'flat';
+    patch(msh); axis equal
+    hold on
+end
 
 %--------------------------------------------------------------------------
 jv = sparse(3,nb_elem);
@@ -1057,7 +1125,7 @@ f_quiver(node,imag(vf));
 %--------------------------------------------------------------------------
 jv = sparse(3,nb_elem);
 %----------------------------------------------------------------------
-id_phydom = 'coil';
+id_phydom = 'plate_2';
 %----------------------------------------------------------------------
 id_elem = c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).id_elem;
 sigma_array = c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).sigma_array;
