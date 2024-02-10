@@ -1,4 +1,4 @@
-function named_arguments = f_str2namedarg(str)
+function named_arguments = f_struct2namedarg(str)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
 % as a contribution to champ3d code.
