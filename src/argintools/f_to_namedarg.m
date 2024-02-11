@@ -1,4 +1,4 @@
-function validargs = f_struct2namedarg(argsin,varargin)
+function validargs = f_to_namedarg(argsin,fargs)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
 % as a contribution to champ3d code.
@@ -9,36 +9,17 @@ function validargs = f_struct2namedarg(argsin,varargin)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-% --- valid argument list (to be updated each time modifying function)
-arglist = {'with_out','with_only'};
-
-% --- default input value
-with_out = [];
-with_only = [];
-
-%--------------------------------------------------------------------------
-% --- check and update input
-for i = 1:length(varargin)/2
-    if any(strcmpi(arglist,varargin{2*i-1}))
-        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
-    else
-        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
-    end
+arguments
+    argsin
+    fargs.with_out = [];
+    fargs.with_only = [];
 end
-
+% ---
+with_out = fargs.with_out;
+with_only = fargs.with_only;
 %--------------------------------------------------------------------------
 if iscell(argsin)
     argsin = f_to_scellargin(argsin);
-    % ---
-    k = 0;
-    validargs = [];
-    for i = 1:length(argsin)/2
-        if ~f_strcmpi(lower(varargin{2*i-1}),{with_out,'with_out'})
-            k = k + 1;
-            validargs{2*k-1} = lower(varargin{2*i-1});
-            validargs{2*k}   = varargin{2*i};
-        end
-    end
     % ---
     if ~isempty(with_out)
         k = 0;
@@ -46,8 +27,8 @@ if iscell(argsin)
         for i = 1:length(argsin)/2
             if ~f_strcmpi(lower(argsin{2*i-1}),with_out)
                 k = k + 1;
-                validargs{2*k-1} = lower(varargin{2*i-1});
-                validargs{2*k}   = varargin{2*i};
+                validargs{2*k-1} = lower(argsin{2*i-1});
+                validargs{2*k}   = argsin{2*i};
             end
         end
     elseif ~isempty(with_only)
@@ -56,8 +37,8 @@ if iscell(argsin)
         for i = 1:length(argsin)/2
             if any(f_strcmpi(lower(argsin{2*i-1}),with_only))
                 k = k + 1;
-                validargs{2*k-1} = lower(varargin{2*i-1});
-                validargs{2*k}   = varargin{2*i};
+                validargs{2*k-1} = lower(argsin{2*i-1});
+                validargs{2*k}   = argsin{2*i};
             end
         end
     else
@@ -70,9 +51,9 @@ elseif isstruct(argsin)
         validargs = {};
         arg_name = fieldnames(argsin);
         nb_arg = length(arg_name);
+        k = 0;
         for i = 1:nb_arg
             arg_name_ = arg_name{i};
-            k = 0;
             if ~f_strcmpi(lower(arg_name_),with_out)
                 k = k + 1;
                 validargs{2*k - 1} = arg_name_;
@@ -83,9 +64,9 @@ elseif isstruct(argsin)
         validargs = {};
         arg_name = fieldnames(argsin);
         nb_arg = length(arg_name);
+        k = 0;
         for i = 1:nb_arg
             arg_name_ = arg_name{i};
-            k = 0;
             if any(f_strcmpi(lower(arg_name_),with_only))
                 k = k + 1;
                 validargs{2*k - 1} = arg_name_;
