@@ -13,9 +13,10 @@ classdef SurfaceDom < Xhandle
     % --- Properties
     properties
         parent_mesh Mesh
-        elem_code
         id_face
         build_from
+        condition
+        defined_on
     end
 
     % --- Dependent Properties
@@ -29,45 +30,14 @@ classdef SurfaceDom < Xhandle
             arguments
                 % ---
                 args.parent_mesh
-                args.elem_code = []
                 args.id_face = []
                 args.build_from = []
+                args.condition = []
             end
             % ---
             obj <= args;
         end
     end
-
-    % --- Methods
-    methods (Access = protected, Hidden)
-        % -----------------------------------------------------------------
-        function allmeshes = build_from_elem_code(obj)
-            id_elem_ = [];
-            for i = 1:length(obj.elem_code)
-                id_elem_ = [id_elem_ find(obj.parent_mesh.elem_code == obj.elem_code(i))];
-            end
-            % -------------------------------------------------------------
-            node = obj.parent_mesh.node;
-            elem = obj.parent_mesh.elem(:,id_elem_);
-            % -------------------------------------------------------------
-            allmeshes{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
-            allmeshes{1}.gid_elem = id_elem_;
-        end
-        % -----------------------------------------------------------------
-        function allmeshes = build_from_id_elem(obj)
-            id_elem_ = obj.id_face;
-            % -------------------------------------------------------------
-            obj.elem_code = unique(obj.parent_mesh.elem_code(id_elem_));
-            % -------------------------------------------------------------
-            node = obj.parent_mesh.node;
-            elem = obj.parent_mesh.elem(:,id_elem_);
-            % -------------------------------------------------------------
-            allmeshes{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
-            allmeshes{1}.gid_elem = id_elem_;
-        end
-        % -----------------------------------------------------------------
-    end
-
 end
 
 

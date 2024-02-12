@@ -46,7 +46,7 @@ classdef VolumeDom < Xhandle
         function allmeshes = build_from_elem_code(obj)
             id_elem_ = [];
             for i = 1:length(obj.elem_code)
-                id_elem_ = [id_elem_ find(obj.parent_mesh.elem_code == obj.elem_code(i))];
+                id_elem_ = [id_elem_ f_torowv(find(obj.parent_mesh.elem_code == obj.elem_code(i)))];
             end
             % -------------------------------------------------------------
             node = obj.parent_mesh.node;
@@ -89,6 +89,3 @@ classdef VolumeDom < Xhandle
     end
 
 end
-
-
-
