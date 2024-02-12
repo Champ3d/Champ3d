@@ -33,6 +33,7 @@ classdef VolumeDom3d < VolumeDom
                 args.id_zline = []
                 args.elem_code = []
                 args.id_elem = []
+                args.condition = []
             end
             % ---
             obj <= args;
@@ -110,6 +111,15 @@ classdef VolumeDom3d < VolumeDom
             obj.elem_code = elem_code_;
             % -------------------------------------------------------------
             node = obj.parent_mesh.node;
+            elem = obj.parent_mesh.elem(:,id_elem_);
+            elem_type = obj.parent_mesh.elem_type;
+            % -------------------------------------------------------------
+            if ~isempty(obj.condition)
+                idElem = ...
+                    f_find_elem(node,elem,'elem_type',elem_type,'condition', obj.condition);
+                id_elem_ = id_elem_(idElem);
+            end
+            % -------------------------------------------------------------
             elem = obj.parent_mesh.elem(:,id_elem_);
             % -------------------------------------------------------------
             allmeshes{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);

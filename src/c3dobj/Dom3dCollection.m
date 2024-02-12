@@ -39,6 +39,7 @@ classdef Dom3dCollection < Xhandle
 
     % --- Methods
     methods
+        % -----------------------------------------------------------------
         function obj = add_volume_dom3d(obj,args)
             arguments
                 obj
@@ -56,6 +57,25 @@ classdef Dom3dCollection < Xhandle
             % ---
             obj.data.(args.id) = vdom;
         end
+        % -----------------------------------------------------------------
+        function obj = add_surface_dom3d(obj,args)
+            arguments
+                obj
+                % ---
+                args.id char
+                args.dom2d_collection Dom2dCollection
+                args.id_dom2d = []
+                args.id_zline = []
+                args.elem_code = []
+                args.id_face = []
+            end
+            % ---
+            argu = f_to_namedarg(args,'with_out','id');
+            vdom = SurfaceDom3d(argu{:},'parent_mesh',obj.parent_mesh);
+            % ---
+            obj.data.(args.id) = vdom;
+        end
+        % -----------------------------------------------------------------
     end
 
     % --- Methods

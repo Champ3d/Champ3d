@@ -14,7 +14,7 @@ classdef SurfaceDom < Xhandle
     properties
         parent_mesh Mesh
         elem_code
-        id_elem
+        id_face
         build_from
     end
 
@@ -30,7 +30,7 @@ classdef SurfaceDom < Xhandle
                 % ---
                 args.parent_mesh
                 args.elem_code = []
-                args.id_elem = []
+                args.id_face = []
                 args.build_from = []
             end
             % ---
@@ -55,7 +55,7 @@ classdef SurfaceDom < Xhandle
         end
         % -----------------------------------------------------------------
         function allmeshes = build_from_id_elem(obj)
-            id_elem_ = obj.id_elem;
+            id_elem_ = obj.id_face;
             % -------------------------------------------------------------
             obj.elem_code = unique(obj.parent_mesh.elem_code(id_elem_));
             % -------------------------------------------------------------
