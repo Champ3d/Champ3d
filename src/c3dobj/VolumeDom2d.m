@@ -111,6 +111,8 @@ classdef VolumeDom2d < VolumeDom
             % -------------------------------------------------------------
             elem = obj.parent_mesh.elem(:,id_elem_);
             % -------------------------------------------------------------
+            obj.id_elem = id_elem_;
+            % -------------------------------------------------------------
             allmeshes{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
             allmeshes{1}.gid_elem = id_elem_;
         end

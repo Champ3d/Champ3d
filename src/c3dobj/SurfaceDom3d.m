@@ -13,6 +13,7 @@ classdef SurfaceDom3d < SurfaceDom
     % --- Properties
     properties
         dom3d_collection
+        id_dom3d
     end
 
     % --- Dependent Properties
@@ -32,6 +33,7 @@ classdef SurfaceDom3d < SurfaceDom
                 % ---
                 args.defined_on char = []
                 args.dom3d_collection Dom3dCollection
+                args.id_dom3d
             end
             % ---
             obj <= args;
@@ -85,10 +87,34 @@ classdef SurfaceDom3d < SurfaceDom
         end
         % -----------------------------------------------------------------
         function allmeshes = build_from_boundface(obj)
+            % ---
+            id_dom3d_ = f_to_scellargin(obj.id_dom3d);
+            all_id3   = fieldnames(obj.dom3d_collection.data);
+            % ---
+            elem = [];
+            % ---
+            for i = 1:length(id_dom3d_)
+                id3 = id_dom3d_{i};
+                valid3 = f_validid(id3,all_id3);
+                % ---
+                for j = 1:length(valid3)
+                    elem = [elem  obj.parent_mesh.elem(:,obj.dom3d_collection.data.(valid3(j)).id_elem)];
+                end
+            end
+            %--------------------------------------------------------------
+            node = obj.parent_mesh.node;
+            elem_type = f_elemtype(elem);
+            %--------------------------------------------------------------
+            [bound_face, lid_bound_face, info] = ...
+                f_boundface(elem,node,'elem_type',elem_type);
+            %--------------------------------------------------------------
+            % ---
             id_face_ = obj.id_face;
             % -------------------------------------------------------------
-            node = obj.parent_mesh.node;
+            
             face = obj.parent_mesh.face(:,id_face_);
+            % -------------------------------------------------------------
+            
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
                 id_ = ...
