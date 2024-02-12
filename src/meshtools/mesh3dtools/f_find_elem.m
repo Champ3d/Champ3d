@@ -15,7 +15,7 @@ arguments
     elem
     args.condition char
     args.elem_type char = []
-    args.tol = 1e-9
+    args.tol = 1e-12
     args.defined_on char = []
 end
 
@@ -28,7 +28,7 @@ if isempty(args.defined_on)
 end
 
 %--------------------------------------------------------------------------
-condition = f_cut_equation(condition,varargin);
+condition = f_cut_equation(condition,'tol',args.tol);
 %--------------------------------------------------------------------------
 eqcond = condition.eqcond;
 neqcond = condition.neqcond;

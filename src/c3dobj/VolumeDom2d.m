@@ -31,6 +31,7 @@ classdef VolumeDom2d < VolumeDom
                 args.id_yline = []
                 args.elem_code = []
                 args.id_elem = []
+                args.condition char = []
             end
             % ---
             obj <= args;
