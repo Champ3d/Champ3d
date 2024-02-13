@@ -30,32 +30,20 @@ classdef VolumeDom2d < VolumeDom
                 args.id_xline = []
                 args.id_yline = []
                 args.elem_code = []
-                args.id_elem = []
+                args.gid_elem = []
                 args.condition char = []
             end
+            % ---
+            obj = obj@VolumeDom;
             % ---
             obj <= args;
             % ---
             if ~isempty(obj.elem_code)
-                obj.build_from = 'elem_code';
-            elseif ~isempty(obj.id_elem)
-                obj.build_from = 'id_elem';
-            else
-                obj.build_from = 'id_mesh1d';
-            end
-        end
-    end
-
-    % --- Methods
-    methods
-        function allmeshes = submesh(obj)
-            switch obj.build_from
-                case 'id_mesh1d'
-                    allmeshes = obj.build_from_idmesh1d;
-                case 'elem_code'
-                    allmeshes = obj.build_from_elem_code;
-                case 'id_elem'
-                    allmeshes = obj.build_from_id_elem;
+                obj.build_from_elem_code;
+            elseif ~isempty(obj.gid_elem)
+                obj.build_from_gid_elem
+            elseif ~isempty(obj.id_xline) && ~isempty(obj.id_yline)
+                obj.build_from_idmesh1d;
             end
         end
     end
@@ -63,7 +51,7 @@ classdef VolumeDom2d < VolumeDom
     % --- Methods
     methods (Access = private, Hidden)
         % -----------------------------------------------------------------
-        function allmeshes = build_from_idmesh1d(obj)
+        function build_from_idmesh1d(obj)
             id_xline_ = f_to_dcellargin(obj.id_xline);
             id_yline_ = f_to_dcellargin(obj.id_yline);
             [id_xline_, id_yline_] = f_pairing_dcellargin(id_xline_, id_yline_);
@@ -71,7 +59,7 @@ classdef VolumeDom2d < VolumeDom
             all_id_mesh1d = fieldnames(obj.parent_mesh.mesh1d_collection.data);
             id_all_elem   = 1:obj.parent_mesh.nb_elem;
             all_elem_code = obj.parent_mesh.elem_code;
-            id_elem_ = [];
+            gid_elem_ = [];
             elem_code_ = [];
             for i = 1:length(id_xline_)
                 for j = 1:length(id_xline_{i})
@@ -88,7 +76,7 @@ classdef VolumeDom2d < VolumeDom
                                 codeidy = obj.parent_mesh.mesh1d_collection.data.(valid_idy{l}).elem_code;
                                 % ---
                                 given_elem_code = codeidx * codeidy;
-                                id_elem_ = [id_elem_ ...
+                                gid_elem_ = [gid_elem_ ...
                                             id_all_elem(all_elem_code == given_elem_code)];
                                 elem_code_ = [elem_code_ given_elem_code];
                             end
@@ -100,21 +88,17 @@ classdef VolumeDom2d < VolumeDom
             obj.elem_code = unique(elem_code_);
             % -------------------------------------------------------------
             node = obj.parent_mesh.node;
-            elem = obj.parent_mesh.elem(:,id_elem_);
+            elem = obj.parent_mesh.elem(:,gid_elem_);
             elem_type = obj.parent_mesh.elem_type;
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
                 idElem = ...
                     f_find_elem(node,elem,'elem_type',elem_type,'condition', obj.condition);
-                id_elem_ = id_elem_(idElem);
+                gid_elem_ = gid_elem_(idElem);
             end
             % -------------------------------------------------------------
-            elem = obj.parent_mesh.elem(:,id_elem_);
+            obj.gid_elem = gid_elem_;
             % -------------------------------------------------------------
-            obj.id_elem = id_elem_;
-            % -------------------------------------------------------------
-            allmeshes{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
-            allmeshes{1}.gid_elem = id_elem_;
         end
     end
 

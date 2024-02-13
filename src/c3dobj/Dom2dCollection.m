@@ -47,7 +47,7 @@ classdef Dom2dCollection < Xhandle
                 args.id_xline = []
                 args.id_yline = []
                 args.elem_code = []
-                args.id_elem = []
+                args.gid_elem = []
                 args.condition char = []
             end
             % ---

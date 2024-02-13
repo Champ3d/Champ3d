@@ -13,14 +13,18 @@ function obj = build_meshds(obj,args)
 arguments
     obj
     % ---
-    args.option MeshDsOptionList = MeshDsOptionList.all
+    args.get {mustBeMember(args.get,...
+        {'all','edge','face','celem','cface','cedge','id_edge_in_elem',...
+         'ori_edge_in_elem','sign_edge_in_elem','id_face_in_elem',...
+         'ori_face_in_elem','sign_face_in_elem','id_edge_in_face',...
+         'ori_edge_in_face','sign_edge_in_face',...
+         'div','grad','curl'})} = 'all'
 end
-
 %--------------------------------------------------------------------------
 tic
 f_fprintf(0,'Make #meshds');
 % ---
-option = args.option;
+get = args.get;
 % ---
 node_ = obj.node;
 elem_ = obj.elem;
@@ -35,8 +39,8 @@ siNo_inEd = con.siNo_inEd;
 nbEd_inEl = con.nbEd_inEl;
 %--------------------------------------------------------------------------
 %----- barrycenter
-all_option = MeshDsOptionList.celem;
-if any(option == all_option)
+all_get = {'all','celem'};
+if any(f_strcmpi(get,all_get))
     if isempty(obj.celem)
         dim = size(node_,1);
         obj.celem = mean(reshape(node_(:,elem_(1:nbNo_inEl,:)),dim,nbNo_inEl,nb_elem_),2);
@@ -45,8 +49,8 @@ if any(option == all_option)
 end
 %--------------------------------------------------------------------------
 %----- edges
-all_option = [MeshDsOptionList.all MeshDsOptionList.edge MeshDsOptionList.id_edge_in_elem];
-if any(option == all_option)
+all_get = {'all','edge','id_edge_in_elem'};
+if any(f_strcmpi(get,all_get))
     if isempty(obj.edge)
         obj.edge = f_edge(elem_,'elem_type',elem_type_);
     end
@@ -61,9 +65,8 @@ if any(option == all_option)
 end
 %--------------------------------------------------------------------------
 %----- faces
-all_option = [MeshDsOptionList.all MeshDsOptionList.face ...
-              MeshDsOptionList.sign_face_in_elem];
-if any(option == all_option)
+all_get = {'all','face','sign_face_in_elem'};
+if any(f_strcmpi(get,all_get))
     if isempty(obj.face)
         obj.face = f_face(elem_,'elem_type',elem_type_);
     end
@@ -79,8 +82,8 @@ if any(option == all_option)
 end
 %--------------------------------------------------------------------------
 %----- Discrete Div
-all_option = [MeshDsOptionList.all MeshDsOptionList.div];
-if any(option == all_option)
+all_get = {'all','div'};
+if any(f_strcmpi(get,all_get))
     % ---
     if isempty(obj.face)
         obj.face = f_face(elem_,'elem_type',elem_type_);
@@ -108,9 +111,8 @@ if any(option == all_option)
 end
 %--------------------------------------------------------------------------
 %----- Discrete Rot
-all_option = [MeshDsOptionList.all MeshDsOptionList.rot ...
-              MeshDsOptionList.curl];
-if any(option == all_option)
+all_get = {'all','rot','curl'};
+if any(f_strcmpi(get,all_get))
     if any(f_strcmpi(elem_type_,{'tri', 'triangle', 'quad'}))
         % ---
         if isempty(obj.edge)
@@ -187,8 +189,8 @@ if any(option == all_option)
 end
 %--------------------------------------------------------------------------
 %----- Discrete Grad
-all_option = [MeshDsOptionList.all MeshDsOptionList.grad];
-if any(option == all_option)
+all_get = {'all','grad'};
+if any(f_strcmpi(get,all_get))
     if isempty(obj.edge)
         obj.edge = f_edge(elem_,'elem_type',elem_type_);
     end

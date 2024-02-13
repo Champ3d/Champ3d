@@ -32,40 +32,30 @@ classdef VolumeDom3d < VolumeDom
                 args.id_dom2d = []
                 args.id_zline = []
                 args.elem_code = []
-                args.id_elem = []
+                args.gid_elem = []
                 args.condition = []
             end
+            % ---
+            obj = obj@VolumeDom;
             % ---
             obj <= args;
             % ---
             if ~isempty(obj.elem_code)
-                obj.build_from = 'elem_code';
-            elseif ~isempty(obj.id_elem)
-                obj.build_from = 'id_elem';
-            else
-                obj.build_from = 'id_mesh1d2d';
+                obj.build_from_elem_code;
+            elseif ~isempty(obj.gid_elem)
+                obj.build_from_gid_elem;
+            elseif ~isempty(obj.dom2d_collection) && ~isempty(obj.id_dom2d) ...
+                    && ~isempty(obj.id_zline)
+                obj.build_from_idmesh1d2d;
             end
-        end
-    end
-
-    % --- Methods
-    methods
-        function allmeshes = submesh(obj)
-            switch obj.build_from
-                case 'id_mesh1d2d'
-                    allmeshes = obj.build_from_idmesh1d2d;
-                case 'elem_code'
-                    allmeshes = obj.build_from_elem_code;
-                case 'id_elem'
-                    allmeshes = obj.build_from_id_elem;
-            end
+            % ---
         end
     end
 
     % --- Methods
     methods (Access = private, Hidden)
         % -----------------------------------------------------------------
-        function allmeshes = build_from_idmesh1d2d(obj)
+        function build_from_idmesh1d2d(obj)
             id_dom2d_ = f_to_dcellargin(obj.id_dom2d);
             id_zline_ = f_to_dcellargin(obj.id_zline);
             [id_dom2d_, id_zline_] = f_pairing_dcellargin(id_dom2d_, id_zline_);
@@ -75,7 +65,7 @@ classdef VolumeDom3d < VolumeDom
             all_elem_code = obj.parent_mesh.elem_code;
             id_all_elem   = 1:obj.parent_mesh.nb_elem;
             % ---
-            id_elem_ = [];
+            gid_elem_ = [];
             elem_code_ = [];
             % ---
             for i = 1:length(id_dom2d_)
@@ -96,7 +86,7 @@ classdef VolumeDom3d < VolumeDom
                                     elem_code_ = [elem_code_ codedom2d(o) .* codeidz];
                                     % ---
                                     given_elem_code = codedom2d(o) .* codeidz;
-                                    id_elem_ = [id_elem_ ...
+                                    gid_elem_ = [gid_elem_ ...
                                                 id_all_elem(all_elem_code == given_elem_code)];
                                 end
                             end
@@ -106,26 +96,22 @@ classdef VolumeDom3d < VolumeDom
             end
             % ---
             elem_code_ = unique(elem_code_);
-            id_elem_ = unique(id_elem_);
+            gid_elem_ = unique(gid_elem_);
             % -------------------------------------------------------------
             obj.elem_code = elem_code_;
             % -------------------------------------------------------------
             node = obj.parent_mesh.node;
-            elem = obj.parent_mesh.elem(:,id_elem_);
+            elem = obj.parent_mesh.elem(:,gid_elem_);
             elem_type = obj.parent_mesh.elem_type;
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
                 idElem = ...
                     f_find_elem(node,elem,'elem_type',elem_type,'condition', obj.condition);
-                id_elem_ = id_elem_(idElem);
+                gid_elem_ = gid_elem_(idElem);
             end
             % -------------------------------------------------------------
-            elem = obj.parent_mesh.elem(:,id_elem_);
+            obj.gid_elem = gid_elem_;
             % -------------------------------------------------------------
-            obj.id_elem = id_elem_;
-            % -------------------------------------------------------------
-            allmeshes{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
-            allmeshes{1}.gid_elem = id_elem_;
         end
     end
 

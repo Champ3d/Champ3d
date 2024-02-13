@@ -49,7 +49,7 @@ classdef Dom3dCollection < Xhandle
                 args.id_dom2d = []
                 args.id_zline = []
                 args.elem_code = []
-                args.id_elem = []
+                args.gid_elem = []
                 args.condition char = []
             end
             % ---

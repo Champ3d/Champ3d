@@ -27,7 +27,7 @@ classdef SurfaceDom3d < SurfaceDom
             arguments
                 % ---
                 args.parent_mesh
-                args.id_face = []
+                args.gid_face = []
                 args.build_from = []
                 args.condition = []
                 % ---
@@ -38,10 +38,10 @@ classdef SurfaceDom3d < SurfaceDom
             % ---
             obj <= args;
             % ---
-            if isempty(args.id_face)
-                obj.build_from = 'id_face';
+            if isempty(obj.gid_face)
+                obj.build_from = 'gid_face';
             else
-                switch lower(args.defined_on)
+                switch lower(obj.defined_on)
                     case {'bound_face','bound'}
                         obj.build_from = 'bound_face';
                     case {'interface'}
@@ -59,8 +59,8 @@ classdef SurfaceDom3d < SurfaceDom
                     allmeshes = obj.build_from_boundface;
                 case 'interface'
                     allmeshes = obj.build_from_interface;
-                case 'id_face'
-                    allmeshes = obj.build_from_id_face;
+                case 'gid_face'
+                    allmeshes = obj.build_from_gid_face;
             end
         end
     end
@@ -68,21 +68,21 @@ classdef SurfaceDom3d < SurfaceDom
     % --- Methods
     methods (Access = protected, Hidden)
         % -----------------------------------------------------------------
-        function allmeshes = build_from_id_face(obj)
-            id_face_ = obj.id_face;
+        function allmeshes = build_from_gid_face(obj)
+            gid_face_ = obj.gid_face;
             % -------------------------------------------------------------
             node = obj.parent_mesh.node;
-            face = obj.parent_mesh.face(:,id_face_);
+            face = obj.parent_mesh.face(:,gid_face_);
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
                 id_ = ...
                     f_find_elem(node,face,'defined_on','face','condition', obj.condition);
-                id_face_ = id_face_(id_);
+                gid_face_ = gid_face_(id_);
             end
             % -------------------------------------------------------------
-            face = obj.parent_mesh.face(:,id_face_);
+            face = obj.parent_mesh.face(:,gid_face_);
             % -------------------------------------------------------------
-            allmeshes = obj.decompose_face(node,face,id_face_);
+            allmeshes = obj.decompose_face(node,face,gid_face_);
             % -------------------------------------------------------------
         end
         % -----------------------------------------------------------------
@@ -105,44 +105,38 @@ classdef SurfaceDom3d < SurfaceDom
             node = obj.parent_mesh.node;
             elem_type = f_elemtype(elem);
             %--------------------------------------------------------------
-            [bound_face, lid_bound_face, info] = ...
-                f_boundface(elem,node,'elem_type',elem_type);
-            %--------------------------------------------------------------
-            % ---
-            id_face_ = obj.id_face;
-            % -------------------------------------------------------------
-            
-            face = obj.parent_mesh.face(:,id_face_);
-            % -------------------------------------------------------------
-            
+            face = f_boundface(elem,node,'elem_type',elem_type);
+            gid_face_ = f_findvecnd(face,obj.parent_mesh.face);
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
                 id_ = ...
                     f_find_elem(node,face,'defined_on','face','condition', obj.condition);
-                id_face_ = id_face_(id_);
+                gid_face_ = gid_face_(id_);
             end
             % -------------------------------------------------------------
-            face = obj.parent_mesh.face(:,id_face_);
+            face = obj.parent_mesh.face(:,gid_face_);
+            %--------------------------------------------------------------
+            obj.gid_face = gid_face_;
             % -------------------------------------------------------------
-            allmeshes = obj.decompose_face(node,face,id_face_);
+            allmeshes = obj.decompose_face(node,face,gid_face_);
             % -------------------------------------------------------------
         end
         % -----------------------------------------------------------------
         function allmeshes = build_from_interface(obj)
-            id_face_ = obj.id_face;
+            gid_face_ = obj.gid_face;
             % -------------------------------------------------------------
             node = obj.parent_mesh.node;
-            face = obj.parent_mesh.face(:,id_face_);
+            face = obj.parent_mesh.face(:,gid_face_);
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
                 id_ = ...
                     f_find_elem(node,face,'defined_on','face','condition', obj.condition);
-                id_face_ = id_face_(id_);
+                gid_face_ = gid_face_(id_);
             end
             % -------------------------------------------------------------
-            face = obj.parent_mesh.face(:,id_face_);
+            face = obj.parent_mesh.face(:,gid_face_);
             % -------------------------------------------------------------
-            allmeshes = obj.decompose_face(node,face,id_face_);
+            allmeshes = obj.decompose_face(node,face,gid_face_);
             % -------------------------------------------------------------
         end
         % -----------------------------------------------------------------
@@ -157,10 +151,10 @@ classdef SurfaceDom3d < SurfaceDom
             id_quad = setdiff(1:nb_face,id_tria);
             % ---
             allmeshes{1} = TriMesh('node',node,'elem',face(1:3,id_tria));
-            allmeshes{1}.gid_elem = gid_face(id_tria);
+            allmeshes{1}.gid_face = gid_face(id_tria);
             % ---
             allmeshes{2} = QuadMesh('node',node,'elem',face(1:4,id_quad));
-            allmeshes{2}.gid_elem = gid_face(id_quad);
+            allmeshes{2}.gid_face = gid_face(id_quad);
         end
         % -----------------------------------------------------------------
     end

@@ -13,7 +13,7 @@ classdef SurfaceDom < Xhandle
     % --- Properties
     properties
         parent_mesh Mesh
-        id_face
+        gid_face
         build_from
         condition
         defined_on
@@ -30,7 +30,7 @@ classdef SurfaceDom < Xhandle
             arguments
                 % ---
                 args.parent_mesh
-                args.id_face = []
+                args.gid_face = []
                 args.build_from = []
                 args.condition = []
             end

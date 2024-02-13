@@ -12,10 +12,9 @@ classdef VolumeDom < Xhandle
 
     % --- Properties
     properties
-        parent_mesh Mesh
+        parent_mesh
         elem_code
-        id_elem
-        build_from
+        gid_elem
         condition
     end
 
@@ -29,67 +28,94 @@ classdef VolumeDom < Xhandle
         function obj = VolumeDom(args)
             arguments
                 % ---
-                args.parent_mesh
+                args.parent_mesh = []
                 args.elem_code = []
-                args.id_elem = []
-                args.build_from = []
+                args.gid_elem = []
                 args.condition = []
             end
             % ---
             obj <= args;
+            % ---
+            if ~isempty(obj.gid_elem)
+                obj.build_from_gid_elem;
+            elseif ~isempty(obj.elem_code)
+                obj.build_from_elem_code;
+            end
+        end
+    end
+
+    % --- Methods
+    methods
+        function allmeshes = submesh(obj)
+            node = obj.parent_mesh.node;
+            elem = obj.parent_mesh.elem(:,obj.gid_elem);
+            % -------------------------------------------------------------
+            allmeshes{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
+            allmeshes{1}.gid_elem = obj.gid_elem;
         end
     end
 
     % --- Methods
     methods (Access = protected, Hidden)
         % -----------------------------------------------------------------
-        function allmeshes = build_from_elem_code(obj)
-            id_elem_ = [];
+        function build_from_elem_code(obj)
+            gid_elem_ = [];
             for i = 1:length(obj.elem_code)
-                id_elem_ = [id_elem_ f_torowv(find(obj.parent_mesh.elem_code == obj.elem_code(i)))];
+                gid_elem_ = [gid_elem_ f_torowv(find(obj.parent_mesh.elem_code == obj.elem_code(i)))];
             end
             % -------------------------------------------------------------
             node = obj.parent_mesh.node;
-            elem = obj.parent_mesh.elem(:,id_elem_);
+            elem = obj.parent_mesh.elem(:,gid_elem_);
             elem_type = obj.parent_mesh.elem_type;
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
                 idElem = ...
                     f_find_elem(node,elem,'elem_type',elem_type,'condition', obj.condition);
-                id_elem_ = id_elem_(idElem);
+                gid_elem_ = gid_elem_(idElem);
             end
             % -------------------------------------------------------------
-            elem = obj.parent_mesh.elem(:,id_elem_);
+            obj.gid_elem = gid_elem_;
             % -------------------------------------------------------------
-            obj.id_elem = id_elem_;
-            % -------------------------------------------------------------
-            allmeshes{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
-            allmeshes{1}.gid_elem = id_elem_;
         end
         % -----------------------------------------------------------------
-        function allmeshes = build_from_id_elem(obj)
-            id_elem_ = obj.id_elem;
+        function build_from_gid_elem(obj)
+            gid_elem_ = obj.gid_elem;
             % -------------------------------------------------------------
-            obj.elem_code = unique(obj.parent_mesh.elem_code(id_elem_));
+            obj.elem_code = unique(obj.parent_mesh.elem_code(gid_elem_));
             % -------------------------------------------------------------
             node = obj.parent_mesh.node;
-            elem = obj.parent_mesh.elem(:,id_elem_);
+            elem = obj.parent_mesh.elem(:,gid_elem_);
             elem_type = obj.parent_mesh.elem_type;
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
                 idElem = ...
                     f_find_elem(node,elem,'elem_type',elem_type,'condition', obj.condition);
-                id_elem_ = id_elem_(idElem);
+                gid_elem_ = gid_elem_(idElem);
             end
             % -------------------------------------------------------------
-            elem = obj.parent_mesh.elem(:,id_elem_);
+            obj.gid_elem = gid_elem_;
             % -------------------------------------------------------------
-            obj.id_elem = id_elem_;
-            % -------------------------------------------------------------
-            allmeshes{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
-            allmeshes{1}.gid_elem = id_elem_;
         end
         % -----------------------------------------------------------------
+    end
+
+    % --- Methods
+    methods
+        function objy = plus(obj,objx)
+            objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
+            objy.gid_elem = [f_torowv(obj.gid_elem) f_torowv(objx.gid_elem)];
+            objy.build_from_gid_elem;
+        end
+        function objy = minus(obj,objx)
+            objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
+            objy.gid_elem = setdiff(f_torowv(obj.gid_elem),f_torowv(objx.gid_elem));
+            objy.build_from_gid_elem;
+        end
+        function objy = mpower(obj,objx)
+            objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
+            objy.gid_elem = intersect(f_torowv(obj.gid_elem),f_torowv(objx.gid_elem));
+            objy.build_from_gid_elem;
+        end
     end
 
 end
