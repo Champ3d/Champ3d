@@ -83,11 +83,11 @@ classdef VolumeDom3d < VolumeDom
                                 for l = 1:length(valid_idz)
                                     codeidz = obj.parent_mesh.mesh1d_collection.data.(valid_idz{l}).elem_code;
                                     % ---
-                                    elem_code_ = [elem_code_ codedom2d(o) .* codeidz];
-                                    % ---
                                     given_elem_code = codedom2d(o) .* codeidz;
                                     gid_elem_ = [gid_elem_ ...
                                                 id_all_elem(all_elem_code == given_elem_code)];
+                                    % ---
+                                    elem_code_ = [elem_code_ given_elem_code];
                                 end
                             end
                         end
@@ -95,22 +95,21 @@ classdef VolumeDom3d < VolumeDom
                 end
             end
             % ---
-            elem_code_ = unique(elem_code_);
             gid_elem_ = unique(gid_elem_);
             % -------------------------------------------------------------
-            obj.elem_code = elem_code_;
-            % -------------------------------------------------------------
-            node = obj.parent_mesh.node;
-            elem = obj.parent_mesh.elem(:,gid_elem_);
-            elem_type = obj.parent_mesh.elem_type;
-            % -------------------------------------------------------------
             if ~isempty(obj.condition)
+                % ---------------------------------------------------------
+                node = obj.parent_mesh.node;
+                elem = obj.parent_mesh.elem(:,gid_elem_);
+                elem_type = obj.parent_mesh.elem_type;
+                % ---
                 idElem = ...
                     f_find_elem(node,elem,'elem_type',elem_type,'condition', obj.condition);
                 gid_elem_ = gid_elem_(idElem);
             end
             % -------------------------------------------------------------
-            obj.gid_elem = gid_elem_;
+            obj.gid_elem  = unique(gid_elem_);
+            obj.elem_code = unique(obj.parent_mesh.elem_code(gid_elem_));
             % -------------------------------------------------------------
         end
     end

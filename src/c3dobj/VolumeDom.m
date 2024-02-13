@@ -59,41 +59,57 @@ classdef VolumeDom < Xhandle
     methods (Access = protected, Hidden)
         % -----------------------------------------------------------------
         function build_from_elem_code(obj)
+            % ---
+            if any(f_strcmpi(obj.elem_code,{':','all','all_domaine'}))
+                obj.gid_elem = ':';
+                obj.build_from_gid_elem;
+                return
+            end
+            % ---
             gid_elem_ = [];
             for i = 1:length(obj.elem_code)
                 gid_elem_ = [gid_elem_ f_torowv(find(obj.parent_mesh.elem_code == obj.elem_code(i)))];
             end
-            % -------------------------------------------------------------
-            node = obj.parent_mesh.node;
-            elem = obj.parent_mesh.elem(:,gid_elem_);
-            elem_type = obj.parent_mesh.elem_type;
+            % ---
+            gid_elem_ = unique(gid_elem_);
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
+                % ---------------------------------------------------------
+                node = obj.parent_mesh.node;
+                elem = obj.parent_mesh.elem(:,gid_elem_);
+                elem_type = obj.parent_mesh.elem_type;
+                % ---
                 idElem = ...
                     f_find_elem(node,elem,'elem_type',elem_type,'condition', obj.condition);
                 gid_elem_ = gid_elem_(idElem);
             end
             % -------------------------------------------------------------
-            obj.gid_elem = gid_elem_;
+            obj.gid_elem  = unique(gid_elem_);
+            obj.elem_code = unique(obj.parent_mesh.elem_code(gid_elem_));
             % -------------------------------------------------------------
         end
         % -----------------------------------------------------------------
         function build_from_gid_elem(obj)
+            % ---
+            if any(f_strcmpi(obj.gid_elem,{':','all','all_domaine'}))
+                obj.gid_elem = 1:obj.parent_mesh.nb_elem;
+            end
+            % ---
             gid_elem_ = obj.gid_elem;
             % -------------------------------------------------------------
-            obj.elem_code = unique(obj.parent_mesh.elem_code(gid_elem_));
-            % -------------------------------------------------------------
-            node = obj.parent_mesh.node;
-            elem = obj.parent_mesh.elem(:,gid_elem_);
-            elem_type = obj.parent_mesh.elem_type;
-            % -------------------------------------------------------------
             if ~isempty(obj.condition)
+                % ---------------------------------------------------------
+                node = obj.parent_mesh.node;
+                elem = obj.parent_mesh.elem(:,gid_elem_);
+                elem_type = obj.parent_mesh.elem_type;
+                % ---
                 idElem = ...
                     f_find_elem(node,elem,'elem_type',elem_type,'condition', obj.condition);
                 gid_elem_ = gid_elem_(idElem);
             end
             % -------------------------------------------------------------
-            obj.gid_elem = gid_elem_;
+            obj.gid_elem  = unique(gid_elem_);
+            obj.elem_code = unique(obj.parent_mesh.elem_code(gid_elem_));
             % -------------------------------------------------------------
         end
         % -----------------------------------------------------------------

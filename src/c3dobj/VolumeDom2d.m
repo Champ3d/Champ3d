@@ -85,19 +85,19 @@ classdef VolumeDom2d < VolumeDom
                 end
             end
             % -------------------------------------------------------------
-            obj.elem_code = unique(elem_code_);
-            % -------------------------------------------------------------
-            node = obj.parent_mesh.node;
-            elem = obj.parent_mesh.elem(:,gid_elem_);
-            elem_type = obj.parent_mesh.elem_type;
-            % -------------------------------------------------------------
             if ~isempty(obj.condition)
+                % ---------------------------------------------------------
+                node = obj.parent_mesh.node;
+                elem = obj.parent_mesh.elem(:,gid_elem_);
+                elem_type = obj.parent_mesh.elem_type;
+                % ---
                 idElem = ...
                     f_find_elem(node,elem,'elem_type',elem_type,'condition', obj.condition);
                 gid_elem_ = gid_elem_(idElem);
             end
             % -------------------------------------------------------------
-            obj.gid_elem = gid_elem_;
+            obj.gid_elem  = unique(gid_elem_);
+            obj.elem_code = unique(obj.parent_mesh.elem_code(gid_elem_));
             % -------------------------------------------------------------
         end
     end

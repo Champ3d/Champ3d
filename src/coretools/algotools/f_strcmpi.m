@@ -17,6 +17,11 @@ len = length(str1);
 cmpresult = zeros(1,len);
 %--------------------------------------------------------------------------
 for i = 1:len
-    cmpresult(i) = any(strcmpi(str1{i},str2));
+    s1 = str1{i};
+    if ischar(s1)
+        cmpresult(i) = any(strcmpi(s1,str2));
+    else
+        cmpresult(i) = 0;
+    end
 end
 %--------------------------------------------------------------------------
