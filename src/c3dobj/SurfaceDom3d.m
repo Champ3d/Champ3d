@@ -67,7 +67,7 @@ classdef SurfaceDom3d < SurfaceDom
                 valid3 = f_validid(id3,all_id3);
                 % ---
                 for j = 1:length(valid3)
-                    elem = [elem  obj.parent_mesh.elem(:,obj.dom3d_collection.data.(valid3(j)).id_elem)];
+                    elem = [elem  obj.parent_mesh.elem(:,obj.dom3d_collection.data.(valid3{j}).gid_elem)];
                 end
             end
             %--------------------------------------------------------------
@@ -88,9 +88,36 @@ classdef SurfaceDom3d < SurfaceDom
         end
         % -----------------------------------------------------------------
         function  build_from_interface(obj)
-            gid_face_ = obj.gid_face;
-            % -------------------------------------------------------------
+            % ---
+            id_dom3d_ = f_to_dcellargin(obj.id_dom3d);
+            all_id3   = fieldnames(obj.dom3d_collection.data);
             node = obj.parent_mesh.node;
+            % ---
+            for i = 1:length(id_dom3d_)
+                elem = [];
+                for j = 1:length(id_dom3d_{i})
+                    id3 = id_dom3d_{i}{j};
+                    valid3 = f_validid(id3,all_id3);
+                    for j = 1:length(valid3)
+                        elem = [elem  obj.parent_mesh.elem(:,obj.dom3d_collection.data.(valid3{j}).gid_elem)];
+                    end
+                end
+                %----------------------------------------------------------
+                elem_type = f_elemtype(elem);
+                %----------------------------------------------------------
+                face = f_boundface(elem,node,'elem_type',elem_type);
+                xgid_face_{i} = f_findvecnd(face,obj.parent_mesh.face);
+            end
+            % ---
+            gid_face_ = [];
+            for i = 1:length(xgid_face_)
+                if i == 1
+                    gid_face_ = xgid_face_{i};
+                else
+                    gid_face_ = intersect(gid_face_,xgid_face_{i});
+                end
+            end
+            % ---
             face = obj.parent_mesh.face(:,gid_face_);
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
@@ -98,9 +125,10 @@ classdef SurfaceDom3d < SurfaceDom
                     f_find_elem(node,face,'defined_on','face','condition', obj.condition);
                 gid_face_ = gid_face_(id_);
             end
+            %--------------------------------------------------------------
+            obj.gid_face = gid_face_;
             % -------------------------------------------------------------
-            obj.gid_face = unique(gid_face_);
-            % -------------------------------------------------------------
+
         end
     end
 
