@@ -80,7 +80,7 @@ classdef VolumeDom < Xhandle
                 elem_type = obj.parent_mesh.elem_type;
                 % ---
                 idElem = ...
-                    f_find_elem(node,elem,'elem_type',elem_type,'condition', obj.condition);
+                    f_find_elem(node,elem,'condition', obj.condition);
                 gid_elem_ = gid_elem_(idElem);
             end
             % -------------------------------------------------------------
@@ -104,7 +104,7 @@ classdef VolumeDom < Xhandle
                 elem_type = obj.parent_mesh.elem_type;
                 % ---
                 idElem = ...
-                    f_find_elem(node,elem,'elem_type',elem_type,'condition', obj.condition);
+                    f_find_elem(node,elem,'condition', obj.condition);
                 gid_elem_ = gid_elem_(idElem);
             end
             % -------------------------------------------------------------

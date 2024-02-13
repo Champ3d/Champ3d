@@ -9,7 +9,6 @@
 %--------------------------------------------------------------------------
 
 function id_elem = f_find_elem(node,elem,args)
-
 arguments
     node
     elem
@@ -27,55 +26,64 @@ neqcond = condition.neqcond;
 %--------------------------------------------------------------------------
 nbEqcond = length(eqcond);
 %--------------------------------------------------------------------------
-elem = sort(elem,1,"descend");
+nbelm = size(elem,2);
+elemx = [sort(elem,1,"descend"); zeros(1,nbelm)];
 %--------------------------------------------------------------------------
-id_gr = {};
+ie_gr = {};
 el_gr = {};
-nb_gr = 1;
-for i = size(elem,1):1
-    if any(elem(i,:) == 0)
+nb_gr = 0;
+% ---
+for i = 2 : size(elemx,1)
+    if any(elemx(i,:) == 0)
         nb_gr = nb_gr + 1;
-    else
-        el_gr{1} = elem;
+        id_ = find(elemx(i,:) == 0);
+        ie_gr{nb_gr} = id_;
+        el_gr{nb_gr} = elemx(1:i-1,id_);
     end
 end
 
+% ---
+id_elem = [];
 
-
-%--------------------------------------------------------------------------
-nbNo_inEl = con.nbNo_inEl;
-nbElem = size(elem,2);
-%----- barrycenter
-x = mean(reshape(node(1,elem(1:nbNo_inEl,:)),nbNo_inEl,nbElem));
-y = mean(reshape(node(2,elem(1:nbNo_inEl,:)),nbNo_inEl,nbElem));
-if size(node,1) >= 3
-    z = mean(reshape(node(3,elem(1:nbNo_inEl,:)),nbNo_inEl,nbElem));
+for j = 1:length(el_gr)
+    % ---
+    elem_ = el_gr{j};
+    nbNo_inEl = size(elem_,1);
+    nbElem = size(elem_,2);
+    %----------------------------------------------------------------------
+    %----- barrycenter
+    x = mean(reshape(node(1,elem_(1:nbNo_inEl,:)),nbNo_inEl,nbElem));
+    y = mean(reshape(node(2,elem_(1:nbNo_inEl,:)),nbNo_inEl,nbElem));
+    if size(node,1) >= 3
+        z = mean(reshape(node(3,elem_(1:nbNo_inEl,:)),nbNo_inEl,nbElem));
+    end
+    % ---
+    if length(neqcond) > 1                      % 1 & something else
+        eval(['checksum = (' neqcond ');']);
+        id_elem_ = find(checksum >= 1); 
+    else
+        id_elem_ = 1:nbElem;
+    end
+    % ---
+    for i = 1:nbEqcond
+        eqcond_L = strrep(eqcond{i},'==','<');
+        eqcond_R = strrep(eqcond{i},'==','>');
+        eval(['iEqcond_L{i} = (' eqcond_L ');']);
+        eval(['iEqcond_R{i} = (' eqcond_R ');']);
+        checksum_L = sum(iEqcond_L{i});
+        checksum_R = sum(iEqcond_R{i});
+        checksum   = checksum_L + checksum_R;
+        % just need one node touched
+        iElemEqcond{i} = find( (checksum_L < nbNo_inEl & checksum_L > 0 & ...
+                                checksum_R < nbNo_inEl & checksum_R > 0)  ...
+                              |(checksum   < nbNo_inEl)); 
+    end
+    % ---
+    for i = 1:nbEqcond
+        id_elem_ = intersect(id_elem_,iElemEqcond{i});
+    end
+    %----------------------------------------------------------------------
+    id_elem_ = unique(id_elem_);
+    id_elem = [id_elem ie_gr{j}(id_elem_)];
+    %----------------------------------------------------------------------
 end
-% ---
-if length(neqcond) > 1                      % 1 & something else
-    eval(['checksum = (' neqcond ');']);
-    id_elem = find(checksum >= 1); 
-else
-    id_elem = 1:nbElem;
-end
-% ---
-for i = 1:nbEqcond
-    eqcond_L = strrep(eqcond{i},'==','<');
-    eqcond_R = strrep(eqcond{i},'==','>');
-    eval(['iEqcond_L{i} = (' eqcond_L ');']);
-    eval(['iEqcond_R{i} = (' eqcond_R ');']);
-    checksum_L = sum(iEqcond_L{i});
-    checksum_R = sum(iEqcond_R{i});
-    checksum   = checksum_L + checksum_R;
-    % just need one node touched
-    iElemEqcond{i} = find( (checksum_L < nbNo_inEl & checksum_L > 0 & ...
-                            checksum_R < nbNo_inEl & checksum_R > 0)  ...
-                          |(checksum   < nbNo_inEl)); 
-end
-% ---
-for i = 1:nbEqcond
-    id_elem = intersect(id_elem,iElemEqcond{i});
-end
-%--------------------------------------------------------------------------
-id_elem = unique(id_elem);
-%--------------------------------------------------------------------------
