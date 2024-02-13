@@ -31,16 +31,20 @@ elemx = [sort(elem,1,"descend"); zeros(1,nbelm)];
 %--------------------------------------------------------------------------
 ie_gr = {};
 el_gr = {};
-nb_gr = 0;
+nb_gr = 1;
+ie_gr{1} = [];
 % ---
 for i = 2 : size(elemx,1)
     if any(elemx(i,:) == 0)
         nb_gr = nb_gr + 1;
         id_ = find(elemx(i,:) == 0);
-        ie_gr{nb_gr} = id_;
-        el_gr{nb_gr} = elemx(1:i-1,id_);
+        ie_gr{nb_gr} = setdiff(id_,ie_gr{nb_gr-1});
+        el_gr{nb_gr} = elem(1:i-1,ie_gr{nb_gr});
     end
 end
+% ---
+ie_gr(1) = [];
+el_gr(1) = [];
 
 % ---
 id_elem = [];
