@@ -10,15 +10,19 @@ function valide_id = f_validid(id2test,all_id)
 %--------------------------------------------------------------------------
 
 if contains(id2test,'...')
-    id2test = replace(id2test,'...','');
-    check_valide = regexp(all_id,[id2test '\w*']);
-    % ---
-    valide_id = {};
-    k = 0;
-    for i = 1:length(check_valide)
-        if check_valide{i} == 1
-            k = k + 1;
-            valide_id{k} = all_id{i};
+    if strcmpi(id2test,'...') == 1
+        valide_id = all_id;
+    else
+        id2test = replace(id2test,'...','');
+        check_valide = regexp(all_id,[id2test '\w*']);
+        % ---
+        valide_id = {};
+        k = 0;
+        for i = 1:length(check_valide)
+            if check_valide{i} == 1
+                k = k + 1;
+                valide_id{k} = all_id{i};
+            end
         end
     end
 else

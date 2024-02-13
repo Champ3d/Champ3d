@@ -15,7 +15,6 @@ classdef HexaMeshFromQuadMesh < HexMesh
         % ---
         mesh1d_collection
         mesh2d_collection
-        id_mesh1d
         id_mesh2d
         id_zline
     end
@@ -35,14 +34,17 @@ classdef HexaMeshFromQuadMesh < HexMesh
                 % --- sub
                 args.mesh1d_collection Mesh1dCollection
                 args.mesh2d_collection Mesh2dCollection
-                args.id_mesh1d char = []
                 args.id_mesh2d char = [];
                 args.id_zline = []
             end
-            obj <= args;
-            obj.elem_type = 'hexa';
             % ---
-            if isempty(obj.node) || isempty(obj.elem)
+            obj = obj@HexMesh;
+            obj <= args;
+            % ---
+            if ~isempty(obj.mesh1d_collection) && ...
+               ~isempty(obj.mesh2d_collection) && ...
+               ~isempty(obj.id_mesh2d) && ...
+               ~isempty(obj.id_zline)
                 obj.build;
             end
         end

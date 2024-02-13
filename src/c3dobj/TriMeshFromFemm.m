@@ -33,13 +33,12 @@ classdef TriMeshFromFemm < TriMesh
                 args.mesh_file = []
             end
             % --- super
-            obj.info = args.info;
-            obj.node = args.node;
-            obj.elem = args.elem;
+            obj = obj@TriMesh;
+            obj <= args;
             % --- sub
             obj.mesh_file = args.mesh_file;
             % ---
-            if isempty(obj.node) || isempty(obj.elem)
+            if ~isempty(obj.mesh_file)
                 obj.build;
             end
         end

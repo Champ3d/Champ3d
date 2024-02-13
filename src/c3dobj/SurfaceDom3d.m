@@ -71,6 +71,10 @@ classdef SurfaceDom3d < SurfaceDom
                 end
             end
             %--------------------------------------------------------------
+            if isempty(elem)
+                return
+            end
+            %--------------------------------------------------------------
             node = obj.parent_mesh.node;
             elem_type = f_elemtype(elem);
             %--------------------------------------------------------------
@@ -89,7 +93,7 @@ classdef SurfaceDom3d < SurfaceDom
         % -----------------------------------------------------------------
         function  build_from_interface(obj)
             % ---
-            id_dom3d_ = f_to_dcellargin(obj.id_dom3d);
+            id_dom3d_ = f_to_dcellargin(obj.id_dom3d,'forced','on');
             all_id3   = fieldnames(obj.dom3d_collection.data);
             node = obj.parent_mesh.node;
             % ---
@@ -101,6 +105,11 @@ classdef SurfaceDom3d < SurfaceDom
                     for j = 1:length(valid3)
                         elem = [elem  obj.parent_mesh.elem(:,obj.dom3d_collection.data.(valid3{j}).gid_elem)];
                     end
+                end
+                %--------------------------------------------------------------
+                if isempty(elem)
+                    xgid_face_{i} = [];
+                    break;
                 end
                 %----------------------------------------------------------
                 elem_type = f_elemtype(elem);

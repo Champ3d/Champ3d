@@ -15,7 +15,6 @@ classdef PrismMeshFromTriMesh < PrismMesh
         % ---
         mesh1d_collection
         mesh2d_collection
-        id_mesh1d
         id_mesh2d
         id_zline
     end
@@ -35,22 +34,17 @@ classdef PrismMeshFromTriMesh < PrismMesh
                 % --- sub
                 args.mesh1d_collection Mesh1dCollection
                 args.mesh2d_collection Mesh2dCollection
-                args.id_mesh1d char = []
                 args.id_mesh2d char = [];
                 args.id_zline = []
             end
             % --- super
-            obj.node = args.node;
-            obj.elem = args.elem;
-            % --- sub
-            obj.elem_type = 'prism';
-            obj.mesh1d_collection = args.mesh1d_collection;
-            obj.mesh2d_collection = args.mesh2d_collection;
-            obj.id_mesh1d = args.id_mesh1d;
-            obj.id_mesh2d = args.id_mesh2d;
-            obj.id_zline = args.id_zline;
+            obj = obj@PrismMesh;
+            obj <= args;
             % ---
-            if isempty(obj.node) || isempty(obj.elem)
+            if ~isempty(obj.mesh1d_collection) && ...
+               ~isempty(obj.mesh2d_collection) && ...
+               ~isempty(obj.id_mesh2d) && ...
+               ~isempty(obj.id_zline)
                 obj.build;
             end
         end

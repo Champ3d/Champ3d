@@ -54,11 +54,16 @@ classdef SurfaceDom < Xhandle
             id_tria = find(face(4,:) == 0);
             id_quad = setdiff(1:nb_face,id_tria);
             % ---
-            allmeshes{1} = TriMesh('node',node,'elem',face(1:3,id_tria));
-            allmeshes{1}.gid_face = obj.gid_face(id_tria);
-            % ---
-            allmeshes{2} = QuadMesh('node',node,'elem',face(1:4,id_quad));
-            allmeshes{2}.gid_face = obj.gid_face(id_quad);
+            nb_sm = 1;
+            if ~isempty(id_tria)
+                allmeshes{nb_sm} = TriMesh('node',node,'elem',face(1:3,id_tria));
+                allmeshes{nb_sm}.gid_face = obj.gid_face(id_tria);
+                nb_sm = nb_sm + 1;
+            end
+            if ~isempty(id_quad)
+                allmeshes{nb_sm} = QuadMesh('node',node,'elem',face(1:4,id_quad));
+                allmeshes{nb_sm}.gid_face = obj.gid_face(id_quad);
+            end
         end
     end
 
