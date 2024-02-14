@@ -40,8 +40,7 @@ classdef QuadMeshFrom1d < QuadMesh
             obj = obj@QuadMesh;
             obj <= args;
             % ---
-            if ~isempty(obj.mesh1d_collection) && ~isempty(obj.id_xline) && ...
-               ~isempty(obj.id_yline)
+            if obj.is_available(args,{'mesh1d_collection','id_xline','id_yline'})
                 obj.build;
             end
         end

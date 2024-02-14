@@ -9,8 +9,13 @@
 %--------------------------------------------------------------------------
 
 classdef Xhandle < matlab.mixin.Copyable
-
+    %----------------------------------------------------------------------
+    properties
+        tmp
+    end
+    %----------------------------------------------------------------------
     methods
+        %------------------------------------------------------------------
         function le(obj,objx)
             % ---
             if isstruct(objx)
@@ -27,6 +32,45 @@ classdef Xhandle < matlab.mixin.Copyable
                 end
             end
         end
+        %------------------------------------------------------------------
+        function res = is_available(obj,args,field_name)
+            arguments
+                obj
+                args struct = []
+                field_name = []
+            end
+            % ---
+            if nargin < 1
+                res = 0;
+                return
+            end
+            % ---
+            if isempty(args)
+                res = 0;
+                return
+            end
+            % ---
+            if isempty(field_name)
+                field_name = fieldnames(args);
+            end
+            % ---
+            field_name = f_to_scellargin(field_name);
+            % ---
+            res = 1;
+            for i = 1:length(field_name)
+                if isfield(args,field_name{i})
+                    if isempty(args.(field_name{i}))
+                        res = 0;
+                        args = rmfield(args,field_name{i});
+                    end
+                else
+                    res = 0;
+                end
+            end
+            % ---
+            obj.tmp.args = f_to_namedarg(args);
+        end
+        %------------------------------------------------------------------
+        %------------------------------------------------------------------
     end
-
 end
