@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef PhysicalModel < Xhandle
+classdef MultiPhysicalModel < Xhandle
     properties
         info 
         mesh1d_collection Mesh1dCollection
@@ -18,12 +18,12 @@ classdef PhysicalModel < Xhandle
         dom3d_collection  Dom3dCollection
         emmodel_collection 
         thmodel_collection 
-        memodel_collection 
+        mecmodel_collection
     end
 
     % --- Constructors
     methods
-        function obj = PhysicalModel(args)
+        function obj = MultiPhysicalModel(args)
             arguments
                 args.info = 'no_info';
             end
