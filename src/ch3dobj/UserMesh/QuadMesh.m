@@ -62,7 +62,7 @@ classdef QuadMesh < Mesh
             patch(msh);
             xlabel('x (m)'); ylabel('y (m)');
             if size(obj.node,1) == 3
-                zlabel('z (m)'); 
+                zlabel('z (m)'); view(3);
             end
             axis equal; axis tight; alpha(alpha_); hold on
             %--------------------------------------------------------------

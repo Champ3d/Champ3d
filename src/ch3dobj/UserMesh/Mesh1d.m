@@ -18,6 +18,7 @@ classdef Mesh1d < Xhandle
         dnum = 1
         flog = 1.05
         node
+        elem_code
     end
     % ---
     properties (Access = protected)
@@ -26,7 +27,7 @@ classdef Mesh1d < Xhandle
 
     % --- Dependent Properties
     properties (Dependent = true)
-        elem_code
+
     end
 
     % --- Constructors
@@ -42,17 +43,15 @@ classdef Mesh1d < Xhandle
             % ---
             obj <= args;
             % ---
+            if obj.is_available(args,{'id','len','dtype','dnum','flog'})
+                obj.build;
+            end
         end
     end
 
     % --- Methods
     methods
-        % ---
-        function val = get.elem_code(obj)
-            val = f_str2code(obj.id);
-        end
-        % ---
-        function obj = build(obj)
+        function build(obj)
             % ---
             if obj.is_build == 1
                 return
@@ -90,6 +89,7 @@ classdef Mesh1d < Xhandle
             end
             %--------------------------------------------------------------
             obj.node = node_;
+            obj.elem_code = f_str2code(obj.id);
             obj.is_build = 1;
         end
     end

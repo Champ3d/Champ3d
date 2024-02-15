@@ -49,7 +49,6 @@ classdef Mesh3dCollection < Xhandle
                 args.id_zline = []
             end
             % ---
-            
             if isa(args.mesh2d_collection.data.(args.id_mesh2d),'QuadMesh')
                 mtype = @HexaMeshFromQuadMesh;
             elseif isa(args.mesh2d_collection.data.(args.id_mesh2d),'TriMesh')
@@ -62,7 +61,7 @@ classdef Mesh3dCollection < Xhandle
             obj.data.(args.id) = msh;
         end
         % ---
-        function obj = add_from_femm(obj,args)
+        function obj = add_from_gmsh(obj,args)
             arguments
                 obj
                 % ---

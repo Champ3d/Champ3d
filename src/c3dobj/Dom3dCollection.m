@@ -32,8 +32,7 @@ classdef Dom3dCollection < Xhandle
             end
             % ---
             obj <= args;
-            % --- link
-            obj.parent_mesh.dom3d_collection = obj;
+            % ---
         end
     end
 
