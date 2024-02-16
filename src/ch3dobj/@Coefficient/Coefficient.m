@@ -10,12 +10,24 @@
 
 classdef Coefficient
     properties
+        f
+        depend_on
+        varargin_list
+        vectorized
+        % ---
         value
     end
 
     % --- Contructor
     methods
         function obj = Coefficient(args)
+            arguments
+                args.f
+                args.depend_on
+                args.varargin_list
+                args.vectorized
+            end
+            obj <= args;
         end
     end
 end
