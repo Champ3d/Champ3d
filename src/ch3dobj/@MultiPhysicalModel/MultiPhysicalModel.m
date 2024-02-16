@@ -136,27 +136,6 @@ classdef MultiPhysicalModel < Xhandle
             % ---
             switch defined_with
                 case 'mesh1d2d'
-                    if isempty(args.mesh1d_collection)
-                        args.mesh1d_collection = obj.mesh1d_collection;
-                    end
-                    if isempty(args.id_zline)
-                        if ~isempty(obj.mesh2d_collection.data)
-                            fn = fieldnames(obj.mesh2d_collection.data);
-                            fn = fn{1};
-                        end
-                        args.id_zline = fn;
-                    end
-                    % ---
-                    if isempty(args.mesh2d_collection)
-                        args.mesh2d_collection = obj.mesh2d_collection;
-                    end
-                    if isempty(args.id_mesh2d)
-                        if ~isempty(obj.mesh2d_collection.data)
-                            fn = fieldnames(obj.mesh2d_collection.data);
-                            fn = fn{1};
-                        end
-                        args.id_mesh2d = fn;
-                    end
                     % ---
                     if isa(args.mesh2d_collection.data.(args.id_mesh2d),'QuadMesh')
                         mtype = @HexaMeshFromQuadMesh;
@@ -194,24 +173,7 @@ classdef MultiPhysicalModel < Xhandle
                 args.condition char = []
             end
             % ---
-            if isempty(args.mesh3d_collection)
-                args.mesh3d_collection = obj.mesh3d_collection;
-            end
-            % ---
-            if isempty(args.parent_mesh)
-                if isempty(args.id_mesh3d)
-                    if ~isempty(obj.mesh3d_collection.data)
-                        fn = fieldnames(obj.mesh3d_collection.data);
-                        fn = fn{1};
-                    end
-                    args.id_mesh3d = fn;
-                end
-                args.parent_mesh = args.mesh3d_collection.data.(args.id_mesh3d);
-            end
-            % ---
-            if isempty(args.dom2d_collection)
-                args.dom2d_collection = obj.dom2d_collection;
-            end
+            args = obj.getargs(args);
             % ---
             argu = f_to_namedarg(args,'with_only',...
                 {'parent_mesh','dom2d_collection','id_dom2d','id_zline',...
@@ -241,24 +203,7 @@ classdef MultiPhysicalModel < Xhandle
                 args.condition char = []
             end
             % ---
-            if isempty(args.mesh3d_collection)
-                args.mesh3d_collection = obj.mesh3d_collection;
-            end
-            % ---
-            if isempty(args.parent_mesh)
-                if isempty(args.id_mesh3d)
-                    if ~isempty(obj.mesh3d_collection.data)
-                        fn = fieldnames(obj.mesh3d_collection.data);
-                        fn = fn{1};
-                    end
-                    args.id_mesh3d = fn;
-                end
-                args.parent_mesh = args.mesh3d_collection.data.(args.id_mesh3d);
-            end
-            % ---
-            if isempty(args.dom3d_collection)
-                args.dom3d_collection = obj.dom3d_collection;
-            end
+            args = obj.getargs(args);
             % ---
             argu = f_to_namedarg(args,'with_only',...
                 {'parent_mesh','dom3d_collection','id_dom3d','defined_on',...
@@ -286,24 +231,7 @@ classdef MultiPhysicalModel < Xhandle
                 % ---
             end
             % ---
-            if isempty(args.mesh3d_collection)
-                args.mesh3d_collection = obj.mesh3d_collection;
-            end
-            % ---
-            if isempty(args.parent_mesh)
-                if isempty(args.id_mesh3d)
-                    if ~isempty(obj.mesh3d_collection.data)
-                        fn = fieldnames(obj.mesh3d_collection.data);
-                        fn = fn{1};
-                    end
-                    args.id_mesh3d = fn;
-                end
-                args.parent_mesh = args.mesh3d_collection.data.(args.id_mesh3d);
-            end
-            % ---
-            if isempty(args.dom3d_collection)
-                args.dom3d_collection = obj.dom3d_collection;
-            end
+            args = obj.getargs(args);
             % ---
             argu = f_to_namedarg(args,'with_only',...
                 {'parent_mesh','dom3d_collection','id_dom3d','defined_on',...
