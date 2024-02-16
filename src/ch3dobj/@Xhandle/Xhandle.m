@@ -77,6 +77,7 @@ classdef Xhandle < matlab.mixin.Copyable
         function args = getargs(obj,args)
             % --- do first
             args = obj.cal_parent_multiphysical_model(args);
+            args = obj.cal_parent_model(args);
             % --- then
             args = obj.cal_mesh3d_collection(args);
             args = obj.cal_id_mesh3d(args);
@@ -268,10 +269,40 @@ classdef Xhandle < matlab.mixin.Copyable
                     end
                 end
             end
-            % ---
-            %obj <= args;
         end
         % ---
+        function args = cal_parent_model(obj,args)
+            if isfield(args,'parent_model')
+                if ~isempty(args.parent_model)
+                    mpmodel = args.parent_model;
+                    if isprop(mpmodel,'mesh1d_collection')
+                        if isfield(args,'mesh1d_collection')
+                            args.mesh1d_collection = mpmodel.mesh1d_collection;
+                        end
+                    end
+                    if isprop(mpmodel,'mesh2d_collection')
+                        if isfield(args,'mesh2d_collection')
+                            args.mesh2d_collection = mpmodel.mesh2d_collection;
+                        end
+                    end
+                    if isprop(mpmodel,'mesh3d_collection')
+                        if isfield(args,'mesh3d_collection')
+                            args.mesh3d_collection = mpmodel.mesh3d_collection;
+                        end
+                    end
+                    if isprop(mpmodel,'dom2d_collection')
+                        if isfield(args,'dom2d_collection')
+                            args.dom2d_collection = mpmodel.dom2d_collection;
+                        end
+                    end
+                    if isprop(mpmodel,'dom3d_collection')
+                        if isfield(args,'dom3d_collection')
+                            args.dom3d_collection = mpmodel.dom3d_collection;
+                        end
+                    end
+                end
+            end
+        end
         % ---
         % ---
         % ---

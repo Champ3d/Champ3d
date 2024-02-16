@@ -16,10 +16,9 @@ classdef Econductor < PhysicalDom
     % --- Contructor
     methods
         function obj = Econductor(args)
-            argu = f_to_namedarg(args);
-            obj = obj@PhysicalDom(argu{:});
-            % ---
-            obj.sigma = args.sigma;
+            obj = obj@PhysicalDom(args);
+            args = obj.getargs(args);
+            obj <= args;
         end
     end
 end

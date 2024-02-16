@@ -13,8 +13,23 @@ classdef FEM3dAphi < EmModel
     % --- Contructor
     methods
         function obj = FEM3dAphi(args)
-            argu = f_to_namedarg(args);
-            obj = obj@EmModel(argu{:});
+            arguments
+                args.id = 'no_id'
+                % ---
+                args.parent_multiphysical_model = []
+                args.mesh2d_collection = []
+                args.mesh3d_collection = []
+                args.dom2d_collection = []
+                args.dom3d_collection = []
+                args.id_mesh2d = []
+                args.id_mesh3d = []
+                % ---
+                args.parent_mesh = []
+            end
+            % ---
+            args = obj.getargs(args);
+            % ---
+            obj <= args;
         end
     end
 

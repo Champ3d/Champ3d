@@ -77,6 +77,8 @@ classdef EmModel < Xhandle
             end
             % ---
             args.parent_model = obj;
+            % ---
+            args = obj.getargs(args);
             phydom = Econductor(args);
             obj.econductor.(args.id) = phydom;
         end
