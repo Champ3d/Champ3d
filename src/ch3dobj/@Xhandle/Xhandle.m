@@ -78,6 +78,12 @@ classdef Xhandle < matlab.mixin.Copyable
             % ---
             args = obj.cal_mesh3d_collection(args);
             args = obj.cal_id_mesh3d(args);
+            args = obj.cal_mesh2d_collection(args);
+            args = obj.cal_id_mesh2d(args);
+            % ---
+            args = obj.cal_mesh1d_collection(args);
+            args = obj.cal_id_line(args);
+            % ---
             args = obj.cal_parent_mesh(args);
             % ---
             args = obj.cal_dom3d_collection(args);
@@ -93,7 +99,7 @@ classdef Xhandle < matlab.mixin.Copyable
         function args = cal_mesh3d_collection(obj,args)
             if isfield(args,'mesh3d_collection')
                 if isempty(args.mesh3d_collection)
-                    if isfield(obj,'mesh3d_collection')
+                    if isprop(obj,'mesh3d_collection')
                         args.mesh3d_collection = obj.mesh3d_collection;
                     end
                 end
@@ -103,8 +109,18 @@ classdef Xhandle < matlab.mixin.Copyable
         function args = cal_mesh2d_collection(obj,args)
             if isfield(args,'mesh2d_collection')
                 if isempty(args.mesh2d_collection)
-                    if isfield(obj,'mesh2d_collection')
+                    if isprop(obj,'mesh2d_collection')
                         args.mesh2d_collection = obj.mesh2d_collection;
+                    end
+                end
+            end
+        end
+        % ---
+        function args = cal_mesh1d_collection(obj,args)
+            if isfield(args,'mesh1d_collection')
+                if isempty(args.mesh1d_collection)
+                    if isprop(obj,'mesh1d_collection')
+                        args.mesh1d_collection = obj.mesh1d_collection;
                     end
                 end
             end
@@ -113,7 +129,7 @@ classdef Xhandle < matlab.mixin.Copyable
         function args = cal_dom3d_collection(obj,args)
             if isfield(args,'dom3d_collection')
                 if isempty(args.dom3d_collection)
-                    if isfield(obj,'dom3d_collection')
+                    if isprop(obj,'dom3d_collection')
                         args.dom3d_collection = obj.dom3d_collection;
                     end
                 end
@@ -123,7 +139,7 @@ classdef Xhandle < matlab.mixin.Copyable
         function args = cal_dom2d_collection(obj,args)
             if isfield(args,'dom2d_collection')
                 if isempty(args.dom2d_collection)
-                    if isfield(obj,'dom2d_collection')
+                    if isprop(obj,'dom2d_collection')
                         args.dom2d_collection = obj.dom2d_collection;
                     end
                 end
@@ -133,7 +149,7 @@ classdef Xhandle < matlab.mixin.Copyable
         function args = cal_id_mesh3d(obj,args)
             if isfield(args,'id_mesh3d')
                 if isempty(args.id_mesh3d)
-                    if isfield(obj,'mesh3d_collection')
+                    if isprop(obj,'mesh3d_collection')
                         if ~isempty(obj.mesh3d_collection.data)
                             fn = fieldnames(obj.mesh3d_collection.data);
                             fn = fn{1};
@@ -147,7 +163,7 @@ classdef Xhandle < matlab.mixin.Copyable
         function args = cal_id_mesh2d(obj,args)
             if isfield(args,'id_mesh2d')
                 if isempty(args.id_mesh2d)
-                    if isfield(obj,'mesh2d_collection')
+                    if isprop(obj,'mesh2d_collection')
                         if ~isempty(obj.mesh2d_collection.data)
                             fn = fieldnames(obj.mesh2d_collection.data);
                             fn = fn{1};
@@ -191,6 +207,23 @@ classdef Xhandle < matlab.mixin.Copyable
             end
         end
         % ---
+        function args = cal_id_line(obj,args)
+            id__ = {'id_xline','id_yline','id_zline'};
+            for i = 1:length(id__)
+                id_ = id__{i};
+                if isfield(args,id_)
+                    if isempty(args.(id_))
+                        if isprop(obj,'mesh1d_collection')
+                            if ~isempty(obj.mesh1d_collection.data)
+                                fn = fieldnames(obj.mesh1d_collection.data);
+                                fn = fn{1};
+                                args.(id_) = fn;
+                            end
+                        end
+                    end
+                end
+            end
+        end
         % ---
         % ---
         % ---

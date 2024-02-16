@@ -102,19 +102,7 @@ classdef MultiPhysicalModel < Xhandle
                 args.condition char = []
             end
             % ---
-            if isempty(args.parent_mesh)
-                if isempty(args.mesh2d_collection)
-                    args.mesh2d_collection = obj.mesh2d_collection;
-                end
-                if isempty(args.id_mesh2d)
-                    if ~isempty(obj.mesh2d_collection.data)
-                        fn = fieldnames(obj.mesh2d_collection.data);
-                        fn = fn{1};
-                    end
-                    args.id_mesh2d = fn;
-                end
-                args.parent_mesh = args.mesh2d_collection.data.(args.id_mesh2d);
-            end
+            args = obj.getargs(args);
             % ---
             argu = f_to_namedarg(args,'with_only',...
                          {'parent_mesh','id_xline','id_yline','elem_code',...
@@ -137,6 +125,8 @@ classdef MultiPhysicalModel < Xhandle
                 % ---
                 args.mesh_file = []
             end
+            % ---
+            args = obj.getargs(args);
             % ---
             if ~isempty(args.id_zline)
                 defined_with = 'mesh1d2d';
