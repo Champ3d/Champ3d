@@ -14,6 +14,7 @@ classdef Mesh3d < Mesh
     methods
         function obj = Mesh3d()
             obj = obj@Mesh;
+            obj.meshds.sign_edge_in_elem = 0;
         end
     end
 

@@ -14,6 +14,9 @@ classdef Mesh2d < Mesh
     methods
         function obj = Mesh2d()
             obj = obj@Mesh;
+            obj.meshds.id_edge_in_face = 0;
+            obj.meshds.ori_edge_in_face = 0;
+            obj.meshds.sign_edge_in_face = 0;
         end
     end
 
