@@ -12,7 +12,8 @@ function obj = build_intkit(obj)
 
 %--------------------------------------------------------------
 tic
-f_fprintf(0,'Make #intkit');
+f_fprintf(0,'Make #intkit \n');
+fprintf('   ');
 %--------------------------------------------------------------
 elem_type_ = obj.elem_type;
 %--------------------------------------------------------------
@@ -28,6 +29,14 @@ coor = {'U','V','W','cU','cV','cW'};
 for i = 1:length(coor)
     if isfield(con,coor{i})
         eval([coor{i} '= con.' coor{i} ';'])
+    end
+end
+%--------------------------------------------------------------
+fnmeshds = fieldnames(obj.meshds);
+for i = 1:length(fnmeshds)
+    if isempty(obj.meshds.(fnmeshds{i}))
+        obj.build_meshds;
+        break
     end
 end
 %--------------------------------------------------------------
