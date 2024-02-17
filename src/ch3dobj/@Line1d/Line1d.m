@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Mesh1d < Xhandle
+classdef Line1d < Xhandle
 
     % --- Properties
     properties
@@ -32,7 +32,7 @@ classdef Mesh1d < Xhandle
 
     % --- Constructors
     methods
-        function obj = Mesh1d(args)
+        function obj = Line1d(args)
             arguments
                 args.id char = '0'
                 args.len {mustBeNumeric}  = 0

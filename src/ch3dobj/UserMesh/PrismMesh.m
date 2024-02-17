@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef PrismMesh < Mesh
+classdef PrismMesh < Mesh3d
 
     % --- Properties
     properties
@@ -27,6 +27,8 @@ classdef PrismMesh < Mesh
                 args.node = []
                 args.elem = []
             end
+            % ---
+            obj = obj@Mesh3d;
             % ---
             obj.elem_type = 'prism';
             obj.node = args.node;

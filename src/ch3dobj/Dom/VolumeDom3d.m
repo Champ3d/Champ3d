@@ -12,7 +12,6 @@ classdef VolumeDom3d < VolumeDom
 
     % --- Properties
     properties
-        dom2d_collection
         id_dom2d
         id_zline
     end
@@ -27,8 +26,7 @@ classdef VolumeDom3d < VolumeDom
         function obj = VolumeDom3d(args)
             arguments
                 % ---
-                args.parent_mesh
-                args.dom2d_collection Dom2dCollection
+                args.parent_mesh = []
                 args.id_dom2d = []
                 args.id_zline = []
                 args.elem_code = []
@@ -44,8 +42,7 @@ classdef VolumeDom3d < VolumeDom
                 obj.build_from_elem_code;
             elseif ~isempty(obj.gid_elem)
                 obj.build_from_gid_elem;
-            elseif ~isempty(obj.dom2d_collection) && ~isempty(obj.id_dom2d) ...
-                    && ~isempty(obj.id_zline)
+            elseif ~isempty(obj.id_zline)
                 obj.build_from_idmesh1d2d;
             end
             % ---
@@ -60,8 +57,8 @@ classdef VolumeDom3d < VolumeDom
             id_zline_ = f_to_dcellargin(obj.id_zline);
             [id_dom2d_, id_zline_] = f_pairing_dcellargin(id_dom2d_, id_zline_);
             % ---
-            all_id_dom2d  = fieldnames(obj.dom2d_collection.data);
-            all_id_mesh1d = fieldnames(obj.parent_mesh.mesh1d_collection.data);
+            all_id_dom2d  = fieldnames(obj.parent_mesh.parent_mesh.dom);
+            all_id_mesh1d = fieldnames(obj.parent_mesh.parent_mesh.parent_mesh.dom);
             all_elem_code = obj.parent_mesh.elem_code;
             id_all_elem   = 1:obj.parent_mesh.nb_elem;
             % ---
@@ -74,14 +71,14 @@ classdef VolumeDom3d < VolumeDom
                     valid_iddom2d = f_validid(iddom2d,all_id_dom2d);
                     % ---
                     for m = 1:length(valid_iddom2d)
-                        codedom2d = obj.dom2d_collection.data.(valid_iddom2d{m}).elem_code;
+                        codedom2d = obj.parent_mesh.parent_mesh.dom.(valid_iddom2d{m}).elem_code;
                         for o = 1:length(codedom2d)
                             for k = 1:length(id_zline_{i})
                                 idz = id_zline_{i}{k};
                                 valid_idz = f_validid(idz,all_id_mesh1d);
                                 % ---
                                 for l = 1:length(valid_idz)
-                                    codeidz = obj.parent_mesh.mesh1d_collection.data.(valid_idz{l}).elem_code;
+                                    codeidz = obj.parent_mesh.parent_mesh.parent_mesh.dom.(valid_idz{l}).elem_code;
                                     % ---
                                     given_elem_code = codedom2d(o) .* codeidz;
                                     gid_elem_ = [gid_elem_ ...

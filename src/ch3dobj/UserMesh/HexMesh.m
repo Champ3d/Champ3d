@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef HexMesh < Mesh
+classdef HexMesh < Mesh3d
 
     % --- Properties
     properties
@@ -27,6 +27,8 @@ classdef HexMesh < Mesh
                 args.node = []
                 args.elem = []
             end
+            % ---
+            obj = obj@Mesh3d;
             % ---
             obj.elem_type = 'hexa';
             obj.node = args.node;

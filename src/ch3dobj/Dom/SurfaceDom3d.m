@@ -12,7 +12,6 @@ classdef SurfaceDom3d < SurfaceDom
 
     % --- Properties
     properties
-        dom3d_collection
         id_dom3d
     end
 
@@ -26,12 +25,11 @@ classdef SurfaceDom3d < SurfaceDom
         function obj = SurfaceDom3d(args)
             arguments
                 % ---
-                args.parent_mesh
+                args.parent_mesh = []
                 args.gid_face = []
                 args.condition = []
                 % ---
                 args.defined_on char = []
-                args.dom3d_collection Dom3dCollection
                 args.id_dom3d
             end
             % ---
@@ -58,7 +56,7 @@ classdef SurfaceDom3d < SurfaceDom
         function build_from_boundface(obj)
             % ---
             id_dom3d_ = f_to_scellargin(obj.id_dom3d);
-            all_id3   = fieldnames(obj.dom3d_collection.data);
+            all_id3   = fieldnames(obj.parent_mesh.dom);
             % ---
             elem = [];
             % ---
@@ -67,7 +65,7 @@ classdef SurfaceDom3d < SurfaceDom
                 valid3 = f_validid(id3,all_id3);
                 % ---
                 for j = 1:length(valid3)
-                    elem = [elem  obj.parent_mesh.elem(:,obj.dom3d_collection.data.(valid3{j}).gid_elem)];
+                    elem = [elem  obj.parent_mesh.elem(:,obj.parent_mesh.dom.(valid3{j}).gid_elem)];
                 end
             end
             %--------------------------------------------------------------
@@ -94,7 +92,7 @@ classdef SurfaceDom3d < SurfaceDom
         function  build_from_interface(obj)
             % ---
             id_dom3d_ = f_to_dcellargin(obj.id_dom3d,'forced','on');
-            all_id3   = fieldnames(obj.dom3d_collection.data);
+            all_id3   = fieldnames(obj.parent_mesh.dom);
             node = obj.parent_mesh.node;
             % ---
             for i = 1:length(id_dom3d_)
@@ -103,7 +101,7 @@ classdef SurfaceDom3d < SurfaceDom
                     id3 = id_dom3d_{i}{j};
                     valid3 = f_validid(id3,all_id3);
                     for j = 1:length(valid3)
-                        elem = [elem  obj.parent_mesh.elem(:,obj.dom3d_collection.data.(valid3{j}).gid_elem)];
+                        elem = [elem  obj.parent_mesh.elem(:,obj.parent_mesh.dom.(valid3{j}).gid_elem)];
                     end
                 end
                 %--------------------------------------------------------------

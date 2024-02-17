@@ -12,7 +12,6 @@ classdef QuadMeshFrom1d < QuadMesh
 
     % --- Properties
     properties
-        mesh1d_collection Mesh1dCollection
         id_xline
         id_yline
     end
@@ -31,16 +30,17 @@ classdef QuadMeshFrom1d < QuadMesh
                 args.node = []
                 args.elem = []
                 % --- sub
-                args.mesh1d_collection Mesh1dCollection
+                args.parent_mesh
                 args.id_xline = []
                 args.id_yline = []
                 % ---
             end
             % ---
             obj = obj@QuadMesh;
+            % ---
             obj <= args;
             % ---
-            if obj.is_available(args,{'mesh1d_collection','id_xline','id_yline'})
+            if obj.is_available(args,{'parent_mesh','id_xline','id_yline'})
                 obj.build;
             end
         end
@@ -54,21 +54,21 @@ classdef QuadMeshFrom1d < QuadMesh
             obj.id_xline = f_to_scellargin(obj.id_xline);
             obj.id_yline = f_to_scellargin(obj.id_yline);
             % ---
-            all_id_line = fieldnames(obj.mesh1d_collection.data);
+            all_id_line = fieldnames(obj.parent_mesh.dom);
             xline = [];
             yline = [];
             for i = 1:length(obj.id_xline)
                 id = obj.id_xline{i};
                 valid_id = f_validid(id,all_id_line);
                 for j = 1:length(valid_id)
-                    xline = [xline obj.mesh1d_collection.data.(valid_id{j})];
+                    xline = [xline obj.parent_mesh.dom.(valid_id{j})];
                 end
             end
             for i = 1:length(obj.id_yline)
                 id = obj.id_yline{i};
                 valid_id = f_validid(id,all_id_line);
                 for j = 1:length(valid_id)
-                    yline = [yline obj.mesh1d_collection.data.(valid_id{j})];
+                    yline = [yline obj.parent_mesh.dom.(valid_id{j})];
                 end
             end
             % -------------------------------------------------------------

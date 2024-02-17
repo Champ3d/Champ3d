@@ -26,7 +26,7 @@ classdef VolumeDom2d < VolumeDom
         function obj = VolumeDom2d(args)
             arguments
                 % ---
-                args.parent_mesh
+                args.parent_mesh = []
                 args.id_xline = []
                 args.id_yline = []
                 args.elem_code = []
@@ -56,7 +56,7 @@ classdef VolumeDom2d < VolumeDom
             id_yline_ = f_to_dcellargin(obj.id_yline);
             [id_xline_, id_yline_] = f_pairing_dcellargin(id_xline_, id_yline_);
             % ---
-            all_id_mesh1d = fieldnames(obj.parent_mesh.mesh1d_collection.data);
+            all_id_mesh1d = fieldnames(obj.parent_mesh.parent_mesh.dom);
             id_all_elem   = 1:obj.parent_mesh.nb_elem;
             all_elem_code = obj.parent_mesh.elem_code;
             gid_elem_ = [];
@@ -67,13 +67,13 @@ classdef VolumeDom2d < VolumeDom
                     valid_idx = f_validid(idx,all_id_mesh1d);
                     % ---
                     for m = 1:length(valid_idx)
-                        codeidx = obj.parent_mesh.mesh1d_collection.data.(valid_idx{m}).elem_code;
+                        codeidx = obj.parent_mesh.parent_mesh.dom.(valid_idx{m}).elem_code;
                         for k = 1:length(id_yline_{i})
                             idy = id_yline_{i}{k};
                             valid_idy = f_validid(idy,all_id_mesh1d);
                             % ---
                             for l = 1:length(valid_idy)
-                                codeidy = obj.parent_mesh.mesh1d_collection.data.(valid_idy{l}).elem_code;
+                                codeidy = obj.parent_mesh.parent_mesh.dom.(valid_idy{l}).elem_code;
                                 % ---
                                 given_elem_code = codeidx * codeidy;
                                 gid_elem_ = [gid_elem_ ...

@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef TriMesh < Mesh
+classdef TriMesh < Mesh2d
 
     % --- Properties
     properties
@@ -27,6 +27,8 @@ classdef TriMesh < Mesh
                 args.node = []
                 args.elem = []
             end
+            % ---
+            obj = obj@Mesh2d;
             % ---
             obj.elem_type = 'tri';
             obj.node = args.node;

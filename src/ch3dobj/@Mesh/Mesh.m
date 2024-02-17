@@ -24,6 +24,8 @@ classdef Mesh < Xhandle
         cedge
         origin
         % ---
+        dom
+        % ---
         meshds
         discrete
         intkit

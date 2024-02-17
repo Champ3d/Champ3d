@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef QuadMesh < Mesh
+classdef QuadMesh < Mesh2d
 
     % --- Properties
     properties
@@ -28,7 +28,7 @@ classdef QuadMesh < Mesh
                 args.elem = []
             end
             % ---
-            obj = obj@Mesh;
+            obj = obj@Mesh2d;
             % ---
             obj.elem_type = 'quad';
             obj.node = args.node;

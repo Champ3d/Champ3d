@@ -12,10 +12,6 @@ classdef HexaMeshFromQuadMesh < HexMesh
 
     % --- Properties
     properties
-        % ---
-        mesh1d_collection
-        mesh2d_collection
-        id_mesh2d
         id_zline
     end
 
@@ -32,19 +28,14 @@ classdef HexaMeshFromQuadMesh < HexMesh
                 args.node = []
                 args.elem = []
                 % --- sub
-                args.mesh1d_collection Mesh1dCollection
-                args.mesh2d_collection Mesh2dCollection
-                args.id_mesh2d char = [];
+                args.parent_mesh
                 args.id_zline = []
             end
             % ---
             obj = obj@HexMesh;
             obj <= args;
             % ---
-            if ~isempty(obj.mesh1d_collection) && ...
-               ~isempty(obj.mesh2d_collection) && ...
-               ~isempty(obj.id_mesh2d) && ...
-               ~isempty(obj.id_zline)
+            if ~isempty(obj.parent_mesh) && ~isempty(obj.id_zline)
                 obj.build;
             end
         end
@@ -57,14 +48,14 @@ classdef HexaMeshFromQuadMesh < HexMesh
             % ---
             obj.id_zline = f_to_scellargin(obj.id_zline);
             % ---
-            all_id_line = fieldnames(obj.mesh1d_collection.data);
+            all_id_line = fieldnames(obj.parent_mesh.parent_mesh.dom);
             %--------------------------------------------------------------
             zline = [];
             for i = 1:length(obj.id_zline)
                 id = obj.id_zline{i};
                 valid_id = f_validid(id,all_id_line);
                 for j = 1:length(valid_id)
-                    zline = [zline obj.mesh1d_collection.data.(valid_id{j})];
+                    zline = [zline obj.parent_mesh.parent_mesh.dom.(valid_id{j})];
                 end
             end
             % ---
@@ -88,7 +79,7 @@ classdef HexaMeshFromQuadMesh < HexMesh
             %--------------------------------------------------------------
             % build vertices (nodes) in 3D
             % ---
-            mesh2d = obj.mesh2d_collection.data.(obj.id_mesh2d);
+            mesh2d = obj.parent_mesh;
             % ---
             nbNode2D = mesh2d.nb_node;
             nb_node  = nbNode2D*(nb_layer+1);
