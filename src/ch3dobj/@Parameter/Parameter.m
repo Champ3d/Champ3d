@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Parameter < Xhandle
+classdef Parameter % < Xhandle
     properties
         f
         depend_on
@@ -16,7 +16,9 @@ classdef Parameter < Xhandle
         varargin_list
         fvectorized
         % ---
+        argspath
         value
+        value_type
     end
 
     % --- Contructor
@@ -43,18 +45,30 @@ classdef Parameter < Xhandle
             elseif isa(args.f,'function_handle')
                 if isempty(args.from)
                     error('#from must be given ! Give EMModel, THModel, ... ');
+                else
+                    args.from = f_to_scellargin(args.from);
                 end
             else
                 error('#f must be function handle or numeric value');
             end
             % ---
-            obj <= args;
+            obj.f = args.f;
+            obj.depend_on = args.depend_on;
+            obj.from = args.from;
+            obj.varargin_list = args.varargin_list;
+            obj.fvectorized = args.fvectorized;
         end
     end
 
     % --- Methods
     methods
         function evaluate_on(obj,physical_dom)
+            % ---
+            obj.value = 0;
+            obj.value_type = '';
+        end
+        % ---
+        function get_argspath(obj,physical_dom)
             % ---
             obj.value = 0;
             obj.value_type = '';
