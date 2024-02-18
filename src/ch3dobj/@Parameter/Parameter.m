@@ -51,4 +51,13 @@ classdef Parameter < Xhandle
             obj <= args;
         end
     end
+
+    % --- Methods
+    methods
+        function evaluate_on(obj,physical_dom)
+            % ---
+            obj.value = 0;
+            obj.value_type = '';
+        end
+    end
 end

@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef LTensor
+classdef LTensor < Xhandle
     properties
         dim
         value
