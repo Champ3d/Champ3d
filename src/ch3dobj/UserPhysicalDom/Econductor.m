@@ -10,7 +10,7 @@
 
 classdef Econductor < PhysicalDom
     properties
-        sigma
+        sigma = 0
     end
 
     % --- Contructor
@@ -18,6 +18,9 @@ classdef Econductor < PhysicalDom
         function obj = Econductor(args)
             obj = obj@PhysicalDom(args);
             obj <= args;
+            if isnumeric(obj.sigma)
+                obj.sigma = Parameter('f',obj.sigma);
+            end
         end
     end
 end
