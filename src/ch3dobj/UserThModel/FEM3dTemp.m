@@ -8,6 +8,19 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef FEMTemp < ThModel
-
+classdef FEM3dTemp < ThModel
+    % --- Contructor
+    methods
+        function obj = FEM3dTemp(args)
+            arguments
+                args.id = 'no_id'
+                args.parent_mesh = []
+            end
+            % ---
+            argu = f_to_namedarg(args);
+            obj = obj@ThModel(argu{:});
+            % ---
+            obj <= args;
+        end
+    end
 end

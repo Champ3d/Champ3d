@@ -59,11 +59,13 @@ classdef SurfaceDom < Xhandle
                 nb_sm = nb_sm + 1;
                 allmeshes{nb_sm} = TriMesh('node',node,'elem',face(1:3,id_tria));
                 allmeshes{nb_sm}.gid_face = obj.gid_face(id_tria);
+                allmeshes{nb_sm}.parent_mesh = obj.parent_mesh;
             end
             if ~isempty(id_quad)
                 nb_sm = nb_sm + 1;
                 allmeshes{nb_sm} = QuadMesh('node',node,'elem',face(1:4,id_quad));
                 allmeshes{nb_sm}.gid_face = obj.gid_face(id_quad);
+                allmeshes{nb_sm}.parent_mesh = obj.parent_mesh;
             end
             % ---
             if nb_sm == 0

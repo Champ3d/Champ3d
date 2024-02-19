@@ -27,7 +27,7 @@ classdef EmModel < Xhandle
         sibc
         % ---
         matrix
-        field
+        fields
     end
 
     % --- Constructor
@@ -42,6 +42,12 @@ classdef EmModel < Xhandle
             obj <= args;
             % ---
             obj.jome = 1j*2*pi*obj.fr;
+            % ---
+            obj.init('property_name','fields',...
+                     'field_name',{'bv','jv','hv','pv','av','phiv','tv','omev',...
+                     'bs','js','hs','ps','as','phis','ts','omes'}, ...
+                     'init_value',ones(1,obj.parent_mesh.nb_elem));
+            % ---
         end
     end
 

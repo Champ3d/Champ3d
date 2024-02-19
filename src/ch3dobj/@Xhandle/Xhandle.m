@@ -86,6 +86,24 @@ classdef Xhandle < matlab.mixin.Copyable
             end
         end
         %------------------------------------------------------------------
+        function init(obj,args)
+            arguments
+                obj
+                args.property_name = []
+                args.field_names = []
+                args.init_value = []
+            end
+            % ---
+            if ~isempty(args.property_name)
+                if isprop(obj,args.property_name)
+                    field_names = f_to_scellargin(args.field_names);
+                    for i = 1:length(field_names)
+                        fn = field_names{i};
+                        obj.(args.property_name).(fn) = args.init_value;
+                    end
+                end
+            end
+        end
         %------------------------------------------------------------------
     end
 

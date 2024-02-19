@@ -32,17 +32,49 @@ classdef PhysicalDom < Xhandle
         function obj = PhysicalDom(args)
             obj = obj@Xhandle;
             obj <= args;
+            obj.get_geodom;
         end
     end
 
     % --- Methods
     methods
-        function coef_array = call_coefficient(obj,args)
-            arguments
-                obj
-                % ---
-                args.coef_name = []
+        function get_geodom(obj)
+            if ~isempty(obj.parent_model)
+                if ~isempty(obj.parent_model.parent_mesh)
+                    % ---
+                    if ~isempty(obj.id_dom3d)
+                        id_dom_ = f_to_scellargin(obj.id_dom3d);
+                    elseif ~isempty(obj.id_dom2d)
+                        id_dom_ = f_to_scellargin(obj.id_dom2d);
+                    end
+                    % ---
+                    obj.dom = cell(1,length(id_dom_));
+                    for i = 1:length(id_dom_)
+                        obj.dom{i} = obj.parent_model.parent_mesh.dom.(id_dom_{i});
+                    end
+                end
             end
         end
+        % -----------------------------------------------------------------
+    end
+
+    % --- Methods
+    methods
+        function plot(obj,args)
+            arguments
+                obj
+                args.edge_color = 'none'
+                args.face_color = 'c'
+                args.alpha {mustBeNumeric} = 0.9
+            end
+            % ---
+            argu = f_to_namedarg(args);
+            if ~isempty(obj.dom)
+                for i = 1:length(obj.dom)
+                    obj.dom{i}.plot(argu{:});
+                end
+            end
+        end
+        % -----------------------------------------------------------------
     end
 end
