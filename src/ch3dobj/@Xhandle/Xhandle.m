@@ -105,6 +105,103 @@ classdef Xhandle < matlab.mixin.Copyable
             end
         end
         %------------------------------------------------------------------
+        function [colx,array_type] = column_format(obj,x)
+            if isnumeric(x)
+                x = squeeze(x);
+                % ---
+                sx = size(x);
+                lensx = length(sx);
+                if lensx > 3
+                    colx = x;
+                    array_type = '4+dimensional';
+                else
+                    switch lensx
+                        case 2
+                            s1 = sx(1);
+                            s2 = sx(2);
+                            if s1 == s2
+                                if s1 == 1
+                                    colx = x;
+                                    array_type = 'scalar';
+                                else
+                                    colx(1,:,:) = x;
+                                    array_type = 'tensor';
+                                end
+                            elseif s1 < s2
+                                colx = x.';
+                                if s1 == 1 
+                                    if s2 > 3
+                                        array_type = 'scalar';
+                                    else
+                                        array_type = {'scalar','vector'};
+                                    end
+                                else
+                                    array_type = 'vector';
+                                end
+                            else
+                                colx = x;
+                                if s2 == 1 
+                                    if s1 > 3
+                                        array_type = 'scalar';
+                                    else
+                                        array_type = {'scalar','vector'};
+                                    end
+                                else
+                                    array_type = 'vector';
+                                end
+                            end
+                        case 3
+                            s1 = sx(1);
+                            s2 = sx(2);
+                            s3 = sx(3);
+                            % ---
+                            if s1 == s2 && s2 == s3
+                                colx = x;
+                                if s1 <= 3
+                                    array_type = 'tensor';
+                                else
+                                    array_type = '4+dimensional';
+                                end
+                            else
+                                if s1 == s2 && s1 > s3
+                                    ielem = 3;
+                                    % ---
+                                    if s1 <= 3
+                                        array_type = 'tensor';
+                                    else
+                                        array_type = '4+dimensional';
+                                    end
+                                elseif s1 == s3 && s1 > s2
+                                    ielem = 2;
+                                    % ---
+                                    if s1 <= 3
+                                        array_type = 'tensor';
+                                    else
+                                        array_type = '4+dimensional';
+                                    end
+                                elseif s2 == s3 && s2 > s1
+                                    ielem = 1;
+                                    % ---
+                                    if s2 <= 3
+                                        array_type = 'tensor';
+                                    else
+                                        array_type = '4+dimensional';
+                                    end
+                                else
+                                    [~,ielem] = max(sx);
+                                    array_type = '4+dimensional';
+                                end
+                                % ---
+                                ix = [1 2 3];
+                                ix(ielem) = [];
+                                ix = [ielem ix];
+                                colx = permute(x,ix);
+                            end
+                    end
+                end
+            end
+        end
+        %------------------------------------------------------------------
     end
 
     % ---

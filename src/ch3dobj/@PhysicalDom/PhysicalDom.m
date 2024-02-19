@@ -12,6 +12,7 @@ classdef PhysicalDom < Xhandle
     properties
         id
         dom
+        matrix
         to_be_rebuild
     end
     % ---

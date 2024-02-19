@@ -13,36 +13,64 @@ arguments
     obj
     args.id_elem = []
     args.coefficient = 1
+    args.order = 'full'
 end
 %--------------------------------------------------------------------------
+id_elem = args.id_elem;
 coefficient = args.coefficient;
+order = args.order;
 %--------------------------------------------------------------------------
-nb_elem = length(id_elem);
-%--------------------------------------------------------------------------
-if isempty(coefficient)
-    coef_array = 1;
-    coef_array_type = 'iso_array';
+if isempty(id_elem)
+    nb_elem = obj.nb_elem;
+    id_elem = 1:nb_elem;
 else
-    [coef_array, coef_array_type] = f_tensor_array(coefficient);
+    nb_elem = length(id_elem);
 end
+% ---
+if isnumeric(order)
+    if order < 1
+        order = '0';
+    else
+        order = 'full';
+    end
+end
+%--------------------------------------------------------------------------
+[coef_array, coef_array_type] = obj.column_format(coefficient);
 %--------------------------------------------------------------------------
 elem_type = obj.elem_type;
-%--------------------------------------------------------------------------
 con = f_connexion(elem_type);
-nbG = con.nbG;
-Weigh = con.Weigh;
 nbEd_inEl = con.nbEd_inEl;
 %--------------------------------------------------------------------------
-We = cell(1,nbG);
-detJ = cell(1,nbG);
-for iG = 1:nbG
-    We{iG} = obj.intkit.We{iG}(id_elem,:,:);
-    detJ{iG} = obj.intkit.detJ{iG}(id_elem,1);
+if isempty(obj.intkit.Wf) || isempty(obj.intkit.cWf)
+    obj.build_intkit;
+end
+%--------------------------------------------------------------------------
+switch order
+    case '0'
+        nbG = 1;
+        Weigh = con.cWeigh;
+        % ---
+        We = cell(1,nbG);
+        detJ = cell(1,nbG);
+        for iG = 1:nbG
+            We{iG} = obj.intkit.cWe{iG}(id_elem,:,:);
+            detJ{iG} = obj.intkit.cdetJ{iG}(id_elem,1);
+        end
+    case 'full'
+        nbG = con.nbG;
+        Weigh = con.Weigh;
+        % ---
+        We = cell(1,nbG);
+        detJ = cell(1,nbG);
+        for iG = 1:nbG
+            We{iG} = obj.intkit.We{iG}(id_elem,:,:);
+            detJ{iG} = obj.intkit.detJ{iG}(id_elem,1);
+        end
 end
 %--------------------------------------------------------------------------
 coefwewe = zeros(nb_elem,nbEd_inEl,nbEd_inEl);
 %--------------------------------------------------------------------------
-if any(strcmpi(coef_array_type,{'iso_array'}))
+if any(f_strcmpi(coef_array_type,{'scalar'}))
     %----------------------------------------------------------------------
     for iG = 1:nbG
         dJ    = f_tocolv(detJ{iG});
@@ -63,7 +91,7 @@ if any(strcmpi(coef_array_type,{'iso_array'}))
         end
     end
     %----------------------------------------------------------------------
-elseif any(strcmpi(coef_array_type,{'tensor_array'}))
+elseif any(f_strcmpi(coef_array_type,{'tensor'}))
     %----------------------------------------------------------------------
     for iG = 1:nbG
         dJ    = f_tocolv(detJ{iG});

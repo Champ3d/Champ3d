@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Parameter % < Xhandle
+classdef Parameter < Xhandle
     properties
         f
         depend_on
@@ -16,9 +16,6 @@ classdef Parameter % < Xhandle
         varargin_list
         fvectorized
         % ---
-        argspath
-        value
-        value_type
     end
 
     % --- Contructor
@@ -77,8 +74,10 @@ classdef Parameter % < Xhandle
         function vout = evaluate_on(obj,dom)
             if obj.fvectorized
                 vout = eval_fvectorized(obj,dom);
+                vout = obj.column_format(vout);
             else
                 vout = eval_fserial(obj,dom);
+                vout = obj.column_format(vout);
             end
         end
         %------------------------------------------------------------------
@@ -311,5 +310,7 @@ classdef Parameter % < Xhandle
                 end
             end
         end
+        %------------------------------------------------------------------
+
     end
 end

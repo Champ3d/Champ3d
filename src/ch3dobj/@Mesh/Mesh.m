@@ -71,6 +71,20 @@ classdef Mesh < Xhandle
             obj.discrete.div = [];
             obj.discrete.grad = [];
             obj.discrete.rot = [];
+            % ---
+            obj.intkit.cdetJ = {};
+            obj.intkit.cgradWn = {};
+            obj.intkit.cJinv = {};
+            obj.intkit.cWe = {};
+            obj.intkit.cWf = {};
+            obj.intkit.cWn = {};
+            obj.intkit.cWv = {};
+            obj.intkit.detJ = {};
+            obj.intkit.gradWn = {};
+            obj.intkit.Jinv = {};
+            obj.intkit.We = {};
+            obj.intkit.Wf = {};
+            obj.intkit.Wn = {};
         end
     end
 
