@@ -36,14 +36,36 @@ classdef LTensor < Xhandle
 
     % --- Methods
     methods
-        function vout = evaluate_on(obj,dom)
-            if obj.fvectorized
-                vout = eval_fvectorized(obj,dom);
-                vout = obj.column_format(vout);
-            else
-                vout = eval_fserial(obj,dom);
-                vout = obj.column_format(vout);
+        function gtensor = evaluate_on(obj,dom)
+            % ---
+            if isa(dom,'VolumeDom')
+                id_elem = dom.gid_elem;
+            elseif isa(dom,'SurfaceDom')
+                id_elem = dom.gid_face;
+            elseif isprop(dom,'gid_elem')
+                id_elem = dom.gid_elem;
+            elseif isprop(dom,'gid_face')
+                id_elem = dom.gid_face;
             end
+            % ---
+            nb_elem = length(id_elem);
+            % ---
+            fnames = {'main_value','main_dir','ort1_value','ort1_dir',...
+                      'ort2_value','ort2_dir'};
+            % ---
+            ltensor = [];
+            for i = 1:length(fnames)
+                fn = fnames{i};
+                ltfield = obj.(fn);
+                if isnumeric(ltfield)
+                    ltensor.(fn) = repmat(ltfield,nb_elem,1);
+                elseif isa(ltfield,'Parameter')
+                    ltensor.(fn) = ltfield.evaluate_on(dom);
+                end
+            end
+            % ---
+            gtensor = f_gtensor(ltensor);
+            % ---
         end
     end
 end

@@ -163,7 +163,7 @@ classdef Xhandle < matlab.mixin.Copyable
                                     array_type = '4+dimensional';
                                 end
                             else
-                                if s1 == s2 && s1 > s3
+                                if s1 == s2
                                     ielem = 3;
                                     % ---
                                     if s1 <= 3
@@ -171,7 +171,7 @@ classdef Xhandle < matlab.mixin.Copyable
                                     else
                                         array_type = '4+dimensional';
                                     end
-                                elseif s1 == s3 && s1 > s2
+                                elseif s1 == s3
                                     ielem = 2;
                                     % ---
                                     if s1 <= 3
@@ -179,7 +179,7 @@ classdef Xhandle < matlab.mixin.Copyable
                                     else
                                         array_type = '4+dimensional';
                                     end
-                                elseif s2 == s3 && s2 > s1
+                                elseif s2 == s3
                                     ielem = 1;
                                     % ---
                                     if s2 <= 3

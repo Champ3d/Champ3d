@@ -84,7 +84,6 @@ classdef Parameter < Xhandle
         function vout = eval_fvectorized(obj,dom)
             %--------------------------------------------------------------
             f_ = obj.f;
-            nb_fargin = f_nargin(obj.f);
             varargs = obj.varargin_list;
             fargs = obj.get_fargs(dom);
             %--------------------------------------------------------------
