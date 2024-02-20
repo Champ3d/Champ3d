@@ -105,6 +105,170 @@ classdef VolumeDom < Xhandle
             %--------------------------------------------------------------
         end
         % -----------------------------------------------------------------
+        function [gid_elem, lid_elem] = get_cutelem(obj,args)
+            arguments
+                obj
+                args.cut_equation = []
+            end
+            % ---
+            node = obj.parent_mesh.node;
+            elem = obj.parent_mesh.elem(:,obj.gid_elem);
+            elem_type = obj.parent_mesh.elem_type;
+            cut_equation = f_cut_equation(args.cut_equation);
+            %--------------------------------------------------------------
+            eqcond = cut_equation.eqcond;
+            neqcond = cut_equation.neqcond;
+            %--------------------------------------------------------------
+            nbEqcond = length(eqcond);
+            %--------------------------------------------------------------
+            con = f_connexion(elem_type);
+            nbNo_inEl = con.nbNo_inEl;
+            nbElem = size(elem,2);
+            % ---
+            x = zeros(nbNo_inEl,nbElem);
+            y = zeros(nbNo_inEl,nbElem);
+            z = zeros(nbNo_inEl,nbElem);
+            % ---
+            for i = 1:nbNo_inEl
+                x(i,:) = node(1,elem(i,:));
+                y(i,:) = node(2,elem(i,:));
+                z(i,:) = node(3,elem(i,:));
+            end
+            % ---
+            if length(neqcond) > 1                    % 1 & something else
+                eval(['iNeqcond = (' neqcond ');']);
+                eval('checksum = sum(iNeqcond);');
+                % just need one node touched
+                lid_elem = find(checksum >= 1);
+            else
+                lid_elem = 1:nbElem;
+            end
+            % ---
+            for i = 1:nbEqcond
+                eqcond_L = strrep(eqcond{i},'==','<');
+                eqcond_R = strrep(eqcond{i},'==','>');
+                eval(['iEqcond_L{i} = (' eqcond_L ');']);
+                eval(['iEqcond_R{i} = (' eqcond_R ');']);
+                checksum_L = sum(iEqcond_L{i});
+                checksum_R = sum(iEqcond_R{i});
+                checksum   = checksum_L + checksum_R;
+                % just need one node touched
+                iElemEqcond{i} = find( (checksum_L < nbNo_inEl & checksum_L > 0 & ...
+                    checksum_R < nbNo_inEl & checksum_R > 0)  ...
+                    |(checksum   < nbNo_inEl));
+            end
+            % ---
+            for i = 1:nbEqcond
+                lid_elem = intersect(lid_elem,iElemEqcond{i});
+            end
+            %--------------------------------------------------------------
+            lid_elem = unique(lid_elem);
+            gid_elem = obj.gid_elem(lid_elem);
+            %--------------------------------------------------------------
+        end
+        % -----------------------------------------------------------------
+        function [gid_node, lid_node] = get_cutnode(obj,args)
+            arguments
+                obj
+                args.cut_equation = []
+            end
+            % ---
+            node = obj.parent_mesh.node;
+            elem = obj.parent_mesh.elem(:,obj.gid_elem);
+            cut_equation = f_cut_equation(args.cut_equation);
+            %--------------------------------------------------------------
+            eqcond = cut_equation.eqcond;
+            neqcond = cut_equation.neqcond;
+            %--------------------------------------------------------------
+            nbEqcond = length(eqcond);
+            %--------------------------------------------------------------
+            IDNode = f_uniquenode(elem);
+            x = node(1,IDNode);
+            y = node(2,IDNode);
+            z = node(3,IDNode);
+            %--------------------------------------------------------------
+            checksum = [];
+            neqNode  = [];
+            %--------------------------------------------------------------
+            if length(neqcond) > 1                     % 1 & something else
+                eval(['checksum = (' neqcond ');']);
+                neqNode = find(checksum);
+            else
+                neqNode = 1:length(IDNode);
+            end
+            %--------------------------------------------------------------
+            for i = 1:nbEqcond
+                eqc = eqcond{i};
+                isep = strfind(eqc,'==');
+                eqcond_L = eqc(1:isep-1);
+                eqcond_R = eqc(isep+2:end);
+                % == with tolerance
+                eqc = [eqcond_L '<=' eqcond_R '+' num2str(tol) ' & ' ...
+                    eqcond_L '>=' eqcond_R '-' num2str(tol)];
+                eval(['checksum = (' eqc ');']);
+                eqNode{i} = find(checksum);
+            end
+            %--------------------------------------------------------------
+            eNode = neqNode;
+            for i = 1:nbEqcond
+                eNode = intersect(eNode,eqNode{i});
+            end
+            eNode(eNode == 0) = [];
+            %--------------------------------------------------------------
+            lid_node = unique(eNode);
+            gid_node = unique(IDNode(eNode));
+            %--------------------------------------------------------------
+        end
+        % -----------------------------------------------------------------
+        function cut_dom = get_cutdom(obj,args)
+            arguments
+                obj
+                args.cut_equation
+            end
+            % ---
+            [gid_elem_, lid_elem] = obj.get_cutelem(args.cut_equation);
+            % ---
+            node = obj.parent_mesh.node;
+            elem_type = obj.parent_mesh.elem_type;
+            cut_equation = f_cut_equation(args.cut_equation);
+            %--------------------------------------------------------------
+            eqcond = cut_equation.eqcond;
+            % ---
+            elem1 = obj.parent_mesh.elem(:,gid_elem_);
+            elem2 = obj.parent_mesh.elem(:,setdiff(1:obj.parent_mesh.nb_elem,gid_elem_));
+            side_face = f_interface(elem1,elem2,node,'elem_type',elem_type);
+            % ---
+            id_side_node = f_uniquenode(side_face);
+            % ---
+            id_side_node(id_side_node == 0) = [];
+            % ---
+            x = node(1,id_side_node);
+            y = node(2,id_side_node);
+            z = node(3,id_side_node);
+            % ---
+            for i = 1:nbEqcond
+                eqcond_L = strrep(eqcond{i},'==','<');
+                eqcond_R = strrep(eqcond{i},'==','>');
+                eval(['checksum_L = (' eqcond_L ');']);
+                eval(['checksum_R = (' eqcond_R ');']);
+                lid_side_node_1{i} = id_side_node(checksum_L~=0);
+                lid_side_node_2{i} = id_side_node(checksum_R~=0);
+            end
+            % ---
+            gid_side_node_1 = [];
+            gid_side_node_2 = [];
+            for i = 1:nbEqcond
+                gid_side_node_1 = [gid_side_node_1 lid_side_node_1{i}];
+                gid_side_node_2 = [gid_side_node_2 lid_side_node_2{i}];
+            end
+            %--------------------------------------------------------------
+            cut_dom.gid_elem = gid_elem_;
+            cut_dom.gid_side_node_1 = gid_side_node_1;
+            cut_dom.gid_side_node_2 = gid_side_node_2;
+            %--------------------------------------------------------------
+        end
+        %------------------------------------------------------------------
+        %------------------------------------------------------------------
     end
 
     % --- Methods
