@@ -125,15 +125,9 @@ classdef VolumeDom < Xhandle
             nbNo_inEl = con.nbNo_inEl;
             nbElem = size(elem,2);
             % ---
-            x = zeros(nbNo_inEl,nbElem);
-            y = zeros(nbNo_inEl,nbElem);
-            z = zeros(nbNo_inEl,nbElem);
-            % ---
-            for i = 1:nbNo_inEl
-                x(i,:) = node(1,elem(i,:));
-                y(i,:) = node(2,elem(i,:));
-                z(i,:) = node(3,elem(i,:));
-            end
+            x = reshape(node(1,elem(:,:)),nbNo_inEl,[]);
+            y = reshape(node(2,elem(:,:)),nbNo_inEl,[]);
+            z = reshape(node(3,elem(:,:)),nbNo_inEl,[]);
             % ---
             if length(neqcond) > 1                    % 1 & something else
                 eval(['iNeqcond = (' neqcond ');']);
@@ -225,17 +219,24 @@ classdef VolumeDom < Xhandle
                 obj
                 args.cut_equation
             end
-            % ---
-            [gid_elem_, lid_elem] = obj.get_cutelem(args.cut_equation);
-            % ---
+            %--------------------------------------------------------------
+            [gid_elem_, lid_elem] = obj.get_cutelem('cut_equation',args.cut_equation);
+            if isempty(gid_elem_)
+                cut_dom.gid_elem = [];
+                cut_dom.gid_side_node_1 = [];
+                cut_dom.gid_side_node_2 = [];
+                return
+            end
+            %--------------------------------------------------------------
             node = obj.parent_mesh.node;
             elem_type = obj.parent_mesh.elem_type;
             cut_equation = f_cut_equation(args.cut_equation);
-            %--------------------------------------------------------------
+            % ---
             eqcond = cut_equation.eqcond;
             % ---
             elem1 = obj.parent_mesh.elem(:,gid_elem_);
-            elem2 = obj.parent_mesh.elem(:,setdiff(1:obj.parent_mesh.nb_elem,gid_elem_));
+            elem2 = obj.parent_mesh.elem(:,setdiff(obj.gid_elem,gid_elem_));
+            % ---
             side_face = f_interface(elem1,elem2,node,'elem_type',elem_type);
             % ---
             id_side_node = f_uniquenode(side_face);
@@ -246,7 +247,7 @@ classdef VolumeDom < Xhandle
             y = node(2,id_side_node);
             z = node(3,id_side_node);
             % ---
-            for i = 1:nbEqcond
+            for i = 1:length(eqcond)
                 eqcond_L = strrep(eqcond{i},'==','<');
                 eqcond_R = strrep(eqcond{i},'==','>');
                 eval(['checksum_L = (' eqcond_L ');']);
@@ -257,7 +258,7 @@ classdef VolumeDom < Xhandle
             % ---
             gid_side_node_1 = [];
             gid_side_node_2 = [];
-            for i = 1:nbEqcond
+            for i = 1:length(eqcond)
                 gid_side_node_1 = [gid_side_node_1 lid_side_node_1{i}];
                 gid_side_node_2 = [gid_side_node_2 lid_side_node_2{i}];
             end
@@ -346,7 +347,6 @@ classdef VolumeDom < Xhandle
             argu = f_to_namedarg(args);
             for i = 1:length(submesh_)
                 submesh_{i}.plot(argu{:}); hold on
-                delete(submesh_{i});
             end
         end
     end

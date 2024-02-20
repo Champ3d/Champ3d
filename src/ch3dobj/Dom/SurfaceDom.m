@@ -126,7 +126,6 @@ classdef SurfaceDom < Xhandle
             argu = f_to_namedarg(args);
             for i = 1:length(submesh_)
                 submesh_{i}.plot(argu{:}); hold on
-                delete(submesh_{i});
             end
             % ---
         end

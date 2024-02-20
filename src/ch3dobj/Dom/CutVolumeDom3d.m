@@ -48,21 +48,49 @@ classdef CutVolumeDom3d < VolumeDom
     methods (Access = private, Hidden)
         % -----------------------------------------------------------------
         function build(obj)
-            iddom3 = f_to_scellargin(obj.id_dom3d);
-            iddom3 = iddom3{1};
-            cutequ = f_to_scellargin(obj.cut_equation);
-            cutequ = cutequ{1};
-            % ---
-            all_id_dom2d  = fieldnames(obj.parent_mesh.parent_mesh2d.dom);
-            all_id_mesh1d = fieldnames(obj.parent_mesh.parent_mesh1d.dom);
-            all_elem_code = obj.parent_mesh.elem_code;
-            id_all_elem   = 1:obj.parent_mesh.nb_elem;
             % ---
             gid_elem_ = [];
-            elem_code_ = [];
+            gid_side_node_1_ = [];
+            gid_side_node_2_ = [];
+            iddom3 = f_to_scellargin(obj.id_dom3d);
+            for i = 1:length(iddom3)
+                dom2cut = obj.parent_mesh.dom.(iddom3{i});
+                cut_dom = dom2cut.get_cutdom('cut_equation',obj.cut_equation);
+                gid_elem_ = [gid_elem_ cut_dom.gid_elem];
+                gid_side_node_1_ = [gid_side_node_1_ cut_dom.gid_side_node_1];
+                gid_side_node_2_ = [gid_side_node_2_ cut_dom.gid_side_node_2];
+            end
+            % ---
+            obj.gid_elem = gid_elem_;
+            obj.gid_side_node_1 = gid_side_node_1_;
+            obj.gid_side_node_2 = gid_side_node_2_;
             % -------------------------------------------------------------
-            obj.gid_elem  = unique(gid_elem_);
-            obj.elem_code = unique(obj.parent_mesh.elem_code(gid_elem_));
+        end
+        % -----------------------------------------------------------------
+    end
+
+    % ---
+    methods
+        function plot(obj,args)
+            arguments
+                obj
+                args.edge_color = 'none'
+                args.face_color = 'c'
+                args.alpha {mustBeNumeric} = 0.9
+            end
+            % ---
+            argu = f_to_namedarg(args);
+            plot@VolumeDom(obj,argu{:}); hold on
+            % side 1
+            x = obj.parent_mesh.node(1,obj.gid_side_node_1);
+            y = obj.parent_mesh.node(2,obj.gid_side_node_1);
+            z = obj.parent_mesh.node(3,obj.gid_side_node_1);
+            plot3(x,y,z,'or','MarkerFaceColor','r'); hold on
+            % side 1
+            x = obj.parent_mesh.node(1,obj.gid_side_node_2);
+            y = obj.parent_mesh.node(2,obj.gid_side_node_2);
+            z = obj.parent_mesh.node(3,obj.gid_side_node_2);
+            plot3(x,y,z,'ob','MarkerFaceColor','b');
             % -------------------------------------------------------------
         end
     end
