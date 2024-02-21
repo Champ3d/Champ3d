@@ -57,16 +57,19 @@ classdef PrismMesh < Mesh3d
             %--------------------------------------------------------------
             clear msh;
             %--------------------------------------------------------------
+            boface = f_boundface(obj.elem,obj.node,'elem_type','prism');
+            allfac = 1:size(boface,2);
+            %--------------------------------------------------------------
             msh.Vertices = obj.node.';
             msh.FaceColor = face_color_;
             msh.EdgeColor = edge_color_; % [0.7 0.7 0.7] --> gray
             %--------------------------------------------------------------
-            id_tria = find(obj.face(4,:) == 0);
-            id_quad = setdiff(1:obj.nb_face,id_tria);
+            id_tria = find(boface(4,:) == 0);
+            id_quad = setdiff(allfac,id_tria);
             % ---
-            msh.Faces = f_unique(obj.face(1:3,id_tria)).';
+            msh.Faces = f_unique(boface(1:3,id_tria)).';
             patch(msh); hold on
-            msh.Faces = f_unique(obj.face(1:4,id_quad)).';
+            msh.Faces = f_unique(boface(1:4,id_quad)).';
             patch(msh); hold on
             % ---
             xlabel('x (m)'); ylabel('y (m)');

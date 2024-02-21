@@ -76,11 +76,7 @@ classdef PhysicalDom < Xhandle
             end
             % ---
             argu = f_to_namedarg(args);
-            if ~isempty(obj.dom)
-                for i = 1:length(obj.dom)
-                    obj.dom{i}.plot(argu{:});
-                end
-            end
+            obj.dom.plot(argu{:});
         end
         % -----------------------------------------------------------------
     end

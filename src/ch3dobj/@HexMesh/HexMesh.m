@@ -57,8 +57,10 @@ classdef HexMesh < Mesh3d
             %--------------------------------------------------------------
             clear msh;
             %--------------------------------------------------------------
+            boface = f_boundface(obj.elem,obj.node,'elem_type','hexa');
+            %--------------------------------------------------------------
             msh.Vertices = obj.node.';
-            msh.Faces = f_unique(obj.face(1:4,:)).';
+            msh.Faces = f_unique(boface(1:4,:)).';
             msh.FaceColor = face_color_;
             msh.EdgeColor = edge_color_; % [0.7 0.7 0.7] --> gray
             %--------------------------------------------------------------

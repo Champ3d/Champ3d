@@ -19,21 +19,19 @@ for i = 1:length(allphydom)
     id_phydom = allphydom{i};
     % ---
     phydom = obj.(phydom_type).(id_phydom);
-    dom__ = phydom.dom;
-    for j = 1:length(dom__)
-        dom = dom__{j};
-        parent_mesh = dom.parent_mesh;
-        gid_elem    = dom.gid_elem;
-        %------------------------------------------------------
-        mu0 = 4 * pi * 1e-7;
-        nu0 = 1/mu0;
-        nu0nur = nu0 .* obj.(phydom_type).(id_phydom).mur.get_inverse_on(dom);
-        %------------------------------------------------------
-        nu0nurwfwf = parent_mesh.cwfwf('id_elem',gid_elem,'coefficient',nu0nur);
-        %------------------------------------------------------
-        obj.(phydom_type).(id_phydom).matrix.nu0nurwfwf{j} = nu0nurwfwf;
-        %------------------------------------------------------
-    end
+    dom = phydom.dom;
+    % ---
+    parent_mesh = dom.parent_mesh;
+    gid_elem    = dom.gid_elem;
+    % ---
+    mu0 = 4 * pi * 1e-7;
+    nu0 = 1/mu0;
+    nu0nur = nu0 .* obj.(phydom_type).(id_phydom).mur.get_inverse_on(dom);
+    % ---
+    nu0nurwfwf = parent_mesh.cwfwf('id_elem',gid_elem,'coefficient',nu0nur);
+    % ---
+    obj.(phydom_type).(id_phydom).matrix.nu0nurwfwf = nu0nurwfwf;
+    % ---
 end
 
 end

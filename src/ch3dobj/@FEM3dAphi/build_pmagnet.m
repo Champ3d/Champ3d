@@ -18,16 +18,14 @@ for i = 1:length(allphydom)
     id_phydom = allphydom{i};
     % ---
     phydom = obj.(phydom_type).(id_phydom);
-    dom__ = phydom.dom;
-    for j = 1:length(dom__)
-        dom = dom__{j};
-        parent_mesh = dom.parent_mesh;
-        gid_elem    = dom.gid_elem;
-        %------------------------------------------------------
-        br = obj.(phydom_type).(id_phydom).br.get_on(dom);
-        wfbr = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',br);
-        %------------------------------------------------------
-        obj.(phydom_type).(id_phydom).matrix.wfbr{j} = wfbr;
-    end
+    dom = phydom.dom;
+    % ---
+    parent_mesh = dom.parent_mesh;
+    gid_elem    = dom.gid_elem;
+    % ---
+    br = obj.(phydom_type).(id_phydom).br.get_on(dom);
+    wfbr = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',br);
+    % ---
+    obj.(phydom_type).(id_phydom).matrix.wfbr = wfbr;
 end
 end

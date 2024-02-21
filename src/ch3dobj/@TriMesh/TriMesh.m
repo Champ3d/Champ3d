@@ -45,7 +45,7 @@ classdef TriMesh < Mesh2d
             arguments
                 obj
                 args.edge_color = [0.4940 0.1840 0.5560]
-                args.face_color = 'b'
+                args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
             end
             edge_color_  = args.edge_color;
