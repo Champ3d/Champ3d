@@ -22,69 +22,63 @@ if parent_mesh.intkit_to_be_rebuild
 end
 % ---
 %--------------------------------------------------------------------------
-nb_elem = size(c3dobj.mesh3d.(id_mesh3d).elem,2);
-nb_face = size(c3dobj.mesh3d.(id_mesh3d).face,2);
-nb_edge = size(c3dobj.mesh3d.(id_mesh3d).edge,2);
-nb_node = size(c3dobj.mesh3d.(id_mesh3d).node,2);
+nb_elem = obj.nb_elem;
+nb_face = obj.nb_face;
+nb_edge = obj.nb_edge;
+nb_node = obj.nb_node;
 %--------------------------------------------------------------------------
 % Do this first
-c3dobj.emdesign.(id_emdesign).matrix.id_edge_a = 1:nb_edge;
-id_edge_a = c3dobj.emdesign.(id_emdesign).matrix.id_edge_a;
+obj.matrix.id_edge_a = 1:nb_edge;
+id_edge_a = obj.matrix.id_edge_a;
 %--------------------------------------------------------------------------
-% Then build nomesh
-c3dobj = f_build_nomesh(c3dobj,'id_emdesign',id_emdesign);
-%--------------------------------------------------------------------------
-% Then build airbox
-c3dobj = f_build_airbox(c3dobj,'id_emdesign',id_emdesign);
-%--------------------------------------------------------------------------
-% Then whatever order
-c3dobj = f_build_econductor(c3dobj,'id_emdesign',id_emdesign);
-c3dobj = f_build_mconductor(c3dobj,'id_emdesign',id_emdesign);
-c3dobj = f_build_bsfield(c3dobj,'id_emdesign',id_emdesign);
-c3dobj = f_build_bc(c3dobj,'id_emdesign',id_emdesign);
-c3dobj = f_build_pmagnet(c3dobj,'id_emdesign',id_emdesign);
-c3dobj = f_build_coil(c3dobj,'id_emdesign',id_emdesign);
-
+obj.build_nomesh;
+obj.build_airbox;
+obj.build_econductor;
+obj.build_mconductor;
+obj.build_bsfield;
+obj.build_pmagnet;
+obj.build_sibc;
+obj.build_coil;
 %--------------------------------------------------------------------------
 id_econductor__ = {};
 id_mconductor__ = {};
 id_airbox__     = {};
-id_bc__         = {};
+id_sibc__         = {};
 id_bsfield__    = {};
 id_coil__       = {};
 id_nomesh__     = {};
 id_pmagnet__    = {};
 % ---
-if isfield(c3dobj.emdesign.(id_emdesign),'econductor')
-    id_econductor__ = fieldnames(c3dobj.emdesign.(id_emdesign).econductor);
+if isfield(obj,'econductor')
+    id_econductor__ = fieldnames(obj.econductor);
 end
 % ---
-if isfield(c3dobj.emdesign.(id_emdesign),'mconductor')
-    id_mconductor__ = fieldnames(c3dobj.emdesign.(id_emdesign).mconductor);
+if isfield(obj,'mconductor')
+    id_mconductor__ = fieldnames(obj.mconductor);
 end
 % ---
-if isfield(c3dobj.emdesign.(id_emdesign),'airbox')
-    id_airbox__ = fieldnames(c3dobj.emdesign.(id_emdesign).airbox);
+if isfield(obj,'airbox')
+    id_airbox__ = fieldnames(obj.airbox);
 end
 % ---
-if isfield(c3dobj.emdesign.(id_emdesign),'bc')
-    id_bc__ = fieldnames(c3dobj.emdesign.(id_emdesign).bc);
+if isfield(obj,'sibc')
+    id_sibc__ = fieldnames(obj.sibc);
 end
 % ---
-if isfield(c3dobj.emdesign.(id_emdesign),'bsfield')
-    id_bsfield__ = fieldnames(c3dobj.emdesign.(id_emdesign).bsfield);
+if isfield(obj,'bsfield')
+    id_bsfield__ = fieldnames(obj.bsfield);
 end
 % ---
-if isfield(c3dobj.emdesign.(id_emdesign),'coil')
-    id_coil__ = fieldnames(c3dobj.emdesign.(id_emdesign).coil);
+if isfield(obj,'coil')
+    id_coil__ = fieldnames(obj.coil);
 end
 % ---
-if isfield(c3dobj.emdesign.(id_emdesign),'nomesh')
-    id_nomesh__ = fieldnames(c3dobj.emdesign.(id_emdesign).nomesh);
+if isfield(obj,'nomesh')
+    id_nomesh__ = fieldnames(obj.nomesh);
 end
 % ---
-if isfield(c3dobj.emdesign.(id_emdesign),'pmagnet')
-    id_pmagnet__ = fieldnames(c3dobj.emdesign.(id_emdesign).pmagnet);
+if isfield(obj,'pmagnet')
+    id_pmagnet__ = fieldnames(obj.pmagnet);
 end
 %--------------------------------------------------------------------------
 tic;
@@ -107,9 +101,9 @@ for iec = 1:length(id_nomesh__)
     %----------------------------------------------------------------------
     f_fprintf(0,'--- #nomesh',1,id_phydom,0,'\n');
     %----------------------------------------------------------------------
-    id_elem = c3dobj.emdesign.(id_emdesign).nomesh.(id_phydom).id_elem;
-    id_inner_edge = c3dobj.emdesign.(id_emdesign).nomesh.(id_phydom).id_inner_edge;
-    id_inner_node = c3dobj.emdesign.(id_emdesign).nomesh.(id_phydom).id_inner_node;
+    id_elem = obj.nomesh.(id_phydom).id_elem;
+    id_inner_edge = obj.nomesh.(id_phydom).id_inner_edge;
+    id_inner_node = obj.nomesh.(id_phydom).id_inner_node;
     %----------------------------------------------------------------------
     id_elem_nomesh = [id_elem_nomesh id_elem];
     id_inner_edge_nomesh = [id_inner_edge_nomesh f_torowv(id_inner_edge)];
@@ -129,8 +123,8 @@ for iec = 1:length(id_mconductor__)
     %----------------------------------------------------------------------
     f_fprintf(0,'--- #mcon',1,id_phydom,0,'\n');
     %----------------------------------------------------------------------
-    id_elem = c3dobj.emdesign.(id_emdesign).mconductor.(id_phydom).id_elem;
-    lmatrix = c3dobj.emdesign.(id_emdesign).mconductor.(id_phydom).nu0nurwfwf;
+    id_elem = obj.mconductor.(id_phydom).id_elem;
+    lmatrix = obj.mconductor.(id_phydom).nu0nurwfwf;
     %----------------------------------------------------------------------
     [~,id_] = intersect(id_elem,id_elem_nomesh);
     id_elem(id_) = [];
@@ -154,8 +148,8 @@ for iec = 1:length(id_mconductor__)
     %----------------------------------------------------------------------
     id_phydom = id_mconductor__{iec};
     %----------------------------------------------------------------------
-    id_elem = c3dobj.emdesign.(id_emdesign).mconductor.(id_phydom).id_elem;
-    lmatrix = c3dobj.emdesign.(id_emdesign).mconductor.(id_phydom).nu0nurwfwf;
+    id_elem = obj.mconductor.(id_phydom).id_elem;
+    lmatrix = obj.mconductor.(id_phydom).nu0nurwfwf;
     %----------------------------------------------------------------------
     [~,id_] = intersect(id_elem,id_elem_nomesh);
     id_elem(id_) = [];
@@ -170,19 +164,19 @@ end
 %--------------------------------------------------------------------------
 % --- wfwf / wfwfx
 no_wfwf = 0;
-if ~isfield(c3dobj.emdesign.(id_emdesign),'matrix')
+if ~isfield(obj,'matrix')
     no_wfwf = 1;
-elseif ~isfield(c3dobj.emdesign.(id_emdesign).matrix,'wfwf')
+elseif ~isfield(obj.matrix,'wfwf')
     no_wfwf = 1;
-elseif isempty(c3dobj.emdesign.(id_emdesign).matrix.wfwf)
+elseif isempty(obj.matrix.wfwf)
     no_wfwf = 1;
 end
 no_wfwfx = 0;
-if ~isfield(c3dobj.emdesign.(id_emdesign),'matrix')
+if ~isfield(obj,'matrix')
     no_wfwfx = 1;
-elseif ~isfield(c3dobj.emdesign.(id_emdesign).matrix,'wfwfx')
+elseif ~isfield(obj.matrix,'wfwfx')
     no_wfwfx = 1;
-elseif isempty(c3dobj.emdesign.(id_emdesign).matrix.wfwfx)
+elseif isempty(obj.matrix.wfwfx)
     no_wfwfx = 1;
 end
 % ---
@@ -231,24 +225,24 @@ if no_wfwf || no_wfwfx
     end
 end
 % ---
-c3dobj.emdesign.(id_emdesign).matrix.wfwf  = wfwf;
-c3dobj.emdesign.(id_emdesign).matrix.wfwfx = wfwfx;
+obj.matrix.wfwf  = wfwf;
+obj.matrix.wfwfx = wfwfx;
 %--------------------------------------------------------------------------
 % --- wewe / wewex
 no_wewe = 0;
-if ~isfield(c3dobj.emdesign.(id_emdesign),'matrix')
+if ~isfield(obj,'matrix')
     no_wewe = 1;
-elseif ~isfield(c3dobj.emdesign.(id_emdesign).matrix,'wewe')
+elseif ~isfield(obj.matrix,'wewe')
     no_wewe = 1;
-elseif isempty(c3dobj.emdesign.(id_emdesign).matrix.wewe)
+elseif isempty(obj.matrix.wewe)
     no_wewe = 1;
 end
 no_wewex = 0;
-if ~isfield(c3dobj.emdesign.(id_emdesign),'matrix')
+if ~isfield(obj,'matrix')
     no_wewex = 1;
-elseif ~isfield(c3dobj.emdesign.(id_emdesign).matrix,'wewex')
+elseif ~isfield(obj.matrix,'wewex')
     no_wewex = 1;
-elseif isempty(c3dobj.emdesign.(id_emdesign).matrix.wewex)
+elseif isempty(obj.matrix.wewex)
     no_wewex = 1;
 end
 % ---
@@ -297,24 +291,24 @@ if no_wewe || no_wewex
     end
 end
 % ---
-c3dobj.emdesign.(id_emdesign).matrix.wewe  = wewe;
-c3dobj.emdesign.(id_emdesign).matrix.wewex = wewex;
+obj.matrix.wewe  = wewe;
+obj.matrix.wewex = wewex;
 %--------------------------------------------------------------------------
 % --- wewf / wewfx
 no_wewf = 0;
-if ~isfield(c3dobj.emdesign.(id_emdesign),'matrix')
+if ~isfield(obj,'matrix')
     no_wewf = 1;
-elseif ~isfield(c3dobj.emdesign.(id_emdesign).matrix,'wewf')
+elseif ~isfield(obj.matrix,'wewf')
     no_wewf = 1;
-elseif isempty(c3dobj.emdesign.(id_emdesign).matrix.wewf)
+elseif isempty(obj.matrix.wewf)
     no_wewf = 1;
 end
 no_wewfx = 0;
-if ~isfield(c3dobj.emdesign.(id_emdesign),'matrix')
+if ~isfield(obj,'matrix')
     no_wewfx = 1;
-elseif ~isfield(c3dobj.emdesign.(id_emdesign).matrix,'wewfx')
+elseif ~isfield(obj.matrix,'wewfx')
     no_wewfx = 1;
-elseif isempty(c3dobj.emdesign.(id_emdesign).matrix.wewfx)
+elseif isempty(obj.matrix.wewfx)
     no_wewfx = 1;
 end
 % ---
@@ -347,14 +341,14 @@ if no_wewf || no_wewfx
     end
 end
 % ---
-c3dobj.emdesign.(id_emdesign).matrix.wewf  = wewf;
-c3dobj.emdesign.(id_emdesign).matrix.wewfx = wewfx;
+obj.matrix.wewf  = wewf;
+obj.matrix.wewfx = wewfx;
 %--------------------------------------------------------------------------
 % --- airbox
 id_phydom = id_airbox__{1};
 f_fprintf(0,'--- #airbox',1,id_phydom,0,'\n');
-id_elem_airbox = c3dobj.emdesign.(id_emdesign).airbox.(id_phydom).id_elem;
-id_inner_edge_airbox = c3dobj.emdesign.(id_emdesign).airbox.(id_phydom).id_inner_edge;
+id_elem_airbox = obj.airbox.(id_phydom).id_elem;
+id_inner_edge_airbox = obj.airbox.(id_phydom).id_inner_edge;
 %--------------------------------------------------------------------------
 % --- econductor
 sigmawewe = sparse(nb_edge,nb_edge);
@@ -366,8 +360,8 @@ for iec = 1:length(id_econductor__)
     %----------------------------------------------------------------------
     f_fprintf(0,'--- #econ',1,id_phydom,0,'\n');
     %----------------------------------------------------------------------
-    id_elem = c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).id_elem;
-    lmatrix = c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).sigmawewe;
+    id_elem = obj.econductor.(id_phydom).id_elem;
+    lmatrix = obj.econductor.(id_phydom).sigmawewe;
     %----------------------------------------------------------------------
     [~,id_] = intersect(id_elem,id_elem_nomesh);
     id_elem(id_) = [];
@@ -382,7 +376,7 @@ for iec = 1:length(id_econductor__)
     end
     %----------------------------------------------------------------------
     id_node_phi = [id_node_phi ...
-        c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).id_node_phi];
+        obj.econductor.(id_phydom).id_node_phi];
     %----------------------------------------------------------------------
 end
 % ---
@@ -392,8 +386,8 @@ for iec = 1:length(id_econductor__)
     %----------------------------------------------------------------------
     id_phydom = id_econductor__{iec};
     %----------------------------------------------------------------------
-    id_elem = c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).id_elem;
-    lmatrix = c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).sigmawewe;
+    id_elem = obj.econductor.(id_phydom).id_elem;
+    lmatrix = obj.econductor.(id_phydom).sigmawewe;
     %----------------------------------------------------------------------
     [~,id_] = intersect(id_elem,id_elem_nomesh);
     id_elem(id_) = [];
@@ -416,24 +410,24 @@ for iec = 1:length(id_coil__)
     wfjs = sparse(nb_face,1);
     %----------------------------------------------------------------------
     id_phydom = id_coil__{iec};
-    coil_type = c3dobj.emdesign.(id_emdesign).coil.(id_phydom).coil_type;
+    coil_type = obj.coil.(id_phydom).coil_type;
     if any(f_strcmpi(coil_type,{'close_jscoil','open_jscoil'}))
         %----------------------------------------------------------------------
         f_fprintf(0,'--- #coil/jscoil',1,id_phydom,0,'\n');
         %----------------------------------------------------------------------
-        id_elem = c3dobj.emdesign.(id_emdesign).coil.(id_phydom).id_elem;
-        lmatrix = c3dobj.emdesign.(id_emdesign).coil.(id_phydom).wfjs;
+        id_elem = obj.coil.(id_phydom).id_elem;
+        lmatrix = obj.coil.(id_phydom).wfjs;
         for i = 1:nbFa_inEl
             wfjs = wfjs + ...
                    sparse(id_face_in_elem(i,id_elem),1,lmatrix(:,i),nb_face,1);
         end
         %----------------------------------------------------------------------
-        rotj = c3dobj.mesh3d.(id_mesh3d).rot.' * wfjs;
-        rotrot = c3dobj.mesh3d.(id_mesh3d).rot.' * ...
-                 c3dobj.emdesign.(id_emdesign).matrix.wfwf * ...
-                 c3dobj.mesh3d.(id_mesh3d).rot;
+        rotj = obj.discrete.rot.' * wfjs;
+        rotrot = obj.discrete.rot.' * ...
+                 obj.matrix.wfwf * ...
+                 obj.discrete.rot;
         %----------------------------------------------------------------------
-        id_edge_t_unknown = c3dobj.emdesign.(id_emdesign).matrix.id_edge_a;
+        id_edge_t_unknown = obj.matrix.id_edge_a;
         %----------------------------------------------------------------------
         rotj = rotj(id_edge_t_unknown,1);
         rotrot = rotrot(id_edge_t_unknown,id_edge_t_unknown);
@@ -443,12 +437,12 @@ for iec = 1:length(id_coil__)
         %----------------------------------------------------------------------
         t_jsfield = t_jsfield + int_oned_t;
     elseif any(f_strcmpi(coil_type,{'open_iscoil','open_vscoil'}))
-        id_node_netrode = [id_node_netrode c3dobj.emdesign.(id_emdesign).coil.(id_phydom).netrode.id_node];
-        id_node_petrode = [id_node_petrode c3dobj.emdesign.(id_emdesign).coil.(id_phydom).petrode.id_node];
+        id_node_netrode = [id_node_netrode obj.coil.(id_phydom).netrode.id_node];
+        id_node_petrode = [id_node_petrode obj.coil.(id_phydom).petrode.id_node];
     end
 end
 %--------------------------------------------------------------------------
-int_onfa_js = c3dobj.mesh3d.(id_mesh3d).rot * t_jsfield;
+int_onfa_js = obj.discrete.rot * t_jsfield;
 jsv = f_field_wf(int_onfa_js,c3dobj.mesh3d.(id_mesh3d));
 node = c3dobj.mesh3d.(id_mesh3d).celem;
 vf = jsv;
@@ -466,19 +460,19 @@ for iec = 1:length(id_bsfield__)
     %----------------------------------------------------------------------
     f_fprintf(0,'--- #bsfield',1,id_phydom,0,'\n');
     %----------------------------------------------------------------------
-    id_elem = c3dobj.emdesign.(id_emdesign).bsfield.(id_phydom).id_elem;
-    lmatrix = c3dobj.emdesign.(id_emdesign).bsfield.(id_phydom).wfbs;
+    id_elem = obj.bsfield.(id_phydom).id_elem;
+    lmatrix = obj.bsfield.(id_phydom).wfbs;
     for i = 1:nbFa_inEl
         wfbs = wfbs + ...
                sparse(id_face_in_elem(i,id_elem),1,lmatrix(:,i),nb_face,1);
     end
     %----------------------------------------------------------------------
-    rotb = c3dobj.mesh3d.(id_mesh3d).rot.' * wfbs;
-    rotrot = c3dobj.mesh3d.(id_mesh3d).rot.' * ...
-             c3dobj.emdesign.(id_emdesign).matrix.wfwf * ...
-             c3dobj.mesh3d.(id_mesh3d).rot;
+    rotb = obj.discrete.rot.' * wfbs;
+    rotrot = obj.discrete.rot.' * ...
+             obj.matrix.wfwf * ...
+             obj.discrete.rot;
     %----------------------------------------------------------------------
-    id_edge_a_unknown = c3dobj.emdesign.(id_emdesign).matrix.id_edge_a;
+    id_edge_a_unknown = obj.matrix.id_edge_a;
     %id_edge_a_unknown = setdiff(id_edge_a_unknown,id_inner_edge_nomesh);
     %----------------------------------------------------------------------
     rotb = rotb(id_edge_a_unknown,1);
@@ -490,7 +484,7 @@ for iec = 1:length(id_bsfield__)
     a_bsfield = a_bsfield + int_oned_a;
 end
 %--------------------------------------------------------------------------
-int_onfa_b = c3dobj.mesh3d.(id_mesh3d).rot * a_bsfield;
+int_onfa_b = obj.discrete.rot * a_bsfield;
 bv = f_field_wf(int_onfa_b,c3dobj.mesh3d.(id_mesh3d));
 node = c3dobj.mesh3d.(id_mesh3d).celem;
 vf = bv;
@@ -508,19 +502,19 @@ for iec = 1:length(id_pmagnet__)
     %----------------------------------------------------------------------
     f_fprintf(0,'--- #pmagnet',1,id_phydom,0,'\n');
     %----------------------------------------------------------------------
-    id_elem = c3dobj.emdesign.(id_emdesign).pmagnet.(id_phydom).id_elem;
-    lmatrix = c3dobj.emdesign.(id_emdesign).pmagnet.(id_phydom).wfbr;
+    id_elem = obj.pmagnet.(id_phydom).id_elem;
+    lmatrix = obj.pmagnet.(id_phydom).wfbr;
     for i = 1:nbFa_inEl
         wfbr = wfbr + ...
                sparse(id_face_in_elem(i,id_elem),1,lmatrix(:,i),nb_face,1);
     end
     %----------------------------------------------------------------------
-    rotb = c3dobj.mesh3d.(id_mesh3d).rot.' * wfbr;
-    rotrot = c3dobj.mesh3d.(id_mesh3d).rot.' * ...
-             c3dobj.emdesign.(id_emdesign).matrix.wfwf * ...
-             c3dobj.mesh3d.(id_mesh3d).rot;
+    rotb = obj.discrete.rot.' * wfbr;
+    rotrot = obj.discrete.rot.' * ...
+             obj.matrix.wfwf * ...
+             obj.discrete.rot;
     %----------------------------------------------------------------------
-    id_edge_a_unknown = c3dobj.emdesign.(id_emdesign).matrix.id_edge_a;
+    id_edge_a_unknown = obj.matrix.id_edge_a;
     %id_edge_a_unknown = setdiff(id_edge_a_unknown,id_inner_edge_nomesh);
     %----------------------------------------------------------------------
     rotb = rotb(id_edge_a_unknown,1);
@@ -532,7 +526,7 @@ for iec = 1:length(id_pmagnet__)
     a_pmagnet = a_pmagnet + int_oned_a;
 end
 %--------------------------------------------------------------------------
-int_onfa_b = c3dobj.mesh3d.(id_mesh3d).rot * a_pmagnet;
+int_onfa_b = obj.discrete.rot * a_pmagnet;
 bv = f_field_wf(int_onfa_b,c3dobj.mesh3d.(id_mesh3d));
 node = c3dobj.mesh3d.(id_mesh3d).celem;
 vf = bv;
@@ -543,18 +537,18 @@ f_quiver(node,vf);
 % --- sibc
 gsibcwewe = sparse(nb_edge,nb_edge);
 % ---
-for iec = 1:length(id_bc__)
+for iec = 1:length(id_sibc__)
     %----------------------------------------------------------------------
-    id_phydom = id_bc__{iec};
-    bc_type = c3dobj.emdesign.(id_emdesign).bc.(id_phydom).bc_type;
-    if any(f_strcmpi(bc_type,'sibc'))
+    id_phydom = id_sibc__{iec};
+
+
         %------------------------------------------------------------------
         f_fprintf(0,'--- #bc/sibc ',1,id_phydom,0,'\n');
         %------------------------------------------------------------------
-        %id_face  = c3dobj.emdesign.(id_emdesign).bc.(id_phydom).id_face;
-        gid_face = c3dobj.emdesign.(id_emdesign).bc.(id_phydom).gid_face;
-        lid_face = c3dobj.emdesign.(id_emdesign).bc.(id_phydom).lid_face;
-        lmatrix  = c3dobj.emdesign.(id_emdesign).bc.(id_phydom).gsibcwewe;
+        %id_face  = obj.bc.(id_phydom).id_face;
+        gid_face = obj.bc.(id_phydom).gid_face;
+        lid_face = obj.bc.(id_phydom).lid_face;
+        lmatrix  = obj.bc.(id_phydom).gsibcwewe;
         %------------------------------------------------------------------
         for igr = 1:length(lmatrix)
             nbEd_inFa = size(lmatrix{igr},2);
@@ -569,23 +563,23 @@ for iec = 1:length(id_bc__)
         end
         %------------------------------------------------------------------
         id_node_phi = [id_node_phi ...
-            c3dobj.emdesign.(id_emdesign).bc.(id_phydom).id_node_phi];
+            obj.bc.(id_phydom).id_node_phi];
         %------------------------------------------------------------------
-    end
+    
 end
 % ---
 gsibcwewe = gsibcwewe + gsibcwewe.';
 % ---
-for iec = 1:length(id_bc__)
+for iec = 1:length(id_sibc__)
     %----------------------------------------------------------------------
-    id_phydom = id_bc__{iec};
-    bc_type = c3dobj.emdesign.(id_emdesign).bc.(id_phydom).bc_type;
+    id_phydom = id_sibc__{iec};
+    bc_type = obj.bc.(id_phydom).bc_type;
     if any(f_strcmpi(bc_type,'sibc'))
         %------------------------------------------------------------------
-        %id_face = c3dobj.emdesign.(id_emdesign).bc.(id_phydom).id_face;
-        gid_face = c3dobj.emdesign.(id_emdesign).bc.(id_phydom).gid_face;
-        lid_face = c3dobj.emdesign.(id_emdesign).bc.(id_phydom).lid_face;
-        lmatrix = c3dobj.emdesign.(id_emdesign).bc.(id_phydom).gsibcwewe;
+        %id_face = obj.bc.(id_phydom).id_face;
+        gid_face = obj.bc.(id_phydom).gid_face;
+        lid_face = obj.bc.(id_phydom).lid_face;
+        lmatrix = obj.bc.(id_phydom).gsibcwewe;
         %------------------------------------------------------------------
         for igr = 1:length(lmatrix)
             id_face = gid_face{igr};
@@ -603,13 +597,13 @@ end
 % --- bc-bsfield
 % for iec = 1:length(id_bc__)
 %     id_phydom = id_bc__{iec};
-%     bc_type = c3dobj.emdesign.(id_emdesign).bc.(id_phydom).bc_type;
+%     bc_type = obj.bc.(id_phydom).bc_type;
 %     if any(f_strcmpi(bc_type,'bsfield'))
 %     end
 % end
 
 % %--------------------------------------------------------------------------
-% int_onfa_b = c3dobj.mesh3d.(id_mesh3d).rot * a_bc;
+% int_onfa_b = obj.discrete.rot * a_bc;
 % bv = f_field_wf(int_onfa_b,c3dobj.mesh3d.(id_mesh3d));
 % node = c3dobj.mesh3d.(id_mesh3d).celem;
 % vf = bv;
@@ -631,7 +625,7 @@ id_node_phi_unknown = setdiff(id_node_phi,...
 id_elem_air = setdiff(id_elem_airbox,[id_elem_nomesh id_elem_mcon]);
 id_face_in_elem_air = f_uniquenode(id_face_in_elem(:,id_elem_air));
 mu0 = 4 * pi * 1e-7;
-nu0wfwf = (1/mu0) .* c3dobj.emdesign.(id_emdesign).matrix.wfwfx;
+nu0wfwf = (1/mu0) .* obj.matrix.wfwfx;
 % ---
 nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) = ...
     nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) + ...
@@ -639,17 +633,17 @@ nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) = ...
 % ---
 %nu0nurwfwf = nu0nurwfwf + nu0wfwf;
 % ---
-% nu0wfwf = (1/mu0) .* c3dobj.emdesign.(id_emdesign).matrix.wfwf;
+% nu0wfwf = (1/mu0) .* obj.matrix.wfwf;
 % nu0nurwfwf = nu0wfwf;
 % ---
 sigmawewe = sigmawewe + gsibcwewe;
 % ---
-freq = c3dobj.emdesign.(id_emdesign).frequency;
+freq = obj.frequency;
 jome = 1j*2*pi*freq;
-S11  = c3dobj.mesh3d.(id_mesh3d).rot.' * nu0nurwfwf * c3dobj.mesh3d.(id_mesh3d).rot;
+S11  = obj.discrete.rot.' * nu0nurwfwf * obj.discrete.rot;
 S11  = S11 + jome .* sigmawewe;
-S12  = jome .* sigmawewe * c3dobj.mesh3d.(id_mesh3d).grad;
-S22  = jome .* c3dobj.mesh3d.(id_mesh3d).grad.' * sigmawewe * c3dobj.mesh3d.(id_mesh3d).grad;
+S12  = jome .* sigmawewe * obj.discrete.grad;
+S22  = jome .* obj.discrete.grad.' * sigmawewe * obj.discrete.grad;
 % --- dirichlet remove
 S11 = S11(id_edge_a_unknown,id_edge_a_unknown);
 S12 = S12(id_edge_a_unknown,:);
@@ -662,29 +656,29 @@ LHS = [LHS; S12.' S22]; clear S12 S22;
 
 %--------------------------------------------------------------------------
 % --- RHS
-% bsfieldRHS = - c3dobj.mesh3d.(id_mesh3d).rot.' * ...
+% bsfieldRHS = - obj.discrete.rot.' * ...
 %                nu0nurwfwf * ...
-%                c3dobj.mesh3d.(id_mesh3d).rot * a_bsfield;
-% pmagnetRHS =   c3dobj.mesh3d.(id_mesh3d).rot.' * ...
+%                obj.discrete.rot * a_bsfield;
+% pmagnetRHS =   obj.discrete.rot.' * ...
 %                nu0nurwfwf * ...
-%                c3dobj.mesh3d.(id_mesh3d).rot * a_pmagnet;
-% jscoilRHS  =   c3dobj.mesh3d.(id_mesh3d).rot.' * wewf.' * t_jsfield;
+%                obj.discrete.rot * a_pmagnet;
+% jscoilRHS  =   obj.discrete.rot.' * wewf.' * t_jsfield;
 % ---
-% bsfieldRHS = - c3dobj.mesh3d.(id_mesh3d).rot.' * ...
+% bsfieldRHS = - obj.discrete.rot.' * ...
 %                nu0wfwf * ...
-%                c3dobj.mesh3d.(id_mesh3d).rot * a_bsfield;
-% pmagnetRHS =   c3dobj.mesh3d.(id_mesh3d).rot.' * ...
+%                obj.discrete.rot * a_bsfield;
+% pmagnetRHS =   obj.discrete.rot.' * ...
 %                nu0wfwf * ...
-%                c3dobj.mesh3d.(id_mesh3d).rot * a_pmagnet;
-% jscoilRHS  =   c3dobj.mesh3d.(id_mesh3d).rot.' * wewf.' * t_jsfield;
+%                obj.discrete.rot * a_pmagnet;
+% jscoilRHS  =   obj.discrete.rot.' * wewf.' * t_jsfield;
 % ---
-bsfieldRHS = - c3dobj.mesh3d.(id_mesh3d).rot.' * ...
+bsfieldRHS = - obj.discrete.rot.' * ...
                nu0nurwfwf * ...
-               c3dobj.mesh3d.(id_mesh3d).rot * a_bsfield;
-pmagnetRHS =   c3dobj.mesh3d.(id_mesh3d).rot.' * ...
-               ((1/mu0).* c3dobj.emdesign.(id_emdesign).matrix.wfwf) * ...
-               c3dobj.mesh3d.(id_mesh3d).rot * a_pmagnet;
-jscoilRHS  =   c3dobj.mesh3d.(id_mesh3d).rot.' * wewf.' * t_jsfield;
+               obj.discrete.rot * a_bsfield;
+pmagnetRHS =   obj.discrete.rot.' * ...
+               ((1/mu0).* obj.matrix.wfwf) * ...
+               obj.discrete.rot * a_pmagnet;
+jscoilRHS  =   obj.discrete.rot.' * wewf.' * t_jsfield;
 %--------------------------------------------------------------------------
 RHS = bsfieldRHS + pmagnetRHS + jscoilRHS;
 RHS = RHS(id_edge_a_unknown,1);
@@ -693,17 +687,17 @@ RHS = [RHS; zeros(length(id_node_phi_unknown),1)];
 for iec = 1:length(id_coil__)
     %----------------------------------------------------------------------
     id_phydom = id_coil__{iec};
-    coil_type = c3dobj.emdesign.(id_emdesign).coil.(id_phydom).coil_type;
+    coil_type = obj.coil.(id_phydom).coil_type;
     if any(f_strcmpi(coil_type,{'open_iscoil'}))
         %------------------------------------------------------------------
         f_fprintf(0,'--- #coil/iscoil',1,id_phydom,0,'\n');
         %------------------------------------------------------------------
-        alpha  = c3dobj.emdesign.(id_emdesign).coil.(id_phydom).alpha;
-        i_coil = c3dobj.emdesign.(id_emdesign).coil.(id_phydom).i_coil;
+        alpha  = obj.coil.(id_phydom).alpha;
+        i_coil = obj.coil.(id_phydom).i_coil;
         %------------------------------------------------------------------
-        S13 = jome * (sigmawewe * c3dobj.mesh3d.(id_mesh3d).grad * alpha);
-        S23 = jome * (c3dobj.mesh3d.(id_mesh3d).grad.' * sigmawewe * c3dobj.mesh3d.(id_mesh3d).grad * alpha);
-        S33 = jome * (alpha.' * c3dobj.mesh3d.(id_mesh3d).grad.' * sigmawewe * c3dobj.mesh3d.(id_mesh3d).grad * alpha);
+        S13 = jome * (sigmawewe * obj.discrete.grad * alpha);
+        S23 = jome * (obj.discrete.grad.' * sigmawewe * obj.discrete.grad * alpha);
+        S33 = jome * (alpha.' * obj.discrete.grad.' * sigmawewe * obj.discrete.grad * alpha);
         S13 = S13(id_edge_a_unknown,1);
         S23 = S23(id_node_phi_unknown,1);
         LHS = [LHS [S13;  S23]];
@@ -714,15 +708,15 @@ for iec = 1:length(id_coil__)
         %------------------------------------------------------------------
         f_fprintf(0,'--- #coil/vscoil',1,id_phydom,0,'\n');
         %------------------------------------------------------------------
-        Voltage  = c3dobj.emdesign.(id_emdesign).coil.(id_phydom).v_petrode - ...
-                   c3dobj.emdesign.(id_emdesign).coil.(id_phydom).v_netrode;
-        alpha    = c3dobj.emdesign.(id_emdesign).coil.(id_phydom).alpha;
+        Voltage  = obj.coil.(id_phydom).v_petrode - ...
+                   obj.coil.(id_phydom).v_netrode;
+        alpha    = obj.coil.(id_phydom).alpha;
         %------------------------------------------------------------------
-        vRHSed = - sigmawewe * c3dobj.mesh3d.(id_mesh3d).grad * (alpha .* Voltage);
+        vRHSed = - sigmawewe * obj.discrete.grad * (alpha .* Voltage);
         vRHSed = vRHSed(id_edge_a_unknown);
         %------------------------------------------------------------------
-        vRHSno = - c3dobj.mesh3d.(id_mesh3d).grad.'  * sigmawewe * ...
-                   c3dobj.mesh3d.(id_mesh3d).grad * (alpha .* Voltage);
+        vRHSno = - obj.discrete.grad.'  * sigmawewe * ...
+                   obj.discrete.grad * (alpha .* Voltage);
         vRHSno = vRHSno(id_node_phi_unknown);
         %------------------------------------------------------------------
         RHS = RHS + [vRHSed; vRHSno];
@@ -749,41 +743,41 @@ end
 for iec = 1:length(id_coil__)
     %----------------------------------------------------------------------
     id_phydom = id_coil__{iec};
-    coil_type = c3dobj.emdesign.(id_emdesign).coil.(id_phydom).coil_type;
+    coil_type = obj.coil.(id_phydom).coil_type;
     %----------------------------------------------------------------------
     id_dphi = 0;
     if any(f_strcmpi(coil_type,{'open_iscoil'}))
         %------------------------------------------------------------------
-        alpha  = c3dobj.emdesign.(id_emdesign).coil.(id_phydom).alpha;
-        i_coil = c3dobj.emdesign.(id_emdesign).coil.(id_phydom).i_coil;
+        alpha  = obj.coil.(id_phydom).alpha;
+        i_coil = obj.coil.(id_phydom).i_coil;
         %------------------------------------------------------------------
         id_dphi = id_dphi + 1;
         %------------------------------------------------------------------
         Voltage = jome .* dphiv(id_dphi);
         phiv = phiv + 1/jome .* (alpha .* Voltage);
         %------------------------------------------------------------------
-        int_oned_e = -jome .* (int_oned_a + c3dobj.mesh3d.(id_mesh3d).grad * phiv);
-        Current = -(sigmawewe * int_oned_e).' * (c3dobj.mesh3d.(id_mesh3d).grad * alpha);
+        int_oned_e = -jome .* (int_oned_a + obj.discrete.grad * phiv);
+        Current = -(sigmawewe * int_oned_e).' * (obj.discrete.grad * alpha);
         %------------------------------------------------------------------
-        c3dobj.emdesign.(id_emdesign).coil.(id_phydom).Voltage = Voltage;
-        c3dobj.emdesign.(id_emdesign).coil.(id_phydom).Current = Current;
-        c3dobj.emdesign.(id_emdesign).coil.(id_phydom).Z = Voltage/i_coil;
+        obj.coil.(id_phydom).Voltage = Voltage;
+        obj.coil.(id_phydom).Current = Current;
+        obj.coil.(id_phydom).Z = Voltage/i_coil;
         %------------------------------------------------------------------
     elseif any(f_strcmpi(coil_type,{'open_vscoil'}))
         %------------------------------------------------------------------
-        Voltage  = c3dobj.emdesign.(id_emdesign).coil.(id_phydom).v_petrode - ...
-                   c3dobj.emdesign.(id_emdesign).coil.(id_phydom).v_netrode;
-        alpha    = c3dobj.emdesign.(id_emdesign).coil.(id_phydom).alpha;
+        Voltage  = obj.coil.(id_phydom).v_petrode - ...
+                   obj.coil.(id_phydom).v_netrode;
+        alpha    = obj.coil.(id_phydom).alpha;
         %------------------------------------------------------------------
         phiv = phiv + 1/jome .* (alpha .* Voltage);
         %------------------------------------------------------------------
-        int_oned_e = -jome .* (int_oned_a + c3dobj.mesh3d.(id_mesh3d).grad * phiv);
-        i_coil = -(sigmawewe * int_oned_e).' * (c3dobj.mesh3d.(id_mesh3d).grad * alpha);
+        int_oned_e = -jome .* (int_oned_a + obj.discrete.grad * phiv);
+        i_coil = -(sigmawewe * int_oned_e).' * (obj.discrete.grad * alpha);
         Current = i_coil;
         %------------------------------------------------------------------
-        c3dobj.emdesign.(id_emdesign).coil.(id_phydom).Voltage = Voltage;
-        c3dobj.emdesign.(id_emdesign).coil.(id_phydom).Current = Current;
-        c3dobj.emdesign.(id_emdesign).coil.(id_phydom).Z = Voltage/Current;
+        obj.coil.(id_phydom).Voltage = Voltage;
+        obj.coil.(id_phydom).Current = Current;
+        obj.coil.(id_phydom).Z = Voltage/Current;
     end
 end
 
@@ -853,7 +847,7 @@ patch(msh);
 view(3);
 
 %--------------------------------------------------------------------------
-int_onfa_b = c3dobj.mesh3d.(id_mesh3d).rot * int_oned_a;
+int_onfa_b = obj.discrete.rot * int_oned_a;
 bv = f_field_wf(int_onfa_b,c3dobj.mesh3d.(id_mesh3d));
 % ---
 node = c3dobj.mesh3d.(id_mesh3d).celem;
@@ -876,9 +870,9 @@ f_quiver(node,imag(vf));
 
 
 %--------------------------------------------------------------------------
-int_oned_e = -jome .* (int_oned_a + c3dobj.mesh3d.(id_mesh3d).grad * phiv);
+int_oned_e = -jome .* (int_oned_a + obj.discrete.grad * phiv);
 %int_oned_e = -jome .* (int_oned_a);
-%int_oned_e = -jome .* (c3dobj.mesh3d.(id_mesh3d).grad * phiv);
+%int_oned_e = -jome .* (obj.discrete.grad * phiv);
 ev = f_field_we(int_oned_e,c3dobj.mesh3d.(id_mesh3d));
 % ---
 node = c3dobj.mesh3d.(id_mesh3d).celem;
@@ -897,11 +891,11 @@ id_edge_in_face = c3dobj.mesh3d.(id_mesh3d).id_edge_in_face;
 
 %--------------------------------------------------------------------------
 dom_name = 'sibc1';
-sigma_array = c3dobj.emdesign.(id_emdesign).bc.(dom_name).sigma;
-skindepth = c3dobj.emdesign.(id_emdesign).bc.(dom_name).skindepth;
-facemesh = c3dobj.emdesign.(id_emdesign).bc.(dom_name).facemesh;
-gid_face = c3dobj.emdesign.(id_emdesign).bc.(dom_name).gid_face;
-lid_face = c3dobj.emdesign.(id_emdesign).bc.(dom_name).lid_face;
+sigma_array = obj.bc.(dom_name).sigma;
+skindepth = obj.bc.(dom_name).skindepth;
+facemesh = obj.bc.(dom_name).facemesh;
+gid_face = obj.bc.(dom_name).gid_face;
+lid_face = obj.bc.(dom_name).lid_face;
 for i = 1:length(facemesh)
     face = facemesh{i}.elem;
     elem_type = facemesh{i}.elem_type;
@@ -919,11 +913,11 @@ for i = 1:length(facemesh)
 end
 %--------------------------------------------------------------------------
 dom_name = 'sibc2';
-sigma_array = c3dobj.emdesign.(id_emdesign).bc.(dom_name).sigma;
-skindepth = c3dobj.emdesign.(id_emdesign).bc.(dom_name).skindepth;
-facemesh = c3dobj.emdesign.(id_emdesign).bc.(dom_name).facemesh;
-gid_face = c3dobj.emdesign.(id_emdesign).bc.(dom_name).gid_face;
-lid_face = c3dobj.emdesign.(id_emdesign).bc.(dom_name).lid_face;
+sigma_array = obj.bc.(dom_name).sigma;
+skindepth = obj.bc.(dom_name).skindepth;
+facemesh = obj.bc.(dom_name).facemesh;
+gid_face = obj.bc.(dom_name).gid_face;
+lid_face = obj.bc.(dom_name).lid_face;
 for i = 1:length(facemesh)
     face = facemesh{i}.elem;
     elem_type = facemesh{i}.elem_type;
@@ -1039,8 +1033,8 @@ for iec = 1:length(id_econductor__)
     %----------------------------------------------------------------------
     id_phydom = id_econductor__{iec};
     %----------------------------------------------------------------------
-    id_elem = c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).id_elem;
-    sigma_array = c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).sigma_array;
+    id_elem = obj.econductor.(id_phydom).id_elem;
+    sigma_array = obj.econductor.(id_phydom).sigma_array;
     %----------------------------------------------------------------------
     jv(:,id_elem) = f_cxvf(sigma_array,ev(:,id_elem));
 end
@@ -1060,8 +1054,8 @@ jv = sparse(3,nb_elem);
 %----------------------------------------------------------------------
 id_phydom = 'plate_2';
 %----------------------------------------------------------------------
-id_elem = c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).id_elem;
-sigma_array = c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).sigma_array;
+id_elem = obj.econductor.(id_phydom).id_elem;
+sigma_array = obj.econductor.(id_phydom).sigma_array;
 %----------------------------------------------------------------------
 jv(:,id_elem) = f_cxvf(sigma_array,ev(:,id_elem));
 
