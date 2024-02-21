@@ -87,6 +87,18 @@ classdef EmModel < Xhandle
         end
         % -----------------------------------------------------------------
         function add_nomesh(obj,args)
+            arguments
+                obj
+                % ---
+                args.id = 'no_id'
+                args.id_dom2d = []
+                args.id_dom3d = []
+            end
+            % ---
+            args.parent_model = obj;
+            % ---
+            phydom = Nomesh(args);
+            obj.nomesh.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
         function add_sibc(obj,args)
