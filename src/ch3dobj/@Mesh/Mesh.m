@@ -30,7 +30,10 @@ classdef Mesh < Xhandle
         discrete
         intkit
         % ---
-        is_build
+        is_build = 0
+        meshds_to_be_rebuild = 1
+        discrete_to_be_rebuild = 1
+        intkit_to_be_rebuild = 1
         % --- submesh
         parent_mesh
         gid_node

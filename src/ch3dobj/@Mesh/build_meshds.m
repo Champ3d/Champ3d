@@ -21,6 +21,9 @@ arguments
          'div','grad','curl'})} = 'all'
 end
 %--------------------------------------------------------------------------
+obj.meshds_to_be_rebuild = 0;
+obj.discrete_to_be_rebuild = 0;
+%--------------------------------------------------------------------------
 tic
 f_fprintf(0,'Make #meshds \n');
 fprintf('   ');

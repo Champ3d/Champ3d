@@ -10,6 +10,8 @@
 
 function obj = build_intkit(obj)
 
+obj.intkit_to_be_rebuild = 0;
+
 %--------------------------------------------------------------
 tic
 f_fprintf(0,'Make #intkit \n');
