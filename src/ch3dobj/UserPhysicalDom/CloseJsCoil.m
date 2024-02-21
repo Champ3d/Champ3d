@@ -11,6 +11,8 @@
 classdef CloseJsCoil < CloseCoil
     properties
         js
+        nb_turn = 1
+        cs_area = 1
     end
 
     % --- Contructor
@@ -18,8 +20,15 @@ classdef CloseJsCoil < CloseCoil
         function obj = CloseJsCoil(args)
             obj = obj@CloseCoil(args);
             obj <= args;
+            % ---
             if isnumeric(obj.js)
                 obj.js = Parameter('f',obj.js);
+            end
+            if isnumeric(obj.nb_turn)
+                obj.nb_turn = Parameter('f',obj.nb_turn);
+            end
+            if isnumeric(obj.cs_area)
+                obj.cs_area = Parameter('f',obj.cs_area);
             end
         end
     end

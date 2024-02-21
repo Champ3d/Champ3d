@@ -163,7 +163,9 @@ classdef EmModel < Xhandle
                 args.id_dom2d = []
                 args.id_dom3d = []
                 args.id_electrode_dom3d = []
-                args.js = []
+                args.js = 1
+                args.nb_turn = 1
+                args.cs_area = 1
             end
             % ---
             args.parent_model = obj;

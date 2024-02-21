@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef CutVolumeDom3d < VolumeDom
+classdef CutVolumeDom3d < VolumeDom3d
 
     % --- Properties
     properties
@@ -33,7 +33,7 @@ classdef CutVolumeDom3d < VolumeDom
                 args.cut_equation = []
             end
             % ---
-            obj = obj@VolumeDom;
+            obj = obj@VolumeDom3d;
             % ---
             obj <= args;
             % ---
