@@ -17,9 +17,6 @@ if isempty(obj.airbox)
     obj.add_airbox('id','default_airbox','id_dom3d','default_domain');
 end
 % ---
-gid_elem = [];
-gid_inner_edge = [];
-% ---
 phydom_type = 'airbox';
 % ---
 allphydom = fieldnames(obj.(phydom_type));
@@ -31,12 +28,16 @@ for i = 1:length(allphydom)
     phydom = obj.(phydom_type).(id_phydom);
     dom = phydom.dom;
     % ---
-    gid_elem = [gid_elem dom.gid.gid_elem];
-    gid_inner_edge = [gid_inner_edge dom.gid.gid_inner_edge];
+    if ~phydom.to_be_rebuild
+        break
+    end
     % ---
-    obj.(phydom_type).(id_phydom).matrix.gid_elem = gid_elem;
-    obj.(phydom_type).(id_phydom).matrix.gid_inner_edge = gid_inner_edge;
+    f_fprintf(0,['Build #' phydom_type],1,id_phydom,0,'\n');
     % ---
+    obj.(phydom_type).(id_phydom).matrix.gid_elem = dom.gid.gid_elem;
+    obj.(phydom_type).(id_phydom).matrix.gid_inner_edge = dom.gid.gid_inner_edge;
+    % ---
+    phydom.to_be_rebuild = 0;
 end
 
 end

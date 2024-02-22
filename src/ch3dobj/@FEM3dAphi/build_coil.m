@@ -26,6 +26,12 @@ for i = 1:length(allphydom)
     phydom = obj.(phydom_type).(id_phydom);
     dom = phydom.dom;
     % ---
+    if ~phydom.to_be_rebuild
+        break
+    end
+    % ---
+    f_fprintf(0,['Build #' phydom_type],1,id_phydom,0,'\n');
+    % ---
     parent_mesh = dom.parent_mesh;
     % --- current field
     current_field = sparse(3,parent_mesh.nb_elem);
@@ -109,6 +115,7 @@ for i = 1:length(allphydom)
         obj.(phydom_type).(id_phydom).matrix.wfjs = wfjs;
     end
     % ---------------------------------------------------------------------
+    phydom.to_be_rebuild = 0;
     % ---------------------------------------------------------------------
     % ---------------------------------------------------------------------
     % ---------------------------------------------------------------------

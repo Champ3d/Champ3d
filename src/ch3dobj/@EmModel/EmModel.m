@@ -28,6 +28,7 @@ classdef EmModel < Xhandle
         % ---
         matrix
         fields
+        dof
     end
 
     % --- Constructor

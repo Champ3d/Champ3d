@@ -25,6 +25,12 @@ for i = 1:length(allphydom)
     phydom = obj.(phydom_type).(id_phydom);
     dom = phydom.dom;
     % ---
+    if ~phydom.to_be_rebuild
+        break
+    end
+    % ---
+    f_fprintf(0,['Build #' phydom_type],1,id_phydom,0,'\n');
+    % ---
     parent_mesh = dom.parent_mesh;
     gid_elem    = dom.gid_elem;
     % ---
@@ -37,6 +43,7 @@ for i = 1:length(allphydom)
     obj.(phydom_type).(id_phydom).matrix.gid_elem = gid_elem;
     obj.(phydom_type).(id_phydom).matrix.nu0nurwfwf = nu0nurwfwf;
     % ---
+    phydom.to_be_rebuild = 0;
 end
 
 end

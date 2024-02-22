@@ -10,10 +10,6 @@
 
 function build_nomesh(obj)
 % ---
-gid_elem = [];
-gid_inner_edge = [];
-gid_inner_node = [];
-% ---
 phydom_type = 'nomesh';
 % ---
 if isempty(obj.(phydom_type))
@@ -29,14 +25,17 @@ for i = 1:length(allphydom)
     phydom = obj.(phydom_type).(id_phydom);
     dom = phydom.dom;
     % ---
-    gid_elem = [gid_elem dom.gid.gid_elem];
-    gid_inner_edge = [gid_inner_edge dom.gid.gid_inner_edge];
-    gid_inner_node = [gid_inner_node dom.gid.gid_inner_edge];
+    if ~phydom.to_be_rebuild
+        break
+    end
     % ---
-    obj.(phydom_type).(id_phydom).matrix.gid_elem = gid_elem;
-    obj.(phydom_type).(id_phydom).matrix.gid_inner_edge = gid_inner_edge;
-    obj.(phydom_type).(id_phydom).matrix.gid_inner_node = gid_inner_node;
+    f_fprintf(0,['Build #' phydom_type],1,id_phydom,0,'\n');
     % ---
+    obj.(phydom_type).(id_phydom).matrix.gid_elem = dom.gid.gid_elem;
+    obj.(phydom_type).(id_phydom).matrix.gid_inner_edge = dom.gid.gid_inner_edge;
+    obj.(phydom_type).(id_phydom).matrix.gid_inner_node = dom.gid.gid_inner_node;
+    % ---
+    phydom.to_be_rebuild = 0;
 end
 
 end

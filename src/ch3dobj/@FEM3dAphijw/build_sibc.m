@@ -9,6 +9,7 @@
 %--------------------------------------------------------------------------
 
 function build_sibc(obj)
+
 phydom_type = 'sibc';
 % ---
 if isempty(obj.(phydom_type))
@@ -23,6 +24,12 @@ for i = 1:length(allphydom)
     % ---
     phydom = obj.(phydom_type).(id_phydom);
     dom = phydom.dom;
+    % ---
+    if ~phydom.to_be_rebuild
+        break
+    end
+    % ---
+    f_fprintf(0,['Build #' phydom_type],1,id_phydom,0,'\n');
     % ---
     gid_face = dom.gid_face;
     nb_face  = length(gid_face);
@@ -59,5 +66,6 @@ for i = 1:length(allphydom)
     obj.(phydom_type).(id_phydom).matrix.gsibcwewe = gsibcwewe;
     obj.(phydom_type).(id_phydom).matrix.gid_face = gid_face_;
     % ---
+    phydom.to_be_rebuild = 0;
 end
 end
