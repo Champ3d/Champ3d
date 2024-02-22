@@ -79,5 +79,111 @@ classdef PhysicalDom < Xhandle
             obj.dom.plot(argu{:});
         end
         % -----------------------------------------------------------------
+        function plotjv(obj,args)
+            arguments
+                obj
+                args.show_dom = 1
+            end
+            % ---
+            obj.plotfieldv('show_dom',args.show_dom,'field_name','jv')
+        end
+        % -----------------------------------------------------------------
+        function plotev(obj,args)
+            arguments
+                obj
+                args.show_dom = 1
+            end
+            % ---
+            obj.plotfieldv('show_dom',args.show_dom,'field_name','ev')
+        end
+        % -----------------------------------------------------------------
+        function plotbv(obj,args)
+            arguments
+                obj
+                args.show_dom = 1
+            end
+            % ---
+            obj.plotfieldv('show_dom',args.show_dom,'field_name','bv')
+        end
+        % -----------------------------------------------------------------
+        function plotjs(obj,args)
+            arguments
+                obj
+                args.show_dom = 1
+            end
+            % ---
+            if args.show_dom
+                obj.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
+            end
+            % ---
+            sdom = obj.dom;
+            if isa(sdom,'SurfaceDom3d')
+                id_face = sdom.gid_face;
+                face = obj.parent_model.parent_mesh.face(:,id_face);
+                node = obj.parent_model.parent_mesh.node;
+                js   = obj.parent_model.fields.js(:,id_face);
+                js   = f_magnitude(js);
+                %--------------------------------------------------------------
+                clear msh;
+                %--------------------------------------------------------------
+                msh.Vertices  = node.';
+                msh.FaceColor = 'none';
+                msh.EdgeColor = 'none'; % [0.7 0.7 0.7] --> gray
+                %--------------------------------------------------------------
+                id_tria = find(face(4,:) == 0);
+                id_quad = setdiff(1:length(js),id_tria);
+                % ---
+                if ~isempty(id_tria)
+                    msh.Faces = f_unique(face(1:3,id_tria)).';
+                    msh.FaceVertexCData = f_tocolv(full(js(itria)));
+                    msh.FaceColor = 'flat';
+                    patch(msh); hold on
+                end
+                % ---
+                if ~isempty(id_quad)
+                    msh.Faces = f_unique(face(1:4,id_quad)).';
+                    msh.FaceVertexCData = f_tocolv(full(js(id_quad)));
+                    msh.FaceColor = 'flat';
+                    patch(msh); hold on
+                end
+                % ---
+                axis equal; axis tight; alpha(alpha_); view(3); hold on
+                %--------------------------------------------------------------
+                f_chlogo;
+            end
+        end
+        % -----------------------------------------------------------------
+        
+    end
+
+    % --- Methods
+    methods (Hidden)
+        function plotfieldv(obj,args)
+            arguments
+                obj
+                args.show_dom = 1
+                args.field_name = []
+            end
+            % ---
+            if args.show_dom
+                obj.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
+            end
+            % ---
+            if isa(obj.dom,'VolumeDom3d')
+                id_elem = obj.dom.gid_elem;
+                fv = obj.parent_model.fields.(args.field_name)(:,id_elem);
+                no = obj.parent_model.parent_mesh.celem(:,id_elem);
+                if isreal(fv)
+                    f_quiver(no,fv);
+                else
+                    subplot(121);
+                    f_quiver(no,real(fv)); title('Real part')
+                    subplot(122);
+                    f_quiver(no,imag(fv)); title('Imag part')
+                end
+            end
+        end
+        % -----------------------------------------------------------------
+        
     end
 end

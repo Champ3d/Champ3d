@@ -82,6 +82,10 @@ elseif size(vector_field,1) >  length(id_elem) && ...
     vfx = vector_field(id_elem,1);
     vfy = vector_field(id_elem,2);
     vfz = vector_field(id_elem,3);
+else
+    vfx = vector_field(:,1);
+    vfy = vector_field(:,2);
+    vfz = vector_field(:,3);
 end
 %--------------------------------------------------------------------------
 if any(strcmpi(coef_array_type,{'scalar'}))

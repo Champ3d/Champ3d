@@ -65,6 +65,7 @@ for i = 1:length(allphydom)
     % ---
     obj.(phydom_type).(id_phydom).matrix.gsibcwewe = gsibcwewe;
     obj.(phydom_type).(id_phydom).matrix.gid_face = gid_face_;
+    obj.(phydom_type).(id_phydom).matrix.sigma_array = sigma_array;
     % ---
     phydom.to_be_rebuild = 0;
 end

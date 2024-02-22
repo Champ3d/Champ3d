@@ -697,27 +697,61 @@ for iec = 1:length(id_econductor__)
     [coefficient, coef_array_type] = ...
         obj.column_format(obj.econductor.(id_phydom).matrix.sigma_array);
     %----------------------------------------------------------------------
+    id_elem = obj.econductor.(id_phydom).matrix.gid_elem;
+    %----------------------------------------------------------------------
     if any(f_strcmpi(coef_array_type,{'scalar'}))
         %------------------------------------------------------------------
-        obj.fields.jv(1,:) = coefficient .* obj.fields.ev(1,:);
+        obj.fields.jv(1,id_elem) = coefficient .* obj.fields.ev(1,id_elem);
         %------------------------------------------------------------------
     elseif any(f_strcmpi(coef_array_type,{'tensor'}))
         %------------------------------------------------------------------
-        obj.fields.jv(1,:) = coefficient(:,1,1) .* obj.fields.ev(1,:) + ...
-                             coefficient(:,1,2) .* obj.fields.ev(2,:) + ...
-                             coefficient(:,1,3) .* obj.fields.ev(3,:);
-        obj.fields.jv(2,:) = coefficient(:,2,1) .* obj.fields.ev(1,:) + ...
-                             coefficient(:,2,2) .* obj.fields.ev(2,:) + ...
-                             coefficient(:,2,3) .* obj.fields.ev(3,:);
-        obj.fields.jv(3,:) = coefficient(:,3,1) .* obj.fields.ev(1,:) + ...
-                             coefficient(:,3,2) .* obj.fields.ev(2,:) + ...
-                             coefficient(:,3,3) .* obj.fields.ev(3,:);
+        obj.fields.jv(1,id_elem) = coefficient(:,1,1).' .* obj.fields.ev(1,id_elem) + ...
+                                   coefficient(:,1,2).' .* obj.fields.ev(2,id_elem) + ...
+                                   coefficient(:,1,3).' .* obj.fields.ev(3,id_elem);
+        obj.fields.jv(2,id_elem) = coefficient(:,2,1).' .* obj.fields.ev(1,id_elem) + ...
+                                   coefficient(:,2,2).' .* obj.fields.ev(2,id_elem) + ...
+                                   coefficient(:,2,3).' .* obj.fields.ev(3,id_elem);
+        obj.fields.jv(3,id_elem) = coefficient(:,3,1).' .* obj.fields.ev(1,id_elem) + ...
+                                   coefficient(:,3,2).' .* obj.fields.ev(2,id_elem) + ...
+                                   coefficient(:,3,3).' .* obj.fields.ev(3,id_elem);
     end
 end
 
-
-
-
+% ---
+es = sparse(2,nb_face);
+js = sparse(2,nb_face);
+for iec = 1:length(id_sibc__)
+    %----------------------------------------------------------------------
+    id_phydom = id_sibc__{iec};
+    phydom = obj.sibc.(id_phydom);
+    dom = phydom.dom;
+    %----------------------------------------------------------------------
+    sigma_array  = phydom.sigma.get_on(dom);
+    % ---
+    dom.build_submesh;
+    submesh = dom.submesh;
+    for k = 1:length(submesh)
+        sm = submesh{k};
+        sm.build_intkit;
+        % ---
+        id_face = sm.gid_face;
+        cWes = sm.intkit.cWe{1};
+        % ---
+        if any(f_strcmpi(sm.elem_type,'tri'))
+            dofe = obj.dof.e(id_edge_in_face(1:3,id_face)).';
+        elseif any(f_strcmpi(sm.elem_type,'quad'))
+            dofe = obj.dof.e(id_edge_in_face(1:4,id_face)).';
+        end
+        %------------------------------------------------------------------
+        es(1,id_face) = es(1,id_face) + sum(squeeze(cWes(:,1,:)) .* dofe,2).';
+        es(2,id_face) = es(2,id_face) + sum(squeeze(cWes(:,2,:)) .* dofe,2).';
+        js(1,id_face) = sigma_array .* es(1,id_face);
+        js(2,id_face) = sigma_array .* es(2,id_face);
+    end
+end
+% -------------------------------------------------------------------------
+obj.fields.js = js;
+obj.fields.es = es;
 
 
 
