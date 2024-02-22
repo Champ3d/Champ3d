@@ -84,12 +84,12 @@ end
 tic;
 f_fprintf(0,'Assembly',1,em_model,0,'\n');
 %--------------------------------------------------------------------------
-con = f_connexion(c3dobj.mesh3d.(id_mesh3d).elem_type);
+con = f_connexion(obj.elem_type);
 nbEd_inEl = con.nbEd_inEl;
 nbFa_inEl = con.nbFa_inEl;
-id_edge_in_elem = c3dobj.mesh3d.(id_mesh3d).id_edge_in_elem;
-id_edge_in_face = c3dobj.mesh3d.(id_mesh3d).id_edge_in_face;
-id_face_in_elem = c3dobj.mesh3d.(id_mesh3d).id_face_in_elem;
+id_edge_in_elem = obj.meshds.id_edge_in_elem;
+id_edge_in_face = obj.meshds.id_edge_in_face;
+id_face_in_elem = obj.meshds.id_face_in_elem;
 %--------------------------------------------------------------------------
 % --- nomesh
 id_elem_nomesh = [];
@@ -101,9 +101,9 @@ for iec = 1:length(id_nomesh__)
     %----------------------------------------------------------------------
     f_fprintf(0,'--- #nomesh',1,id_phydom,0,'\n');
     %----------------------------------------------------------------------
-    id_elem = obj.nomesh.(id_phydom).id_elem;
-    id_inner_edge = obj.nomesh.(id_phydom).id_inner_edge;
-    id_inner_node = obj.nomesh.(id_phydom).id_inner_node;
+    id_elem = obj.nomesh.(id_phydom).matrix.gid_elem;
+    id_inner_edge = obj.nomesh.(id_phydom).matrix.gid_inner_edge;
+    id_inner_node = obj.nomesh.(id_phydom).matrix.gid_inner_node;
     %----------------------------------------------------------------------
     id_elem_nomesh = [id_elem_nomesh id_elem];
     id_inner_edge_nomesh = [id_inner_edge_nomesh f_torowv(id_inner_edge)];
@@ -443,8 +443,8 @@ for iec = 1:length(id_coil__)
 end
 %--------------------------------------------------------------------------
 int_onfa_js = obj.discrete.rot * t_jsfield;
-jsv = f_field_wf(int_onfa_js,c3dobj.mesh3d.(id_mesh3d));
-node = c3dobj.mesh3d.(id_mesh3d).celem;
+jsv = f_field_wf(int_onfa_js,obj);
+node = obj.celem;
 vf = jsv;
 figure
 f_quiver(node,vf);
@@ -485,8 +485,8 @@ for iec = 1:length(id_bsfield__)
 end
 %--------------------------------------------------------------------------
 int_onfa_b = obj.discrete.rot * a_bsfield;
-bv = f_field_wf(int_onfa_b,c3dobj.mesh3d.(id_mesh3d));
-node = c3dobj.mesh3d.(id_mesh3d).celem;
+bv = f_field_wf(int_onfa_b,obj);
+node = obj.celem;
 vf = bv;
 figure
 f_quiver(node,vf);
@@ -527,8 +527,8 @@ for iec = 1:length(id_pmagnet__)
 end
 %--------------------------------------------------------------------------
 int_onfa_b = obj.discrete.rot * a_pmagnet;
-bv = f_field_wf(int_onfa_b,c3dobj.mesh3d.(id_mesh3d));
-node = c3dobj.mesh3d.(id_mesh3d).celem;
+bv = f_field_wf(int_onfa_b,obj);
+node = obj.celem;
 vf = bv;
 figure
 f_quiver(node,vf);
@@ -604,8 +604,8 @@ end
 
 % %--------------------------------------------------------------------------
 % int_onfa_b = obj.discrete.rot * a_bc;
-% bv = f_field_wf(int_onfa_b,c3dobj.mesh3d.(id_mesh3d));
-% node = c3dobj.mesh3d.(id_mesh3d).celem;
+% bv = f_field_wf(int_onfa_b,obj);
+% node = obj.celem;
 % vf = bv;
 % figure
 % f_quiver(node,vf);
@@ -787,9 +787,9 @@ end
 
 
 %--------------------------------------------------------------------------
-av = f_field_we(int_oned_a,c3dobj.mesh3d.(id_mesh3d));
+av = f_field_we(int_oned_a,obj);
 % ---
-node = c3dobj.mesh3d.(id_mesh3d).celem;
+node = obj.celem;
 vf = av;
 figure
 subplot(121)
@@ -797,9 +797,9 @@ f_quiver(node,real(vf));
 subplot(122)
 f_quiver(node,imag(vf));
 % ---
-inode = find(c3dobj.mesh3d.(id_mesh3d).celem(3,:) > 0.02 & ...
-             c3dobj.mesh3d.(id_mesh3d).celem(3,:) < 0.04);
-node = c3dobj.mesh3d.(id_mesh3d).celem(:,inode);
+inode = find(obj.celem(3,:) > 0.02 & ...
+             obj.celem(3,:) < 0.04);
+node = obj.celem(:,inode);
 vf = av(:,inode);
 figure
 subplot(121)
@@ -808,18 +808,18 @@ subplot(122)
 f_quiver(node,imag(vf));
 
 %--------------------------------------------------------------------------
-node = c3dobj.mesh3d.(id_mesh3d).node;
+node = obj.node;
 id_dom = 'plate_1_surface';
-if isfield(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom),'id_elem')
-    if ~isempty(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_elem)
-        id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_elem;
-        elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
+if isfield(obj.dom3d.(id_dom),'id_elem')
+    if ~isempty(obj.dom3d.(id_dom).id_elem)
+        id_elem = obj.dom3d.(id_dom).id_elem;
+        elem = obj.elem(:,id_elem);
         face = f_boundface(elem,node,'elem_type',elem_type);
     end
-elseif isfield(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom),'id_face')
-    if ~isempty(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_face)
-        id_face = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_face;
-        face = c3dobj.mesh3d.(id_mesh3d).face(:,id_face);
+elseif isfield(obj.dom3d.(id_dom),'id_face')
+    if ~isempty(obj.dom3d.(id_dom).id_face)
+        id_face = obj.dom3d.(id_dom).id_face;
+        face = obj.face(:,id_face);
     end
 end
 sf   = imag(phiv);
@@ -848,9 +848,9 @@ view(3);
 
 %--------------------------------------------------------------------------
 int_onfa_b = obj.discrete.rot * int_oned_a;
-bv = f_field_wf(int_onfa_b,c3dobj.mesh3d.(id_mesh3d));
+bv = f_field_wf(int_onfa_b,obj);
 % ---
-node = c3dobj.mesh3d.(id_mesh3d).celem;
+node = obj.celem;
 vf = bv;
 figure
 subplot(121)
@@ -858,9 +858,9 @@ f_quiver(node,real(vf));
 subplot(122)
 f_quiver(node,imag(vf));
 % ---
-inode = find(c3dobj.mesh3d.(id_mesh3d).celem(3,:) > 0.02 & ...
-             c3dobj.mesh3d.(id_mesh3d).celem(3,:) < 0.04);
-node = c3dobj.mesh3d.(id_mesh3d).celem(:,inode);
+inode = find(obj.celem(3,:) > 0.02 & ...
+             obj.celem(3,:) < 0.04);
+node = obj.celem(:,inode);
 vf = bv(:,inode);
 figure
 subplot(121)
@@ -873,9 +873,9 @@ f_quiver(node,imag(vf));
 int_oned_e = -jome .* (int_oned_a + obj.discrete.grad * phiv);
 %int_oned_e = -jome .* (int_oned_a);
 %int_oned_e = -jome .* (obj.discrete.grad * phiv);
-ev = f_field_we(int_oned_e,c3dobj.mesh3d.(id_mesh3d));
+ev = f_field_we(int_oned_e,obj);
 % ---
-node = c3dobj.mesh3d.(id_mesh3d).celem;
+node = obj.celem;
 vf = ev;
 figure
 subplot(121)
@@ -884,10 +884,10 @@ subplot(122)
 f_quiver(node,imag(vf));
 
 %--------------------------------------------------------------------------
-nb_face = size(c3dobj.mesh3d.(id_mesh3d).face,2);
+nb_face = size(obj.face,2);
 es = sparse(2,nb_face);
 js = sparse(2,nb_face);
-id_edge_in_face = c3dobj.mesh3d.(id_mesh3d).id_edge_in_face;
+id_edge_in_face = obj.id_edge_in_face;
 
 %--------------------------------------------------------------------------
 dom_name = 'sibc1';
@@ -934,20 +934,20 @@ for i = 1:length(facemesh)
     js(2,id_face) = sigma_array .* es(2,id_face);
 end
 %--------------------------------------------------------------------------
-node = c3dobj.mesh3d.(id_mesh3d).node;
+node = obj.node;
 id_dom = 'plate_1_surface'; % 
-if isfield(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom),'id_elem')
-    if ~isempty(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_elem)
-        id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_elem;
-        elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
-        face = f_boundface(elem,node,'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
+if isfield(obj.dom3d.(id_dom),'id_elem')
+    if ~isempty(obj.dom3d.(id_dom).id_elem)
+        id_elem = obj.dom3d.(id_dom).id_elem;
+        elem = obj.elem(:,id_elem);
+        face = f_boundface(elem,node,'elem_type',obj.elem_type);
         id_face = f_findvecnd(face, ...
-                              c3dobj.mesh3d.(id_mesh3d).face);
+                              obj.face);
     end
-elseif isfield(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom),'id_face')
-    if ~isempty(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_face)
-        id_face = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_face;
-        face = c3dobj.mesh3d.(id_mesh3d).face(:,id_face);
+elseif isfield(obj.dom3d.(id_dom),'id_face')
+    if ~isempty(obj.dom3d.(id_dom).id_face)
+        id_face = obj.dom3d.(id_dom).id_face;
+        face = obj.face(:,id_face);
     end
 end
 sf   = f_magnitude(js);
@@ -963,7 +963,7 @@ iquad = id_face(iquad);
 figure
 if ~isempty(itria)
     msh = [];
-    msh.Faces = c3dobj.mesh3d.(id_mesh3d).face(1:3,itria).';
+    msh.Faces = obj.face(1:3,itria).';
     msh.Vertices = node.';
     msh.FaceVertexCData = f_tocolv(full(sf(itria)));
     msh.FaceColor = 'flat';
@@ -972,7 +972,7 @@ if ~isempty(itria)
 end
 if ~isempty(iquad)
     msh = [];
-    msh.Faces = c3dobj.mesh3d.(id_mesh3d).face(1:4,iquad).';
+    msh.Faces = obj.face(1:4,iquad).';
     msh.Vertices = node.';
     msh.FaceVertexCData = f_tocolv(full(sf(iquad)));
     msh.FaceColor = 'flat';
@@ -981,20 +981,20 @@ if ~isempty(iquad)
 end
 
 %--------------------------------------------------------------------------
-node = c3dobj.mesh3d.(id_mesh3d).node;
+node = obj.node;
 id_dom = 'coil_surface'; % 
-if isfield(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom),'id_elem')
-    if ~isempty(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_elem)
-        id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_elem;
-        elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
-        face = f_boundface(elem,node,'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
+if isfield(obj.dom3d.(id_dom),'id_elem')
+    if ~isempty(obj.dom3d.(id_dom).id_elem)
+        id_elem = obj.dom3d.(id_dom).id_elem;
+        elem = obj.elem(:,id_elem);
+        face = f_boundface(elem,node,'elem_type',obj.elem_type);
         id_face = f_findvecnd(face, ...
-                              c3dobj.mesh3d.(id_mesh3d).face);
+                              obj.face);
     end
-elseif isfield(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom),'id_face')
-    if ~isempty(c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_face)
-        id_face = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom).id_face;
-        face = c3dobj.mesh3d.(id_mesh3d).face(:,id_face);
+elseif isfield(obj.dom3d.(id_dom),'id_face')
+    if ~isempty(obj.dom3d.(id_dom).id_face)
+        id_face = obj.dom3d.(id_dom).id_face;
+        face = obj.face(:,id_face);
     end
 end
 sf   = f_magnitude(js);
@@ -1010,7 +1010,7 @@ iquad = id_face(iquad);
 figure
 if ~isempty(itria)
     msh = [];
-    msh.Faces = c3dobj.mesh3d.(id_mesh3d).face(1:3,itria).';
+    msh.Faces = obj.face(1:3,itria).';
     msh.Vertices = node.';
     msh.FaceVertexCData = f_tocolv(full(sf(itria)));
     msh.FaceColor = 'flat';
@@ -1019,7 +1019,7 @@ if ~isempty(itria)
 end
 if ~isempty(iquad)
     msh = [];
-    msh.Faces = c3dobj.mesh3d.(id_mesh3d).face(1:4,iquad).';
+    msh.Faces = obj.face(1:4,iquad).';
     msh.Vertices = node.';
     msh.FaceVertexCData = f_tocolv(full(sf(iquad)));
     msh.FaceColor = 'flat';
@@ -1040,7 +1040,7 @@ for iec = 1:length(id_econductor__)
 end
 
 % ---
-node = c3dobj.mesh3d.(id_mesh3d).celem;
+node = obj.celem;
 vf = jv;
 figure
 subplot(121)
@@ -1060,7 +1060,7 @@ sigma_array = obj.econductor.(id_phydom).sigma_array;
 jv(:,id_elem) = f_cxvf(sigma_array,ev(:,id_elem));
 
 % ---
-node = c3dobj.mesh3d.(id_mesh3d).celem;
+node = obj.celem;
 vf = jv;
 figure
 subplot(121)

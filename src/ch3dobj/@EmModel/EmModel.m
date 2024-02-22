@@ -12,7 +12,7 @@ classdef EmModel < Xhandle
     properties
         id
         % ---
-        fr = 0
+        frequency = 0
         jome
         % ---
         parent_mesh
@@ -37,12 +37,12 @@ classdef EmModel < Xhandle
                 args.id = 'no_id'
                 % ---
                 args.parent_mesh = []
-                args.fr = 0
+                args.frequency = 0
             end
             % ---
             obj <= args;
             % ---
-            obj.jome = 1j*2*pi*obj.fr;
+            obj.jome = 1j*2*pi*obj.frequency;
             % ---
             obj.init('property_name','fields',...
                      'field_name',{'bv','jv','hv','pv','av','phiv','tv','omev',...

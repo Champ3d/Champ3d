@@ -9,9 +9,14 @@
 %--------------------------------------------------------------------------
 
 function build_bsfield(obj)
+
 phydom_type = 'bsfield';
 % ---
-allphydom = fieldnames(obj.(phydom_type));
+if isempty(obj.(phydom_type))
+    return
+else
+    allphydom = fieldnames(obj.(phydom_type));
+end
 % ---
 for i = 1:length(allphydom)
     % ---
@@ -26,6 +31,7 @@ for i = 1:length(allphydom)
     bs = obj.(phydom_type).(id_phydom).bs.get_on(dom);
     wfbs = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',bs);
     % ---
+    obj.(phydom_type).(id_phydom).matrix.gid_elem = gid_elem;
     obj.(phydom_type).(id_phydom).matrix.wfbs = wfbs;
 end
 end

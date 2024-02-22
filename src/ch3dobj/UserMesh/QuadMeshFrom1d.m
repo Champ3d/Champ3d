@@ -113,10 +113,8 @@ classdef QuadMeshFrom1d < QuadMesh
                 y2 = [y2 y1(ik,:)];
             end
             %----- centering
-            %if f_istrue(obj.centering)
-            %    x2 = x2 - mean(x2);
-            %    y2 = y2 - mean(y2);
-            %end
+            x2 = x2 - mean(x2);
+            y2 = y2 - mean(y2);
             %-----
             node_ = [x2; y2];
             %-----

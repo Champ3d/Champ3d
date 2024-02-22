@@ -8,19 +8,17 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-function coefwfvf = cwfvf(obj,args)
+function coefwewf = cwewf(obj,args)
 arguments
     obj
     args.id_elem = []
     args.coefficient = 1
-    args.vector_field = [1 1 1];
     args.order = 'full'
 end
 %--------------------------------------------------------------------------
 id_elem = args.id_elem;
 coefficient = args.coefficient;
 order = args.order;
-vector_field = args.vector_field;
 %--------------------------------------------------------------------------
 if isempty(id_elem)
     nb_elem = obj.nb_elem;
@@ -38,13 +36,14 @@ if isnumeric(order)
 end
 %--------------------------------------------------------------------------
 [coefficient, coef_array_type] = obj.column_format(coefficient);
-vector_field = obj.column_format(vector_field);
 %--------------------------------------------------------------------------
 elem_type = obj.elem_type;
 con = f_connexion(elem_type);
+nbEd_inEl = con.nbEd_inEl;
 nbFa_inEl = con.nbFa_inEl;
 %--------------------------------------------------------------------------
-if isempty(obj.intkit.Wf) || isempty(obj.intkit.cWf)
+if isempty(obj.intkit.We) || isempty(obj.intkit.cWe) || ...
+   isempty(obj.intkit.Wf) || isempty(obj.intkit.cWf)
     obj.build_intkit;
 end
 %--------------------------------------------------------------------------
@@ -53,9 +52,11 @@ switch order
         nbG = 1;
         Weigh = con.cWeigh;
         % ---
+        We = cell(1,nbG);
         Wf = cell(1,nbG);
         detJ = cell(1,nbG);
         for iG = 1:nbG
+            We{iG} = obj.intkit.cWe{iG}(id_elem,:,:);
             Wf{iG} = obj.intkit.cWf{iG}(id_elem,:,:);
             detJ{iG} = obj.intkit.cdetJ{iG}(id_elem,1);
         end
@@ -63,63 +64,66 @@ switch order
         nbG = con.nbG;
         Weigh = con.Weigh;
         % ---
+        We = cell(1,nbG);
         Wf = cell(1,nbG);
         detJ = cell(1,nbG);
         for iG = 1:nbG
+            We{iG} = obj.intkit.We{iG}(id_elem,:,:);
             Wf{iG} = obj.intkit.Wf{iG}(id_elem,:,:);
             detJ{iG} = obj.intkit.detJ{iG}(id_elem,1);
         end
 end
 %--------------------------------------------------------------------------
-coefwfvf = zeros(nb_elem,nbFa_inEl);
+coefwewf = zeros(nb_elem,nbEd_inEl,nbFa_inEl);
 %--------------------------------------------------------------------------
-if numel(vector_field) == 3
-    vfx = vector_field(1);
-    vfy = vector_field(2);
-    vfz = vector_field(3);
-elseif size(vector_field,1) >  length(id_elem) && ...
-       size(vector_field,1) == obj.nb_elem
-    vfx = vector_field(id_elem,1);
-    vfy = vector_field(id_elem,2);
-    vfz = vector_field(id_elem,3);
+if any(f_strcmpi(coef_array_type,{'scalar'}))
+    %----------------------------------------------------------------------
+    for iG = 1:nbG
+        dJ    = f_tocolv(detJ{iG});
+        weigh = Weigh(iG);
+        for i = 1:nbEd_inEl
+            weix = We{iG}(:,1,i);
+            weiy = We{iG}(:,2,i);
+            weiz = We{iG}(:,3,i);
+            for j = 1:nbFa_inEl % !!! 1
+                wfjx = Wf{iG}(:,1,j);
+                wfjy = Wf{iG}(:,2,j);
+                wfjz = Wf{iG}(:,3,j);
+                % ---
+                coefwewf(:,i,j) = coefwewf(:,i,j) + ...
+                    weigh .* dJ .* ( coefficient .* ...
+                    (weix .* wfjx + weiy .* wfjy + weiz .* wfjz) );
+            end
+        end
+    end
+    %----------------------------------------------------------------------
+elseif any(f_strcmpi(coef_array_type,{'tensor'}))
+    %----------------------------------------------------------------------
+    for iG = 1:nbG
+        dJ    = f_tocolv(detJ{iG});
+        weigh = Weigh(iG);
+        for i = 1:nbEd_inEl
+            weix = We{iG}(:,1,i);
+            weiy = We{iG}(:,2,i);
+            weiz = We{iG}(:,3,i);
+            for j = 1:nbFa_inEl % !!! 1
+                wfjx = Wf{iG}(:,1,j);
+                wfjy = Wf{iG}(:,2,j);
+                wfjz = Wf{iG}(:,3,j);
+                % ---
+                coefwewf(:,i,j) = coefwewf(:,i,j) + ...
+                    weigh .* dJ .* (...
+                    coefficient(:,1,1) .* weix .* wfjx +...
+                    coefficient(:,1,2) .* weiy .* wfjx +...
+                    coefficient(:,1,3) .* weiz .* wfjx +...
+                    coefficient(:,2,1) .* weix .* wfjy +...
+                    coefficient(:,2,2) .* weiy .* wfjy +...
+                    coefficient(:,2,3) .* weiz .* wfjy +...
+                    coefficient(:,3,1) .* weix .* wfjz +...
+                    coefficient(:,3,2) .* weiy .* wfjz +...
+                    coefficient(:,3,3) .* weiz .* wfjz );
+            end
+        end
+    end
+    %----------------------------------------------------------------------
 end
-%--------------------------------------------------------------------------
-if any(strcmpi(coef_array_type,{'scalar'}))
-    %----------------------------------------------------------------------
-    for iG = 1:nbG
-        dJ    = f_tocolv(detJ{iG});
-        weigh = Weigh(iG);
-        for i = 1:nbFa_inEl
-            wix = Wf{iG}(:,1,i);
-            wiy = Wf{iG}(:,2,i);
-            wiz = Wf{iG}(:,3,i);
-            coefwfvf(:,i) = coefwfvf(:,i) + ...
-                weigh .* dJ .* ( coefficient .* ...
-                (wix .* vfx + wiy .* vfy + wiz .* vfz) );
-        end
-    end
-    %----------------------------------------------------------------------
-elseif any(strcmpi(coef_array_type,{'tensor'}))
-    %----------------------------------------------------------------------
-    for iG = 1:nbG
-        dJ    = f_tocolv(detJ{iG});
-        weigh = Weigh(iG);
-        for i = 1:nbFa_inEl
-            wix = Wf{iG}(:,1,i);
-            wiy = Wf{iG}(:,2,i);
-            wiz = Wf{iG}(:,3,i);
-            coefwfvf(:,i) = coefwfvf(:,i) + ...
-                weigh .* dJ .* (...
-                coefficient(:,1,1) .* wix .* vfx +...
-                coefficient(:,1,2) .* wiy .* vfx +...
-                coefficient(:,1,3) .* wiz .* vfx +...
-                coefficient(:,2,1) .* wix .* vfy +...
-                coefficient(:,2,2) .* wiy .* vfy +...
-                coefficient(:,2,3) .* wiz .* vfy +...
-                coefficient(:,3,1) .* wix .* vfz +...
-                coefficient(:,3,2) .* wiy .* vfz +...
-                coefficient(:,3,3) .* wiz .* vfz );
-        end
-    end
-    %----------------------------------------------------------------------
-end 

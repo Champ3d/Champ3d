@@ -13,7 +13,11 @@ function build_econductor(obj)
 % ---
 phydom_type = 'econductor';
 % ---
-allphydom = fieldnames(obj.(phydom_type));
+if isempty(obj.(phydom_type))
+    return
+else
+    allphydom = fieldnames(obj.(phydom_type));
+end
 % ---
 for i = 1:length(allphydom)
     % ---
@@ -27,13 +31,14 @@ for i = 1:length(allphydom)
     % ---
     elem = parent_mesh.elem(:,gid_elem);
     % ---
-    id_node_phi = f_uniquenode(elem);
+    gid_node_phi = f_uniquenode(elem);
     % ---
     sigma_array = obj.(phydom_type).(id_phydom).sigma.get_on(dom);
     % ---
     sigmawewe = parent_mesh.cwewe('id_elem',gid_elem,'coefficient',sigma_array);
     % ---
-    obj.(phydom_type).(id_phydom).matrix.id_node_phi = id_node_phi;
+    obj.(phydom_type).(id_phydom).matrix.gid_elem = gid_elem;
+    obj.(phydom_type).(id_phydom).matrix.gid_node_phi = gid_node_phi;
     obj.(phydom_type).(id_phydom).matrix.sigmawewe = sigmawewe;
     % ---
 end

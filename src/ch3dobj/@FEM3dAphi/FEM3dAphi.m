@@ -16,7 +16,7 @@ classdef FEM3dAphi < EmModel
             arguments
                 args.id = 'no_id'
                 args.parent_mesh = []
-                args.fr = 0
+                args.frequency = 0
             end
             % ---
             argu = f_to_namedarg(args);

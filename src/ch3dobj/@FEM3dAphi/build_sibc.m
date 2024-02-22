@@ -11,7 +11,11 @@
 function build_sibc(obj)
 phydom_type = 'sibc';
 % ---
-allphydom = fieldnames(obj.(phydom_type));
+if isempty(obj.(phydom_type))
+    return
+else
+    allphydom = fieldnames(obj.(phydom_type));
+end
 % ---
 for i = 1:length(allphydom)
     % ---
@@ -30,7 +34,7 @@ for i = 1:length(allphydom)
     cparam_array = obj.(phydom_type).(id_phydom).cparam.get_on(dom);
     % ---
     mu0 = 4 * pi * 1e-7;
-    fr = obj.fr;
+    fr = obj.frequency;
     skindepth = sqrt(2./(2*pi*fr.*(mu0.*mur_array).*sigma_array));
     % ---
     z_sibc = (1+1j)./(skindepth.*sigma_array) .* ...

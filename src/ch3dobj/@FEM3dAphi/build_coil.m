@@ -13,7 +13,11 @@ function build_coil(obj)
 % ---
 phydom_type = 'coil';
 % ---
-allphydom = fieldnames(obj.(phydom_type));
+if isempty(obj.(phydom_type))
+    return
+else
+    allphydom = fieldnames(obj.(phydom_type));
+end
 % ---
 for i = 1:length(allphydom)
     % ---
@@ -85,10 +89,29 @@ for i = 1:length(allphydom)
         % current turn density vector field
         % current_turn_density  = current_field .* nb_turn ./ cs_area;
         % ---
-        figure
-        f_quiver(parent_mesh.celem(:,dom.gid_elem),real(current_field(:,dom.gid_elem)));
+        obj.(phydom_type).(id_phydom).matrix.gid_elem = dom.gid_elem;
+        obj.(phydom_type).(id_phydom).matrix.current_field = current_field;
         % ---
     end
+    % ---------------------------------------------------------------------
+    % ---------------------------------------------------------------------
+    if isa(phydom,'CloseJsCoil') || isa(phydom,'OpenJsCoil')
+        % --- current turn density vector field
+        current_turn_density  = current_field .* phydom.nb_turn ./ phydom.cs_area;
+        % ---
+        js_array = phydom.js.get_on(dom);
+        js_array = js_array .* phydom.matrix.current_field;
+        % ---
+        gid_elem = dom.gid_elem;
+        wfjs = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',js_array);
+        % ---
+        obj.(phydom_type).(id_phydom).matrix.current_turn_density = current_turn_density;
+        obj.(phydom_type).(id_phydom).matrix.wfjs = wfjs;
+    end
+    % ---------------------------------------------------------------------
+    % ---------------------------------------------------------------------
+    % ---------------------------------------------------------------------
+    % ---------------------------------------------------------------------
 end
 
 end

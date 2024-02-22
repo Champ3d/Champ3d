@@ -16,7 +16,11 @@ gid_inner_node = [];
 % ---
 phydom_type = 'nomesh';
 % ---
-allphydom = fieldnames(obj.(phydom_type));
+if isempty(obj.(phydom_type))
+    return
+else
+    allphydom = fieldnames(obj.(phydom_type));
+end
 % ---
 for i = 1:length(allphydom)
     % ---

@@ -12,7 +12,11 @@ function build_mconductor(obj)
 
 phydom_type = 'mconductor';
 % ---
-allphydom = fieldnames(obj.(phydom_type));
+if isempty(obj.(phydom_type))
+    return
+else
+    allphydom = fieldnames(obj.(phydom_type));
+end
 % ---
 for i = 1:length(allphydom)
     % ---
@@ -30,6 +34,7 @@ for i = 1:length(allphydom)
     % ---
     nu0nurwfwf = parent_mesh.cwfwf('id_elem',gid_elem,'coefficient',nu0nur);
     % ---
+    obj.(phydom_type).(id_phydom).matrix.gid_elem = gid_elem;
     obj.(phydom_type).(id_phydom).matrix.nu0nurwfwf = nu0nurwfwf;
     % ---
 end

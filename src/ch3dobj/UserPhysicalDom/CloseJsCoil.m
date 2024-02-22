@@ -24,11 +24,11 @@ classdef CloseJsCoil < CloseCoil
             if isnumeric(obj.js)
                 obj.js = Parameter('f',obj.js);
             end
-            if isnumeric(obj.nb_turn)
-                obj.nb_turn = Parameter('f',obj.nb_turn);
+            if ~isnumeric(obj.nb_turn)
+                obj.nb_turn = 1;
             end
-            if isnumeric(obj.cs_area)
-                obj.cs_area = Parameter('f',obj.cs_area);
+            if ~isnumeric(obj.cs_area)
+                obj.cs_area = 1;
             end
         end
     end
