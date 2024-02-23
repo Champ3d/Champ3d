@@ -113,7 +113,8 @@ classdef PhysicalDom < Xhandle
             end
             % ---
             if args.show_dom
-                obj.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
+                obj.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none');
+                hold on
             end
             % ---
             sdom = obj.dom;
@@ -147,7 +148,7 @@ classdef PhysicalDom < Xhandle
                     patch(msh); hold on
                 end
                 % ---
-                axis equal; axis tight; alpha(alpha_); view(3); hold on
+                axis equal; axis tight; view(3); hold on
                 %--------------------------------------------------------------
                 f_chlogo;
             end
