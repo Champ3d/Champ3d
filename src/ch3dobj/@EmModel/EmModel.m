@@ -147,6 +147,30 @@ classdef EmModel < Xhandle
         function add_embc(obj,args)
         end
         % -----------------------------------------------------------------
+        function add_coil(obj,args)
+            arguments
+                obj
+                % ---
+                args.id = 'no_id'
+                args.id_dom2d = []
+                args.id_dom3d = []
+                args.etrode_equation = []
+                args.coil_type {mustBeMember(args.coil_type,{'stranded','solid'})}
+                args.coil_mode {mustBeMember(args.coil_mode,{'tx','rx'})} = 'tx'
+                args.source_type {mustBeMember(args.source_type,'current_fed','voltage_fed','current_density_fed')}
+                args.j_coil = 0
+                args.i_coil = 0
+                args.v_coil = 0
+                args.nb_turn = 1
+                args.cs_area = 1
+            end
+            % ---
+            args.parent_model = obj;
+            % ---
+            phydom = CloseJsCoil(args);
+            obj.coil.(args.id) = phydom;
+        end
+        % -----------------------------------------------------------------
         function add_open_iscoil(obj,args)
         end
         % -----------------------------------------------------------------
@@ -163,7 +187,7 @@ classdef EmModel < Xhandle
                 args.id = 'no_id'
                 args.id_dom2d = []
                 args.id_dom3d = []
-                args.id_electrode_dom3d = []
+                args.etrode_equation = []
                 args.js = 1
                 args.nb_turn = 1
                 args.cs_area = 1

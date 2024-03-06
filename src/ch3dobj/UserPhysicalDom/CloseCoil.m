@@ -10,7 +10,7 @@
 
 classdef CloseCoil < PhysicalDom
     properties
-        id_electrode_dom3d
+        etrode_equation
         electrode_dom
         shape_dom
     end
@@ -20,6 +20,10 @@ classdef CloseCoil < PhysicalDom
         function obj = CloseCoil(args)
             obj = obj@PhysicalDom(args);
             obj <= args;
+            % ---
+            obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
+            obj.etrode_equation = obj.etrode_equation{1};
+            % ---
             obj.get_electrode;  
         end
     end
@@ -31,14 +35,13 @@ classdef CloseCoil < PhysicalDom
             if ~isempty(obj.parent_model)
                 if ~isempty(obj.parent_model.parent_mesh)
                     % ---
-                    if ~isempty(obj.id_electrode_dom3d)
-                        id_dom_ = f_to_scellargin(obj.id_electrode_dom3d);
-                    end
+                    args4cv3.parent_mesh = obj.parent_model.parent_mesh;
+                    args4cv3.id_dom3d = obj.id_dom3d;
+                    args4cv3.cut_equation = obj.etrode_equation;
+                    argu = f_to_namedarg(args4cv3,'with_only',...
+                                {'parent_mesh','id_dom3d','cut_equation'});
                     % ---
-                    obj.electrode_dom = obj.parent_model.parent_mesh.dom.(id_dom_{1});
-                    for i = 2:length(id_dom_)
-                        obj.electrode_dom = obj.electrode_dom + obj.parent_model.parent_mesh.dom.(id_dom_{i});
-                    end
+                    obj.electrode_dom = CutVolumeDom3d(argu{:});
                     % ---
                     coilshape = obj.dom - obj.electrode_dom;
                     % ---
