@@ -36,12 +36,18 @@ classdef Line1d < Xhandle
             arguments
                 args.id char = '0'
                 args.len {mustBeNumeric}  = 0
-                args.dtype = 'lin'
+                args.dtype {mustBeMember(args.dtype,{'lin','log+','log-','log+-','log-+','log='})} = 'lin'
                 args.dnum {mustBeInteger} = 1
                 args.flog {mustBeNumeric} = 1.05
             end
             % ---
             obj <= args;
+            % ---
+            if any(f_strcmpi(obj.dtype,{'log+-','log-+','log='}))
+                if mod(obj.dnum,2) ~= 0
+                    obj.dnum = obj.dnum + 1;
+                end
+            end
             % ---
             obj.build;
         end

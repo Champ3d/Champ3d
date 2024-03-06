@@ -8,30 +8,40 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef QuadMeshFrom3d < QuadMesh
+classdef ProcessingSurface3d < CutVolumeDom3d
 
     % --- Properties
     properties
+        parent_model
+        %id_dom3d
         parallel_line_1
         parallel_line_2
         dtype_parallel
         dtype_orthogonal
         dnum_parallel
         dnum_orthogonal
-        flog
+        flog = 1.05;
+        % ---
+        mesh
+        fields
+        % ---
+        %cut_equation
+        %gid_elem
+        %gid_side_node_1
+        %gid_side_node_2
     end
 
     % --- Dependent Properties
     properties (Dependent = true)
-
+        
     end
 
     % --- Constructors
     methods
-        function obj = QuadMeshFrom3d(args)
+        function obj = ProcessingSurface3d(args)
             arguments
-                % --- super
-                args.info = 'no_info'
+                % ---
+                args.parent_model = []
                 args.parallel_line_1 = []
                 args.parallel_line_2 = []
                 args.dtype_parallel {mustBeMember(args.dtype_parallel,{'lin','log+','log-','log+-','log-+','log='})} = 'lin'
@@ -39,11 +49,16 @@ classdef QuadMeshFrom3d < QuadMesh
                 args.dnum_parallel = 6
                 args.dnum_orthogonal = 6
                 args.flog = 1.05;
+                args.id_dom3d = []
             end
             % ---
-            obj = obj@QuadMesh;
-            % ---
             obj <= args;
+            % ---
+            if isempty(obj.id_dom3d)
+                obj.id_dom3d = 'default_domain';
+            end
+            % ---
+            obj.parent_mesh = obj.parent_model.parent_mesh;
             % ---
             if obj.is_available(args,{'parallel_line_1','parallel_line_2'})
                 % ---
@@ -72,65 +87,62 @@ classdef QuadMeshFrom3d < QuadMesh
     end
 
     % --- Methods
-    methods (Access = private)
+    methods (Access = private, Hidden)
         % -----------------------------------------------------------------
-        function obj = build(obj)
+        function build(obj)
             % ---
             bl = obj.parallel_line_1(1,:);
             br = obj.parallel_line_1(2,:);
             tl = obj.parallel_line_2(1,:);
-            tr = obj.parallel_line_2(2,:);
             % ---
             vec1 = br - bl;
-            vec2 = tr - tl;
+            vec2 = tl - bl;
             % ---
-            if norm(cross(vec1,vec2)) ~= 0
-                error('Lines are not parallel !')
+            ci = cross(vec1,vec2);
+            ci = f_normalize(f_tocolv(ci));
+            % ---
+            d = (ci(1)*bl(1) + ci(2)*bl(2) + ci(3)*bl(3));
+            % ---
+            obj.cut_equation = [num2str(ci(1)) '*x+' ...
+                                num2str(ci(2)) '*y+' ...
+                                num2str(ci(3)) '*z =' num2str(d)];
+            % ---
+            gid_elem_ = [];
+            gid_side_node_1_ = [];
+            gid_side_node_2_ = [];
+            iddom3 = f_to_scellargin(obj.id_dom3d);
+            for i = 1:length(iddom3)
+                dom2cut = obj.parent_model.parent_mesh.dom.(iddom3{i});
+                cut_dom = dom2cut.get_cutdom('cut_equation',obj.cut_equation);
+                gid_elem_ = [gid_elem_ cut_dom.gid_elem];
+                gid_side_node_1_ = [gid_side_node_1_ cut_dom.gid_side_node_1];
+                gid_side_node_2_ = [gid_side_node_2_ cut_dom.gid_side_node_2];
             end
             % ---
-            if dot(vec1,vec2) < 0
-                tmp = tl;
-                tl = tr;
-                tr = tmp;
-            end
-            % ---
-            dtype_p = obj.dtype_parallel;
-            dtype_o = obj.dtype_orthogonal;
-            dnum_p = obj.dnum_parallel;
-            dnum_o = obj.dnum_orthogonal;
-            flog_ = obj.flog;
-            % ---
-            node = zeros(3,(dnum_p+1) * (dnum_o+1));
-            % --- divline
-            node_l = f_divline(bl,tl,'dnum',dnum_o,'dtype',dtype_o,'flog',flog_);
-            node_r = f_divline(br,tr,'dnum',dnum_o,'dtype',dtype_o,'flog',flog_);
-            for i = 1:dnum_o+1
-                tli = node_l(:,i);
-                tri = node_r(:,i);
-                % ---
-                id_node = (i-1) * (dnum_p+1) + (1:dnum_p+1);
-                node(:,id_node) = f_divline(tli,tri,'dnum',dnum_p,'dtype',dtype_p,'flog',flog_);
-            end
-            % ---
-            elem = zeros(4,dnum_p * dnum_o);
-            elem_code = ones(1,dnum_p * dnum_o);
-            for i = 1:dnum_o
-                id_elem = (i-1) * dnum_p + (1:dnum_p);
-                idn1 = (i-1) * (dnum_p+1) + (1:dnum_p);
-                idn2 = idn1 + 1;
-                idn3 = (dnum_p+1) + idn2;
-                idn4 = idn3 - 1;
-                elem(:,id_elem) = [idn1; idn2; idn3; idn4];
-            end
+            obj.gid_elem = gid_elem_;
+            obj.gid_side_node_1 = gid_side_node_1_;
+            obj.gid_side_node_2 = gid_side_node_2_;
             % -------------------------------------------------------------
-            obj.node = node;
-            obj.elem = elem;
-            obj.elem_code = elem_code;
-            obj.is_build = 1;
         end
         % -----------------------------------------------------------------
     end
-    
+
+    % ---
+    methods
+        function plot(obj,args)
+            arguments
+                obj
+                args.edge_color = [0.4940 0.1840 0.5560]
+                args.face_color = 'c'
+                args.alpha {mustBeNumeric} = 0.9
+            end
+            % ---
+            argu = f_to_namedarg(args);
+            plot@CutVolumeDom3d(obj,argu{:}); hold on
+            % -------------------------------------------------------------
+        end
+    end
+
 end
 
 

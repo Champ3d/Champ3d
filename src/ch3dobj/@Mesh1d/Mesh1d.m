@@ -43,7 +43,7 @@ classdef Mesh1d < Xhandle
                 % ---
                 args.id char
                 args.len {mustBeNumeric}
-                args.dtype = 'lin'
+                args.dtype {mustBeMember(args.dtype,{'lin','log+','log-','log+-','log-+','log='})} = 'lin'
                 args.dnum {mustBeInteger} = 1
                 args.flog {mustBeNumeric} = 1.05
             end
