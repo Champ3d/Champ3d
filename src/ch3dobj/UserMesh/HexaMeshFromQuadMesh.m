@@ -30,9 +30,15 @@ classdef HexaMeshFromQuadMesh < HexMesh
                 args.node = []
                 args.elem = []
                 % --- sub
-                args.parent_mesh1d
-                args.parent_mesh2d
+                args.parent_mesh1d = []
+                args.parent_mesh2d = []
                 args.id_zline = []
+            end
+            % ---
+            if isempty(args.parent_mesh1d)
+                if isprop(args.parent_mesh2d,'parent_mesh')
+                    args.parent_mesh1d = args.parent_mesh2d.parent_mesh;
+                end
             end
             % ---
             obj = obj@HexMesh;
