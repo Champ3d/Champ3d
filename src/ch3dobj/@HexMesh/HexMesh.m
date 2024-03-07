@@ -47,6 +47,7 @@ classdef HexMesh < Mesh3d
                 args.edge_color = [0.4940 0.1840 0.5560]
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
+                args.id_elem = []
             end
             edge_color_  = args.edge_color;
             face_color_  = args.face_color;
@@ -58,7 +59,11 @@ classdef HexMesh < Mesh3d
             %--------------------------------------------------------------
             clear msh;
             %--------------------------------------------------------------
-            boface = f_boundface(obj.elem,obj.node,'elem_type','hexa');
+            if isempty(args.id_elem)
+                boface = f_boundface(obj.elem,obj.node,'elem_type','hexa');
+            else
+                boface = f_boundface(obj.elem(:,args.id_elem),obj.node,'elem_type','hexa');
+            end
             %--------------------------------------------------------------
             msh.Vertices = obj.node.';
             msh.Faces = f_unique(boface(1:4,:)).';

@@ -58,7 +58,9 @@ classdef ProcessingSurface3d < VolumeDom3d
                 obj.id_dom3d = 'default_domain';
             end
             % ---
-            obj.parent_mesh = obj.parent_model.parent_mesh;
+            if obj.is_available(args,{'parent_model'})
+                obj.parent_mesh = obj.parent_model.parent_mesh;
+            end
             % ---
             if obj.is_available(args,{'parallel_line_1','parallel_line_2'})
                 % ---
@@ -404,9 +406,9 @@ classdef ProcessingSurface3d < VolumeDom3d
                 vfz = [vfz vf{i}(3,id_elem)];
             end
             % ---
-            Fx = scatteredInterpolant(xi,yi,zi,full(vfx.'),'natural');
-            Fy = scatteredInterpolant(xi,yi,zi,full(vfy.'),'natural');
-            Fz = scatteredInterpolant(xi,yi,zi,full(vfz.'),'natural');
+            Fx = scatteredInterpolant(xi,yi,zi,full(vfx.'),'natural','linear');
+            Fy = scatteredInterpolant(xi,yi,zi,full(vfy.'),'natural','linear');
+            Fz = scatteredInterpolant(xi,yi,zi,full(vfz.'),'natural','linear');
             % ---
             xnode = obj.mesh.node(1,:);
             ynode = obj.mesh.node(2,:);
