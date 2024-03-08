@@ -10,20 +10,43 @@
 
 classdef SolidCoil < Coil
     properties
-        cs_area
-        nb_turn
-        fill_factor
+        
     end
 
     % --- Contructor
     methods
         function obj = SolidCoil(args)
-            obj = obj@Coil(args);
+            arguments
+                args.id
+                args.parent_model
+                args.id_dom2d
+                args.id_dom3d
+            end
+            % ---
+            obj@Coil;
+            % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
             obj <= args;
-            obj.connexion = 'serie';
+            % ---
+            obj.to_be_rebuild = 1;
+            % ---
+            obj.build;
         end
     end
-
-    % --- Methods
+    
+    % --- build
+    methods
+        function build(obj)
+            if obj.to_be_rebuild
+                % ---
+                build@Coil(obj);
+                % ---
+                obj.to_be_rebuild = 0;
+            end
+        end
+    end
 
 end

@@ -9,15 +9,17 @@
 %--------------------------------------------------------------------------
 
 classdef Coil < PhysicalDom
+    % --- entry
     properties
-        connexion
-        source_type
-        coil_type
-        coil_mode
+        
+    end
+    % --- computed
+    properties
         i_coil
         v_coil
         j_coil
-        %sigma
+        z_coil
+        L0
     end
 
     % --- Contructor
@@ -28,16 +30,9 @@ classdef Coil < PhysicalDom
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
-                args.connexion
-                args.source_type
-                args.coil_type
-                args.coil_mode
-                args.i_coil
-                args.v_coil
-                args.j_coil
             end
             % ---
-            obj = obj@PhysicalDom;
+            obj@PhysicalDom;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -58,6 +53,7 @@ classdef Coil < PhysicalDom
                 % ---
                 build@PhysicalDom(obj);
                 % ---
+                obj.to_be_rebuild = 0;
             end
         end
     end

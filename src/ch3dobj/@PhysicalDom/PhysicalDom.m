@@ -39,7 +39,7 @@ classdef PhysicalDom < Xhandle
                 args.id_dom3d
             end
             % ---
-            obj = obj@Xhandle;
+            obj@Xhandle;
             % ---
             if isempty(fieldnames(args))
                 return

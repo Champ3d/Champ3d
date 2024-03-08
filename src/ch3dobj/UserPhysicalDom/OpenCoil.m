@@ -26,17 +26,10 @@ classdef OpenCoil < Coil
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
-                args.connexion
-                args.source_type
-                args.coil_type
-                args.coil_mode
-                args.i_coil
-                args.v_coil
-                args.j_coil
                 args.etrode_equation
             end
             % ---
-            obj = obj@Coil;
+            obj@Coil;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -60,6 +53,8 @@ classdef OpenCoil < Coil
                 obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
                 % ---
                 obj.get_electrode;
+                % ---
+                obj.to_be_rebuild = 0;
             end
         end
     end
@@ -103,8 +98,8 @@ classdef OpenCoil < Coil
                         end
                     end
                     % -----------------------------------------------------
-                    obj.gid_node_petrode = petrode;
-                    obj.gid_node_netrode = netrode;
+                    obj.gid_node_petrode = unique(gid_node(petrode));
+                    obj.gid_node_netrode = unique(gid_node(netrode));
                 end
             end
         end
@@ -126,8 +121,8 @@ classdef OpenCoil < Coil
                 plot(penode(1,:),penode(2,:),'ro'); hold on
                 plot(nenode(1,:),nenode(2,:),'bo'); hold on
             elseif size(penode,1) == 3
-                plot(penode(1,:),penode(2,:),penode(3,:),'ro'); hold on
-                plot(nenode(1,:),nenode(2,:),nenode(3,:),'bo'); hold on
+                plot3(penode(1,:),penode(2,:),penode(3,:),'ro'); hold on
+                plot3(nenode(1,:),nenode(2,:),nenode(3,:),'bo'); hold on
             end
         end
         % -----------------------------------------------------------------

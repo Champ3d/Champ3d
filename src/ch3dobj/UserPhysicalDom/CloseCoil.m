@@ -27,17 +27,10 @@ classdef CloseCoil < Coil
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
-                args.connexion
-                args.source_type
-                args.coil_type
-                args.coil_mode
-                args.i_coil
-                args.v_coil
-                args.j_coil
                 args.etrode_equation
             end
             % ---
-            obj = obj@Coil;
+            obj@Coil;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -62,6 +55,8 @@ classdef CloseCoil < Coil
                 obj.etrode_equation = obj.etrode_equation{1};
                 % ---
                 obj.get_electrode;
+                % ---
+                obj.to_be_rebuild = 0;
             end
         end
     end

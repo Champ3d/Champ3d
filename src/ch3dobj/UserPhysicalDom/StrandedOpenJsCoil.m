@@ -8,23 +8,31 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Econductor < PhysicalDom
+classdef StrandedOpenJsCoil < StrandedCoil & OpenCoil
     properties
-        sigma = 0
+        coil_mode = 'tx'
     end
 
     % --- Contructor
     methods
-        function obj = Econductor(args)
+        function obj = StrandedOpenJsCoil(args)
             arguments
                 args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
-                args.sigma
+                args.connexion
+                args.cs_area
+                args.nb_turn
+                args.fill_factor
+                args.etrode_equation
+                % ---
+                args.j_coil
+                args.coil_mode {mustBeMember(args.coil_mode,{'tx','rx'})}
             end
             % ---
-            obj = obj@PhysicalDom;
+            obj@StrandedCoil;
+            obj@OpenCoil;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -43,14 +51,30 @@ classdef Econductor < PhysicalDom
         function build(obj)
             if obj.to_be_rebuild
                 % ---
-                build@PhysicalDom(obj);
+                build@StrandedCoil(obj);
+                obj.to_be_rebuild = 1;
+                build@OpenCoil(obj);
                 % ---
-                if isnumeric(obj.sigma)
-                    obj.sigma = Parameter('f',obj.sigma);
+                if isempty(obj.j_coil)
+                    obj.coil_mode = 'rx';
+                elseif isnumeric(obj.j_coil)
+                    if obj.j_coil == 0
+                        obj.coil_mode = 'rx';
+                    end
+                    % ---
+                    obj.j_coil = Parameter('f',obj.j_coil);
                 end
                 % ---
                 obj.to_be_rebuild = 0;
             end
         end
     end
+
+    % --- Methods
+    methods
+        function plot(obj)
+            plot@OpenCoil(obj);
+        end
+    end
+
 end
