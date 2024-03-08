@@ -40,20 +40,20 @@ classdef StrandedOpenJsCoil < StrandedCoil & OpenCoil
             % ---
             obj <= args;
             % ---
-            obj.to_be_rebuild = 1;
+            obj.setup_ready = 0;
             % ---
-            obj.build;
+            obj.setup;
         end
     end
 
-    % --- build
+    % --- setup
     methods
-        function build(obj)
-            if obj.to_be_rebuild
+        function setup(obj)
+            if ~obj.setup_ready
                 % ---
-                build@StrandedCoil(obj);
-                obj.to_be_rebuild = 1;
-                build@OpenCoil(obj);
+                setup@StrandedCoil(obj);
+                obj.setup_ready = 0;
+                setup@OpenCoil(obj);
                 % ---
                 if isempty(obj.j_coil)
                     obj.coil_mode = 'rx';
@@ -65,7 +65,7 @@ classdef StrandedOpenJsCoil < StrandedCoil & OpenCoil
                     obj.j_coil = Parameter('f',obj.j_coil);
                 end
                 % ---
-                obj.to_be_rebuild = 0;
+                obj.setup_ready = 1;
             end
         end
     end

@@ -21,7 +21,7 @@ classdef PhysicalDom < Xhandle
         parent_mesh
         dom
         matrix
-        to_be_rebuild
+        setup_ready = 0
     end
     % ---
     properties(Access = private, Hidden)
@@ -47,17 +47,19 @@ classdef PhysicalDom < Xhandle
             % ---
             obj <= args;
             % ---
-            obj.to_be_rebuild = 1;
+            obj.setup_ready = 0;
             % ---
-            obj.build;
+            obj.setup;
         end
     end
     
     % --- Methods
     methods
-        function build(obj)
-            if obj.to_be_rebuild
+        function setup(obj)
+            if ~obj.setup_ready
                 obj.get_geodom;
+                % ---
+                obj.setup_ready = 1;
             end
         end
     end

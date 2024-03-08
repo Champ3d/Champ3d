@@ -31,20 +31,20 @@ classdef SolidCoil < Coil
             % ---
             obj <= args;
             % ---
-            obj.to_be_rebuild = 1;
+            obj.setup_ready = 0;
             % ---
-            obj.build;
+            obj.setup;
         end
     end
     
-    % --- build
+    % --- setup
     methods
-        function build(obj)
-            if obj.to_be_rebuild
+        function setup(obj)
+            if ~obj.setup_ready
                 % ---
-                build@Coil(obj);
+                setup@Coil(obj);
                 % ---
-                obj.to_be_rebuild = 0;
+                obj.setup_ready = 1;
             end
         end
     end
