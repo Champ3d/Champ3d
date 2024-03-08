@@ -18,21 +18,60 @@ classdef CloseJsCoil < CloseCoil
     % --- Contructor
     methods
         function obj = CloseJsCoil(args)
-            obj = obj@CloseCoil(args);
+            arguments
+                args.id
+                args.parent_model
+                args.id_dom2d
+                args.id_dom3d
+                args.connexion
+                args.source_type
+                args.coil_type
+                args.coil_mode
+                args.i_coil
+                args.v_coil
+                args.j_coil
+                args.etrode_equation
+                args.js
+                args.nb_turn = 1
+                args.cs_area = 1
+            end
+            % ---
+            obj = obj@CloseCoil;
+            % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
             obj <= args;
             % ---
-            if isnumeric(obj.js)
-                obj.js = Parameter('f',obj.js);
-            end
-            if ~isnumeric(obj.nb_turn)
-                obj.nb_turn = 1;
-            end
-            if ~isnumeric(obj.cs_area)
-                obj.cs_area = 1;
+            obj.to_be_rebuild = 1;
+            % ---
+            obj.build;
+            % ---
+            
+        end
+    end
+
+    % --- build
+    methods
+        function build(obj)
+            if obj.to_be_rebuild
+                % ---
+                build@CloseCoil(obj);
+                % ---
+                if isnumeric(obj.js)
+                    obj.js = Parameter('f',obj.js);
+                end
+                if ~isnumeric(obj.nb_turn)
+                    obj.nb_turn = 1;
+                end
+                if ~isnumeric(obj.cs_area)
+                    obj.cs_area = 1;
+                end
             end
         end
     end
-    
+    % ---
     methods
         function plotjv(obj,args)
             arguments

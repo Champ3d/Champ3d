@@ -16,10 +16,38 @@ classdef Bsfield < PhysicalDom
     % --- Contructor
     methods
         function obj = Bsfield(args)
-            obj = obj@PhysicalDom(args);
+            arguments
+                args.id
+                args.parent_model
+                args.id_dom2d
+                args.id_dom3d
+                args.bs
+            end
+            % ---
+            obj = obj@PhysicalDom;
+            % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
             obj <= args;
-            if isnumeric(obj.bs)
-                obj.bs = Parameter('f',obj.bs);
+            % ---
+            obj.to_be_rebuild = 1;
+            % ---
+            obj.build;
+        end
+    end
+
+    % --- build
+    methods
+        function build(obj)
+            if obj.to_be_rebuild
+                % ---
+                build@PhysicalDom(obj);
+                % ---
+                if isnumeric(obj.bs)
+                    obj.bs = Parameter('f',obj.bs);
+                end
             end
         end
     end

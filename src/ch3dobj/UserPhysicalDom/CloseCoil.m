@@ -9,8 +9,12 @@
 %--------------------------------------------------------------------------
 
 classdef CloseCoil < Coil
+    % --- entry
     properties
         etrode_equation
+    end
+    % --- computed
+    properties
         electrode_dom
         shape_dom
     end
@@ -18,16 +22,49 @@ classdef CloseCoil < Coil
     % --- Contructor
     methods
         function obj = CloseCoil(args)
-            obj = obj@Coil(args);
+            arguments
+                args.id
+                args.parent_model
+                args.id_dom2d
+                args.id_dom3d
+                args.connexion
+                args.source_type
+                args.coil_type
+                args.coil_mode
+                args.i_coil
+                args.v_coil
+                args.j_coil
+                args.etrode_equation
+            end
+            % ---
+            obj = obj@Coil;
+            % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
             obj <= args;
             % ---
-            obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
-            obj.etrode_equation = obj.etrode_equation{1};
+            obj.to_be_rebuild = 1;
             % ---
-            obj.get_electrode;  
+            obj.build;
         end
     end
-
+    
+    % --- build
+    methods
+        function build(obj)
+            if obj.to_be_rebuild
+                % ---
+                build@Coil(obj);
+                % ---
+                obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
+                obj.etrode_equation = obj.etrode_equation{1};
+                % ---
+                obj.get_electrode;
+            end
+        end
+    end
     % --- Methods
     methods
         % -----------------------------------------------------------------

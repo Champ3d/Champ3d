@@ -23,8 +23,42 @@ classdef Coil < PhysicalDom
     % --- Contructor
     methods
         function obj = Coil(args)
-            obj = obj@PhysicalDom(args);
+            arguments
+                args.id
+                args.parent_model
+                args.id_dom2d
+                args.id_dom3d
+                args.connexion
+                args.source_type
+                args.coil_type
+                args.coil_mode
+                args.i_coil
+                args.v_coil
+                args.j_coil
+            end
+            % ---
+            obj = obj@PhysicalDom;
+            % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
             obj <= args;
+            % ---
+            obj.to_be_rebuild = 1;
+            % ---
+            obj.build;
+        end
+    end
+    
+    % --- build
+    methods
+        function build(obj)
+            if obj.to_be_rebuild
+                % ---
+                build@PhysicalDom(obj);
+                % ---
+            end
         end
     end
 

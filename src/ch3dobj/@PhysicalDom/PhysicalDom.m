@@ -9,18 +9,19 @@
 %--------------------------------------------------------------------------
 
 classdef PhysicalDom < Xhandle
+    % --- entry
     properties
         id
+        parent_model
+        id_dom2d
+        id_dom3d
+    end
+    % --- computed
+    properties
+        parent_mesh
         dom
         matrix
         to_be_rebuild
-    end
-    % ---
-    properties
-        parent_model
-        parent_mesh
-        id_dom2d
-        id_dom3d
     end
     % ---
     properties(Access = private, Hidden)
@@ -31,13 +32,35 @@ classdef PhysicalDom < Xhandle
     % --- Contructor
     methods
         function obj = PhysicalDom(args)
+            arguments
+                args.id
+                args.parent_model
+                args.id_dom2d
+                args.id_dom3d
+            end
+            % ---
             obj = obj@Xhandle;
+            % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
             obj <= args;
-            obj.get_geodom;
+            % ---
             obj.to_be_rebuild = 1;
+            % ---
+            obj.build;
         end
     end
-
+    
+    % --- Methods
+    methods
+        function build(obj)
+            if obj.to_be_rebuild
+                obj.get_geodom;
+            end
+        end
+    end
     % --- Methods
     methods
         function get_geodom(obj)

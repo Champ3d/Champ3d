@@ -16,10 +16,38 @@ classdef Mconductor < PhysicalDom
     % --- Contructor
     methods
         function obj = Mconductor(args)
-            obj = obj@PhysicalDom(args);
+            arguments
+                args.id
+                args.parent_model
+                args.id_dom2d
+                args.id_dom3d
+                args.mur
+            end
+            % ---
+            obj = obj@PhysicalDom;
+            % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
             obj <= args;
-            if isnumeric(obj.mur)
-                obj.mur = Parameter('f',obj.mur);
+            % ---
+            obj.to_be_rebuild = 1;
+            % ---
+            obj.build;
+        end
+    end
+
+    % --- build
+    methods
+        function build(obj)
+            if obj.to_be_rebuild
+                % ---
+                build@PhysicalDom(obj);
+                % ---
+                if isnumeric(obj.mur)
+                    obj.mur = Parameter('f',obj.mur);
+                end
             end
         end
     end

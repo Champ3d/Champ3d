@@ -68,7 +68,9 @@ classdef EmModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            phydom = Econductor(args);
+            argu = f_to_namedarg(args);
+            % ---
+            phydom = Econductor(argu{:});
             obj.econductor.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -83,7 +85,9 @@ classdef EmModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            phydom = Airbox(args);
+            argu = f_to_namedarg(args);
+            % ---
+            phydom = Airbox(argu{:});
             obj.airbox.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -98,7 +102,9 @@ classdef EmModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            phydom = Nomesh(args);
+            argu = f_to_namedarg(args);
+            % ---
+            phydom = Nomesh(argu{:});
             obj.nomesh.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -117,7 +123,9 @@ classdef EmModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            phydom = Sibc(args);
+            argu = f_to_namedarg(args);
+            % ---
+            phydom = Sibc(argu{:});
             obj.sibc.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -140,7 +148,9 @@ classdef EmModel < Xhandle
                 args.id_dom3d = 'default_domain';
             end
             % ---
-            phydom = Bsfield(args);
+            argu = f_to_namedarg(args);
+            % ---
+            phydom = Bsfield(argu{:});
             obj.bsfield.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -167,7 +177,9 @@ classdef EmModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            phydom = CloseJsCoil(args);
+            argu = f_to_namedarg(args);
+            % ---
+            phydom = CloseJsCoil(argu{:});
             obj.coil.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -195,7 +207,9 @@ classdef EmModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            phydom = CloseJsCoil(args);
+            argu = f_to_namedarg(args);
+            % ---
+            phydom = CloseJsCoil(argu{:});
             obj.coil.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -217,7 +231,9 @@ classdef EmModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            phydom = Mconductor(args);
+            argu = f_to_namedarg(args);
+            % ---
+            phydom = Mconductor(argu{:});
             obj.mconductor.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -233,7 +249,9 @@ classdef EmModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            phydom = PMagnet(args);
+            argu = f_to_namedarg(args);
+            % ---
+            phydom = PMagnet(argu{:});
             obj.pmagnet.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
