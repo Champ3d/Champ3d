@@ -33,9 +33,9 @@ classdef Mesh < Xhandle
         % ---
         setup_done = 0
         build_meshds_done = 0
-        discrete_done = 0
-        intkit_done = 0
-        prokit_done = 0
+        build_discrete_done = 0
+        build_intkit_done = 0
+        build_prokit_done = 0
         % --- submesh
         parent_mesh
         gid_node

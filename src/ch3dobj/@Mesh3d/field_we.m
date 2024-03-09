@@ -44,16 +44,13 @@ if isempty(obj.meshds.id_edge_in_elem)
 end
 id_edge_in_elem = obj.meshds.id_edge_in_elem;
 %--------------------------------------------------------------------------
-if isempty(obj.intkit.We) || isempty(obj.intkit.cWe)
-    obj.build_intkit;
-end
-%--------------------------------------------------------------------------
-if isempty(obj.prokit.We)
-    obj.build_prokit;
-end
-%--------------------------------------------------------------------------
 switch on_
     case 'center'
+        % ---
+        if isempty(obj.intkit.cWe)
+            obj.build_intkit;
+        end
+        % ---
         nbG = 1;
         % ---
         Wx = cell(1,nbG);
@@ -61,6 +58,11 @@ switch on_
             Wx{iG} = obj.intkit.cWe{iG}(id_elem,:,:);
         end
     case 'gauss_points'
+        % ---
+        if isempty(obj.intkit.We)
+            obj.build_intkit;
+        end
+        % ---
         nbG = con.nbG;
         % ---
         Wx = cell(1,nbG);
@@ -68,6 +70,11 @@ switch on_
             Wx{iG} = obj.intkit.We{iG}(id_elem,:,:);
         end
     case 'interpolation_points'
+        % ---
+        if isempty(obj.prokit.We)
+            obj.build_prokit;
+        end
+        % ---
         nbG = obj.refelem.nbI;
         % ---
         Wx = cell(1,nbG);

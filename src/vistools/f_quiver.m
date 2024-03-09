@@ -194,7 +194,7 @@ else
     % patchinfo.FaceLighting = 'gouraud';
     patchinfo.EdgeColor = 'non';
     patchinfo.LineWidth = 0.1;
-    patch(patchinfo); hold on; axis equal; alpha(1);
+    patch(patchinfo); hold on; axis equal;
     h = colorbar;
     h.Label.String = 'Enter Unit';
     f_colormap; view(3); axis equal; axis tight;

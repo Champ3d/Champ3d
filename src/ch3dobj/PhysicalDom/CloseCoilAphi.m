@@ -49,6 +49,11 @@ classdef CloseCoilAphi < CloseCoil
                 % ---
                 setup@CloseCoil(obj);
                 % ---
+                obj.parent_mesh = obj.dom.parent_mesh;
+                % ---
+                obj.matrix.gid_elem = [];
+                obj.matrix.unit_current_field = [];
+                % ---
                 obj.setup_done = 1;
                 % ---
                 obj.build_done = 0;
@@ -66,6 +71,9 @@ classdef CloseCoilAphi < CloseCoil
             if ~obj.build_done
                 % ---
                 parent_mesh = obj.dom.parent_mesh;
+                parent_mesh.build_meshds;
+                parent_mesh.build_discrete;
+                parent_mesh.build_intkit;
                 % --- current field
                 unit_current_field = sparse(3,parent_mesh.nb_elem);
                 % ---
@@ -76,7 +84,6 @@ classdef CloseCoilAphi < CloseCoil
                 id_edge_in_elem = parent_mesh.meshds.id_edge_in_elem;
                 % ---
                 for ipart = 1:2
-                    ipart
                     if ipart == 1
                         vdom = obj.electrode_dom;
                     else
@@ -136,8 +143,22 @@ classdef CloseCoilAphi < CloseCoil
 
     % --- Methods
     methods
-        function plot(obj)
-            plot@CloseCoil(obj);
+        function plot(obj,args)
+            arguments
+                obj
+                args.edge_color = 'k'
+                args.face_color = 'none'
+                args.alpha {mustBeNumeric} = 0.5
+            end
+            % ---
+            argu = f_to_namedarg(args);
+            plot@CloseCoil(obj,argu{:});
+            % ---
+            if ~isempty(obj.matrix.unit_current_field)
+                hold on;
+                f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
+                         obj.matrix.unit_current_field(:,obj.matrix.gid_elem));
+            end
         end
     end
 

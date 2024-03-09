@@ -17,12 +17,12 @@ arguments
         {'all','edge','face','celem','cface','cedge','id_edge_in_elem',...
          'ori_edge_in_elem','sign_edge_in_elem','id_face_in_elem',...
          'ori_face_in_elem','sign_face_in_elem','id_edge_in_face',...
-         'ori_edge_in_face','sign_edge_in_face',...
-         'div','grad','curl'})} = 'all'
+         'ori_edge_in_face','sign_edge_in_face'})} = 'all'
 end
 %--------------------------------------------------------------------------
-obj.meshds_to_be_rebuild = 0;
-obj.discrete_to_be_rebuild = 0;
+if obj.build_meshds_done
+    return
+end
 %--------------------------------------------------------------------------
 tic
 f_fprintf(0,'Make #meshds \n');
@@ -138,6 +138,11 @@ if any(f_strcmpi(get,all_get))
         obj.meshds.sign_edge_in_face = sign_edge_in_face;
     end
     % ---
+end
+%--------------------------------------------------------------------------
+all_get = {'all'};
+if any(f_strcmpi(get,all_get))
+    obj.build_meshds_done = 1;
 end
 %--------------------------------------------------------------------------
 %--- Log message

@@ -8,19 +8,15 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-function obj = build_prokit(obj,args)
-arguments
-    obj
-    args.id_elem = []
+function obj = build_prokit(obj)
+%--------------------------------------------------------------------------
+if obj.build_prokit_done
+    return
 end
 %--------------------------------------------------------------------------
 tic
 f_fprintf(0,'Make #prokit \n');
 fprintf('   ');
-%--------------------------------------------------------------------------
-if isempty(args.id_elem)
-    id_elem = 1:obj.nb_elem;
-end
 %--------------------------------------------------------------------------
 U = obj.refelem.iU;
 V = obj.refelem.iV;
@@ -72,6 +68,8 @@ obj.prokit.gradWn = gradWn;
 obj.prokit.We = We;
 obj.prokit.Wf = Wf;
 obj.prokit.node = node;
+%--------------------------------------------------------------------------
+obj.build_prokit_done = 1;
 %--------------------------------------------------------------------------
 %--- Log message
 f_fprintf(0,'--- in',...

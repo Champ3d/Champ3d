@@ -9,12 +9,15 @@
 %--------------------------------------------------------------------------
 
 function obj = build_discrete(obj,args)
-
 arguments
     obj
     % ---
     args.get {mustBeMember(args.get,...
         {'all','div','grad','curl'})} = 'all'
+end
+%--------------------------------------------------------------------------
+if obj.build_discrete_done
+    return
 end
 %--------------------------------------------------------------------------
 tic
@@ -156,6 +159,11 @@ if any(f_strcmpi(get,all_get))
         obj.discrete.grad = obj.discrete.grad + ...
             sparse(1:nbEdge,obj.edge(i,:),siNo_inEd(i),nbEdge,nbNode);
     end
+end
+%--------------------------------------------------------------------------
+all_get = {'all'};
+if any(f_strcmpi(get,all_get))
+    obj.build_discrete_done = 1;
 end
 %--------------------------------------------------------------------------
 %--- Log message
