@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef StrandedCloseJsCoilAphi < StrandedCloseJsCoil
+classdef StrandedCloseJsCoilAphi < CloseCoilAphi
 
     % --- computed
     properties
