@@ -30,8 +30,8 @@ nb_edge = parent_mesh.nb_edge;
 nb_node = parent_mesh.nb_node;
 %--------------------------------------------------------------------------
 obj.matrix.id_edge_a = 1:nb_edge;
-obj.matrix.sigmawewe = sparse(nb_edge,nb_edge);
-obj.matrix.obj.matrix.nu0nurwfwf = sparse(nb_face,nb_face);
+obj.matrix.obj.matrix.sigmawewe = sparse(nb_edge,nb_edge);
+obj.matrix.nu0nurwfwf = sparse(nb_face,nb_face);
 %--------------------------------------------------------------------------
 allowed_physical_dom = {'econductor','mconductor','airbox','sibc',...
                         'bsfield','coil','nomesh','pmagnet','embc'};
@@ -50,10 +50,13 @@ for i = 1:length(allowed_physical_dom)
     allphydomid = fieldnames(obj.(phydom_type));
     for j = 1:length(allphydomid)
         id_phydom = allphydomid{j};
+        phydom = obj.(phydom_type).(id_phydom);
+        if isa(phydom,'IsCoilAphi') || isa(phydom,'VsCoilAphi')
+            continue
+        end
         % ---
         f_fprintf(0,['Assembly #' phydom_type],1,id_phydom,0,'\n');
         % ---
-        phydom = obj.(phydom_type).(id_phydom);
         phydom.assembly;
     end
 end
@@ -114,14 +117,14 @@ obj.matrix.nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) = ...
     obj.matrix.nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) + ...
     nu0wfwf(id_face_in_elem_air,id_face_in_elem_air);
 % ---
-sigmawewe = sigmawewe + gsibcwewe;
+obj.matrix.sigmawewe = obj.matrix.sigmawewe + gsibcwewe;
 % ---
 freq = obj.frequency;
 jome = 1j*2*pi*freq;
 S11  = obj.parent_mesh.discrete.rot.' * obj.matrix.nu0nurwfwf * obj.parent_mesh.discrete.rot;
-S11  = S11 + jome .* sigmawewe;
-S12  = jome .* sigmawewe * obj.parent_mesh.discrete.grad;
-S22  = jome .* obj.parent_mesh.discrete.grad.' * sigmawewe * obj.parent_mesh.discrete.grad;
+S11  = S11 + jome .* obj.matrix.sigmawewe;
+S12  = jome .* obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad;
+S22  = jome .* obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad;
 % --- dirichlet remove
 S11 = S11(id_edge_a_unknown,id_edge_a_unknown);
 S12 = S12(id_edge_a_unknown,:);
@@ -158,9 +161,9 @@ for iec = 1:length(id_coil__)
         alpha  = coil.matrix.alpha;
         i_coil = coil.matrix.i_coil;
         %------------------------------------------------------------------
-        S13 = jome * (sigmawewe * obj.parent_mesh.discrete.grad * alpha);
-        S23 = jome * (obj.parent_mesh.discrete.grad.' * sigmawewe * obj.parent_mesh.discrete.grad * alpha);
-        S33 = jome * (alpha.' * obj.parent_mesh.discrete.grad.' * sigmawewe * obj.parent_mesh.discrete.grad * alpha);
+        S13 = jome * (obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
+        S23 = jome * (obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
+        S33 = jome * (alpha.' * obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
         S13 = S13(id_edge_a_unknown,1);
         S23 = S23(id_node_phi_unknown,1);
         LHS = [LHS [S13;  S23]];
@@ -174,10 +177,10 @@ for iec = 1:length(id_coil__)
         Voltage  = coil.matrix.v_coil;
         alpha    = coil.matrix.alpha;
         %------------------------------------------------------------------
-        vRHSed = - sigmawewe * obj.parent_mesh.discrete.grad * (alpha .* Voltage);
+        vRHSed = - obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * (alpha .* Voltage);
         vRHSed = vRHSed(id_edge_a_unknown);
         %------------------------------------------------------------------
-        vRHSno = - obj.parent_mesh.discrete.grad.'  * sigmawewe * ...
+        vRHSno = - obj.parent_mesh.discrete.grad.'  * obj.matrix.sigmawewe * ...
                    obj.parent_mesh.discrete.grad * (alpha .* Voltage);
         vRHSno = vRHSno(id_node_phi_unknown);
         %------------------------------------------------------------------

@@ -89,6 +89,7 @@ classdef MconductorAphi < Mconductor
             obj.matrix.nu0nurwfwf = nu0nurwfwf;
             % ---
             obj.build_done = 1;
+            obj.assembly_done = 0;
         end
     end
 

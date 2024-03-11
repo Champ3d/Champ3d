@@ -19,6 +19,7 @@ classdef BsfieldAphi < Bsfield
     properties (Access = private)
         setup_done = 0
         build_done = 0
+        assembly_done = 0
     end
 
     % --- Contructor
@@ -42,6 +43,7 @@ classdef BsfieldAphi < Bsfield
             % ---
             obj.setup_done = 0;
             obj.build_done = 0;
+            obj.assembly_done = 0;
             % ---
             obj.setup;
         end
@@ -59,6 +61,7 @@ classdef BsfieldAphi < Bsfield
             obj.setup_done = 1;
             % ---
             obj.build_done = 0;
+            obj.assembly_done = 0;
         end
     end
 
@@ -83,47 +86,55 @@ classdef BsfieldAphi < Bsfield
             obj.matrix.wfbs = wfbs;
             % ---
             obj.build_done = 1;
+            obj.assembly_done = 0;
         end
     end
 
     % --- assembly
     methods
         function assembly(obj)
-            a_bsfield = zeros(nb_edge,1);
-            for iec = 1:length(id_bsfield__)
-                %----------------------------------------------------------------------
-                wfbs = sparse(nb_face,1);
-                %----------------------------------------------------------------------
-                id_phydom = id_bsfield__{iec};
-                %----------------------------------------------------------------------
-                f_fprintf(0,'--- #bsfield',1,id_phydom,0,'\n');
-                %----------------------------------------------------------------------
-                id_elem = obj.bsfield.(id_phydom).matrix.gid_elem;
-                lmatrix = obj.bsfield.(id_phydom).matrix.wfbs;
-                for i = 1:nbFa_inEl
-                    wfbs = wfbs + ...
-                        sparse(id_face_in_elem(i,id_elem),1,lmatrix(:,i),nb_face,1);
-                end
-                %----------------------------------------------------------------------
-                rotb = obj.parent_mesh.discrete.rot.' * wfbs;
-                rotrot = obj.parent_mesh.discrete.rot.' * ...
-                    obj.matrix.wfwf * ...
-                    obj.parent_mesh.discrete.rot;
-                %----------------------------------------------------------------------
-                id_edge_a_unknown = obj.matrix.id_edge_a;
-                %----------------------------------------------------------------------
-                rotb = rotb(id_edge_a_unknown,1);
-                rotrot = rotrot(id_edge_a_unknown,id_edge_a_unknown);
-                %----------------------------------------------------------------------
-                int_oned_a = zeros(nb_edge,1);
-                int_oned_a(id_edge_a_unknown) = f_solve_axb(rotrot,rotb);
-                clear rotb rotrot
-                %----------------------------------------------------------------------
-                a_bsfield = a_bsfield + int_oned_a;
+            % ---
+            obj.build;
+            % ---
+            if obj.assembly_done
+                return
             end
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
+            a_bsfield = zeros(nb_edge,1);
+            %--------------------------------------------------------------
+            wfbs = sparse(nb_face,1);
+            %--------------------------------------------------------------
+            id_phydom = id_bsfield__{iec};
+            %--------------------------------------------------------------
+            f_fprintf(0,'--- #bsfield',1,id_phydom,0,'\n');
+            %--------------------------------------------------------------
+            id_elem = obj.bsfield.(id_phydom).matrix.gid_elem;
+            lmatrix = obj.bsfield.(id_phydom).matrix.wfbs;
+            for i = 1:nbFa_inEl
+                wfbs = wfbs + ...
+                    sparse(id_face_in_elem(i,id_elem),1,lmatrix(:,i),nb_face,1);
+            end
+            %--------------------------------------------------------------
+            rotb = obj.parent_mesh.discrete.rot.' * wfbs;
+            rotrot = obj.parent_mesh.discrete.rot.' * ...
+                obj.matrix.wfwf * ...
+                obj.parent_mesh.discrete.rot;
+            %--------------------------------------------------------------
+            id_edge_a_unknown = obj.matrix.id_edge_a;
+            %--------------------------------------------------------------
+            rotb = rotb(id_edge_a_unknown,1);
+            rotrot = rotrot(id_edge_a_unknown,id_edge_a_unknown);
+            %--------------------------------------------------------------
+            int_oned_a = zeros(nb_edge,1);
+            int_oned_a(id_edge_a_unknown) = f_solve_axb(rotrot,rotb);
+            clear rotb rotrot
+            %--------------------------------------------------------------
+            a_bsfield = a_bsfield + int_oned_a;
+            %--------------------------------------------------------------
             obj.dof.a_bs = a_bsfield;
             obj.dof.bs   = obj.parent_mesh.discrete.rot * a_bsfield;
+            %--------------------------------------------------------------
+            obj.assembly_done = 1;
         end
     end
 end
