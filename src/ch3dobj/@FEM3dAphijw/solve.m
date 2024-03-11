@@ -447,7 +447,7 @@ end
 clear wfjs
 %--------------------------------------------------------------------------
 obj.dof.t_js = t_jsfield;
-obj.dof.js  = obj.parent_mesh.discrete.rot * t_jsfield;
+obj.dof.js   = obj.parent_mesh.discrete.rot * t_jsfield;
 obj.matrix.js  = obj.parent_mesh.field_wf('dof',obj.dof.js);
 %--------------------------------------------------------------------------
 % --- bsfield
@@ -691,6 +691,8 @@ obj.fields.ev = obj.parent_mesh.field_we('dof',obj.dof.e);
 obj.fields.phiv = obj.dof.phi;
 
 % ---
+obj.fields.jv = sparse(3,nb_elem);
+% ---
 for iec = 1:length(id_econductor__)
     %----------------------------------------------------------------------
     id_phydom = id_econductor__{iec};
@@ -702,7 +704,7 @@ for iec = 1:length(id_econductor__)
     %----------------------------------------------------------------------
     if any(f_strcmpi(coef_array_type,{'scalar'}))
         %------------------------------------------------------------------
-        obj.fields.jv(1,id_elem) = coefficient .* obj.fields.ev(1,id_elem);
+        obj.fields.jv(:,id_elem) = coefficient .* obj.fields.ev(:,id_elem);
         %------------------------------------------------------------------
     elseif any(f_strcmpi(coef_array_type,{'tensor'}))
         %------------------------------------------------------------------

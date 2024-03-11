@@ -12,7 +12,6 @@ classdef Mesh1d < Xhandle
 
     % --- Properties
     properties
-        info = []
         dom = []
     end
 
@@ -23,14 +22,8 @@ classdef Mesh1d < Xhandle
 
     % --- Constructors
     methods
-        function obj = Mesh1d(args)
-            arguments
-                args.info = 'no_info'
-                args.data = []
-            end
-            % ---
-            obj.info = args.info;
-            obj.dom = args.data;
+        function obj = Mesh1d()
+            obj@Xhandle;
         end
     end
 
@@ -43,7 +36,7 @@ classdef Mesh1d < Xhandle
                 % ---
                 args.id char
                 args.len {mustBeNumeric}
-                args.dtype = 'lin'
+                args.dtype {mustBeMember(args.dtype,{'lin','log+','log-','log+-','log-+','log='})} = 'lin'
                 args.dnum {mustBeInteger} = 1
                 args.flog {mustBeNumeric} = 1.05
             end

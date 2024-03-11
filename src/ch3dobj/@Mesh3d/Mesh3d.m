@@ -13,8 +13,7 @@ classdef Mesh3d < Mesh
     % --- Constructors
     methods
         function obj = Mesh3d()
-            obj = obj@Mesh;
-            obj.meshds.sign_edge_in_elem = 0;
+            obj@Mesh;
         end
     end
 

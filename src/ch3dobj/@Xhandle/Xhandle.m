@@ -28,7 +28,7 @@ classdef Xhandle < matlab.mixin.Copyable
             validprop = properties(obj);
             % ---
             for i = 1:length(fname)
-                if any(f_strcmpi(fname,validprop))
+                if any(f_strcmpi(fname{i},validprop))
                     obj.(fname{i}) = objx.(fname{i});
                 end
             end

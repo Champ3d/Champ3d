@@ -13,15 +13,17 @@ classdef FEM3dAphijw < FEM3dAphi
     methods
         function obj = FEM3dAphijw(args)
             arguments
-                args.id = 'no_id'
-                % ---
                 args.parent_mesh = []
                 args.frequency = 0
             end
             % ---
-            argu = f_to_namedarg(args);
-            obj = obj@FEM3dAphi(argu{:});
+            obj@FEM3dAphi;
             % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
+            obj <= args;
         end
     end
 end

@@ -12,8 +12,20 @@ function VM = f_magnitude(V,varargin)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-
-VM = sqrt(sum(V.^2));
-if ~isreal(V)
-    VM = abs(VM);
+if isreal(V)
+    VM  = sqrt(sum(V.^2));
+else
+    MV  = abs(V);
+    ang = angle(V);
+    % ---
+    VM1 = MV .* sin(ang);
+    VM1 = sqrt(sum(VM1.^2));
+    VM2 = MV .* cos(ang);
+    VM2 = sqrt(sum(VM2.^2));
+    VM  = max([VM1;VM2]);
 end
+
+% VM = sqrt(sum(V .* conj(V)));
+% if ~isreal(V)
+%     VM = abs(VM);
+% end

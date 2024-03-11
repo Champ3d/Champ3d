@@ -12,7 +12,6 @@ classdef Mesh < Xhandle
 
     % --- Properties
     properties
-        info
         node
         elem
         edge
@@ -26,14 +25,17 @@ classdef Mesh < Xhandle
         % ---
         dom
         % ---
+        refelem
         meshds
         discrete
         intkit
+        prokit
         % ---
-        is_build = 0
-        meshds_to_be_rebuild = 1
-        discrete_to_be_rebuild = 1
-        intkit_to_be_rebuild = 1
+        setup_done = 0
+        build_meshds_done = 0
+        build_discrete_done = 0
+        build_intkit_done = 0
+        build_prokit_done = 0
         % --- submesh
         parent_mesh
         gid_node
@@ -54,12 +56,8 @@ classdef Mesh < Xhandle
 
     % --- Constructors
     methods
-        function obj = Mesh(args)
-            arguments
-                args.info = 'no_info';
-            end
+        function obj = Mesh()
             % ---
-            obj.info = args.info;
             obj.meshds.id_edge_in_elem = [];
             obj.meshds.ori_edge_in_elem = [];
             obj.meshds.sign_edge_in_elem = [];
@@ -88,6 +86,14 @@ classdef Mesh < Xhandle
             obj.intkit.We = {};
             obj.intkit.Wf = {};
             obj.intkit.Wn = {};
+            % ---
+            obj.prokit.detJ = {};
+            obj.prokit.gradWn = {};
+            obj.prokit.Jinv = {};
+            obj.prokit.We = {};
+            obj.prokit.Wf = {};
+            obj.prokit.Wn = {};
+            obj.prokit.node = {};
         end
     end
 

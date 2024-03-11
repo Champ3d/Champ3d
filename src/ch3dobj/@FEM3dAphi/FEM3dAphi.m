@@ -14,13 +14,15 @@ classdef FEM3dAphi < EmModel
     methods
         function obj = FEM3dAphi(args)
             arguments
-                args.id = 'no_id'
-                args.parent_mesh = []
-                args.frequency = 0
+                args.parent_mesh
+                args.frequency
             end
             % ---
-            argu = f_to_namedarg(args);
-            obj = obj@EmModel(argu{:});
+            obj@EmModel;
+            % ---
+            if isempty(fieldnames(args))
+                return
+            end
             % ---
             obj <= args;
         end

@@ -30,11 +30,31 @@ classdef TriMesh < Mesh2d
             % ---
             obj = obj@Mesh2d;
             % ---
-            obj.elem_type = 'tri';
-            obj.node = args.node;
-            obj.elem = args.elem;
+            if isempty(fieldnames(args))
+                return
+            end
             % ---
+            obj <= args;
+            % ---
+            obj.setup_done = 0;
+            % ---
+            obj.setup;
+        end
+    end
+
+    % --- setup
+    methods
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            obj.elem_type = 'tri';
+            obj.reference;
             obj.calflatnode;
+            % ---
+            obj.setup_done = 1;
         end
     end
 
@@ -67,6 +87,10 @@ classdef TriMesh < Mesh2d
             axis equal; axis tight; alpha(alpha_); hold on
             %--------------------------------------------------------------
             f_chlogo;
+        end
+        % -----------------------------------------------------------------
+        function reference(obj)
+            % --- XTODO
         end
     end
 

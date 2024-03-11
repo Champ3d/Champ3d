@@ -14,7 +14,7 @@ arguments
     args.id_elem = []
     args.coefficient = 1
     args.dof = 1
-    args.on {mustBeMember(args.on,{'center','gauss_points'})} = 'center'
+    args.on {mustBeMember(args.on,{'center','gauss_points','interpolation_points'})} = 'center'
 end
 %--------------------------------------------------------------------------
 id_elem = args.id_elem;
@@ -44,12 +44,13 @@ if isempty(obj.meshds.id_edge_in_elem)
 end
 id_edge_in_elem = obj.meshds.id_edge_in_elem;
 %--------------------------------------------------------------------------
-if isempty(obj.intkit.We) || isempty(obj.intkit.cWe)
-    obj.build_intkit;
-end
-%--------------------------------------------------------------------------
 switch on_
     case 'center'
+        % ---
+        if isempty(obj.intkit.cWe)
+            obj.build_intkit;
+        end
+        % ---
         nbG = 1;
         % ---
         Wx = cell(1,nbG);
@@ -57,11 +58,28 @@ switch on_
             Wx{iG} = obj.intkit.cWe{iG}(id_elem,:,:);
         end
     case 'gauss_points'
+        % ---
+        if isempty(obj.intkit.We)
+            obj.build_intkit;
+        end
+        % ---
         nbG = con.nbG;
         % ---
         Wx = cell(1,nbG);
         for iG = 1:nbG
             Wx{iG} = obj.intkit.We{iG}(id_elem,:,:);
+        end
+    case 'interpolation_points'
+        % ---
+        if isempty(obj.prokit.We)
+            obj.build_prokit;
+        end
+        % ---
+        nbG = obj.refelem.nbI;
+        % ---
+        Wx = cell(1,nbG);
+        for iG = 1:nbG
+            Wx{iG} = obj.prokit.We{iG}(id_elem,:,:);
         end
 end
 %--------------------------------------------------------------------------
@@ -96,9 +114,9 @@ elseif any(f_strcmpi(coef_array_type,{'tensor'}))
         fi = zeros(3,length(id_elem));
         %------------------------------------------------------------------
         for i = 1:nbEd_inEl
-            wix = Wx(:,1,i);
-            wiy = Wx(:,2,i);
-            wiz = Wx(:,3,i);
+            wix = Wx{iG}(:,1,i);
+            wiy = Wx{iG}(:,2,i);
+            wiz = Wx{iG}(:,3,i);
             id_edge = id_edge_in_elem(i,id_elem);
             fi(1,:) = fi(1,:) + (coefficient(:,1,1) .* wix + ...
                                  coefficient(:,1,2) .* wiy + ...

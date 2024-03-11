@@ -24,17 +24,37 @@ classdef QuadMesh < Mesh2d
     methods
         function obj = QuadMesh(args)
             arguments
-                args.node = []
-                args.elem = []
+                args.node
+                args.elem
             end
             % ---
             obj = obj@Mesh2d;
             % ---
-            obj.elem_type = 'quad';
-            obj.node = args.node;
-            obj.elem = args.elem;
+            if isempty(fieldnames(args))
+                return
+            end
             % ---
+            obj <= args;
+            % ---
+            obj.setup_done = 0;
+            % ---
+            obj.setup;
+        end
+    end
+
+    % --- setup
+    methods
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            obj.elem_type = 'quad';
+            obj.reference;
             obj.calflatnode;
+            % ---
+            obj.setup_done = 1;
         end
     end
 
@@ -47,6 +67,7 @@ classdef QuadMesh < Mesh2d
                 args.edge_color = [0.4940 0.1840 0.5560]
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
+                args.field_value = []
             end
             edge_color_  = args.edge_color;
             face_color_  = args.face_color;
@@ -59,6 +80,10 @@ classdef QuadMesh < Mesh2d
             msh.FaceColor = face_color_;
             msh.EdgeColor = edge_color_; % [0.7 0.7 0.7] --> gray
             %--------------------------------------------------------------
+            if ~isempty(args.field_value)
+                msh.FaceVertexCData = f_tocolv(full(args.field_value));
+            end
+            %--------------------------------------------------------------
             patch(msh);
             xlabel('x (m)'); ylabel('y (m)');
             if size(obj.node,1) == 3
@@ -67,6 +92,10 @@ classdef QuadMesh < Mesh2d
             axis equal; axis tight; alpha(alpha_); hold on
             %--------------------------------------------------------------
             f_chlogo;
+        end
+        % -----------------------------------------------------------------
+        function reference(obj)
+            % --- XTODO
         end
     end
 
