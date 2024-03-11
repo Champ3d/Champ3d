@@ -17,7 +17,9 @@ classdef MconductorAphi < Mconductor
 
     % --- computed
     properties (Access = private)
+        setup_done = 0
         build_done = 0
+        assembly_done = 0
     end
 
     % --- Contructor
@@ -41,6 +43,7 @@ classdef MconductorAphi < Mconductor
             % ---
             obj.setup_done = 0;
             obj.build_done = 0;
+            obj.assembly_done = 0;
             % ---
             obj.setup;
         end
@@ -55,13 +58,10 @@ classdef MconductorAphi < Mconductor
             % ---
             setup@Mconductor(obj);
             % ---
-            if isnumeric(obj.mur)
-                obj.mur = Parameter('f',obj.mur);
-            end
-            % ---
             obj.setup_done = 1;
             % ---
             obj.build_done = 0;
+            obj.assembly_done = 0;
         end
     end
 
@@ -95,51 +95,47 @@ classdef MconductorAphi < Mconductor
     % --- assembly
     methods
         function assembly(obj)
-            id_elem_mcon = obj.matrix.id_elem_mcon;
-            nu0nurwfwf = sparse(nb_face,nb_face);
             % ---
-            for iec = 1:length(id_mconductor__)
-                %----------------------------------------------------------------------
-                id_phydom = id_mconductor__{iec};
-                %----------------------------------------------------------------------
-                f_fprintf(0,'--- #mcon',1,id_phydom,0,'\n');
-                %----------------------------------------------------------------------
-                id_elem = obj.mconductor.(id_phydom).matrix.gid_elem;
-                lmatrix = obj.mconductor.(id_phydom).matrix.nu0nurwfwf;
-                %----------------------------------------------------------------------
-                [~,id_] = intersect(id_elem,id_elem_nomesh);
-                id_elem(id_) = [];
-                lmatrix(id_,:,:) = [];
-                %----------------------------------------------------------------------
-                for i = 1:nbFa_inEl
-                    for j = i+1 : nbFa_inEl
-                        nu0nurwfwf = nu0nurwfwf + ...
-                            sparse(id_face_in_elem(i,id_elem),id_face_in_elem(j,id_elem),...
-                            lmatrix(:,i,j),nb_face,nb_face);
-                    end
+            obj.build;
+            % ---
+            if obj.assembly_done
+                return
+            end
+            %--------------------------------------------------------------
+            id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
+            id_face_in_elem = obj.parent_model.parent_mesh.meshds.id_face_in_elem;
+            nb_face = obj.parent_model.parent_mesh.nb_face;
+            nbFa_inEl = obj.parent_model.parent_mesh.refelem.nbFa_inEl;
+            %--------------------------------------------------------------
+            gid_elem = obj.matrix.gid_elem;
+            lmatrix = obj.matrix.nu0nurwfwf;
+            %--------------------------------------------------------------
+            [~,id_] = intersect(gid_elem,id_elem_nomesh);
+            gid_elem(id_) = [];
+            lmatrix(id_,:,:) = [];
+            %--------------------------------------------------------------
+            nu0nurwfwf = sparse(nb_face,nb_face);
+            %--------------------------------------------------------------
+            for i = 1:nbFa_inEl
+                for j = i+1 : nbFa_inEl
+                    nu0nurwfwf = nu0nurwfwf + ...
+                        sparse(id_face_in_elem(i,gid_elem),id_face_in_elem(j,gid_elem),...
+                        lmatrix(:,i,j),nb_face,nb_face);
                 end
-                %----------------------------------------------------------------------
             end
             % ---
             nu0nurwfwf = nu0nurwfwf + nu0nurwfwf.';
             % ---
-            for iec = 1:length(id_mconductor__)
-                %----------------------------------------------------------------------
-                id_phydom = id_mconductor__{iec};
-                %----------------------------------------------------------------------
-                id_elem = obj.mconductor.(id_phydom).matrix.gid_elem;
-                lmatrix = obj.mconductor.(id_phydom).matrix.nu0nurwfwf;
-                %----------------------------------------------------------------------
-                [~,id_] = intersect(id_elem,id_elem_nomesh);
-                id_elem(id_) = [];
-                lmatrix(id_,:,:) = [];
-                %----------------------------------------------------------------------
-                for i = 1:nbFa_inEl
-                    nu0nurwfwf = nu0nurwfwf + ...
-                        sparse(id_face_in_elem(i,id_elem),id_face_in_elem(i,id_elem),...
-                        lmatrix(:,i,i),nb_face,nb_face);
-                end
+            for i = 1:nbFa_inEl
+                nu0nurwfwf = nu0nurwfwf + ...
+                    sparse(id_face_in_elem(i,gid_elem),id_face_in_elem(i,gid_elem),...
+                    lmatrix(:,i,i),nb_face,nb_face);
             end
+            %--------------------------------------------------------------
+            obj.parent_model.matrix.nu0nurwfwf = ...
+                obj.parent_model.matrix.nu0nurwfwf + nu0nurwfwf;
+            %--------------------------------------------------------------
+            obj.assembly_done = 1;
         end
     end
 end

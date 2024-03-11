@@ -22,6 +22,17 @@ if obj.assembly_done
     return
 end
 %--------------------------------------------------------------------------
+%--------------------------------------------------------------------------
+parent_mesh = obj.parent_mesh;
+nb_elem = parent_mesh.nb_elem;
+nb_face = parent_mesh.nb_face;
+nb_edge = parent_mesh.nb_edge;
+nb_node = parent_mesh.nb_node;
+%--------------------------------------------------------------------------
+obj.matrix.id_edge_a = 1:nb_edge;
+obj.matrix.sigmawewe = sparse(nb_edge,nb_edge);
+obj.matrix.obj.matrix.nu0nurwfwf = sparse(nb_face,nb_face);
+%--------------------------------------------------------------------------
 allowed_physical_dom = {'econductor','mconductor','airbox','sibc',...
                         'bsfield','coil','nomesh','pmagnet','embc'};
 %--------------------------------------------------------------------------
@@ -50,15 +61,6 @@ end
 obj.assembly_done = 1;
 
 
-
-%--------------------------------------------------------------------------
-parent_mesh = obj.parent_mesh;
-nb_elem = parent_mesh.nb_elem;
-nb_face = parent_mesh.nb_face;
-nb_edge = parent_mesh.nb_edge;
-nb_node = parent_mesh.nb_node;
-%--------------------------------------------------------------------------
-obj.matrix.id_edge_a = 1:nb_edge;
 %--------------------------------------------------------------------------
 con = f_connexion(parent_mesh.elem_type);
 nbEd_inEl = con.nbEd_inEl;
@@ -102,21 +104,21 @@ id_edge_a_unknown   = setdiff(id_inner_edge_airbox,id_inner_edge_nomesh);
 id_node_phi_unknown = setdiff(id_node_phi,...
                    [id_inner_node_nomesh id_node_netrode id_node_petrode]);
 % --- LSH
-% --- nu0nurwfwf
+% --- obj.matrix.nu0nurwfwf
 id_elem_air = setdiff(id_elem_airbox,[id_elem_nomesh id_elem_mcon]);
 id_face_in_elem_air = f_uniquenode(id_face_in_elem(:,id_elem_air));
 mu0 = 4 * pi * 1e-7;
 nu0wfwf = (1/mu0) .* obj.matrix.wfwfx;
 % ---
-nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) = ...
-    nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) + ...
+obj.matrix.nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) = ...
+    obj.matrix.nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) + ...
     nu0wfwf(id_face_in_elem_air,id_face_in_elem_air);
 % ---
 sigmawewe = sigmawewe + gsibcwewe;
 % ---
 freq = obj.frequency;
 jome = 1j*2*pi*freq;
-S11  = obj.parent_mesh.discrete.rot.' * nu0nurwfwf * obj.parent_mesh.discrete.rot;
+S11  = obj.parent_mesh.discrete.rot.' * obj.matrix.nu0nurwfwf * obj.parent_mesh.discrete.rot;
 S11  = S11 + jome .* sigmawewe;
 S12  = jome .* sigmawewe * obj.parent_mesh.discrete.grad;
 S22  = jome .* obj.parent_mesh.discrete.grad.' * sigmawewe * obj.parent_mesh.discrete.grad;
@@ -133,7 +135,7 @@ LHS = [LHS; S12.' S22]; clear S12 S22;
 %--------------------------------------------------------------------------
 % --- RHS
 bsfieldRHS = - obj.parent_mesh.discrete.rot.' * ...
-               nu0nurwfwf * ...
+               obj.matrix.nu0nurwfwf * ...
                obj.parent_mesh.discrete.rot * obj.dof.a_bs;
 pmagnetRHS =   obj.parent_mesh.discrete.rot.' * ...
                ((1/mu0).* obj.matrix.wfwf) * ...

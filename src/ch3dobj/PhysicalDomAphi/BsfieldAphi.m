@@ -56,10 +56,6 @@ classdef BsfieldAphi < Bsfield
             % ---
             setup@Bsfield(obj);
             % ---
-            if isnumeric(obj.bs)
-                obj.bs = Parameter('f',obj.bs);
-            end
-            % ---
             obj.setup_done = 1;
             % ---
             obj.build_done = 0;

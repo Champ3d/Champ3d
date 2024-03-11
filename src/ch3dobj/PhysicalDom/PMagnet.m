@@ -47,10 +47,6 @@ classdef PMagnet < PhysicalDom
             % ---
             setup@PhysicalDom(obj);
             % ---
-            if isnumeric(obj.br)
-                obj.br = Parameter('f',obj.br);
-            end
-            % ---
             obj.setup_done = 1;
         end
     end

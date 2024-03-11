@@ -58,10 +58,6 @@ classdef EconductorAphi < Econductor
             % ---
             setup@Econductor(obj);
             % ---
-            if isnumeric(obj.sigma)
-                obj.sigma = Parameter('f',obj.sigma);
-            end
-            % ---
             obj.setup_done = 1;
             % ---
             obj.build_done = 0;
@@ -97,6 +93,7 @@ classdef EconductorAphi < Econductor
             obj.matrix.sigma_array = sigma_array;
             % ---
             obj.build_done = 1;
+            obj.assembly_done = 0;
         end
     end
 
@@ -109,62 +106,40 @@ classdef EconductorAphi < Econductor
             if obj.assembly_done
                 return
             end
-            % ---
-            dom = obj.dom;
-            parent_mesh = dom.parent_mesh;
-            gid_elem = dom.gid_elem;
-            % ---
-            elem = parent_mesh.elem(:,gid_elem);
+            %--------------------------------------------------------------
+            id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
+            id_edge_in_elem = obj.parent_model.parent_mesh.meshds.id_edge_in_elem;
+            nb_edge = obj.parent_model.parent_mesh.nb_edge;
+            nbEd_inEl = obj.parent_model.parent_mesh.refelem.nbEd_inEl;
+            %--------------------------------------------------------------
+            gid_elem = obj.matrix.gid_elem;
+            lmatrix = obj.matrix.sigmawewe;
+            %--------------------------------------------------------------
+            [~,id_] = intersect(gid_elem,id_elem_nomesh);
+            gid_elem(id_) = [];
+            lmatrix(id_,:,:) = [];
+            %--------------------------------------------------------------
             sigmawewe = sparse(nb_edge,nb_edge);
-            % ---
-            id_node_phi = [];
-            % ---
-            for iec = 1:length(id_econductor__)
-                %----------------------------------------------------------------------
-                id_phydom = id_econductor__{iec};
-                %----------------------------------------------------------------------
-                f_fprintf(0,'--- #econ',1,id_phydom,0,'\n');
-                %----------------------------------------------------------------------
-                id_elem = obj.econductor.(id_phydom).matrix.gid_elem;
-                lmatrix = obj.econductor.(id_phydom).matrix.sigmawewe;
-                %----------------------------------------------------------------------
-                [~,id_] = intersect(id_elem,id_elem_nomesh);
-                id_elem(id_) = [];
-                lmatrix(id_,:,:) = [];
-                %----------------------------------------------------------------------
-                for i = 1:nbEd_inEl
-                    for j = i+1 : nbEd_inEl
-                        sigmawewe = sigmawewe + ...
-                            sparse(id_edge_in_elem(i,id_elem),id_edge_in_elem(j,id_elem),...
-                            lmatrix(:,i,j),nb_edge,nb_edge);
-                    end
+            %--------------------------------------------------------------
+            for i = 1:nbEd_inEl
+                for j = i+1 : nbEd_inEl
+                    sigmawewe = sigmawewe + ...
+                        sparse(id_edge_in_elem(i,gid_elem),id_edge_in_elem(j,gid_elem),...
+                        lmatrix(:,i,j),nb_edge,nb_edge);
                 end
-                %----------------------------------------------------------------------
-                id_node_phi = [id_node_phi ...
-                    obj.econductor.(id_phydom).matrix.gid_node_phi];
-                %----------------------------------------------------------------------
             end
             % ---
             sigmawewe = sigmawewe + sigmawewe.';
             % ---
-            for iec = 1:length(id_econductor__)
-                %----------------------------------------------------------------------
-                id_phydom = id_econductor__{iec};
-                %----------------------------------------------------------------------
-                id_elem = obj.econductor.(id_phydom).matrix.gid_elem;
-                lmatrix = obj.econductor.(id_phydom).matrix.sigmawewe;
-                %----------------------------------------------------------------------
-                [~,id_] = intersect(id_elem,id_elem_nomesh);
-                id_elem(id_) = [];
-                lmatrix(id_,:,:) = [];
-                %----------------------------------------------------------------------
-                for i = 1:nbEd_inEl
-                    sigmawewe = sigmawewe + ...
-                        sparse(id_edge_in_elem(i,id_elem),id_edge_in_elem(i,id_elem),...
-                        lmatrix(:,i,i),nb_edge,nb_edge);
-                end
+            for i = 1:nbEd_inEl
+                sigmawewe = sigmawewe + ...
+                    sparse(id_edge_in_elem(i,gid_elem),id_edge_in_elem(i,gid_elem),...
+                    lmatrix(:,i,i),nb_edge,nb_edge);
             end
-            % ---
+            %--------------------------------------------------------------
+            obj.parent_model.matrix.sigmawewe = ...
+                obj.parent_model.matrix.sigmawewe + sigmawewe;
+            %--------------------------------------------------------------
             obj.assembly_done = 1;
         end
     end
