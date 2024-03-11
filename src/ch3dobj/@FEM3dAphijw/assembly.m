@@ -81,24 +81,6 @@ id_inner_node_nomesh = obj.matrix.id_inner_node_nomesh;
 id_elem_airbox = obj.matrix.id_elem_airbox;
 id_inner_edge_airbox = obj.matrix.id_inner_edge_airbox;
 %--------------------------------------------------------------------------
-% --- mconductor
-
-%--------------------------------------------------------------------------
-% --- econductor
-
-%--------------------------------------------------------------------------
-% --- js-coil
-
-%--------------------------------------------------------------------------
-% --- bsfield
-
-%--------------------------------------------------------------------------
-% --- pmagnet
-
-%--------------------------------------------------------------------------
-% --- sibc
-
-%--------------------------------------------------------------------------
 %
 %               MATRIX SYSTEM
 %
@@ -106,10 +88,14 @@ id_inner_edge_airbox = obj.matrix.id_inner_edge_airbox;
 id_edge_a_unknown   = setdiff(id_inner_edge_airbox,id_inner_edge_nomesh);
 id_node_phi_unknown = setdiff(id_node_phi,...
                    [id_inner_node_nomesh id_node_netrode id_node_petrode]);
+
 % --- LSH
 % --- obj.matrix.nu0nurwfwf
+
 id_elem_air = setdiff(id_elem_airbox,[id_elem_nomesh id_elem_mcon]);
 id_face_in_elem_air = f_uniquenode(id_face_in_elem(:,id_elem_air));
+
+
 mu0 = 4 * pi * 1e-7;
 nu0wfwf = (1/mu0) .* obj.matrix.wfwfx;
 % ---
