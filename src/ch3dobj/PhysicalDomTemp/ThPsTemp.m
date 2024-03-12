@@ -8,15 +8,18 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ThPsTemp < PhysicalDom
+classdef ThPsTemp < ThPs
 
+    % --- computed
     properties
-        ps = 0
+        matrix
     end
 
     % --- computed
     properties (Access = private)
         setup_done = 0
+        build_done = 0
+        assembly_done = 0
     end
 
     % --- Contructor
@@ -30,7 +33,7 @@ classdef ThPsTemp < PhysicalDom
                 args.ps
             end
             % ---
-            obj = obj@PhysicalDom;
+            obj = obj@ThPs;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -39,6 +42,8 @@ classdef ThPsTemp < PhysicalDom
             obj <= args;
             % ---
             obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
             % ---
             obj.setup;
         end
@@ -51,13 +56,93 @@ classdef ThPsTemp < PhysicalDom
                 return
             end
             % ---
-            setup@PhysicalDom(obj);
-            % ---
-            if isnumeric(obj.ps)
-                obj.ps = Parameter('f',obj.ps);
-            end
+            setup@ThPs(obj);
             % ---
             obj.setup_done = 1;
+            % ---
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+        end
+    end
+
+    % --- build
+    methods
+        function build(obj)
+            % ---
+            obj.setup;
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            dom = obj.dom;
+            % ---
+            gid_face = dom.gid_face;
+            nb_face  = length(gid_face);
+            % ---
+            gid_node_t = f_uniquenode(dom.parent_mesh.face(:,gid_face));
+            % ---
+            ps_array = obj.ps.get_on(dom);
+            ps_array = obj.column_array(ps_array,'nb_elem',nb_face);
+            % ---
+            dom.build_submesh;
+            submesh = dom.submesh;
+            for k = 1:length(submesh)
+                sm = submesh{k};
+                sm.build_intkit;
+                % ---
+                lid_face_  = sm.lid_face;
+                ps_sm = ps_array(lid_face_);
+                pswn{k} = sm.cwn('coefficient',ps_sm);
+                % ---
+                gid_face_{k} = sm.gid_face;
+            end
+            % ---
+            obj.matrix.gid_node_t = gid_node_t;
+            % ---
+            obj.matrix.pswn = pswn;
+            obj.matrix.gid_face = gid_face_;
+            obj.matrix.ps_array = ps_array;
+            % ---
+            obj.build_done = 1;
+            obj.assembly_done = 0;
+        end
+    end
+
+    % --- assembly
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
+            % ---
+            if obj.assembly_done
+                return
+            end
+            %--------------------------------------------------------------
+            face = obj.parent_model.parent_mesh.face;
+            nb_node = obj.parent_model.parent_mesh.nb_node;
+            %--------------------------------------------------------------
+            pswn = sparse(nb_node,nb_node);
+            %--------------------------------------------------------------
+            gid_face = obj.matrix.gid_face;
+            lmatrix  = obj.matrix.pswn;
+            %--------------------------------------------------------------
+            for igr = 1:length(lmatrix)
+                nbNo_inFa = size(lmatrix{igr},2);
+                id_face = gid_face{igr};
+                for i = 1:nbNo_inFa
+                    pswn = pswn + ...
+                        sparse(face(i,id_face),1,lmatrix{igr}(:,i),nb_node,1);
+                end
+            end
+            %--------------------------------------------------------------
+            obj.parent_model.matrix.pswn = ...
+                obj.parent_model.matrix.pswn + pswn;
+            %--------------------------------------------------------------
+            obj.parent_model.matrix.id_node_t = ...
+                [obj.parent_model.matrix.id_node_t obj.matrix.gid_node_t];
+            %--------------------------------------------------------------
+            obj.assembly_done = 1;
         end
     end
 end
