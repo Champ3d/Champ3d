@@ -191,6 +191,7 @@ classdef PhysicalDom < Xhandle
 
     % --- Methods
     methods (Hidden)
+        % -----------------------------------------------------------------
         function plotfieldv(obj,args)
             arguments
                 obj
@@ -217,6 +218,34 @@ classdef PhysicalDom < Xhandle
             end
         end
         % -----------------------------------------------------------------
-        
+        function plotfields(obj,args)
+            arguments
+                obj
+                args.show_dom = 1
+                args.field_name = []
+            end
+            % ---
+            if args.show_dom
+                obj.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
+            end
+            % ---
+            if isa(obj.dom,'VolumeDom3d')
+                node = obj.parent_model.parent_mesh.node;
+                elem = obj.parent_model.parent_mesh.elem(:,obj.dom.gid_elem);
+                elem_type = f_elemtype(elem);
+                face = f_boundface(elem,node,'elem_type',elem_type);
+                id_node = f_uniquenode(face);
+                fs = obj.parent_model.fields.(args.field_name)(:,id_node);
+                no = obj.parent_model.parent_mesh.celem(:,id_elem);
+                if isreal(fs)
+                    f_quiver(no,fs);
+                else
+                    subplot(121);
+                    f_quiver(no,real(fs)); title('Real part')
+                    subplot(122);
+                    f_quiver(no,imag(fs)); title('Imag part')
+                end
+            end
+        end
     end
 end

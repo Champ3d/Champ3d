@@ -113,7 +113,7 @@ classdef ThPvTemp < ThPv
             nbNo_inEl = obj.parent_model.parent_mesh.refelem.nbNo_inEl;
             %--------------------------------------------------------------
             gid_elem = obj.matrix.gid_elem;
-            lmatrix = obj.matrix.rhocpwnwn;
+            lmatrix = obj.matrix.pvwn;
             %--------------------------------------------------------------
             [~,id_] = intersect(gid_elem,id_elem_nomesh);
             gid_elem(id_) = [];

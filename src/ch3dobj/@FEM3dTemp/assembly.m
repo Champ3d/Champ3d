@@ -32,6 +32,8 @@ obj.matrix.pswn       = sparse(nb_node,1);
 obj.matrix.pvwn       = sparse(nb_node,1);
 obj.dof.temp          = sparse(nb_node,1);
 %--------------------------------------------------------------------------
+obj.matrix.id_elem_nomesh = [];
+%--------------------------------------------------------------------------
 allowed_physical_dom = {'thconductor','thcapacitor','convection',...
                         'ps','pv'};
 %--------------------------------------------------------------------------
