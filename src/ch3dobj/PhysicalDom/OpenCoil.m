@@ -66,46 +66,42 @@ classdef OpenCoil < Coil
     methods
         % -----------------------------------------------------------------
         function get_electrode(obj)
-            if ~isempty(obj.parent_model)
-                if ~isempty(obj.parent_model.parent_mesh)
+            % ---
+            parent_mesh = obj.parent_model.parent_mesh;
+            etrode_eq = obj.etrode_equation;
+            id_dom3d = f_to_scellargin(obj.id_dom3d);
+            id_dom3d = id_dom3d{1};
+            % ---
+            gid_elem = parent_mesh.dom.(id_dom3d).gid_elem;
+            boface = f_boundface(parent_mesh.elem(:,gid_elem),...
+               parent_mesh.node,'elem_type',parent_mesh.elem_type);
+            % ---
+            gid_node = f_uniquenode(boface);
+            % ---
+            bonode = parent_mesh.node(:,gid_node);
+            % ---
+            petrode = [];
+            netrode = [];
+            for i = 1:length(etrode_eq)
+                condi = etrode_eq{i};
+                lid_node = f_findnode(bonode,'condition',condi);
+                if i == 1
+                    petrode = lid_node;
                     % ---
-                    parent_mesh = obj.parent_model.parent_mesh;
-                    etrode_eq = obj.etrode_equation;
-                    id_dom3d = f_to_scellargin(obj.id_dom3d);
-                    id_dom3d = id_dom3d{1};
-                    % ---
-                    gid_elem = parent_mesh.dom.(id_dom3d).gid_elem;
-                    boface = f_boundface(parent_mesh.elem(:,gid_elem),...
-                       parent_mesh.node,'elem_type',parent_mesh.elem_type);
-                    % ---
-                    gid_node = f_uniquenode(boface);
-                    % ---
-                    bonode = parent_mesh.node(:,gid_node);
-                    % ---
-                    petrode = [];
-                    netrode = [];
-                    for i = 1:length(etrode_eq)
-                        condi = etrode_eq{i};
-                        lid_node = f_findnode(bonode,'condition',condi);
-                        if i == 1
-                            petrode = lid_node;
-                            % ---
-                            if isempty(petrode)
-                                warning(['Electrode not found from eq ' etrode_eq{i}]);
-                            end
-                        else
-                            netrode = [netrode lid_node];
-                            % ---
-                            if isempty(netrode)
-                                warning(['Electrode not found from eq ' etrode_eq{i}]);
-                            end
-                        end
+                    if isempty(petrode)
+                        warning(['Electrode not found from eq ' etrode_eq{i}]);
                     end
-                    % -----------------------------------------------------
-                    obj.gid_node_petrode = unique(gid_node(petrode));
-                    obj.gid_node_netrode = unique(gid_node(netrode));
+                else
+                    netrode = [netrode lid_node];
+                    % ---
+                    if isempty(netrode)
+                        warning(['Electrode not found from eq ' etrode_eq{i}]);
+                    end
                 end
             end
+            % -------------------------------------------------------------
+            obj.gid_node_petrode = unique(gid_node(petrode));
+            obj.gid_node_netrode = unique(gid_node(netrode));
         end
         % -----------------------------------------------------------------
         function plot(obj,args)

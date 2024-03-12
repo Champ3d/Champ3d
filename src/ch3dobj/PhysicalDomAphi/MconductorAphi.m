@@ -136,6 +136,9 @@ classdef MconductorAphi < Mconductor
             obj.parent_model.matrix.nu0nurwfwf = ...
                 obj.parent_model.matrix.nu0nurwfwf + nu0nurwfwf;
             %--------------------------------------------------------------
+            obj.parent_model.matrix.gid_elem_mcon = ...
+                [obj.parent_model.matrix.gid_elem_mcon obj.matrix.gid_elem];
+            %--------------------------------------------------------------
             obj.assembly_done = 1;
         end
     end

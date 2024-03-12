@@ -99,8 +99,8 @@ classdef SolidOpenVsCoilAphi < OpenCoilAphi & SolidCoilAphi & VsCoilAphi
             end
             % ---
             build@OpenCoilAphi(obj);
-            obj.build_done = 0;
             build@VsCoilAphi(obj);
+            % ---
             obj.build_done = 1;
         end
     end

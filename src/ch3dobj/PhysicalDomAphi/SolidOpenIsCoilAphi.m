@@ -99,8 +99,8 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
             end
             % ---
             build@OpenCoilAphi(obj);
-            obj.build_done = 0;
             build@IsCoilAphi(obj);
+            % ---
             obj.build_done = 1;
         end
     end

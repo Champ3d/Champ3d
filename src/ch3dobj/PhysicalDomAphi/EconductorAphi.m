@@ -140,6 +140,9 @@ classdef EconductorAphi < Econductor
             obj.parent_model.matrix.sigmawewe = ...
                 obj.parent_model.matrix.sigmawewe + sigmawewe;
             %--------------------------------------------------------------
+            obj.parent_model.matrix.id_node_phi = ...
+                [obj.parent_model.matrix.id_node_phi obj.matrix.gid_node_phi];
+            %--------------------------------------------------------------
             obj.assembly_done = 1;
         end
     end

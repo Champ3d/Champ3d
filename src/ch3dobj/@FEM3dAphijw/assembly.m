@@ -17,11 +17,9 @@ f_fprintf(0,'Assembly',1,class(obj),0,'\n');
 obj.build;
 obj.base_matrix;
 %--------------------------------------------------------------------------
-%--------------------------------------------------------------------------
 if obj.assembly_done
     return
 end
-%--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 parent_mesh = obj.parent_mesh;
 nb_elem = parent_mesh.nb_elem;
@@ -30,8 +28,15 @@ nb_edge = parent_mesh.nb_edge;
 nb_node = parent_mesh.nb_node;
 %--------------------------------------------------------------------------
 obj.matrix.id_edge_a = 1:nb_edge;
-obj.matrix.obj.matrix.sigmawewe = sparse(nb_edge,nb_edge);
+obj.matrix.id_node_phi = [];
+obj.matrix.id_elem_mcon = [];
+obj.matrix.id_node_petrode = [];
+obj.matrix.id_node_netrode = [];
+obj.matrix.sigmawewe = sparse(nb_edge,nb_edge);
 obj.matrix.nu0nurwfwf = sparse(nb_face,nb_face);
+obj.dof.t_js = sparse(nb_edge,1);
+obj.dof.a_bs = sparse(nb_edge,1);
+obj.dof.a_pm = sparse(nb_edge,1);
 %--------------------------------------------------------------------------
 allowed_physical_dom = {'econductor','mconductor','airbox','sibc',...
                         'bsfield','coil','nomesh','pmagnet','embc'};
@@ -51,9 +56,6 @@ for i = 1:length(allowed_physical_dom)
     for j = 1:length(allphydomid)
         id_phydom = allphydomid{j};
         phydom = obj.(phydom_type).(id_phydom);
-        if isa(phydom,'IsCoilAphi') || isa(phydom,'VsCoilAphi')
-            continue
-        end
         % ---
         f_fprintf(0,['Assembly #' phydom_type],1,id_phydom,0,'\n');
         % ---
@@ -81,6 +83,11 @@ id_inner_node_nomesh = obj.matrix.id_inner_node_nomesh;
 id_elem_airbox = obj.matrix.id_elem_airbox;
 id_inner_edge_airbox = obj.matrix.id_inner_edge_airbox;
 %--------------------------------------------------------------------------
+id_node_phi = obj.matrix.id_node_phi;
+id_elem_mcon = obj.matrix.id_elem_mcon;
+id_node_netrode = obj.matrix.id_node_netrode;
+id_node_petrode = obj.matrix.id_node_petrode;
+%--------------------------------------------------------------------------
 %
 %               MATRIX SYSTEM
 %
@@ -91,11 +98,8 @@ id_node_phi_unknown = setdiff(id_node_phi,...
 
 % --- LSH
 % --- obj.matrix.nu0nurwfwf
-
 id_elem_air = setdiff(id_elem_airbox,[id_elem_nomesh id_elem_mcon]);
 id_face_in_elem_air = f_uniquenode(id_face_in_elem(:,id_elem_air));
-
-
 mu0 = 4 * pi * 1e-7;
 nu0wfwf = (1/mu0) .* obj.matrix.wfwfx;
 % ---
@@ -103,7 +107,7 @@ obj.matrix.nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) = ...
     obj.matrix.nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) + ...
     nu0wfwf(id_face_in_elem_air,id_face_in_elem_air);
 % ---
-obj.matrix.sigmawewe = obj.matrix.sigmawewe + gsibcwewe;
+%obj.matrix.sigmawewe = obj.matrix.sigmawewe + gsibcwewe;
 % ---
 freq = obj.frequency;
 jome = 1j*2*pi*freq;
@@ -135,6 +139,10 @@ RHS = bsfieldRHS + pmagnetRHS + jscoilRHS;
 RHS = RHS(id_edge_a_unknown,1);
 RHS = [RHS; zeros(length(id_node_phi_unknown),1)];
 %--------------------------------------------------------------------------
+if ~isempty(obj.coil)
+    id_coil__ = fieldnames(obj.coil);
+end
+% ---
 for iec = 1:length(id_coil__)
     %----------------------------------------------------------------------
     id_phydom = id_coil__{iec};
@@ -198,8 +206,24 @@ obj.fields.bv = obj.parent_mesh.field_wf('dof',obj.dof.b);
 obj.fields.ev = obj.parent_mesh.field_we('dof',obj.dof.e);
 obj.fields.phiv = obj.dof.phi;
 
+
+id_econductor__ = {};
+id_mconductor__ = {};
+id_airbox__     = {};
+id_sibc__       = {};
+id_bsfield__    = {};
+id_coil__       = {};
+id_nomesh__     = {};
+id_pmagnet__    = {};
+
+
+
 % ---
 obj.fields.jv = sparse(3,nb_elem);
+% ---
+if ~isempty(obj.econductor)
+    id_econductor__ = fieldnames(obj.econductor);
+end
 % ---
 for iec = 1:length(id_econductor__)
     %----------------------------------------------------------------------
@@ -229,6 +253,10 @@ for iec = 1:length(id_econductor__)
 end
 
 % ---
+% ---
+if ~isempty(obj.sibc)
+    id_sibc__ = fieldnames(obj.sibc);
+end
 es = sparse(2,nb_face);
 js = sparse(2,nb_face);
 for iec = 1:length(id_sibc__)
