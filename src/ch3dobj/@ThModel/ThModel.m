@@ -166,7 +166,7 @@ classdef ThModel < Xhandle
                 phydom = ThPvTemp(argu{:});
             end
             % ---
-            obj.ps.(args.id) = phydom;
+            obj.pv.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
         %function add_thbc(obj)

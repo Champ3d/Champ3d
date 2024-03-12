@@ -85,7 +85,7 @@ classdef ThPvTemp < ThPv
             % ---
             pv_array = obj.pv.get_on(dom);
             % ---
-            pvwn = parent_mesh.cwnwn('id_elem',gid_elem,'coefficient',pv_array);
+            pvwn = parent_mesh.cwn('id_elem',gid_elem,'coefficient',pv_array);
             % ---
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.gid_node_t = gid_node_t;

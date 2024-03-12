@@ -89,5 +89,5 @@ obj.dof.temp = zeros(nb_node,1);
 obj.dof.temp(id_node_t) = sol;
 %--------------------------------------------------------------------------
 obj.fields.tempv = obj.parent_mesh.field_wn('dof',obj.dof.temp);
-
+obj.fields.temp  = obj.dof.temp;
 

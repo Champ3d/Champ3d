@@ -44,7 +44,7 @@ for i = 1:nbEqcond
     eqcond_R = eqc(isep+2:end);
     % == with tolerance
     eqc = [eqcond_L '<=' eqcond_R '+' num2str(tol) ' & ' ...
-        eqcond_L '>=' eqcond_R '-' num2str(tol)];
+           eqcond_L '>=' eqcond_R '-' num2str(tol)];
     eval(['checksum = (' eqc ');']);
     eqNode{i} = find(checksum);
 end

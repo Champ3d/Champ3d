@@ -186,6 +186,15 @@ classdef PhysicalDom < Xhandle
             end
         end
         % -----------------------------------------------------------------
+        function plottemp(obj,args)
+            arguments
+                obj
+                args.show_dom = 1
+            end
+            % ---
+            obj.plotfields('show_dom',args.show_dom,'field_name','temp')
+        end
+        % -----------------------------------------------------------------
         
     end
 
@@ -234,17 +243,8 @@ classdef PhysicalDom < Xhandle
                 elem = obj.parent_model.parent_mesh.elem(:,obj.dom.gid_elem);
                 elem_type = f_elemtype(elem);
                 face = f_boundface(elem,node,'elem_type',elem_type);
-                id_node = f_uniquenode(face);
-                fs = obj.parent_model.fields.(args.field_name)(:,id_node);
-                no = obj.parent_model.parent_mesh.celem(:,id_elem);
-                if isreal(fs)
-                    f_quiver(no,fs);
-                else
-                    subplot(121);
-                    f_quiver(no,real(fs)); title('Real part')
-                    subplot(122);
-                    f_quiver(no,imag(fs)); title('Imag part')
-                end
+                fs = obj.parent_model.fields.(args.field_name);
+                f_patch(node,face,'defined_on','face','scalar_field',fs);
             end
         end
     end
