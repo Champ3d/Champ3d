@@ -107,8 +107,8 @@ classdef BsfieldAphi < Bsfield
             %--------------------------------------------------------------
             wfbs = sparse(nb_face,1);
             %--------------------------------------------------------------
-            gid_elem = obj.bsfield.(id_phydom).matrix.gid_elem;
-            lmatrix = obj.bsfield.(id_phydom).matrix.wfbs;
+            gid_elem = obj.matrix.gid_elem;
+            lmatrix  = obj.matrix.wfbs;
             for i = 1:nbFa_inEl
                 wfbs = wfbs + ...
                     sparse(id_face_in_elem(i,gid_elem),1,lmatrix(:,i),nb_face,1);

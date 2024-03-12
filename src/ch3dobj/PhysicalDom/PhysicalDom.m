@@ -17,7 +17,7 @@ classdef PhysicalDom < Xhandle
         id_dom2d
         id_dom3d
     end
-    
+
     % --- computed
     properties
         parent_mesh
@@ -141,7 +141,7 @@ classdef PhysicalDom < Xhandle
         function plotjs(obj,args)
             arguments
                 obj
-                args.show_dom = 1
+                args.show_dom = 0
             end
             % ---
             if args.show_dom

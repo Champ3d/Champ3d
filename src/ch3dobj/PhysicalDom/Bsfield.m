@@ -18,7 +18,7 @@ classdef Bsfield < PhysicalDom
     properties (Access = private)
         setup_done = 0
     end
-    
+
     % --- Contructor
     methods
         function obj = Bsfield(args)
@@ -49,6 +49,13 @@ classdef Bsfield < PhysicalDom
         function setup(obj)
             if obj.setup_done
                 return
+            end
+            % ---
+            if isempty(obj.id_dom3d)
+                if ~isfield(obj.parent_model.parent_mesh.dom,'default_domain')
+                    obj.parent_model.parent_mesh.add_default_domain;
+                end
+                obj.id_dom3d = 'default_domain';
             end
             % ---
             setup@PhysicalDom(obj);

@@ -111,8 +111,8 @@ classdef PMagnetAphi < PMagnet
             %--------------------------------------------------------------
             wfbr = sparse(nb_face,1);
             %--------------------------------------------------------------
-            gid_elem = obj.pmagnet.(id_phydom).matrix.gid_elem;
-            lmatrix = obj.pmagnet.(id_phydom).matrix.wfbr;
+            gid_elem = obj.matrix.gid_elem;
+            lmatrix  = obj.matrix.wfbr;
             for i = 1:nbFa_inEl
                 wfbr = wfbr + ...
                     sparse(id_face_in_elem(i,gid_elem),1,lmatrix(:,i),nb_face,1);
@@ -123,7 +123,7 @@ classdef PMagnetAphi < PMagnet
                      obj.parent_model.matrix.wfwf * ...
                      obj.parent_model.parent_mesh.discrete.rot;
             %--------------------------------------------------------------
-            id_edge_a_unknown = obj.matrix.id_edge_a;
+            id_edge_a_unknown = obj.parent_model.matrix.id_edge_a;
             %--------------------------------------------------------------
             rotb = rotb(id_edge_a_unknown,1);
             rotrot = rotrot(id_edge_a_unknown,id_edge_a_unknown);

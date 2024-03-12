@@ -139,6 +139,7 @@ RHS = bsfieldRHS + pmagnetRHS + jscoilRHS;
 RHS = RHS(id_edge_a_unknown,1);
 RHS = [RHS; zeros(length(id_node_phi_unknown),1)];
 %--------------------------------------------------------------------------
+id_coil__ = {};
 if ~isempty(obj.coil)
     id_coil__ = fieldnames(obj.coil);
 end
