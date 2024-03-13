@@ -49,10 +49,6 @@ classdef EmModel < Xhandle
             % ---
             obj@Xhandle;
             % ---
-            if isempty(fieldnames(args))
-                return
-            end
-            % ---
             obj <= args;
             % ---
             obj.jome = 1j*2*pi*obj.frequency;
@@ -343,11 +339,19 @@ classdef EmModel < Xhandle
 
     % --- Methods/Abs
     methods
-        function build(obj)
-        end
-        function solve(obj)
-        end
-        function postpro(obj)
+        function setup(obj)
+            nb_elem = obj.parent_mesh.nb_elem;
+            nb_face = obj.parent_mesh.nb_face;
+            % ---
+            obj.fields.av = sparse(3,nb_elem);
+            obj.fields.bv = sparse(3,nb_elem);
+            obj.fields.ev = sparse(3,nb_elem);
+            obj.fields.phiv = sparse(3,nb_elem);
+            obj.fields.phi = [];
+            obj.fields.jv = sparse(3,nb_elem);
+            obj.fields.pv = sparse(1,nb_elem);
+            obj.fields.js = sparse(2,nb_face);
+            obj.fields.ps = sparse(1,nb_face);
         end
     end
 end

@@ -8,40 +8,32 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-function build(obj)
+function postpro(obj)
 
 %--------------------------------------------------------------------------
-if obj.build_done
-    return
-end
-%--------------------------------------------------------------------------
 tic;
-f_fprintf(0,'Build',1,class(obj),0,'\n');
+f_fprintf(0,'Postprocessing',1,class(obj),0,'\n');
 f_fprintf(0,'   ');
-% ---
+%--------------------------------------------------------------------------
 parent_mesh = obj.parent_mesh;
-% ---
-if ~parent_mesh.build_meshds_done
-    parent_mesh.build_meshds;
-end
-% ---
-if ~parent_mesh.build_discrete_done
-    parent_mesh.build_discrete;
-end
-% ---
-if ~parent_mesh.build_intkit_done
-    parent_mesh.build_intkit;
-end
+nb_elem = parent_mesh.nb_elem;
+nb_face = parent_mesh.nb_face;
+nb_edge = parent_mesh.nb_edge;
+nb_node = parent_mesh.nb_node;
 %--------------------------------------------------------------------------
-if isempty(obj.airbox)
-    if ~isfield(obj.parent_mesh.dom,'default_domain')
-        obj.parent_mesh.add_default_domain;
-    end
-    obj.airbox.default_airbox = AirboxAphi('parent_model',obj,'id_dom3d','default_domain');
-end
+obj.fields.av = obj.parent_mesh.field_we('dof',obj.dof.a);
+obj.fields.bv = obj.parent_mesh.field_wf('dof',obj.dof.b);
+obj.fields.ev = obj.parent_mesh.field_we('dof',obj.dof.e);
+obj.fields.phiv = obj.parent_mesh.field_wn('dof',obj.dof.phi);
+obj.fields.phi = obj.dof.phi;
+% -------------------------------------------------------------------------
+obj.fields.jv = sparse(3,nb_elem);
+obj.fields.pv = sparse(1,nb_elem);
+obj.fields.js = sparse(2,nb_face);
+obj.fields.ps = sparse(1,nb_face);
 %--------------------------------------------------------------------------
-allowed_physical_dom = {'econductor','mconductor','airbox','sibc',...
-                        'bsfield','coil','nomesh','pmagnet','embc'};
+%allowed_physical_dom = {'econductor','sibc','coil'};
+allowed_physical_dom = {'econductor','sibc'};
 %--------------------------------------------------------------------------
 for i = 1:length(allowed_physical_dom)
     phydom_type = allowed_physical_dom{i};
@@ -57,16 +49,12 @@ for i = 1:length(allowed_physical_dom)
     allphydomid = fieldnames(obj.(phydom_type));
     for j = 1:length(allphydomid)
         id_phydom = allphydomid{j};
-        % ---
-        f_fprintf(0,['Build #' phydom_type],1,id_phydom,0,'\n');
-        % ---
         phydom = obj.(phydom_type).(id_phydom);
         % ---
-        phydom.reset;
-        phydom.build;
+        f_fprintf(0,['--- #' phydom_type],1,id_phydom,0,'\n');
+        % ---
+        phydom.postpro;
     end
 end
 %--------------------------------------------------------------------------
-obj.build_done = 1;
-%--------------------------------------------------------------------------
-return
+f_fprintf(0,'\n');

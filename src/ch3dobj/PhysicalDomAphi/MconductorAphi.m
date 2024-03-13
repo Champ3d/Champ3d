@@ -81,12 +81,17 @@ classdef MconductorAphi < Mconductor
             % ---
             mu0 = 4 * pi * 1e-7;
             nu0 = 1/mu0;
-            nu0nur = nu0 .* obj.mur.get_inverse_on(dom);
+            % ---
+            mur_array = obj.mur.get_on(dom);
+            nur_array = obj.mur.get_inverse_on(dom);
+            nu0nur = nu0 .* nur_array;
             % ---
             nu0nurwfwf = parent_mesh.cwfwf('id_elem',gid_elem,'coefficient',nu0nur);
             % ---
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.nu0nurwfwf = nu0nurwfwf;
+            obj.matrix.nur_array = nur_array;
+            obj.matrix.mur_array = mur_array;
             % ---
             obj.build_done = 1;
             obj.assembly_done = 0;
@@ -140,6 +145,21 @@ classdef MconductorAphi < Mconductor
                 [obj.parent_model.matrix.id_elem_mcon obj.matrix.gid_elem];
             %--------------------------------------------------------------
             obj.assembly_done = 1;
+        end
+    end
+
+    % --- reset
+    methods
+        function reset(obj)
+            if isprop(obj,'setup_done')
+                obj.setup_done = 0;
+            end
+            if isprop(obj,'build_done')
+                obj.build_done = 0;
+            end
+            if isprop(obj,'assembly_done')
+                obj.assembly_done = 0;
+            end
         end
     end
 end

@@ -146,4 +146,56 @@ classdef EconductorAphi < Econductor
             obj.assembly_done = 1;
         end
     end
+
+    % --- postpro
+    methods
+        function postpro(obj)
+            %--------------------------------------------------------------
+            gid_elem = obj.matrix.gid_elem;
+            sigma_array = obj.matrix.sigma_array;
+            %--------------------------------------------------------------
+            [coef, coef_array_type] = obj.column_format(sigma_array);
+            %--------------------------------------------------------------
+            ev = obj.parent_model.fields.ev(:,gid_elem);
+            jv = zeros(3,length(gid_elem));
+            %--------------------------------------------------------------
+            if any(f_strcmpi(coef_array_type,{'scalar'}))
+                %----------------------------------------------------------
+                jv = coef .* ev;
+                %----------------------------------------------------------
+            elseif any(f_strcmpi(coef_array_type,{'tensor'}))
+                %----------------------------------------------------------
+                jv(1,:) = coef(:,1,1).' .* ev(1,:) + ...
+                          coef(:,1,2).' .* ev(2,:) + ...
+                          coef(:,1,3).' .* ev(3,:);
+                jv(2,:) = coef(:,2,1).' .* ev(1,:) + ...
+                          coef(:,2,2).' .* ev(2,:) + ...
+                          coef(:,2,3).' .* ev(3,:);
+                jv(3,:) = coef(:,3,1).' .* ev(1,:) + ...
+                          coef(:,3,2).' .* ev(2,:) + ...
+                          coef(:,3,3).' .* ev(3,:);
+            end
+            %--------------------------------------------------------------
+            obj.parent_model.fields.jv(:,gid_elem) = jv;
+            %--------------------------------------------------------------
+            obj.parent_model.fields.pv(:,gid_elem) = ...
+                real(1/2 .* sum(ev .* conj(jv)));
+            %--------------------------------------------------------------
+        end
+    end
+
+    % --- reset
+    methods
+        function reset(obj)
+            if isprop(obj,'setup_done')
+                obj.setup_done = 0;
+            end
+            if isprop(obj,'build_done')
+                obj.build_done = 0;
+            end
+            if isprop(obj,'assembly_done')
+                obj.assembly_done = 0;
+            end
+        end
+    end
 end

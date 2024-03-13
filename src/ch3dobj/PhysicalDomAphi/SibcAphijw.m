@@ -82,7 +82,7 @@ classdef SibcAphijw < Sibc
             dom = obj.dom;
             % ---
             gid_face = dom.gid_face;
-            nb_face  = length(gid_face);
+            lnb_face  = length(gid_face);
             % ---
             gid_node_phi = f_uniquenode(dom.parent_mesh.face(:,gid_face));
             % ---
@@ -96,7 +96,7 @@ classdef SibcAphijw < Sibc
             % ---
             z_sibc = (1+1j)./(skindepth.*sigma_array) .* ...
                 (1 + (1-1j)/4 .* skindepth .* cparam_array);
-            z_sibc = obj.column_array(z_sibc,'nb_elem',nb_face);
+            z_sibc = obj.column_array(z_sibc,'nb_elem',lnb_face);
             % ---
             dom.build_submesh;
             submesh = dom.submesh;
@@ -174,6 +174,66 @@ classdef SibcAphijw < Sibc
                 [obj.parent_model.matrix.id_node_phi obj.matrix.gid_node_phi];
             %--------------------------------------------------------------
             obj.assembly_done = 1;
+        end
+    end
+
+    % --- postpro
+    methods
+        function postpro(obj)
+            % ---
+            id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face;
+            lnb_face = length(obj.dom.gid_face);
+            % ---
+            sigma_array = obj.column_array(obj.matrix.sigma_array,'nb_elem',lnb_face);
+            skindepth   = obj.column_array(obj.matrix.skindepth,'nb_elem',lnb_face);
+            % ---
+            es = sparse(2,lnb_face);
+            js = sparse(2,lnb_face);
+            %--------------------------------------------------------------
+            obj.dom.build_submesh;
+            submesh = obj.dom.submesh;
+            for k = 1:length(submesh)
+                sm = submesh{k};
+                sm.build_intkit;
+                % ---
+                lid_face = sm.lid_face;
+                gid_face = sm.gid_face;
+                cWes = sm.intkit.cWe{1};
+                % ---
+                if any(f_strcmpi(sm.elem_type,'tri'))
+                    dofe = obj.parent_model.dof.e(id_edge_in_face(1:3,gid_face)).';
+                elseif any(f_strcmpi(sm.elem_type,'quad'))
+                    dofe = obj.parent_model.dof.e(id_edge_in_face(1:4,gid_face)).';
+                end
+                %----------------------------------------------------------
+                es(1,lid_face) = es(1,lid_face) + sum(squeeze(cWes(:,1,:)) .* dofe,2).';
+                es(2,lid_face) = es(2,lid_face) + sum(squeeze(cWes(:,2,:)) .* dofe,2).';
+                js(1,lid_face) = sigma_array(lid_face,1).' .* es(1,lid_face);
+                js(2,lid_face) = sigma_array(lid_face,1).' .* es(2,lid_face);
+                %----------------------------------------------------------
+                obj.parent_model.fields.es(:,gid_face) = es(:,lid_face);
+                obj.parent_model.fields.js(:,gid_face) = js(:,lid_face);
+                %----------------------------------------------------------
+                obj.parent_model.fields.ps(:,gid_face) = ...
+                    real(1/2 .* skindepth(lid_face,1).' .* ...
+                    sum(es(:,lid_face) .* conj(js(:,lid_face))));
+                %----------------------------------------------------------
+            end
+        end
+    end
+
+    % --- reset
+    methods
+        function reset(obj)
+            if isprop(obj,'setup_done')
+                obj.setup_done = 0;
+            end
+            if isprop(obj,'build_done')
+                obj.build_done = 0;
+            end
+            if isprop(obj,'assembly_done')
+                obj.assembly_done = 0;
+            end
         end
     end
 end
