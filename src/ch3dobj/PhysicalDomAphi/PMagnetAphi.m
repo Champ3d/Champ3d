@@ -46,6 +46,10 @@ classdef PMagnetAphi < PMagnet
             obj.assembly_done = 0;
             % ---
             obj.setup;
+            % ---
+            addlistener(obj,...
+                {'parent_model','id_dom2d','id_dom3d','br'},...
+                 'PostSet',@obj.reset);
         end
     end
 
@@ -66,6 +70,11 @@ classdef PMagnetAphi < PMagnet
             % ---
             obj.build_done = 0;
             obj.assembly_done = 0;
+        end
+        % ---
+        function reset(obj,src,evnt)
+            f_fprintf(1,'Reset due to change !');
+            obj.setup_done = 0;
         end
     end
 
@@ -145,16 +154,16 @@ classdef PMagnetAphi < PMagnet
 
     % --- reset
     methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
-        end
+        % function reset(obj)
+        %     if isprop(obj,'setup_done')
+        %         obj.setup_done = 0;
+        %     end
+        %     if isprop(obj,'build_done')
+        %         obj.build_done = 0;
+        %     end
+        %     if isprop(obj,'assembly_done')
+        %         obj.assembly_done = 0;
+        %     end
+        % end
     end
 end

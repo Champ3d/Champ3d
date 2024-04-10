@@ -10,7 +10,7 @@
 
 classdef PMagnet < PhysicalDom
 
-    properties
+    properties (SetObservable)
         br
     end
 

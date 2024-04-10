@@ -11,7 +11,7 @@
 classdef PhysicalDom < Xhandle
 
     % --- entry
-    properties
+    properties (SetObservable)
         id
         parent_model
         id_dom2d
