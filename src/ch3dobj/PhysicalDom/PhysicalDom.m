@@ -82,11 +82,6 @@ classdef PhysicalDom < Xhandle
                         id_dom_ = f_to_scellargin(obj.id_dom2d);
                     end
                     % ---
-                    %obj.dom = cell(1,length(id_dom_));
-                    %for i = 1:length(id_dom_)
-                    %    obj.dom{i} = obj.parent_model.parent_mesh.dom.(id_dom_{i});
-                    %end
-                    % ---
                     obj.dom = obj.parent_model.parent_mesh.dom.(id_dom_{1});
                     for i = 2:length(id_dom_)
                         obj.dom = obj.dom + obj.parent_model.parent_mesh.dom.(id_dom_{i});
