@@ -21,7 +21,7 @@ classdef Mesh < Xhandle
         celem
         cface
         cedge
-        origin
+        origin = 0
         % ---
         dom
         % ---
@@ -94,6 +94,7 @@ classdef Mesh < Xhandle
             obj.prokit.Wf = {};
             obj.prokit.Wn = {};
             obj.prokit.node = {};
+            % ---
         end
     end
 
