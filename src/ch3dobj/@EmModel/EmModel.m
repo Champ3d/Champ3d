@@ -10,6 +10,7 @@
 
 classdef EmModel < Xhandle
     properties
+        id
         frequency = 0
         jome
         % ---
@@ -25,6 +26,8 @@ classdef EmModel < Xhandle
         sibc
         embc
         % ---
+        timesystem
+        % ---
         matrix
         fields
         dof
@@ -38,15 +41,13 @@ classdef EmModel < Xhandle
     methods
         function obj = EmModel(args)
             arguments
+                args.id
                 args.parent_mesh
                 args.frequency
+                args.timesystem
             end
             % ---
             obj@Xhandle;
-            % ---
-            if isempty(fieldnames(args))
-                return
-            end
             % ---
             obj <= args;
             % ---
@@ -97,7 +98,10 @@ classdef EmModel < Xhandle
             % ---
             argu = f_to_namedarg(args);
             % ---
-            phydom = Airbox(argu{:});
+            if isa(obj,'FEM3dAphijw')
+                phydom = AirboxAphi(argu{:});
+            end
+            % ---
             obj.airbox.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -114,7 +118,10 @@ classdef EmModel < Xhandle
             % ---
             argu = f_to_namedarg(args);
             % ---
-            phydom = Nomesh(argu{:});
+            if isa(obj,'FEM3dAphijw')
+                phydom = NomeshAphi(argu{:});
+            end
+            % ---
             obj.nomesh.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -126,7 +133,7 @@ classdef EmModel < Xhandle
                 args.id_dom2d = []
                 args.id_dom3d = []
                 args.sigma = 0
-                args.mur = 0
+                args.mur = 1
                 args.r_ht = []
                 args.r_et = []
             end
@@ -135,8 +142,15 @@ classdef EmModel < Xhandle
             % ---
             argu = f_to_namedarg(args);
             % ---
-            phydom = Sibc(argu{:});
+            if isa(obj,'FEM3dAphijw')
+                phydom = SibcAphijw(argu{:});
+                %nomsh  = NomeshAphi('parent_model',args.parent_model, ...
+                %                    'id_dom2d',args.id_dom2d,...
+                %                    'id_dom3d',args.id_dom3d);
+            end
+            % ---
             obj.sibc.(args.id) = phydom;
+            %obj.nomesh.(['nomesh_for_sibc_' args.id]) = nomsh;
         end
         % -----------------------------------------------------------------
         function add_bsfield(obj,args)
@@ -160,7 +174,10 @@ classdef EmModel < Xhandle
             % ---
             argu = f_to_namedarg(args);
             % ---
-            phydom = Bsfield(argu{:});
+            if isa(obj,'FEM3dAphijw')
+                phydom = BsfieldAphi(argu{:});
+            end
+            % ---
             obj.bsfield.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -290,7 +307,10 @@ classdef EmModel < Xhandle
             % ---
             argu = f_to_namedarg(args);
             % ---
-            phydom = Mconductor(argu{:});
+            if isa(obj,'FEM3dAphijw')
+                phydom = MconductorAphi(argu{:});
+            end
+            % ---
             obj.mconductor.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -308,19 +328,30 @@ classdef EmModel < Xhandle
             % ---
             argu = f_to_namedarg(args);
             % ---
-            phydom = PMagnet(argu{:});
+            if isa(obj,'FEM3dAphijw')
+                phydom = PMagnetAphi(argu{:});
+            end
+            % ---
             obj.pmagnet.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
     end
 
-    % --- Methods/Abs
+    % --- Methods
     methods
-        function build(obj)
-        end
-        function solve(obj)
-        end
-        function postpro(obj)
+        function setup(obj)
+            nb_elem = obj.parent_mesh.nb_elem;
+            nb_face = obj.parent_mesh.nb_face;
+            % ---
+            obj.fields.av = sparse(3,nb_elem);
+            obj.fields.bv = sparse(3,nb_elem);
+            obj.fields.ev = sparse(3,nb_elem);
+            obj.fields.phiv = sparse(3,nb_elem);
+            obj.fields.phi = [];
+            obj.fields.jv = sparse(3,nb_elem);
+            obj.fields.pv = sparse(1,nb_elem);
+            obj.fields.js = sparse(2,nb_face);
+            obj.fields.ps = sparse(1,nb_face);
         end
     end
 end

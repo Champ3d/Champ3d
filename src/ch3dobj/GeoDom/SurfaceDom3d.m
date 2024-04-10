@@ -81,7 +81,7 @@ classdef SurfaceDom3d < SurfaceDom
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
                 id_ = ...
-                    f_find_elem(node,face,'condition', obj.condition);
+                    f_findelem(node,face,'condition', obj.condition);
                 gid_face_ = gid_face_(id_);
             end
             %--------------------------------------------------------------
@@ -129,7 +129,7 @@ classdef SurfaceDom3d < SurfaceDom
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
                 id_ = ...
-                    f_find_elem(node,face,'condition', obj.condition);
+                    f_findelem(node,face,'condition', obj.condition);
                 gid_face_ = gid_face_(id_);
             end
             %--------------------------------------------------------------

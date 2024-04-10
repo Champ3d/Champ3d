@@ -61,6 +61,8 @@ for i = 1:length(allowed_physical_dom)
         f_fprintf(0,['Build #' phydom_type],1,id_phydom,0,'\n');
         % ---
         phydom = obj.(phydom_type).(id_phydom);
+        % ---
+        phydom.reset;
         phydom.build;
     end
 end

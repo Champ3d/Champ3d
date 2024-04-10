@@ -10,6 +10,13 @@
 
 classdef SolidCoilAphi < Econductor
 
+    % ---
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
+    end
+
     % --- Contructor
     methods
         function obj = SolidCoilAphi()
@@ -20,16 +27,17 @@ classdef SolidCoilAphi < Econductor
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@Econductor(obj);
-                % ---
-                if isnumeric(obj.sigma)
-                    obj.sigma = Parameter('f',obj.sigma);
-                end
-                % ---
-                obj.setup_done = 1;
+            if obj.setup_done
+                return
             end
+            % ---
+            setup@Econductor(obj);
+            % ---
+            if isnumeric(obj.sigma)
+                obj.sigma = Parameter('f',obj.sigma);
+            end
+            % ---
+            obj.setup_done = 1;
         end
     end
 
@@ -40,6 +48,21 @@ classdef SolidCoilAphi < Econductor
             z_coil = 0;
             % ---
             obj.z_coil = z_coil;
+        end
+    end
+
+    % --- reset
+    methods
+        function reset(obj)
+            if isprop(obj,'setup_done')
+                obj.setup_done = 0;
+            end
+            if isprop(obj,'build_done')
+                obj.build_done = 0;
+            end
+            if isprop(obj,'assembly_done')
+                obj.assembly_done = 0;
+            end
         end
     end
 

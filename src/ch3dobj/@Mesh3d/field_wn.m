@@ -39,10 +39,10 @@ elem_type = obj.elem_type;
 con = f_connexion(elem_type);
 nbNo_inEl = con.nbNo_inEl;
 %--------------------------------------------------------------------------
-if isempty(obj.meshds.id_node_in_elem)
-    obj.build_meshds;
+if isempty(obj.elem)
+    error('No mesh data !');
 end
-elem = obj.meshds.elem;
+elem = obj.elem;
 %--------------------------------------------------------------------------
 switch on_
     case 'center'
@@ -92,9 +92,9 @@ if any(f_strcmpi(coef_array_type,{'scalar'}))
     for iG = 1:nbG
         fi = zeros(length(id_elem),1);
         for i = 1:nbNo_inEl
-            wi = Wx{iG}(:,1,i);
-            id_edge = elem(i,id_elem);
-            fi(:,1) = fi(:,1) + coefficient .* wi .* dof(id_edge);
+            wi = Wx{iG}(:,i);
+            id_node = elem(i,id_elem);
+            fi(:,1) = fi(:,1) + coefficient .* wi .* dof(id_node);
         end
         % ---
         scalar_field{iG}(1,id_elem) = fi.';

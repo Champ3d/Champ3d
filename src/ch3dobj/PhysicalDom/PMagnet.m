@@ -9,8 +9,14 @@
 %--------------------------------------------------------------------------
 
 classdef PMagnet < PhysicalDom
+
     properties
         br
+    end
+
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
     end
 
     % --- Contructor
@@ -41,16 +47,13 @@ classdef PMagnet < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@PhysicalDom(obj);
-                % ---
-                if isnumeric(obj.br)
-                    obj.br = Parameter('f',obj.br);
-                end
-                % ---
-                obj.setup_done = 1;
+            if obj.setup_done
+                return
             end
+            % ---
+            setup@PhysicalDom(obj);
+            % ---
+            obj.setup_done = 1;
         end
     end
 end

@@ -10,6 +10,13 @@
 
 classdef JsCoilAphi < Xhandle
     
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
+    end
+
     % --- Contructor
     methods
         function obj = JsCoilAphi()
@@ -17,15 +24,12 @@ classdef JsCoilAphi < Xhandle
         end
     end
 
-    % --- setup
-    methods
-        function setup(obj)
-        end
-    end
-
     % --- build
     methods
         function build(obj)
+            if obj.build_done
+                return
+            end
             % --- current turn density vector field
             current_turn_density  = obj.matrix.unit_current_field .* obj.nb_turn ./ obj.cs_area;
             % ---
@@ -38,6 +42,75 @@ classdef JsCoilAphi < Xhandle
             obj.matrix.current_turn_density = current_turn_density;
             obj.matrix.wfjs = wfjs;
             % ---
+            obj.build_done = 1;
+            obj.assembly_done = 0;
+        end
+    end
+
+    % --- assembly
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
+            % ---
+            if obj.assembly_done
+                return
+            end
+            %--------------------------------------------------------------
+            nb_edge = obj.parent_model.parent_mesh.nb_edge;
+            nb_face = obj.parent_model.parent_mesh.nb_face;
+            id_face_in_elem = obj.parent_model.parent_mesh.meshds.id_face_in_elem;
+            nbFa_inEl = obj.parent_model.parent_mesh.refelem.nbFa_inEl;
+            %--------------------------------------------------------------
+            wfjs = sparse(nb_face,1);
+            %--------------------------------------------------------------
+            gid_elem = obj.matrix.gid_elem;
+            lmatrix = obj.matrix.wfjs;
+            for i = 1:nbFa_inEl
+                wfjs = wfjs + ...
+                    sparse(id_face_in_elem(i,gid_elem),1,lmatrix(:,i),nb_face,1);
+            end
+            %--------------------------------------------------------------
+            rotj   = obj.parent_model.parent_mesh.discrete.rot.' * wfjs;
+            rotrot = obj.parent_model.parent_mesh.discrete.rot.' * ...
+                     obj.parent_model.matrix.wfwf * ...
+                     obj.parent_model.parent_mesh.discrete.rot;
+            %--------------------------------------------------------------
+            id_edge_t_unknown = obj.parent_model.matrix.id_edge_a;
+            %--------------------------------------------------------------
+            rotj = rotj(id_edge_t_unknown,1);
+            rotrot = rotrot(id_edge_t_unknown,id_edge_t_unknown);
+            %--------------------------------------------------------------
+            t_jsfield = sparse(nb_edge,1);
+            t_jsfield(id_edge_t_unknown) = f_solve_axb(rotrot,rotj);
+            %--------------------------------------------------------------
+            clear rotj rotrot wfjs
+            %--------------------------------------------------------------
+            obj.parent_model.dof.t_js = ...
+                obj.parent_model.dof.t_js + t_jsfield;
+            %--------------------------------------------------------------
+            %obj.parent_model.dof.js = ...
+            %    obj.parent_model.parent_mesh.discrete.rot * t_jsfield;
+            %obj.parent_model.matrix.js = ...
+            %    obj.parent_model.matrix.js + ...
+            %    obj.parent_model.parent_mesh.field_wf('dof',obj.parent_model.dof.js);
+            %--------------------------------------------------------------
+            obj.assembly_done = 1;
+        end
+    end
+
+    % --- reset
+    methods
+        function reset(obj)
+            if isprop(obj,'setup_done')
+                obj.setup_done = 0;
+            end
+            if isprop(obj,'build_done')
+                obj.build_done = 0;
+            end
+            if isprop(obj,'assembly_done')
+                obj.assembly_done = 0;
+            end
         end
     end
 end

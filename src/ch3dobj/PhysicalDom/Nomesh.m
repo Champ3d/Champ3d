@@ -9,8 +9,10 @@
 %--------------------------------------------------------------------------
 
 classdef Nomesh < PhysicalDom
-    properties
-
+    
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
     end
 
     % --- Contructor

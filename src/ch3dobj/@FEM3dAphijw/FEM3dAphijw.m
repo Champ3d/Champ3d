@@ -24,6 +24,8 @@ classdef FEM3dAphijw < FEM3dAphi
             end
             % ---
             obj <= args;
+            % ---
+            obj.setup;
         end
     end
 end

@@ -9,8 +9,9 @@
 %--------------------------------------------------------------------------
 
 classdef Airbox < PhysicalDom
-    properties
 
+    properties(Access = private)
+        setup_done = 0
     end
 
     % --- Contructor

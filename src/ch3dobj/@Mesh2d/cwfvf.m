@@ -76,6 +76,10 @@ coefwfvf = zeros(nb_elem,nbFa_inEl);
 if numel(vector_field) == 2
     vfx = vector_field(1);
     vfy = vector_field(2);
+elseif size(vector_field,1) >  length(id_elem) && ...
+       size(vector_field,1) == obj.nb_elem
+    vfx = vector_field(id_elem,1);
+    vfy = vector_field(id_elem,2);
 else
     vfx = vector_field(:,1);
     vfy = vector_field(:,2);

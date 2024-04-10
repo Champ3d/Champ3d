@@ -15,12 +15,15 @@ classdef FEM3dTemp < ThModel
             arguments
                 args.id = 'no_id'
                 args.parent_mesh = []
+                args.Temp0 = 0
             end
             % ---
             argu = f_to_namedarg(args);
             obj = obj@ThModel(argu{:});
             % ---
             obj <= args;
+            % ---
+            obj.setup;
         end
     end
 end

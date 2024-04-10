@@ -12,8 +12,14 @@ classdef EconductorAphi < Econductor
 
     % --- computed
     properties
-        build_done = 0
         matrix
+    end
+
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
     end
 
     % --- Contructor
@@ -37,6 +43,7 @@ classdef EconductorAphi < Econductor
             % ---
             obj.setup_done = 0;
             obj.build_done = 0;
+            obj.assembly_done = 0;
             % ---
             obj.setup;
         end
@@ -45,18 +52,16 @@ classdef EconductorAphi < Econductor
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@Econductor(obj);
-                % ---
-                if isnumeric(obj.sigma)
-                    obj.sigma = Parameter('f',obj.sigma);
-                end
-                % ---
-                obj.setup_done = 1;
-                % ---
-                obj.build_done = 0;
+            if obj.setup_done
+                return
             end
+            % ---
+            setup@Econductor(obj);
+            % ---
+            obj.setup_done = 1;
+            % ---
+            obj.build_done = 0;
+            obj.assembly_done = 0;
         end
     end
 
@@ -88,6 +93,109 @@ classdef EconductorAphi < Econductor
             obj.matrix.sigma_array = sigma_array;
             % ---
             obj.build_done = 1;
+            obj.assembly_done = 0;
+        end
+    end
+
+    % --- assembly
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
+            % ---
+            if obj.assembly_done
+                return
+            end
+            %--------------------------------------------------------------
+            id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
+            id_edge_in_elem = obj.parent_model.parent_mesh.meshds.id_edge_in_elem;
+            nb_edge = obj.parent_model.parent_mesh.nb_edge;
+            nbEd_inEl = obj.parent_model.parent_mesh.refelem.nbEd_inEl;
+            %--------------------------------------------------------------
+            gid_elem = obj.matrix.gid_elem;
+            lmatrix = obj.matrix.sigmawewe;
+            %--------------------------------------------------------------
+            [~,id_] = intersect(gid_elem,id_elem_nomesh);
+            gid_elem(id_) = [];
+            lmatrix(id_,:,:) = [];
+            %--------------------------------------------------------------
+            sigmawewe = sparse(nb_edge,nb_edge);
+            %--------------------------------------------------------------
+            for i = 1:nbEd_inEl
+                for j = i+1 : nbEd_inEl
+                    sigmawewe = sigmawewe + ...
+                        sparse(id_edge_in_elem(i,gid_elem),id_edge_in_elem(j,gid_elem),...
+                        lmatrix(:,i,j),nb_edge,nb_edge);
+                end
+            end
+            % ---
+            sigmawewe = sigmawewe + sigmawewe.';
+            % ---
+            for i = 1:nbEd_inEl
+                sigmawewe = sigmawewe + ...
+                    sparse(id_edge_in_elem(i,gid_elem),id_edge_in_elem(i,gid_elem),...
+                    lmatrix(:,i,i),nb_edge,nb_edge);
+            end
+            %--------------------------------------------------------------
+            obj.parent_model.matrix.sigmawewe = ...
+                obj.parent_model.matrix.sigmawewe + sigmawewe;
+            %--------------------------------------------------------------
+            obj.parent_model.matrix.id_node_phi = ...
+                [obj.parent_model.matrix.id_node_phi obj.matrix.gid_node_phi];
+            %--------------------------------------------------------------
+            obj.assembly_done = 1;
+        end
+    end
+
+    % --- postpro
+    methods
+        function postpro(obj)
+            %--------------------------------------------------------------
+            gid_elem = obj.matrix.gid_elem;
+            sigma_array = obj.matrix.sigma_array;
+            %--------------------------------------------------------------
+            [coef, coef_array_type] = obj.column_format(sigma_array);
+            %--------------------------------------------------------------
+            ev = obj.parent_model.fields.ev(:,gid_elem);
+            jv = zeros(3,length(gid_elem));
+            %--------------------------------------------------------------
+            if any(f_strcmpi(coef_array_type,{'scalar'}))
+                %----------------------------------------------------------
+                jv = coef .* ev;
+                %----------------------------------------------------------
+            elseif any(f_strcmpi(coef_array_type,{'tensor'}))
+                %----------------------------------------------------------
+                jv(1,:) = coef(:,1,1).' .* ev(1,:) + ...
+                          coef(:,1,2).' .* ev(2,:) + ...
+                          coef(:,1,3).' .* ev(3,:);
+                jv(2,:) = coef(:,2,1).' .* ev(1,:) + ...
+                          coef(:,2,2).' .* ev(2,:) + ...
+                          coef(:,2,3).' .* ev(3,:);
+                jv(3,:) = coef(:,3,1).' .* ev(1,:) + ...
+                          coef(:,3,2).' .* ev(2,:) + ...
+                          coef(:,3,3).' .* ev(3,:);
+            end
+            %--------------------------------------------------------------
+            obj.parent_model.fields.jv(:,gid_elem) = jv;
+            %--------------------------------------------------------------
+            obj.parent_model.fields.pv(:,gid_elem) = ...
+                real(1/2 .* sum(ev .* conj(jv)));
+            %--------------------------------------------------------------
+        end
+    end
+
+    % --- reset
+    methods
+        function reset(obj)
+            if isprop(obj,'setup_done')
+                obj.setup_done = 0;
+            end
+            if isprop(obj,'build_done')
+                obj.build_done = 0;
+            end
+            if isprop(obj,'assembly_done')
+                obj.assembly_done = 0;
+            end
         end
     end
 end

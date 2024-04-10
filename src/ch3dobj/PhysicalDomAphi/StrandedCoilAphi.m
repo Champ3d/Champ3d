@@ -10,6 +10,13 @@
 
 classdef StrandedCoilAphi < Xhandle
 
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
+    end
+
     % --- Contructor
     methods
         function obj = StrandedCoilAphi()
@@ -24,6 +31,21 @@ classdef StrandedCoilAphi < Xhandle
             z_coil = 0;
             % ---
             obj.z_coil = z_coil;
+        end
+    end
+
+    % --- reset
+    methods
+        function reset(obj)
+            if isprop(obj,'setup_done')
+                obj.setup_done = 0;
+            end
+            if isprop(obj,'build_done')
+                obj.build_done = 0;
+            end
+            if isprop(obj,'assembly_done')
+                obj.assembly_done = 0;
+            end
         end
     end
 

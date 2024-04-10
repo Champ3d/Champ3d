@@ -28,6 +28,13 @@ classdef StrandedOpenJsCoilAphi < OpenCoilAphi & StrandedCoilAphi & JsCoilAphi
         L0
     end
 
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
+    end
+
     % --- Contructor
     methods
         function obj = StrandedOpenJsCoilAphi(args)
@@ -97,9 +104,7 @@ classdef StrandedOpenJsCoilAphi < OpenCoilAphi & StrandedCoilAphi & JsCoilAphi
             end
             % ---
             build@OpenCoilAphi(obj);
-            obj.build_done = 0;
             build@JsCoilAphi(obj);
-            obj.build_done = 1;
         end
     end
 
@@ -115,6 +120,25 @@ classdef StrandedOpenJsCoilAphi < OpenCoilAphi & StrandedCoilAphi & JsCoilAphi
             % ---
             argu = f_to_namedarg(args);
             plot@OpenCoilAphi(obj,argu{:});
+            % ---
+        end
+    end
+
+    % --- reset
+    methods
+        function reset(obj)
+            if isprop(obj,'setup_done')
+                obj.setup_done = 0;
+            end
+            if isprop(obj,'build_done')
+                obj.build_done = 0;
+            end
+            if isprop(obj,'assembly_done')
+                obj.assembly_done = 0;
+            end
+            % ---
+            reset@OpenCoilAphi(obj);
+            reset@JsCoilAphi(obj);
             % ---
         end
     end

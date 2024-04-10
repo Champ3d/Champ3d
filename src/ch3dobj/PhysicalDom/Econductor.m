@@ -9,8 +9,14 @@
 %--------------------------------------------------------------------------
 
 classdef Econductor < PhysicalDom
+
     properties
         sigma = 0
+    end
+
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
     end
 
     % --- Contructor
@@ -41,16 +47,17 @@ classdef Econductor < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@PhysicalDom(obj);
-                % ---
-                if isnumeric(obj.sigma)
-                    obj.sigma = Parameter('f',obj.sigma);
-                end
-                % ---
-                obj.setup_done = 1;
+            if obj.setup_done
+                return
             end
+            % ---
+            setup@PhysicalDom(obj);
+            % ---
+            if isnumeric(obj.sigma)
+                obj.sigma = Parameter('f',obj.sigma);
+            end
+            % ---
+            obj.setup_done = 1;
         end
     end
 end

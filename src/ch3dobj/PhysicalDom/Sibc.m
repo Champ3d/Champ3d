@@ -9,12 +9,18 @@
 %--------------------------------------------------------------------------
 
 classdef Sibc < PhysicalDom
+
     properties
         sigma = 0
-        mur = 0
+        mur = 1
         r_ht = 0
         r_et = 0
         cparam = 0
+    end
+
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
     end
 
     % --- Contructor
@@ -49,32 +55,33 @@ classdef Sibc < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@PhysicalDom(obj);
-                % ---
-                if isnumeric(obj.sigma)
-                    obj.sigma = Parameter('f',obj.sigma);
-                end
-                if isnumeric(obj.mur)
-                    obj.mur = Parameter('f',obj.mur);
-                end
-                % ---
-                cparam_ = 0;
-                if isnumeric(args.r_ht) && isnumeric(args.r_et)
-                    if ~isempty(args.r_ht) && ~isempty(args.r_et)
-                        cparam_ = 1/args.r_ht - 1/args.r_et;
-                    elseif ~isempty(args.r_ht)
-                        cparam_ = 1/args.r_ht;
-                    elseif ~isempty(args.r_et)
-                        cparam_ = - 1/args.r_et;
-                    end
-                end
-                % ---
-                obj.cparam = Parameter('f',cparam_);
-                % ---
-                obj.setup_done = 1;
+            if obj.setup_done
+                return
             end
+            % ---
+            setup@PhysicalDom(obj);
+            % ---
+            if isnumeric(obj.sigma)
+                obj.sigma = Parameter('f',obj.sigma);
+            end
+            if isnumeric(obj.mur)
+                obj.mur = Parameter('f',obj.mur);
+            end
+            % ---
+            cparam_ = 0;
+            if isnumeric(obj.r_ht) && isnumeric(obj.r_et)
+                if ~isempty(obj.r_ht) && ~isempty(obj.r_et)
+                    cparam_ = 1/obj.r_ht - 1/obj.r_et;
+                elseif ~isempty(obj.r_ht)
+                    cparam_ = 1/obj.r_ht;
+                elseif ~isempty(obj.r_et)
+                    cparam_ = - 1/obj.r_et;
+                end
+            end
+            % ---
+            obj.cparam = Parameter('f',cparam_);
+            % ---
+            obj.setup_done = 1;
         end
     end
 end

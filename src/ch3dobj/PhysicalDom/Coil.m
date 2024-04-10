@@ -9,9 +9,10 @@
 %--------------------------------------------------------------------------
 
 classdef Coil < PhysicalDom
-    % --- entry
-    properties
-        
+    
+    % --- 
+    properties (Access = private)
+        setup_done = 0
     end
 
     % --- Contructor
@@ -41,12 +42,13 @@ classdef Coil < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@PhysicalDom(obj);
-                % ---
-                obj.setup_done = 1;
+            if obj.setup_done
+                return
             end
+            % ---
+            setup@PhysicalDom(obj);
+            % ---
+            obj.setup_done = 1;
         end
     end
 

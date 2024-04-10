@@ -9,6 +9,7 @@
 %--------------------------------------------------------------------------
 
 classdef PhysicalDom < Xhandle
+
     % --- entry
     properties
         id
@@ -16,12 +17,18 @@ classdef PhysicalDom < Xhandle
         id_dom2d
         id_dom3d
     end
+
     % --- computed
     properties
         parent_mesh
         dom
+    end
+
+    % --- computed
+    properties (Access = private)
         setup_done = 0
     end
+
     % ---
     properties(Access = private, Hidden)
 
@@ -55,11 +62,12 @@ classdef PhysicalDom < Xhandle
     % --- Methods
     methods
         function setup(obj)
-            if ~obj.setup_done
-                obj.get_geodom;
-                % ---
-                obj.setup_done = 1;
+            if obj.setup_done
+                return
             end
+            obj.get_geodom;
+            % ---
+            obj.setup_done = 1;
         end
     end
     % --- Methods
@@ -106,34 +114,34 @@ classdef PhysicalDom < Xhandle
         function plotjv(obj,args)
             arguments
                 obj
-                args.show_dom = 1
+                args.show_dom = 0
             end
             % ---
-            obj.plotfieldv('show_dom',args.show_dom,'field_name','jv')
+            obj.plotvectorfield('show_dom',args.show_dom,'field_name','jv')
         end
         % -----------------------------------------------------------------
         function plotev(obj,args)
             arguments
                 obj
-                args.show_dom = 1
+                args.show_dom = 0
             end
             % ---
-            obj.plotfieldv('show_dom',args.show_dom,'field_name','ev')
+            obj.plotvectorfield('show_dom',args.show_dom,'field_name','ev')
         end
         % -----------------------------------------------------------------
         function plotbv(obj,args)
             arguments
                 obj
-                args.show_dom = 1
+                args.show_dom = 0
             end
             % ---
-            obj.plotfieldv('show_dom',args.show_dom,'field_name','bv')
+            obj.plotvectorfield('show_dom',args.show_dom,'field_name','bv')
         end
         % -----------------------------------------------------------------
         function plotjs(obj,args)
             arguments
                 obj
-                args.show_dom = 1
+                args.show_dom = 0
             end
             % ---
             if args.show_dom
@@ -178,12 +186,40 @@ classdef PhysicalDom < Xhandle
             end
         end
         % -----------------------------------------------------------------
+        function plottemp(obj,args)
+            arguments
+                obj
+                args.show_dom = 0
+            end
+            % ---
+            obj.plotscalarfield('show_dom',args.show_dom,'field_name','temp')
+        end
+        % -----------------------------------------------------------------
+        function plotps(obj,args)
+            arguments
+                obj
+                args.show_dom = 0
+            end
+            % ---
+            obj.plotscalarfield('show_dom',args.show_dom,'field_name','ps')
+        end
+        % -----------------------------------------------------------------
+        function plotpv(obj,args)
+            arguments
+                obj
+                args.show_dom = 0
+            end
+            % ---
+            obj.plotscalarfield('show_dom',args.show_dom,'field_name','pv')
+        end
+        % -----------------------------------------------------------------
         
     end
 
     % --- Methods
     methods (Hidden)
-        function plotfieldv(obj,args)
+        % -----------------------------------------------------------------
+        function plotvectorfield(obj,args)
             arguments
                 obj
                 args.show_dom = 1
@@ -209,6 +245,44 @@ classdef PhysicalDom < Xhandle
             end
         end
         % -----------------------------------------------------------------
-        
+        function plotscalarfield(obj,args)
+            arguments
+                obj
+                args.show_dom = 1
+                args.field_name = []
+            end
+            % ---
+            if args.show_dom
+                obj.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
+            end
+            % ---
+            if any(f_strcmpi(args.field_name,{'pv'}))
+                fs = obj.parent_model.fields.(args.field_name);
+                % ---
+                gid_elem = obj.dom.gid_elem;
+                celem = obj.parent_model.parent_mesh.celem(:,gid_elem);
+                % ---
+                scatter3(celem(1,:),celem(2,:),celem(3,:),[],fs(gid_elem));
+                f_colormap;
+                return
+            end
+            % ---
+            if isa(obj.dom,'VolumeDom3d')
+                node = obj.parent_model.parent_mesh.node;
+                elem = obj.parent_model.parent_mesh.elem(:,obj.dom.gid_elem);
+                elem_type = f_elemtype(elem);
+                face = f_boundface(elem,node,'elem_type',elem_type);
+                fs = obj.parent_model.fields.(args.field_name);
+                f_patch(node,face,'defined_on','face','scalar_field',fs);
+            end
+            % ---
+            if isa(obj.dom,'SurfaceDom3d')
+                node = obj.parent_model.parent_mesh.node;
+                face = obj.parent_model.parent_mesh.face(:,obj.dom.gid_face);
+                fs = obj.parent_model.fields.(args.field_name);
+                fs = fs(obj.dom.gid_face);
+                f_patch(node,face,'defined_on','face','scalar_field',fs);
+            end
+        end
     end
 end

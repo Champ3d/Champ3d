@@ -9,16 +9,23 @@
 %--------------------------------------------------------------------------
 
 classdef CloseCoil < Coil
+
     % --- entry
     properties
         etrode_equation
     end
+
     % --- computed
     properties
         electrode_dom
         shape_dom
     end
 
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
+    end
+    
     % --- Contructor
     methods
         function obj = CloseCoil(args)
@@ -47,43 +54,41 @@ classdef CloseCoil < Coil
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@Coil(obj);
-                % ---
-                obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
-                obj.etrode_equation = obj.etrode_equation{1};
-                % ---
-                obj.get_electrode;
-                % ---
-                obj.setup_done = 1;
+            % ---
+            if obj.setup_done
+                return
             end
+            % ---
+            setup@Coil(obj);
+            % ---
+            obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
+            obj.etrode_equation = obj.etrode_equation{1};
+            % ---
+            obj.get_electrode;
+            % ---
+            obj.setup_done = 1;
         end
     end
     % --- Methods
     methods
         % -----------------------------------------------------------------
         function get_electrode(obj)
-            if ~isempty(obj.parent_model)
-                if ~isempty(obj.parent_model.parent_mesh)
-                    % ---
-                    args4cv3.parent_mesh = obj.parent_model.parent_mesh;
-                    args4cv3.id_dom3d = obj.id_dom3d;
-                    args4cv3.cut_equation = obj.etrode_equation;
-                    argu = f_to_namedarg(args4cv3,'with_only',...
-                                {'parent_mesh','id_dom3d','cut_equation'});
-                    % ---
-                    obj.electrode_dom = CutVolumeDom3d(argu{:});
-                    % ---
-                    coilshape = obj.dom - obj.electrode_dom;
-                    % ---
-                    obj.shape_dom = eval(class(obj.electrode_dom));
-                    obj.shape_dom <= coilshape;
-                    % ---
-                    obj.shape_dom.gid_side_node_1 = obj.electrode_dom.gid_side_node_2;
-                    obj.shape_dom.gid_side_node_2 = obj.electrode_dom.gid_side_node_1;
-                end
-            end
+            % ---
+            args4cv3.parent_mesh = obj.parent_model.parent_mesh;
+            args4cv3.id_dom3d = obj.id_dom3d;
+            args4cv3.cut_equation = obj.etrode_equation;
+            argu = f_to_namedarg(args4cv3,'with_only',...
+                        {'parent_mesh','id_dom3d','cut_equation'});
+            % ---
+            obj.electrode_dom = CutVolumeDom3d(argu{:});
+            % ---
+            coilshape = obj.dom - obj.electrode_dom;
+            % ---
+            obj.shape_dom = eval(class(obj.electrode_dom));
+            obj.shape_dom <= coilshape;
+            % ---
+            obj.shape_dom.gid_side_node_1 = obj.electrode_dom.gid_side_node_2;
+            obj.shape_dom.gid_side_node_2 = obj.electrode_dom.gid_side_node_1;
         end
         % -----------------------------------------------------------------
         function plot(obj,args)

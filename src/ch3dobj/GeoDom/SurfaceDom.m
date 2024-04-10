@@ -101,7 +101,7 @@ classdef SurfaceDom < Xhandle
                 face = obj.parent_mesh.face(:,gid_face_);
                 % ---
                 id_ = ...
-                    f_find_elem(node,face,'condition', obj.condition);
+                    f_findelem(node,face,'condition', obj.condition);
                 gid_face_ = gid_face_(id_);
             end
             % -------------------------------------------------------------

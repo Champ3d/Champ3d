@@ -12,8 +12,14 @@ classdef CloseCoilAphi < CloseCoil
 
     % --- computed
     properties
-        build_done = 0
         matrix
+    end
+
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
     end
 
     % --- Contructor
@@ -159,6 +165,21 @@ classdef CloseCoilAphi < CloseCoil
                 hold on;
                 f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
                          obj.matrix.unit_current_field(:,obj.matrix.gid_elem));
+            end
+        end
+    end
+
+    % --- reset
+    methods
+        function reset(obj)
+            if isprop(obj,'setup_done')
+                obj.setup_done = 0;
+            end
+            if isprop(obj,'build_done')
+                obj.build_done = 0;
+            end
+            if isprop(obj,'assembly_done')
+                obj.assembly_done = 0;
             end
         end
     end

@@ -24,6 +24,13 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
         L0
     end
 
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
+    end
+
     % --- Contructor
     methods
         function obj = SolidOpenIsCoilAphi(args)
@@ -63,7 +70,6 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
             end
             % ---
             setup@OpenCoilAphi(obj);
-            obj.setup_done = 0;
             setup@SolidCoilAphi(obj);
             % ---
             if isempty(obj.i_coil)
@@ -93,8 +99,8 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
             end
             % ---
             build@OpenCoilAphi(obj);
-            obj.build_done = 0;
             build@IsCoilAphi(obj);
+            % ---
             obj.build_done = 1;
         end
     end
@@ -111,6 +117,26 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
             % ---
             argu = f_to_namedarg(args);
             plot@OpenCoilAphi(obj,argu{:});
+            % ---
+        end
+    end
+
+    % --- reset
+    methods
+        function reset(obj)
+            if isprop(obj,'setup_done')
+                obj.setup_done = 0;
+            end
+            if isprop(obj,'build_done')
+                obj.build_done = 0;
+            end
+            if isprop(obj,'assembly_done')
+                obj.assembly_done = 0;
+            end
+            % ---
+            reset@OpenCoilAphi(obj);
+            reset@SolidCoilAphi(obj);
+            reset@IsCoilAphi(obj);
             % ---
         end
     end

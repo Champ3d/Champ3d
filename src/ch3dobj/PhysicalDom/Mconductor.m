@@ -9,8 +9,14 @@
 %--------------------------------------------------------------------------
 
 classdef Mconductor < PhysicalDom
+    % ---
     properties
         mur = 1
+    end
+    
+    % ---
+    properties(Access = private)
+        setup_done = 0
     end
 
     % --- Contructor
@@ -41,16 +47,17 @@ classdef Mconductor < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@PhysicalDom(obj);
-                % ---
-                if isnumeric(obj.mur)
-                    obj.mur = Parameter('f',obj.mur);
-                end
-                % ---
-                obj.setup_done = 1;
+            if obj.setup_done
+                return
             end
+            % ---
+            setup@PhysicalDom(obj);
+            % ---
+            if isnumeric(obj.mur)
+                obj.mur = Parameter('f',obj.mur);
+            end
+            % ---
+            obj.setup_done = 1;
         end
     end
 end
