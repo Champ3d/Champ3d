@@ -52,6 +52,7 @@ classdef VolumeDom < Xhandle
             % ---
             if ~isempty(obj.submesh)
                 allmeshes = obj.submesh;
+                allmeshes{1}.node = obj.parent_mesh.gnode;
                 return
             end
             % ---

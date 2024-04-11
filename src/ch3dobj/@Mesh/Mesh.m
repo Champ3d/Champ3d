@@ -140,7 +140,19 @@ classdef Mesh < Xhandle
         end
         
     end
-
+    % --- Methods
+    methods (Access = protected)
+        function newmesh = copyElement(obj)
+            newmesh = copyElement@matlab.mixin.Copyable(obj);
+            % ---
+            alldom = fieldnames(obj.dom);
+            % ---
+            for i = 1:length(alldom)
+                newmesh.dom.(alldom{i}) = copy(obj.dom.(alldom{i}));
+                newmesh.dom.(alldom{i}).parent_mesh = newmesh;
+            end
+        end
+    end
     % --- Methods
     methods
         % -----------------------------------------------------------------

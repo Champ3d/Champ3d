@@ -49,6 +49,9 @@ classdef SurfaceDom < Xhandle
             % ---
             if ~isempty(obj.submesh)
                 allmeshes = obj.submesh;
+                for i = 1:length(allmeshes)
+                    allmeshes{i}.node = obj.parent_mesh.gnode;
+                end
                 return
             end
             % ---
