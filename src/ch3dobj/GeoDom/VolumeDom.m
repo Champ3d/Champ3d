@@ -55,7 +55,7 @@ classdef VolumeDom < Xhandle
                 return
             end
             % ---
-            node = obj.parent_mesh.node;
+            node = obj.parent_mesh.gnode;
             elem = obj.parent_mesh.elem(:,obj.gid_elem);
             % -------------------------------------------------------------
             allmeshes{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);

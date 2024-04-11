@@ -52,7 +52,7 @@ classdef SurfaceDom < Xhandle
                 return
             end
             % ---
-            node = obj.parent_mesh.node;
+            node = obj.parent_mesh.gnode;
             face = obj.parent_mesh.face(:,obj.gid_face);
             % ---
             nb_face = size(face,2);
