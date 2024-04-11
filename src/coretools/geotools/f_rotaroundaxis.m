@@ -12,9 +12,10 @@ function vecout = f_rotaroundaxis(vecin,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'rot_axis','angle'};
+arglist = {'rot_origin','rot_axis','angle'};
 
 % --- default input value
+rot_origin = [0 0 0];
 rot_axis = [1 0 0];
 angle = 0; % deg
 
@@ -31,12 +32,16 @@ end
 rot_axis = rot_axis ./ norm(rot_axis);
 %--------------------------------------------------------------------------
 a = angle / 180 * pi;
-ux = rot_axis(1); uy = rot_axis(2); uz = rot_axis(3);
-
+ux = rot_axis(1);
+uy = rot_axis(2);
+uz = rot_axis(3);
+%--------------------------------------------------------------------------
 R = [cos(a) + ux^2 * (1-cos(a))    ux*uy*(1-cos(a)) - uz*sin(a)   ux*uz*(1-cos(a)) + uy*sin(a) ; ...
      uy*ux*(1-cos(a)) + uz*sin(a)  cos(a) + uy^2 * (1-cos(a))     uy*uz*(1-cos(a)) - ux*sin(a) ;...
      uz*ux*(1-cos(a)) - uy*sin(a)  uz*uy*(1-cos(a)) + ux*sin(a)   cos(a) + uz^2 * (1-cos(a))];
-
+%--------------------------------------------------------------------------
+vecin = vecin - rot_origin;
+%--------------------------------------------------------------------------
 vecout = R * vecin.';
 vecout = vecout.';
 %--------------------------------------------------------------------------

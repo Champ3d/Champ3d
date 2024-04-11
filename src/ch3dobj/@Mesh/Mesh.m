@@ -21,7 +21,6 @@ classdef Mesh < Xhandle
         celem
         cface
         cedge
-        origin = 0
         % ---
         dom
         % ---
@@ -43,7 +42,11 @@ classdef Mesh < Xhandle
         gid_edge
         gid_face
         flat_node
-        % --- link
+        % --- global coordinates
+        gcoor_type {mustBeMember(gcoor_type,{'cartesian','cylindrical'})} = 'cartesian'
+        move_type {mustBeMember(move_type,{'linear','rotational'})} = 'linear'
+        gcoor
+        move
     end
 
     % --- Dependent Properties
@@ -52,6 +55,11 @@ classdef Mesh < Xhandle
         nb_elem
         nb_edge
         nb_face
+        % ---
+        dimension
+        gnode
+        gnode_cartesian
+        gnode_cylindrical
     end
 
     % --- Constructors
@@ -104,14 +112,130 @@ classdef Mesh < Xhandle
         function val = get.nb_node(obj)
             val = size(obj.node,2);
         end
+        % ---
         function val = get.nb_elem(obj)
             val = size(obj.elem,2);
         end
+        % ---
         function val = get.nb_edge(obj)
             val = size(obj.edge,2);
         end
+        % ---
         function val = get.nb_face(obj)
             val = size(obj.face,2);
+        end
+        % ---
+        function val = get.dimension(obj)
+            val = size(obj.node,1);
+        end
+        % ---
+        function val = get.gnode(obj)
+            if obj.gcoor.cartesian.o
+            val = size(obj.face,2);
+        end
+        
+    end
+
+    % --- Methods for coordinates
+    methods
+        % ---
+        function val = get_gnode(obj,defined_with)
+            arguments
+                obj
+                defined_with {mustBeMember(defined_with,{'gcoor_cartesian','gcoor_cylindrical'})} = 'gcoor_cartesian'
+            end
+            % ---
+            switch defined_with
+                case 'gcoor_cartesian'
+                    %val = 
+                case 'gcoor_cylindrical'
+            end
+        end
+        % ---
+        function gnode_xyz = get_gnode_cartesian(obj)
+            % ---
+            if obj.dimension == 2
+                % --- lock to gcoor
+                if any(obj.gcoor.cartesian.o(1:2) ~= [0 0])
+                    gnode_xyz = obj.node - obj.gcoor.cartesian.o(1:2).';
+                end
+                % --- move
+                if any(obj.move.cartesian.xyz(1:2) ~= [0 0])
+                    gnode_xyz = gnode_xyz + obj.move.cartesian.xyz(1:2).';
+                end
+            elseif obj.dimension == 3
+                % --- lock to gcoor
+                if any(obj.gcoor.cartesian.o(1:3) ~= [0 0 0])
+                    gnode_xyz = obj.node - obj.gcoor.cartesian.o(1:3).';
+                end
+                % --- move
+                if any(obj.move.cartesian.xyz(1:3) ~= [0 0 0])
+                    gnode_xyz = gnode_xyz + obj.move.cartesian.xyz(1:3).';
+                end
+            end
+            % ---
+        end
+        % ---
+        function gnode_xyz = get_gnode_cylindrical(obj)
+            % ---
+            if obj.dimension == 2
+                % --- lock to gcoor
+                if any(obj.gcoor.cylindrical.o(1:2) ~= [0 0])
+                    gnode_xyz = obj.node - obj.gcoor.cylindrical.o(1:2).';
+                end
+                % ---
+                if any(obj.gcoor.cylindrical.otheta(1:2) ~= [1 0])
+                    otheta0 = [1 0 0];
+                    otheta1 = [obj.gcoor.cylindrical.otheta(1:2) 0];
+                    rot_axis  = cross(otheta0,otheta1);
+                    rot_angle = acosd(dot(otheta0,otheta1)/(norm(otheta0)*norm(otheta1)));
+                    % ---
+                    gnode_xyz = [gnode_xyz; zeros(1,size(gnode_xyz,2))];
+                    % ---
+                    gnode_xyz = f_rotaroundaxis(gnode_xyz.','rot_axis',rot_axis,'angle',rot_angle);
+                    % ---
+                    gnode_xyz = gnode_xyz.';
+                    gnode_xyz = gnode_xyz(1:2,:);
+                end
+                % --- move
+                if any(obj.move.cylindrical.theta ~= 0)
+                    rot_axis = [0 0 1];
+                    rot_angle = obj.move.cylindrical.theta;
+                    % ---
+                    gnode_xyz = [gnode_xyz; zeros(1,size(gnode_xyz,2))];
+                    % ---
+                    gnode_xyz = f_rotaroundaxis(gnode_xyz.','rot_axis',rot_axis,'angle',rot_angle);
+                    % ---
+                    gnode_xyz = gnode_xyz.';
+                    gnode_xyz = gnode_xyz(1:2,:);
+                end
+            elseif obj.dimension == 3
+                % --- lock to gcoor
+                if any(obj.gcoor.cylindrical.o(1:3) ~= [0 0 0])
+                    gnode_xyz = obj.node - obj.gcoor.cylindrical.o(1:3).';
+                end
+                % ---
+                if any(obj.gcoor.cylindrical.otheta(1:3) ~= [1 0 0])
+                    otheta0 = [1 0 0];
+                    otheta1 = obj.gcoor.cylindrical.otheta(1:3);
+                    rot_axis  = cross(otheta0,otheta1);
+                    rot_angle = acosd(dot(otheta0,otheta1)/(norm(otheta0)*norm(otheta1)));
+                    % ---
+                    gnode_xyz = f_rotaroundaxis(gnode_xyz.','rot_axis',rot_axis,'angle',rot_angle);
+                    % ---
+                    gnode_xyz = gnode_xyz.';
+                end
+                % --- move
+                if any(obj.move.cylindrical.theta ~= 0)
+                    rot_axis = [0 0 1];
+                    rot_angle = obj.move.cylindrical.theta;
+                    % ---
+                    gnode_xyz = f_rotaroundaxis(gnode_xyz.','rot_axis',rot_axis,'angle',rot_angle);
+                    % ---
+                    gnode_xyz = gnode_xyz.';
+                end
+            end
+            % ---
         end
     end
 

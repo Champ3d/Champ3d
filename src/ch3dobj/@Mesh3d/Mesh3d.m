@@ -14,6 +14,17 @@ classdef Mesh3d < Mesh
     methods
         function obj = Mesh3d()
             obj@Mesh;
+            % ---
+            obj.gcoor.cartesian.o = [0 0 0];
+            % ---
+            obj.gcoor.cylindrical.o = [0 0 0];
+            obj.gcoor.cylindrical.otheta = [1 0 0]; % w/ counterclockwise convention
+            % ---
+            obj.move.linear.vector_step = [0 0 0];
+            % ---
+            obj.move.rotational.angle_step = 0;       % deg, counterclockwise
+            obj.move.rotational.origin     = [0 0 0]; % rot around o-->axis
+            obj.move.rotational.axis       = [0 0 1]; % rot around o-->axis
         end
     end
 
