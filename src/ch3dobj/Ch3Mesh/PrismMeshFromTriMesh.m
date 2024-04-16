@@ -111,7 +111,7 @@ classdef PrismMeshFromTriMesh < PrismMesh
             end
             %--------------------------------------------------------------
             % lock to origin
-            node_ = node_ + obj.gorigin.';
+            node_ = node_ - obj.gorigin.';
             %--------------------------------------------------------------
             % setup volume elements (elem) in 3D
             nbElem2D = mesh2d.nb_elem;
