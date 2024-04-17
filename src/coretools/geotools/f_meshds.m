@@ -62,13 +62,13 @@ f_fprintf(0,'Make #meshds');
 node = mesh.node;
 elem = mesh.elem;
 nb_elem = size(elem,2);
-con = f_connexion(elem_type);
-nbNo_inEl = con.nbNo_inEl;
-nbFa_inEl = con.nbFa_inEl;
-nbEd_inFa = con.nbEd_inFa;
-nbNo_inEd = con.nbNo_inEd;
-siNo_inEd = con.siNo_inEd;
-nbEd_inEl = con.nbEd_inEl;
+refelem = f_refelem(elem_type);
+nbNo_inEl = refelem.nbNo_inEl;
+nbFa_inEl = refelem.nbFa_inEl;
+nbEd_inFa = refelem.nbEd_inFa;
+nbNo_inEd = refelem.nbNo_inEd;
+siNo_inEd = refelem.siNo_inEd;
+nbEd_inEl = refelem.nbEd_inEl;
 %--------------------------------------------------------------------------
 %----- barrycenter
 if any(f_strcmpi(get,{'_all', 'celem','center'}))

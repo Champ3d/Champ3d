@@ -43,13 +43,13 @@ else
     end
 end
 %--------------------------------------------------------------------------
-con = f_connexion(elem_type);
-nbNo_inEl = con.nbNo_inEl;
+refelem = obj.refelem;
+nbNo_inEl = refelem.nbNo_inEl;
 %--------------------------------------------------------------------------
 if any(f_strcmpi(elem_type,{'tri','triangle','quad'}))
     dim = 2;
-    fgradNx = con.gradNx;
-    fgradNy = con.gradNy;
+    fgradNx = refelem.gradNx;
+    fgradNy = refelem.gradNy;
     %----------------------------------------------------------------------
     nb_elem = size(elem,2);
     %----------------------------------------------------------------------
@@ -101,9 +101,9 @@ if any(f_strcmpi(elem_type,{'tri','triangle','quad'}))
     %----------------------------------------------------------------------
 elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
     dim = 3;
-    fgradNx = con.gradNx;
-    fgradNy = con.gradNy;
-    fgradNz = con.gradNz;
+    fgradNx = refelem.gradNx;
+    fgradNy = refelem.gradNy;
+    fgradNz = refelem.gradNz;
     %----------------------------------------------------------------------
     nb_elem = size(elem,2);
     %----------------------------------------------------------------------

@@ -24,9 +24,9 @@ nb_node = parent_mesh.nb_node;
 %--------------------------------------------------------------------------
 obj.matrix.id_edge_a = 1:nb_edge;
 %--------------------------------------------------------------------------
-con = f_connexion(parent_mesh.elem_type);
-nbEd_inEl = con.nbEd_inEl;
-nbFa_inEl = con.nbFa_inEl;
+refelem = obj.refelem;
+nbEd_inEl = refelem.nbEd_inEl;
+nbFa_inEl = refelem.nbFa_inEl;
 % ---
 id_edge_in_elem = parent_mesh.meshds.id_edge_in_elem;
 id_edge_in_face = parent_mesh.meshds.id_edge_in_face;

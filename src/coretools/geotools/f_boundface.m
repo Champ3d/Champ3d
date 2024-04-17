@@ -42,8 +42,8 @@ face = f_face(elem,'elem_type',elem_type);
 %--------------------------------------------------------------------------
 nb_face = size(face,2);
 %--------------------------------------------------------------------------
-con = f_connexion(elem_type);
-nbFa_inEl = con.nbFa_inEl;
+refelem = f_refelem(elem_type);
+nbFa_inEl = refelem.nbFa_inEl;
 %-----
 elem_left_of_face = zeros(1,nb_face); % !!! convention
 for i = 1:nbFa_inEl

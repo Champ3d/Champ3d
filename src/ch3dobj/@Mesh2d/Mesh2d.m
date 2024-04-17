@@ -15,9 +15,9 @@ classdef Mesh2d < Mesh
         function obj = Mesh2d()
             obj = obj@Mesh;
             % --- for cartesian/cylindrical
-            obj.gcoor.origin = [0 0];
+            %obj.gcoor.origin = [0 0];
             % --- for cylindrical only
-            obj.gcoor.otheta = [1 0]; % w/ counterclockwise convention
+            %obj.gcoor.otheta = [1 0]; % w/ counterclockwise convention
         end
     end
 

@@ -35,9 +35,8 @@ end
 [coefficient, coef_array_type] = obj.column_format(coefficient);
 dof = obj.column_format(dof);
 %--------------------------------------------------------------------------
-elem_type = obj.elem_type;
-con = f_connexion(elem_type);
-nbNo_inEl = con.nbNo_inEl;
+refelem = obj.refelem;
+nbNo_inEl = refelem.nbNo_inEl;
 %--------------------------------------------------------------------------
 if isempty(obj.elem)
     error('No mesh data !');
@@ -63,7 +62,7 @@ switch on_
             obj.build_intkit;
         end
         % ---
-        nbG = con.nbG;
+        nbG = refelem.nbG;
         % ---
         Wx = cell(1,nbG);
         for iG = 1:nbG

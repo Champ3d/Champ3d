@@ -62,10 +62,10 @@ end
 %--------------------------------------------------------------------------
 if any(f_strcmpi(elem_type,{'tri','triangle','quad'}))
     dim = 2;
-    con = f_connexion(elem_type);
-    nbEd_inEl = con.nbEd_inEl;
-    EdNo_inEl = con.EdNo_inEl;
-    NoFa_ofEd = con.NoFa_ofEd;
+    refelem = obj.refelem;
+    nbEd_inEl = refelem.nbEd_inEl;
+    EdNo_inEl = refelem.EdNo_inEl;
+    NoFa_ofEd = refelem.NoFa_ofEd;
     %----------------------------------------------------------------------
     nb_elem = size(elem,2);
     %----------------------------------------------------------------------
@@ -88,10 +88,10 @@ if any(f_strcmpi(elem_type,{'tri','triangle','quad'}))
     %----------------------------------------------------------------------
 elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
     dim = 3;
-    con = f_connexion(elem_type);
-    nbEd_inEl = con.nbEd_inEl;
-    EdNo_inEl = con.EdNo_inEl;
-    NoFa_ofEd = con.NoFa_ofEd;
+    refelem = obj.refelem;
+    nbEd_inEl = refelem.nbEd_inEl;
+    EdNo_inEl = refelem.EdNo_inEl;
+    NoFa_ofEd = refelem.NoFa_ofEd;
     %----------------------------------------------------------------------
     nb_elem = size(elem,2);
     %----------------------------------------------------------------------

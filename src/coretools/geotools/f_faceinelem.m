@@ -33,12 +33,12 @@ if isempty(elem_type)
     error([mfilename ' : #elem_type must be given !']);
 end
 %--------------------------------------------------------------------------
-con = f_connexion(elem_type);
-nbNo_inEl = con.nbNo_inEl;
-nbNo_inFa = con.nbNo_inFa;
-nbFa_inEl = con.nbFa_inEl;
-FaNo_inEl = con.FaNo_inEl;
-siFa_inEl = con.siFa_inEl;
+refelem = f_refelem(elem_type);
+nbNo_inEl = refelem.nbNo_inEl;
+nbNo_inFa = refelem.nbNo_inFa;
+nbFa_inEl = refelem.nbFa_inEl;
+FaNo_inEl = refelem.FaNo_inEl;
+siFa_inEl = refelem.siFa_inEl;
 %--------------------------------------------------------------------------
 nb_elem = size(elem,2);
 [dim,nb_node] = size(node);

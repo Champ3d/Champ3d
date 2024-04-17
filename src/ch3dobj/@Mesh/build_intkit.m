@@ -27,10 +27,10 @@ cU  = [];
 cV  = [];
 cW  = [];
 %--------------------------------------------------------------------------
-con  = f_connexion(elem_type_);
+refelem = obj.refelem;
 coor = {'U','V','W','cU','cV','cW'};
 for i = 1:length(coor)
-    if isfield(con,coor{i})
+    if isfield(refelem,coor{i})
         eval([coor{i} '= con.' coor{i} ';'])
     end
 end

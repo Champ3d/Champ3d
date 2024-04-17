@@ -37,9 +37,8 @@ end
 %--------------------------------------------------------------------------
 [coefficient, coef_array_type] = obj.column_format(coefficient);
 %--------------------------------------------------------------------------
-elem_type = obj.elem_type;
-con = f_connexion(elem_type);
-nbNo_inEl = con.nbNo_inEl;
+refelem = obj.refelem;
+nbNo_inEl = refelem.nbNo_inEl;
 %--------------------------------------------------------------------------
 if isempty(obj.intkit.Wn) || isempty(obj.intkit.cWn)
     obj.build_intkit;
@@ -48,7 +47,7 @@ end
 switch order
     case '0'
         nbG = 1;
-        Weigh = con.cWeigh;
+        Weigh = refelem.cWeigh;
         % ---
         Wn = cell(1,nbG);
         detJ = cell(1,nbG);
@@ -57,8 +56,8 @@ switch order
             detJ{iG} = obj.intkit.cdetJ{iG}(id_elem,1);
         end
     case 'full'
-        nbG = con.nbG;
-        Weigh = con.Weigh;
+        nbG = refelem.nbG;
+        Weigh = refelem.Weigh;
         % ---
         Wn = cell(1,nbG);
         detJ = cell(1,nbG);

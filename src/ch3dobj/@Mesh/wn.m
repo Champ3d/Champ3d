@@ -41,9 +41,9 @@ else
     end
 end
 %--------------------------------------------------------------------------
-con = f_connexion(elem_type);
-nbNo_inEl = con.nbNo_inEl;
-fN = con.N;
+refelem = obj.refelem;
+nbNo_inEl = refelem.nbNo_inEl;
+fN = refelem.N;
 %--------------------------------------------------------------------------
 nb_elem = size(elem,2);
 %--------------------------------------------------------------------------

@@ -54,7 +54,6 @@ classdef HexMesh < Mesh3d
             end
             % ---
             obj.elem_type = 'hexa';
-            obj.reference;
             % ---
             obj.setup_done = 1;
         end
@@ -108,63 +107,66 @@ classdef HexMesh < Mesh3d
             f_chlogo;
         end
         % -----------------------------------------------------------------
-        function reference(obj)
-            con.nbNo_inEl = 8;
-            con.nbNo_inEd = 2;
-            con.EdNo_inEl = [1 2; 1 4; 1 5; 2 3; 2 6; 3 4; 3 7; 4 8; 5 6; 5 8; 6 7; 7 8];
-            con.siNo_inEd = [+1, -1]; % w.r.t edge
-            con.FaNo_inEl = [1 2 3 4; 5 6 7 8; 1 2 6 5; 2 3 7 6; 3 4 8 7; 1 4 8 5]; %
+    end
+
+    % --- Methods
+    methods (Static)
+                function refelem = reference(obj)
+            refelem.nbNo_inEl = 8;
+            refelem.nbNo_inEd = 2;
+            refelem.EdNo_inEl = [1 2; 1 4; 1 5; 2 3; 2 6; 3 4; 3 7; 4 8; 5 6; 5 8; 6 7; 7 8];
+            refelem.siNo_inEd = [+1, -1]; % w.r.t edge
+            refelem.FaNo_inEl = [1 2 3 4; 5 6 7 8; 1 2 6 5; 2 3 7 6; 3 4 8 7; 1 4 8 5]; %
             % ---
-            con.NoFa_ofEd = [6 4; 3 5; 1 2; 3 5; 1 2; 4 6; 1 2; 1 2; 6 4; 3 5; 3 5; 4 6]; % !!! F(i,~j) - circular
-            con.NoFa_ofFa = [6 3 4 5; 6 3 4 5; 6 1 4 2; 3 1 5 2; 4 1 6 2; 3 1 5 2]; % !!! F(i,~i+1) - circular
+            refelem.NoFa_ofEd = [6 4; 3 5; 1 2; 3 5; 1 2; 4 6; 1 2; 1 2; 6 4; 3 5; 3 5; 4 6]; % !!! F(i,~j) - circular
+            refelem.NoFa_ofFa = [6 3 4 5; 6 3 4 5; 6 1 4 2; 3 1 5 2; 4 1 6 2; 3 1 5 2]; % !!! F(i,~i+1) - circular
             % ---
-            con.nbNo_inFa = [      4;       4;       4;       4;       4;       4];
-            con.FaType    = [      2;       2;       2;       2;       2;       2];
-            con.nbEd_inFa{1} = 4; % for FaType 1
-            con.nbEd_inFa{2} = 4; % for FaType 2
-            con.EdNo_inFa{1} = [1 2; 1 4; 2 3; 3 4]; % for FaType 1
-            con.EdNo_inFa{2} = [1 2; 1 4; 2 3; 3 4]; % for FaType 2
-            con.FaEd_inEl = [];
-            con.siFa_inEl = [];
-            con.siEd_inEl = [];
-            con.siEd_inFa{1} = [1 -1 1 1]; % w.r.t face for FaType 1
-            con.siEd_inFa{2} = [1 -1 1 1]; % w.r.t face for FaType 2
+            refelem.nbNo_inFa = [      4;       4;       4;       4;       4;       4];
+            refelem.FaType    = [      2;       2;       2;       2;       2;       2];
+            refelem.nbEd_inFa{1} = 4; % for FaType 1
+            refelem.nbEd_inFa{2} = 4; % for FaType 2
+            refelem.EdNo_inFa{1} = [1 2; 1 4; 2 3; 3 4]; % for FaType 1
+            refelem.EdNo_inFa{2} = [1 2; 1 4; 2 3; 3 4]; % for FaType 2
+            refelem.FaEd_inEl = [];
+            refelem.siFa_inEl = [];
+            refelem.siEd_inEl = [];
+            refelem.siEd_inFa{1} = [1 -1 1 1]; % w.r.t face for FaType 1
+            refelem.siEd_inFa{2} = [1 -1 1 1]; % w.r.t face for FaType 2
             % ---
-            con.nbEd_inEl = size(con.EdNo_inEl,1);
-            con.nbFa_inEl = size(con.FaNo_inEl,1);
+            refelem.nbEd_inEl = size(refelem.EdNo_inEl,1);
+            refelem.nbFa_inEl = size(refelem.FaNo_inEl,1);
             % --- Gauss points
-            con.U   = sqrt(3)/3*[-1 -1 -1 -1  1  1  1 1];
-            con.V   = sqrt(3)/3*[-1 -1  1  1 -1 -1  1 1];
-            con.W   = sqrt(3)/3*[-1  1 -1  1 -1  1 -1 1];
-            con.Weigh =         [ 1  1  1  1  1  1  1 1];
-            con.cU  = 0;
-            con.cV  = 0;
-            con.cW  = 0;
-            con.cWeigh  = 8; % 2x2x2
-            con.nbG = length(con.U);
+            refelem.U   = sqrt(3)/3*[-1 -1 -1 -1  1  1  1 1];
+            refelem.V   = sqrt(3)/3*[-1 -1  1  1 -1 -1  1 1];
+            refelem.W   = sqrt(3)/3*[-1  1 -1  1 -1  1 -1 1];
+            refelem.Weigh =         [ 1  1  1  1  1  1  1 1];
+            refelem.cU  = 0;
+            refelem.cV  = 0;
+            refelem.cW  = 0;
+            refelem.cWeigh  = 8; % 2x2x2
+            refelem.nbG = length(refelem.U);
             % ---
-            con.nbI = 9;
+            refelem.nbI = 9;
             e = 1e-6;
-            con.nU = [-1 +1 +1 -1 -1 +1 +1 -1];
-            con.nV = [-1 -1 +1 +1 -1 -1 +1 +1];
-            con.nW = [-1 -1 -1 -1 +1 +1 +1 +1];
-            con.iU = [(1-e) * con.nU    0];
-            con.iV = [(1-e) * con.nV    0];
-            con.iW = [(1-e) * con.nW    0];
+            refelem.nU = [-1 +1 +1 -1 -1 +1 +1 -1];
+            refelem.nV = [-1 -1 +1 +1 -1 -1 +1 +1];
+            refelem.nW = [-1 -1 -1 -1 +1 +1 +1 +1];
+            refelem.iU = [(1-e) * refelem.nU    0];
+            refelem.iV = [(1-e) * refelem.nV    0];
+            refelem.iW = [(1-e) * refelem.nW    0];
             % ---
-            con.N{1} = @(u,v,w) 1/8.*(1-u).*(1-v).*(1-w);
-            con.N{2} = @(u,v,w) 1/8.*(1+u).*(1-v).*(1-w);
-            con.N{3} = @(u,v,w) 1/8.*(1+u).*(1+v).*(1-w);
-            con.N{4} = @(u,v,w) 1/8.*(1-u).*(1+v).*(1-w);
-            con.N{5} = @(u,v,w) 1/8.*(1-u).*(1-v).*(1+w);
-            con.N{6} = @(u,v,w) 1/8.*(1+u).*(1-v).*(1+w);
-            con.N{7} = @(u,v,w) 1/8.*(1+u).*(1+v).*(1+w);
-            con.N{8} = @(u,v,w) 1/8.*(1-u).*(1+v).*(1+w);
-            con.gradNx = @(u,v,w) [-1/8.*(1-v).*(1-w); +1/8.*(1-v).*(1-w); +1/8.*(1+v).*(1-w); -1/8.*(1+v).*(1-w); -1/8.*(1-v).*(1+w); +1/8.*(1-v).*(1+w); +1/8.*(1+v).*(1+w); -1/8.*(1+v).*(1+w);];
-            con.gradNy = @(u,v,w) [-1/8.*(1-u).*(1-w); -1/8.*(1+u).*(1-w); +1/8.*(1+u).*(1-w); +1/8.*(1-u).*(1-w); -1/8.*(1-u).*(1+w); -1/8.*(1+u).*(1+w); +1/8.*(1+u).*(1+w); +1/8.*(1-u).*(1+w);];
-            con.gradNz = @(u,v,w) [-1/8.*(1-u).*(1-v); -1/8.*(1+u).*(1-v); -1/8.*(1+u).*(1+v); -1/8.*(1-u).*(1+v); +1/8.*(1-u).*(1-v); +1/8.*(1+u).*(1-v); +1/8.*(1+u).*(1+v); +1/8.*(1-u).*(1+v);];
+            refelem.N{1} = @(u,v,w) 1/8.*(1-u).*(1-v).*(1-w);
+            refelem.N{2} = @(u,v,w) 1/8.*(1+u).*(1-v).*(1-w);
+            refelem.N{3} = @(u,v,w) 1/8.*(1+u).*(1+v).*(1-w);
+            refelem.N{4} = @(u,v,w) 1/8.*(1-u).*(1+v).*(1-w);
+            refelem.N{5} = @(u,v,w) 1/8.*(1-u).*(1-v).*(1+w);
+            refelem.N{6} = @(u,v,w) 1/8.*(1+u).*(1-v).*(1+w);
+            refelem.N{7} = @(u,v,w) 1/8.*(1+u).*(1+v).*(1+w);
+            refelem.N{8} = @(u,v,w) 1/8.*(1-u).*(1+v).*(1+w);
+            refelem.gradNx = @(u,v,w) [-1/8.*(1-v).*(1-w); +1/8.*(1-v).*(1-w); +1/8.*(1+v).*(1-w); -1/8.*(1+v).*(1-w); -1/8.*(1-v).*(1+w); +1/8.*(1-v).*(1+w); +1/8.*(1+v).*(1+w); -1/8.*(1+v).*(1+w);];
+            refelem.gradNy = @(u,v,w) [-1/8.*(1-u).*(1-w); -1/8.*(1+u).*(1-w); +1/8.*(1+u).*(1-w); +1/8.*(1-u).*(1-w); -1/8.*(1-u).*(1+w); -1/8.*(1+u).*(1+w); +1/8.*(1+u).*(1+w); +1/8.*(1-u).*(1+w);];
+            refelem.gradNz = @(u,v,w) [-1/8.*(1-u).*(1-v); -1/8.*(1+u).*(1-v); -1/8.*(1+u).*(1+v); -1/8.*(1-u).*(1+v); +1/8.*(1-u).*(1-v); +1/8.*(1+u).*(1-v); +1/8.*(1+u).*(1+v); +1/8.*(1-u).*(1+v);];
             % ---
-            obj.refelem = con;
         end
     end
 

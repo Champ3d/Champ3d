@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef PrismMesh < Mesh3d
+classdef TetMesh < Mesh3d
 
     % --- Properties
     properties
@@ -22,7 +22,7 @@ classdef PrismMesh < Mesh3d
 
     % --- Constructors
     methods
-        function obj = PrismMesh(args)
+        function obj = TetMesh(args)
             arguments
                 args.node
                 args.elem
@@ -31,7 +31,7 @@ classdef PrismMesh < Mesh3d
                 args.gcoor
             end
             % ---
-            obj = obj@Mesh3d;
+            obj@Mesh3d;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -53,7 +53,7 @@ classdef PrismMesh < Mesh3d
                 return
             end
             % ---
-            obj.elem_type = 'prism';
+            obj.elem_type = 'tetra';
             % ---
             obj.setup_done = 1;
         end
@@ -68,6 +68,7 @@ classdef PrismMesh < Mesh3d
                 args.edge_color = [0.4940 0.1840 0.5560]
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
+                args.id_elem = []
                 args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
             end
             edge_color_  = args.edge_color;
@@ -80,8 +81,11 @@ classdef PrismMesh < Mesh3d
             %--------------------------------------------------------------
             clear msh;
             %--------------------------------------------------------------
-            boface = f_boundface(obj.elem,obj.node,'elem_type','prism');
-            allfac = 1:size(boface,2);
+            if isempty(args.id_elem)
+                boface = f_boundface(obj.elem,obj.node,'elem_type','tetra');
+            else
+                boface = f_boundface(obj.elem(:,args.id_elem),obj.node,'elem_type','tetra');
+            end
             %--------------------------------------------------------------
             if f_strcmpi(args.coordinate_system,'global')
                 msh.Vertices = obj.gnode.';
@@ -89,17 +93,11 @@ classdef PrismMesh < Mesh3d
                 msh.Vertices = obj.node.';
             end
             %--------------------------------------------------------------
+            msh.Faces = f_unique(boface(1:3,:)).';
             msh.FaceColor = face_color_;
             msh.EdgeColor = edge_color_; % [0.7 0.7 0.7] --> gray
             %--------------------------------------------------------------
-            id_tria = find(boface(4,:) == 0);
-            id_quad = setdiff(allfac,id_tria);
-            % ---
-            msh.Faces = f_unique(boface(1:3,id_tria)).';
-            patch(msh); hold on
-            msh.Faces = f_unique(boface(1:4,id_quad)).';
-            patch(msh); hold on
-            % ---
+            patch(msh);
             xlabel('x (m)'); ylabel('y (m)');
             if size(obj.node,1) == 3
                 zlabel('z (m)'); 
@@ -114,61 +112,62 @@ classdef PrismMesh < Mesh3d
     % --- Methods
     methods (Static)
         function refelem = reference(obj)
-            refelem.nbNo_inEl = 6;
+            refelem.nbNo_inEl = 4;
             refelem.nbNo_inEd = 2;
-            refelem.EdNo_inEl = [1 2; 1 3; 1 4; 2 3; 2 5; 3 6; 4 5; 4 6; 5 6];
+            refelem.EdNo_inEl = [1 2; 1 3; 1 4; 2 3; 2 4; 3 4];
             refelem.siNo_inEd = [+1, -1]; % w.r.t edge
-            refelem.FaNo_inEl = [1 2 3 0; 4 5 6 0; 1 2 5 4; 1 3 6 4; 2 3 6 5]; % tri first then quad
+            refelem.FaNo_inEl = [1 2 3; 1 2 4; 1 3 4; 2 3 4]; %
             %-----
-            refelem.NoFa_ofEd = [4 5; 3 5; 1 2; 3 4; 1 2; 1 2; 4 5; 3 5; 3 4]; % !!! F(i,~j) - circular
-            refelem.NoFa_ofFa = [4 3 5 0; 4 3 5 0; 4 1 5 2; 3 1 5 2; 3 1 4 2]; % !!! F(i,~i+1) - circular
+            refelem.NoFa_ofEd = [3 4; 2 4; 1 4; 2 3; 1 3; 1 2]; % !!! F(i,~j) - circular
+            refelem.NoFa_ofFa = [3 2 4; 3 1 4; 2 1 4; 2 1 3]; % !!! F(i,~i+1) - circular
             %-----
-            refelem.nbNo_inFa = [      3;       3;       4;       4;       4];
-            refelem.FaType    = [      1;       1;       2;       2;       2];
+            refelem.nbNo_inFa = [    3;     3;     3;     3];
+            refelem.FaType    = [    1;     1;     1;     1];
             refelem.nbEd_inFa{1} = 3; % for FaType 1
-            refelem.nbEd_inFa{2} = 4; % for FaType 2
-            refelem.EdNo_inFa{1} = [1 2; 1 3; 2 3];      % for FaType 1
-            refelem.EdNo_inFa{2} = [1 2; 1 4; 2 3; 3 4]; % for FaType 2
+            refelem.nbEd_inFa{2} = 3; % for FaType 2
+            refelem.EdNo_inFa{1} = [1 2; 1 3; 2 3]; % for FaType 1
+            refelem.EdNo_inFa{2} = [1 2; 1 3; 2 3]; % for FaType 2
             refelem.FaEd_inEl = [];
             refelem.siFa_inEl = [];
             refelem.siEd_inEl = [];
-            refelem.siEd_inFa{1} = [1 -1 1];   % w.r.t face for FaType 1
-            refelem.siEd_inFa{2} = [1 -1 1 1]; % w.r.t face for FaType 2
+            refelem.siEd_inFa{1} = [1 -1 1]; % w.r.t face for FaType 1
+            refelem.siEd_inFa{2} = [1 -1 1]; % w.r.t face for FaType 2
             %-----
             refelem.nbEd_inEl = size(refelem.EdNo_inEl,1);
             refelem.nbFa_inEl = size(refelem.FaNo_inEl,1);
             %----- Gauss points
-            refelem.U   =       1/2*[ 1  0  1  1  0  1];
-            refelem.V   =       1/2*[ 1  1  0  1  1  0];
-            refelem.W   = sqrt(3)/3*[-1 -1 -1  1  1  1];
-            refelem.Weigh =     1/6*[ 1  1  1  1  1  1];
-            refelem.cU  = 1/3;
-            refelem.cV  = 1/3;
-            refelem.cW  = 0;
-            refelem.cWeigh  = 1;
+            a = (5 - sqrt(5)) / 20;
+            b = (5 + 3 * sqrt(5)) / 20;
+            refelem.U   = [a a a b];
+            refelem.V   = [a a b a];
+            refelem.W   = [a b a a];
+            refelem.Weigh = 1/24 * [1  1  1  1];
+            refelem.cU  = 1/4;
+            refelem.cV  = 1/4;
+            refelem.cW  = 1/4;
+            refelem.cWeigh  = 1/6;
             refelem.nbG = length(refelem.U);
             % ---
-            refelem.nbI = 7;
+            refelem.nbI = 5;
             e = 1e-6;
-            refelem.nU = [+0 +1 +0 +0 +1 +0];
-            refelem.nV = [+0 +0 +1 +0 +0 +1];
-            refelem.nW = [-1 -1 -1 +1 +1 +1];
-            refelem.iU = [(1-e) * refelem.nU    1/3];
-            refelem.iV = [(1-e) * refelem.nV    1/3];
-            refelem.iW = [(1-e) * refelem.nW    0];
+            refelem.nU = [ 0 +1  0  0];
+            refelem.nV = [ 0  0 +1  0];
+            refelem.nW = [ 0  0  0 +1];
+            refelem.iU = [(1-e) * refelem.nU    1/4];
+            refelem.iV = [(1-e) * refelem.nV    1/4];
+            refelem.iW = [(1-e) * refelem.nW    1/4];
             %-----
-            refelem.N{1} = @(u,v,w) 1/2.*(1-u-v).*(1-w);
-            refelem.N{2} = @(u,v,w) 1/2.*(    u).*(1-w);
-            refelem.N{3} = @(u,v,w) 1/2.*(    v).*(1-w);
-            refelem.N{4} = @(u,v,w) 1/2.*(1-u-v).*(1+w);
-            refelem.N{5} = @(u,v,w) 1/2.*(    u).*(1+w);
-            refelem.N{6} = @(u,v,w) 1/2.*(    v).*(1+w);
-            refelem.gradNx = @(u,v,w) [w/2 - 1/2;       1/2 - w/2;       0*u;      -w/2 - 1/2; w/2 + 1/2;       0*u];
-            refelem.gradNy = @(u,v,w) [w/2 - 1/2;             0*v; 1/2 - w/2;      -w/2 - 1/2;       0*v; w/2 + 1/2];
-            refelem.gradNz = @(u,v,w) [u/2 + v/2 - 1/2;      -u/2;      -v/2; 1/2 - u/2 - v/2;       u/2;       v/2];
+            refelem.N{1} = @(u,v,w) 1-u-v-w;
+            refelem.N{2} = @(u,v,w) u;
+            refelem.N{3} = @(u,v,w) v;
+            refelem.N{4} = @(u,v,w) w;
+            refelem.gradNx = @(u,v,w) [-1 + 0*u; 1 + 0*u;     0*u;     0*u];
+            refelem.gradNy = @(u,v,w) [-1 + 0*v;     0*v; 1 + 0*v;     0*v];
+            refelem.gradNz = @(u,v,w) [-1 + 0*w;     0*w;     0*w; 1 + 0*w];
             % ---
         end
     end
+
 end
 
 

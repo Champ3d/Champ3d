@@ -34,13 +34,13 @@ node = obj.node;
 elem = obj.elem;
 elem_type = obj.elem_type;
 nb_elem = size(elem,2);
-con = f_connexion(elem_type);
-nbNo_inEl = con.nbNo_inEl;
-nbFa_inEl = con.nbFa_inEl;
-nbEd_inFa = con.nbEd_inFa;
-nbNo_inEd = con.nbNo_inEd;
-siNo_inEd = con.siNo_inEd;
-nbEd_inEl = con.nbEd_inEl;
+refelem = obj.refelem;
+nbNo_inEl = refelem.nbNo_inEl;
+nbFa_inEl = refelem.nbFa_inEl;
+nbEd_inFa = refelem.nbEd_inFa;
+nbNo_inEd = refelem.nbNo_inEd;
+siNo_inEd = refelem.siNo_inEd;
+nbEd_inEl = refelem.nbEd_inEl;
 %--------------------------------------------------------------------------
 %----- barrycenter
 all_get = {'all','celem'};

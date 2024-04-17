@@ -33,10 +33,10 @@ if isempty(elem_type)
     elem_type = f_elemtype(elem,'defined_on',defined_on);
 end
 %--------------------------------------------------------------------------
-con = f_connexion(elem_type);
-nbNo_inEd = con.nbNo_inEd;
-nbEd_inEl = con.nbEd_inEl;
-EdNo_inEl = con.EdNo_inEl;
+refelem = f_refelem(elem_type);
+nbNo_inEd = refelem.nbNo_inEd;
+nbEd_inEl = refelem.nbEd_inEl;
+EdNo_inEl = refelem.EdNo_inEl;
 %--------------------------------------------------------------------------
 nbElem = size(elem,2);
 %--------------------------------------------------------------------------
@@ -45,7 +45,7 @@ e = reshape([elem(EdNo_inEl(:,1),:); elem(EdNo_inEl(:,2),:)], ...
 % ---
 ori_edge_in_elem = squeeze(sign(diff(e, 1, 2))); % with unsorted e !
 if any(strcmpi(elem_type,{'tri','quad','triangle'}))
-    sign_edge_in_elem = ori_edge_in_elem .* con.siEd_inEl;
+    sign_edge_in_elem = ori_edge_in_elem .* refelem.siEd_inEl;
 elseif any(strcmpi(elem_type,{'hex','hexa','prism','tet','tetra'}))
     sign_edge_in_elem = 0;
 end

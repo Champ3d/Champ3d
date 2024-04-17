@@ -54,7 +54,6 @@ classdef TriMesh < Mesh2d
             end
             % ---
             obj.elem_type = 'tri';
-            obj.reference;
             obj.cal_flatnode;
             % ---
             obj.setup_done = 1;
@@ -98,8 +97,53 @@ classdef TriMesh < Mesh2d
             f_chlogo;
         end
         % -----------------------------------------------------------------
-        function reference(obj)
-            % --- XTODO
+    end
+
+    % --- Methods
+    methods (Static)
+        function refelem = reference(obj)
+            refelem.nbNo_inEl = 3;
+            refelem.nbNo_inEd = 2;
+            refelem.EdNo_inEl = [1 2; 1 3; 2 3];
+            refelem.siNo_inEd = [+1, -1]; % w.r.t edge
+            refelem.FaNo_inEl = refelem.EdNo_inEl; % face as edge
+            %-----
+            refelem.NoFa_ofEd = [2 3; 1 3; 1 2]; % !!! F(i,~j) - circular
+            %con.NoFa_ofFa = [6 3 4 5; 6 3 4 5; 6 1 4 2; 3 1 5 2; 4 1 6 2; 3 1 5 2]; % !!! F(i,~i+1) - circular
+            %-----
+            refelem.nbNo_inFa = [  2;   2;   2];
+            refelem.FaType    = [  1;   1;   1];
+            refelem.nbEd_inFa = [];
+            refelem.EdNo_inFa = [];
+            refelem.FaEd_inEl = [];
+            refelem.siEd_inEl = [1; -1; 1];
+            refelem.siFa_inEl = refelem.siEd_inEl; % upperface convention
+            refelem.siEd_inFa = [];
+            %-----
+            refelem.nbEd_inEl = size(refelem.EdNo_inEl,1);
+            refelem.nbFa_inEl = size(refelem.FaNo_inEl,1);
+            %----- Gauss points
+            refelem.U   =       [1/6  2/3  1/6];
+            refelem.V   =       [1/6  1/6  2/3];
+            refelem.Weigh =     [1/6  1/6  1/6];
+            refelem.cU  = 1/3;
+            refelem.cV  = 1/3;
+            refelem.cWeigh  = 1/2;
+            refelem.nbG = length(refelem.U);
+            % ---
+            refelem.nbI = 4;
+            e = 1e-6;
+            refelem.nU = [0 1 0];
+            refelem.nV = [0 0 1];
+            refelem.iU = [(1-e) * refelem.nU    1/3];
+            refelem.iV = [(1-e) * refelem.nV    1/3];
+            %-----
+            refelem.N{1} = @(u,v) (1-u-v);
+            refelem.N{2} = @(u,v) (    u);
+            refelem.N{3} = @(u,v) (    v);
+            refelem.gradNx = @(u,v) [-u./u;   u./u;   0*u];
+            refelem.gradNy = @(u,v) [-u./u;    0*u;  u./u];
+            % ---
         end
     end
 

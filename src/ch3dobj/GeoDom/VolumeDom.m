@@ -115,7 +115,6 @@ classdef VolumeDom < Xhandle
             % ---
             node = obj.parent_mesh.node;
             elem = obj.parent_mesh.elem(:,obj.gid_elem);
-            elem_type = obj.parent_mesh.elem_type;
             cut_equation = f_cut_equation(args.cut_equation);
             tol = args.tolerance;
             %--------------------------------------------------------------
@@ -124,8 +123,8 @@ classdef VolumeDom < Xhandle
             %--------------------------------------------------------------
             nbEqcond = length(eqcond);
             %--------------------------------------------------------------
-            con = f_connexion(elem_type);
-            nbNo_inEl = con.nbNo_inEl;
+            refelem = obj.refelem;
+            nbNo_inEl = refelem.nbNo_inEl;
             nbElem = size(elem,2);
             % ---
             x = reshape(node(1,elem(:,:)),nbNo_inEl,[]);
@@ -134,7 +133,7 @@ classdef VolumeDom < Xhandle
             % ---
             if length(neqcond) > 1                    % 1 & something else
                 eval(['iNeqcond = (' neqcond ');']);
-                eval('checksum = sum(iNeqcond);');
+                checksum = sum(iNeqcond);
                 % just need one node touched
                 lid_elem = find(checksum >= 1);
             else

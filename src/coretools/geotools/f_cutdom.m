@@ -50,8 +50,8 @@ end
 %--------------------------------------------------------------------------
 cut_equation(isspace(cut_equation)) = [];
 %--------------------------------------------------------------------------
-con = f_connexion(elem_type);
-nbNo_inEl = con.nbNo_inEl;
+refelem = f_refelem(elem_type);
+nbNo_inEl = refelem.nbNo_inEl;
 nbElem = size(elem,2);
 %--------------------------------------------------------------------------
 
@@ -132,7 +132,7 @@ else
     inter_face = f_interface(elem1,elem2,node,'elem_type',elem_type);
     % ---
     etrodeNode = [];
-    for i = 1:max(con.nbNo_inFa)
+    for i = 1:max(refelem.nbNo_inFa)
         %etrodeNode = [etrodeNode mesh.interface(i,:)];
         etrodeNode = [etrodeNode inter_face(i,:)];
     end

@@ -52,12 +52,12 @@ end
 %--------------------------------------------------------------------------
 if any(f_strcmpi(elem_type,{'tri','triangle','quad'}))
     dim = 2;
-    con = f_connexion(elem_type);
-    nbNo_inEl = con.nbNo_inEl;
-    FaNo_inEl = con.FaNo_inEl;
-    nbFa_inEl = con.nbFa_inEl;
-    fgradNx = con.gradNx;
-    fgradNy = con.gradNy;
+    refelem = obj.refelem;
+    nbNo_inEl = refelem.nbNo_inEl;
+    FaNo_inEl = refelem.FaNo_inEl;
+    nbFa_inEl = refelem.nbFa_inEl;
+    fgradNx = refelem.gradNx;
+    fgradNy = refelem.gradNy;
     %----------------------------------------------------------------------
     nb_elem = size(elem,2);
     %----------------------------------------------------------------------
@@ -98,13 +98,13 @@ if any(f_strcmpi(elem_type,{'tri','triangle','quad'}))
     end
 elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
     dim = 3;
-    con = f_connexion(elem_type);
-    nbNo_inEl = con.nbNo_inEl;
-    FaNo_inEl = con.FaNo_inEl;
-    nbFa_inEl = con.nbFa_inEl;
-    fgradNx = con.gradNx;
-    fgradNy = con.gradNy;
-    fgradNz = con.gradNz;
+    refelem = obj.refelem;
+    nbNo_inEl = refelem.nbNo_inEl;
+    FaNo_inEl = refelem.FaNo_inEl;
+    nbFa_inEl = refelem.nbFa_inEl;
+    fgradNx = refelem.gradNx;
+    fgradNy = refelem.gradNy;
+    fgradNz = refelem.gradNz;
     %----------------------------------------------------------------------
     nb_elem = size(elem,2);
     %----------------------------------------------------------------------

@@ -24,7 +24,6 @@ classdef Mesh < Xhandle
         % ---
         dom
         % ---
-        refelem
         meshds
         discrete
         intkit
@@ -58,6 +57,8 @@ classdef Mesh < Xhandle
         nb_elem
         nb_edge
         nb_face
+        % ---
+        refelem
         % ---
         dim
         gnode
@@ -132,6 +133,10 @@ classdef Mesh < Xhandle
         % ---
         function val = get.dim(obj)
             val = size(obj.node,1);
+        end
+        % ---
+        function val = get.refelem(obj)
+            val = obj.reference;
         end
         % ---
         function val = get.gnode(obj)

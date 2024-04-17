@@ -1,6 +1,5 @@
-function bound = f_boface(node,elem,elem_type)
 %--------------------------------------------------------------------------
-% This code is written by: H-K. Bui, 2023
+% This code is written by: H-K. Bui, 2024
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
@@ -9,8 +8,25 @@ function bound = f_boface(node,elem,elem_type)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-bcmesh = f_make_mds(node,elem,elem_type);
-bound  = bcmesh.bound;
+function refelem = f_refelem(elem_type,varargin)
+
+switch elem_type
+    case {33,'tri','triangle'}
+        refelem = TriMesh.reference;
+    case {44,'quad'}
+        refelem = QuadMesh.reference;
+    case {46,'tet','tetra'}
+        refelem = TetMesh.reference;
+    case {69,'prism'}
+        refelem = PrismMesh.reference;
+    case {812,'hex','hexa'}
+        refelem = HexMesh.reference;
+    case 'xxx'
+        % ---
+end
+
+
+
 
 
 

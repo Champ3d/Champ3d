@@ -29,10 +29,10 @@ if isempty(elem_type)
     elem_type = f_elemtype(elem,'defined_on',defined_on);
 end
 %--------------------------------------------------------------------------
-con = f_connexion(elem_type);
-nbNo_inFa = con.nbNo_inFa;
-nbFa_inEl = con.nbFa_inEl;
-FaNo_inEl = con.FaNo_inEl;
+refelem = f_refelem(elem_type);
+nbNo_inFa = refelem.nbNo_inFa;
+nbFa_inEl = refelem.nbFa_inEl;
+FaNo_inEl = refelem.FaNo_inEl;
 %--------------------------------------------------------------------------
 nbElem = size(elem,2);
 %--------------------------------------------------------------------------
