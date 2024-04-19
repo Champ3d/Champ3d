@@ -74,10 +74,10 @@ classdef Parameter < Xhandle
         %------------------------------------------------------------------
         function vout = get_on(obj,dom)
             if obj.fvectorized
-                vout = eval_fvectorized(obj,dom);
+                vout = obj.eval_fvectorized(dom);
                 vout = obj.column_format(vout);
             else
-                vout = eval_fserial(obj,dom);
+                vout = obj.eval_fserial(dom);
                 vout = obj.column_format(vout);
             end
         end
