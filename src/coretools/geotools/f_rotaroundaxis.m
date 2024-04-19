@@ -13,12 +13,12 @@ function vecout = f_rotaroundaxis(vecin,args)
 
 arguments
     vecin
-    args.rot_origin = [0 0 0];   % rot around o-->axis
+    args.rot_axis_origin = [0 0 0];   % rot around o-->axis
     args.rot_axis   = [1 0 0];
     args.rot_angle  =  0;        % deg, counterclockwise convention
 end
 %--------------------------------------------------------------------------
-rot_origin = args.rot_origin;
+rot_axis_origin = args.rot_axis_origin;
 rot_axis   = args.rot_axis;
 rot_angle  = args.rot_angle;
 %--------------------------------------------------------------------------
@@ -33,7 +33,7 @@ R = [cos(a) + ux^2 * (1-cos(a))    ux*uy*(1-cos(a)) - uz*sin(a)   ux*uz*(1-cos(a
      uy*ux*(1-cos(a)) + uz*sin(a)  cos(a) + uy^2 * (1-cos(a))     uy*uz*(1-cos(a)) - ux*sin(a) ;...
      uz*ux*(1-cos(a)) - uy*sin(a)  uz*uy*(1-cos(a)) + ux*sin(a)   cos(a) + uz^2 * (1-cos(a))];
 %--------------------------------------------------------------------------
-vecin = vecin - rot_origin;
+vecin = vecin - rot_axis_origin;
 %--------------------------------------------------------------------------
 vecout = R * vecin.';
 vecout = vecout.';
