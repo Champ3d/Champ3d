@@ -83,12 +83,14 @@ classdef Mesh < Xhandle
             obj.intkit.cWf = {};
             obj.intkit.cWn = {};
             obj.intkit.cWv = {};
+            obj.intkit.cnode = {};
             obj.intkit.detJ = {};
             obj.intkit.gradWn = {};
             obj.intkit.Jinv = {};
             obj.intkit.We = {};
             obj.intkit.Wf = {};
             obj.intkit.Wn = {};
+            obj.intkit.node = {};
             % ---
             obj.prokit.detJ = {};
             obj.prokit.gradWn = {};

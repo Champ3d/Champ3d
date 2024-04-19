@@ -18,9 +18,10 @@ tic
 f_fprintf(0,'Make #prokit \n');
 fprintf('   ');
 %--------------------------------------------------------------------------
-U = obj.refelem.iU;
-V = obj.refelem.iV;
-W = obj.refelem.iW;
+refelem = obj.refelem;
+U = refelem.iU;
+V = refelem.iV;
+W = refelem.iW;
 %--------------------------------------------------------------------------
 fnmeshds = fieldnames(obj.meshds);
 for i = 1:length(fnmeshds)
@@ -43,7 +44,7 @@ if size(obj.node,1) == 3
     dim   = 3;
 end
 %--------------------------------------------------------------------------
-nbNo_inEl = obj.refelem.nbNo_inEl;
+nbNo_inEl = refelem.nbNo_inEl;
 realx = (reshape(obj.node(1,obj.elem),nbNo_inEl,[])).';
 realy = (reshape(obj.node(2,obj.elem),nbNo_inEl,[])).';
 if for3d
