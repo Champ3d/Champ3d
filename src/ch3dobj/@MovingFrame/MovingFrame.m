@@ -10,34 +10,24 @@
 
 classdef MovingFrame < Xhandle
     properties
-        main_value
-        main_dir
-        rot_axis
-        rot_angle
+        lin_step
+        rot_origin    % rot around o-->axis
+        rot_axis      % rot around o-->axis
+        rot_angle     % deg, counterclockwise convention
     end
 
     % --- Contructor
     methods
         function obj = MovingFrame(args)
             arguments
-                args.main_value = []
-                args.main_dir = []
+                args.lin_step = []
+                args.rot_origin = []
                 args.rot_axis = []
                 args.rot_angle = []
             end
             % ---
             obj <= args;
             % ---
-            obj.gcoor.cartesian.o = [0 0 0];
-            % ---
-            obj.gcoor.cylindrical.o = [0 0 0];
-            obj.gcoor.cylindrical.otheta = [1 0 0]; % w/ counterclockwise convention
-            % ---
-            obj.move.linear.vector_step = [0 0 0];
-            % ---
-            obj.move.rotational.angle_step = 0;       % deg, counterclockwise
-            obj.move.rotational.origin     = [0 0 0]; % rot around o-->axis
-            obj.move.rotational.axis       = [0 0 1]; % rot around o-->axis
         end
     end
 

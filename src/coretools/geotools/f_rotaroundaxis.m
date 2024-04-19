@@ -1,4 +1,4 @@
-function vecout = f_rotaroundaxis(vecin,varargin)
+function vecout = f_rotaroundaxis(vecin,args)
 % F_ROTAROUNDAXIS returns vector after rotation by angle a around an axis u
 % given by an unit vector.
 %--------------------------------------------------------------------------
@@ -11,27 +11,20 @@ function vecout = f_rotaroundaxis(vecin,varargin)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-% --- valid argument list (to be updated each time modifying function)
-arglist = {'rot_origin','rot_axis','angle'};
-
-% --- default input value
-rot_origin = [0 0 0];
-rot_axis = [1 0 0];
-angle = 0; % deg
-
-% --- check and update input
-for i = 1:length(varargin)/2
-    if any(strcmpi(arglist,varargin{2*i-1}))
-        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
-    else
-        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
-    end
+arguments
+    vecin
+    args.rot_origin = [0 0 0];   % rot around o-->axis
+    args.rot_axis   = [1 0 0];
+    args.rot_angle  =  0;        % deg, counterclockwise convention
 end
-
+%--------------------------------------------------------------------------
+rot_origin = args.rot_origin;
+rot_axis   = args.rot_axis;
+rot_angle  = args.rot_angle;
 %--------------------------------------------------------------------------
 rot_axis = rot_axis ./ norm(rot_axis);
 %--------------------------------------------------------------------------
-a = angle / 180 * pi;
+a = rot_angle / 180 * pi;
 ux = rot_axis(1);
 uy = rot_axis(2);
 uz = rot_axis(3);

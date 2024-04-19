@@ -264,7 +264,7 @@ classdef Mesh < Xhandle
     end
 
     % --- Methods
-    methods (Access = private)
+    methods
         % -----------------------------------------------------------------
         function lock_to_cartesian(obj,args)
             arguments
@@ -301,7 +301,7 @@ classdef Mesh < Xhandle
             % ---
             if isa(obj,'Mesh2d')
                 if isempty(gcoor_origin)
-                    return
+                    node_ = obj.node;
                 elseif any(gcoor_origin ~= [0 0])
                     node_ = obj.node - gcoor_origin.';
                 end
@@ -316,7 +316,7 @@ classdef Mesh < Xhandle
                     % ---
                     node_ = [node_; zeros(1,size(node_,2))];
                     % ---
-                    node_ = f_rotaroundaxis(node_.','rot_axis',rot_axis,'angle',rot_angle);
+                    node_ = f_rotaroundaxis(node_.','rot_axis',rot_axis,'rot_angle',rot_angle);
                     % ---
                     node_ = node_.';
                     node_ = node_(1:2,:);
@@ -326,7 +326,7 @@ classdef Mesh < Xhandle
                 % ---
             elseif isa(obj,'Mesh3d')
                 if isempty(gcoor_origin)
-                    return
+                    node_ = obj.node;
                 elseif any(gcoor_origin ~= [0 0 0])
                     node_ = obj.node - gcoor_origin.';
                 end
@@ -339,7 +339,7 @@ classdef Mesh < Xhandle
                     rot_axis  = cross(otheta0,otheta1);
                     rot_angle = acosd(dot(otheta0,otheta1)/(norm(otheta0)*norm(otheta1)));
                     % ---
-                    node_ = f_rotaroundaxis(node_.','rot_axis',rot_axis,'angle',rot_angle);
+                    node_ = f_rotaroundaxis(node_.','rot_axis',rot_axis,'rot_angle',rot_angle);
                     % ---
                     node_ = node_.';
                 end
