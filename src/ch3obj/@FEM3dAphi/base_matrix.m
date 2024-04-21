@@ -24,7 +24,7 @@ nb_node = parent_mesh.nb_node;
 %--------------------------------------------------------------------------
 obj.matrix.id_edge_a = 1:nb_edge;
 %--------------------------------------------------------------------------
-refelem = obj.refelem;
+refelem = parent_mesh.refelem;
 nbEd_inEl = refelem.nbEd_inEl;
 nbFa_inEl = refelem.nbFa_inEl;
 % ---
