@@ -267,6 +267,14 @@ classdef Parameter < Xhandle
                             eval(['vout' vout_pattern '= f_(a{1},a{2},a{3},a{4},a{5});']);
                         elseif nb_fargin == 6
                             eval(['vout' vout_pattern '= f_(a{1},a{2},a{3},a{4},a{5},a{6});']);
+                        elseif nb_fargin == 7
+                            eval(['vout' vout_pattern '= f_(a{1},a{2},a{3},a{4},a{5},a{6},a{7});']);
+                        elseif nb_fargin == 8
+                            eval(['vout' vout_pattern '= f_(a{1},a{2},a{3},a{4},a{5},a{6},a{7},a{8});']);
+                        elseif nb_fargin == 9
+                            eval(['vout' vout_pattern '= f_(a{1},a{2},a{3},a{4},a{5},a{6},a{7},a{8},a{9});']);
+                        elseif nb_fargin == 10
+                            eval(['vout' vout_pattern '= f_(a{1},a{2},a{3},a{4},a{5},a{6},a{7},a{8},a{9},a{10});']);
                         end
                     else
                         if nb_fargin == 0
@@ -283,6 +291,14 @@ classdef Parameter < Xhandle
                             eval(['vout' vout_pattern '= f_(a{1},a{2},a{3},a{4},a{5},varargs{:});']);
                         elseif nb_fargin == 6
                             eval(['vout' vout_pattern '= f_(a{1},a{2},a{3},a{4},a{5},a{6},varargs{:});']);
+                        elseif nb_fargin == 7
+                            eval(['vout' vout_pattern '= f_(a{1},a{2},a{3},a{4},a{5},a{6},a{7},varargs{:});']);
+                        elseif nb_fargin == 8
+                            eval(['vout' vout_pattern '= f_(a{1},a{2},a{3},a{4},a{5},a{6},a{7},a{8},varargs{:});']);
+                        elseif nb_fargin == 9
+                            eval(['vout' vout_pattern '= f_(a{1},a{2},a{3},a{4},a{5},a{6},a{7},a{8},a{9},varargs{:});']);
+                        elseif nb_fargin == 10
+                            eval(['vout' vout_pattern '= f_(a{1},a{2},a{3},a{4},a{5},a{6},a{7},a{8},a{9},a{10},varargs{:});']);
                         end
                     end
                 end
@@ -321,6 +337,8 @@ classdef Parameter < Xhandle
                         'bv','jv','hv','pv','av','phiv','tv','omev','tempv',...
                         'bs','js','hs','ps','as','phis','ts','omes','temps'}))
                     fargs{i} = from_.fields.(depon_)(:,id_elem);
+                elseif any(f_strcmpi(depon_,{'ltime','time'}))
+                    fargs{i} = from_.ltime.ltime_now;
                 end
             end
         end
@@ -361,6 +379,14 @@ classdef Parameter < Xhandle
                     vout = f_(fargs{1},fargs{2},fargs{3},fargs{4},fargs{5});
                 elseif nb_fargin == 6
                     vout = f_(fargs{1},fargs{2},fargs{3},fargs{4},fargs{5},fargs{6});
+                elseif nb_fargin == 7
+                    vout = f_(fargs{1},fargs{2},fargs{3},fargs{4},fargs{5},fargs{6},fargs{7});
+                elseif nb_fargin == 8
+                    vout = f_(fargs{1},fargs{2},fargs{3},fargs{4},fargs{5},fargs{6},fargs{7},fargs{8});
+                elseif nb_fargin == 9
+                    vout = f_(fargs{1},fargs{2},fargs{3},fargs{4},fargs{5},fargs{6},fargs{7},fargs{8},fargs{9});
+                elseif nb_fargin == 10
+                    vout = f_(fargs{1},fargs{2},fargs{3},fargs{4},fargs{5},fargs{6},fargs{7},fargs{8},fargs{9},fargs{10});
                 end
             else
                 if nb_fargin == 0
@@ -377,6 +403,14 @@ classdef Parameter < Xhandle
                     vout = f_(fargs{1},fargs{2},fargs{3},fargs{4},fargs{5},varargs{:});
                 elseif nb_fargin == 6
                     vout = f_(fargs{1},fargs{2},fargs{3},fargs{4},fargs{5},fargs{6},varargs{:});
+                elseif nb_fargin == 7
+                    vout = f_(fargs{1},fargs{2},fargs{3},fargs{4},fargs{5},fargs{6},fargs{7},varargs{:});
+                elseif nb_fargin == 8
+                    vout = f_(fargs{1},fargs{2},fargs{3},fargs{4},fargs{5},fargs{6},fargs{7},fargs{8},varargs{:});
+                elseif nb_fargin == 9
+                    vout = f_(fargs{1},fargs{2},fargs{3},fargs{4},fargs{5},fargs{6},fargs{7},fargs{8},fargs{9},varargs{:});
+                elseif nb_fargin == 10
+                    vout = f_(fargs{1},fargs{2},fargs{3},fargs{4},fargs{5},fargs{6},fargs{7},fargs{8},fargs{9},fargs{10},varargs{:});
                 end
             end
         end

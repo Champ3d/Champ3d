@@ -11,7 +11,8 @@
 classdef MovingFrame < Xhandle
     
     properties
-        lin_step
+        lin_dir       % linear mov direction
+        lin_step      % linear mov step
         rot_origin    % rot around o-->axis
         rot_axis      % rot around o-->axis
         rot_angle     % deg, counterclockwise convention
@@ -21,6 +22,7 @@ classdef MovingFrame < Xhandle
     methods
         function obj = MovingFrame(args)
             arguments
+                args.lin_dir  = []
                 args.lin_step = []
                 args.rot_origin = []
                 args.rot_axis = []
@@ -33,8 +35,11 @@ classdef MovingFrame < Xhandle
     end
 
     % --- Methods
-    methods
-
+    methods (Abstract)
+        function node = move(obj,mesh)
+        end
+        function node = inverse_move(obj,mesh)
+        end
     end
 
 end

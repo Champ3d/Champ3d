@@ -12,8 +12,6 @@ classdef LTime < Xhandle
 
     % --- Properties
     properties
-        id
-        % ---
         lit = 0
         ltime_array
     end
@@ -27,7 +25,6 @@ classdef LTime < Xhandle
     methods
         function obj = LTime(args)
             arguments
-                args.id
                 args.ltime_array {mustBeNumeric} = []
                 args.t0 {mustBeNumeric} = 0
                 args.t_end {mustBeNumeric} = 0
@@ -35,11 +32,15 @@ classdef LTime < Xhandle
             end
             obj = obj@Xhandle;
             % ---
-            if isempty(args.ltime_array)
-                obj.ltime_array = [args.t0, ...
-                    args.t0 + cumsum((args.t_end-args.t0)/args.dnum .* ones(1,args.dnum))];
+            if nargin < 1
+                obj.ltime_array = 0;
             else
-                obj.ltime_array = args.ltime_array;
+                if isempty(args.ltime_array)
+                    obj.ltime_array = [args.t0, ...
+                        args.t0 + cumsum((args.t_end-args.t0)/args.dnum .* ones(1,args.dnum))];
+                else
+                    obj.ltime_array = args.ltime_array;
+                end
             end
         end
     end

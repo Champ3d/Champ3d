@@ -26,7 +26,7 @@ classdef EmModel < Xhandle
         sibc
         embc
         % ---
-        timesystem
+        ltime
         % ---
         matrix
         fields
@@ -44,7 +44,7 @@ classdef EmModel < Xhandle
                 args.id
                 args.parent_mesh
                 args.frequency
-                args.timesystem
+                args.ltime {mustBeMember(args.ltime,'LTime')}
             end
             % ---
             obj@Xhandle;
@@ -58,11 +58,36 @@ classdef EmModel < Xhandle
                      'bs','js','hs','ps','as','phis','ts','omes'}, ...
                      'init_value',[]);
             % ---
+            if isempty(obj.ltime)
+                obj.ltime = LTime;
+            end
+            % ---
         end
     end
 
     % --- Methods
     methods
+        % -----------------------------------------------------------------
+        function add_ltime(obj,args)
+            arguments
+                obj
+                % ---
+                args.ltime_array {mustBeNumeric} = []
+                args.t0 {mustBeNumeric} = 0
+                args.t_end {mustBeNumeric} = 0
+                args.dnum {mustBeNumeric} = 1
+                args.ltime_obj {mustBeMember(args.ltime_obj,'LTime')}
+            end
+            % ---
+            if isfield(args,'ltime_obj')
+                ltime_obj = args.ltime_obj;
+            else
+                argu = f_to_namedarg(args,'with_out','ltime_obj');
+                ltime_obj = LTime(argu{:});
+            end
+            % ---
+            obj.ltime = ltime_obj;
+        end
         % -----------------------------------------------------------------
         function add_econductor(obj,args)
             arguments

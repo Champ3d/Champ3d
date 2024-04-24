@@ -22,7 +22,7 @@ classdef ThModel < Xhandle
         ps
         pv
         % ---
-        timesystem
+        ltime
         Temp0 = 0
         % ---
         matrix

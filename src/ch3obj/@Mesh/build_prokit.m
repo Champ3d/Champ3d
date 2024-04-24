@@ -51,13 +51,13 @@ if for3d
     realz = (reshape(obj.node(3,obj.elem),nbNo_inEl,[])).';
 end
 nb_inode  = length(U);
-node = cell(1,nb_inode);
+node_i = cell(1,nb_inode);
 for i = 1:nb_inode
-    node{i} = zeros(obj.nb_elem,dim);
-    node{i}(:,1) = sum(Wn{i} .* realx,2);
-    node{i}(:,2) = sum(Wn{i} .* realy,2);
+    node_i{i} = zeros(obj.nb_elem,dim);
+    node_i{i}(:,1) = sum(Wn{i} .* realx,2);
+    node_i{i}(:,2) = sum(Wn{i} .* realy,2);
     if for3d
-        node{i}(:,3) = sum(Wn{i} .* realz,2);
+        node_i{i}(:,3) = sum(Wn{i} .* realz,2);
     end
 end
 %--------------------------------------------------------------------------
@@ -68,7 +68,7 @@ obj.prokit.Wn = Wn;
 obj.prokit.gradWn = gradWn;
 obj.prokit.We = We;
 obj.prokit.Wf = Wf;
-obj.prokit.node = node;
+obj.prokit.node = node_i;
 %--------------------------------------------------------------------------
 obj.build_prokit_done = 1;
 %--------------------------------------------------------------------------
