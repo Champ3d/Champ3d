@@ -12,12 +12,33 @@ function id_elem = f_findelem(node,elem,args)
 arguments
     node
     elem
-    args.condition char
+    args.condition char = ''
+    args.in_box = []
     args.tol = 1e-9
 end
-
-% --- default input value
+%--------------------------------------------------------------------------
 condition = args.condition;
+in_box    = args.in_box;
+%--------------------------------------------------------------------------
+id_elem = [];
+if isempty(condition) && isempty(in_box)
+    return
+end
+%--------------------------------------------------------------------------
+if ~isempty(in_box)
+    xmin = in_box.xmin;
+    xmax = in_box.xmax;
+    ymin = in_box.ymin;
+    ymax = in_box.ymax;
+    zmin = in_box.zmin;
+    zmax = in_box.zmax;
+    id_elem = f_findelem(node,elem,...
+         'condition',...
+        ['x <= ' num2str(xmax) '&&' 'x >= ' num2str(xmin) '&&' ...
+         'y <= ' num2str(ymax) '&&' 'y >= ' num2str(ymin) '&&' ...
+         'z <= ' num2str(zmax) '&&' 'z >= ' num2str(zmin) ]);
+    return
+end
 %--------------------------------------------------------------------------
 condition = f_cut_equation(condition,'tol',args.tol);
 %--------------------------------------------------------------------------
@@ -45,10 +66,8 @@ end
 % ---
 ie_gr(1) = [];
 el_gr(1) = [];
-
 % ---
 id_elem = [];
-
 for j = 1:length(el_gr)
     % ---
     elem_ = el_gr{j};

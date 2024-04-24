@@ -144,6 +144,21 @@ classdef Mesh < Xhandle
             end
         end
     end
+    
+    % --- Methods
+    methods
+        function lbox = localbox(obj)
+            lbox.xmin = min(obj.node(1,:));
+            lbox.xmax = max(obj.node(1,:));
+            lbox.ymin = min(obj.node(2,:));
+            lbox.ymax = max(obj.node(2,:));
+            if size(obj.node,1) == 3
+                lbox.zmin = min(obj.node(3,:));
+                lbox.zmax = max(obj.node(3,:));
+            end
+        end
+    end
+
     % --- Methods
     methods (Access = public)
         % ---
@@ -189,7 +204,7 @@ classdef Mesh < Xhandle
         function rotate(obj,args)
             arguments
                 obj
-                args.rot_axis_origin = [];
+                args.rot_axis_origin = [0 0 0];
                 args.rot_axis = [];
                 args.rot_angle = 0;
             end
@@ -198,45 +213,13 @@ classdef Mesh < Xhandle
             rot_axis   = args.rot_axis;
             rot_angle  = args.rot_angle;
             % ---
-            node_ = obj.node;
-            % ---
-            if isa(obj,'Mesh2d')
-                % ---
-                if isempty(rot_axis)
-                    return
-                else
-                    if rot_angle ~= 0
-                        % ---
-                        rot_axis_origin = [rot_axis_origin 0];
-                        rot_axis = [rot_axis 0];
-                        node_ = [node_; zeros(1,size(node_,2))];
-                        % ---
-                        node_ = f_rotaroundaxis(node_.', ...
-                            'rot_axis_origin',rot_axis_origin, ...
-                            'rot_axis',rot_axis,'rot_angle',rot_angle);
-                        % ---
-                        node_ = node_.';
-                        node_ = node_(1:2,:);
-                    end
-                end
-                % ---
-            elseif isa(obj,'Mesh3d')
-                % ---
-                if isempty(rot_axis)
-                    return
-                else
-                    if rot_angle ~= 0
-                        % ---
-                        node_ = f_rotaroundaxis(node_.', ...
-                            'rot_axis_origin',rot_axis_origin, ...
-                            'rot_axis',rot_axis,'rot_angle',rot_angle);
-                        % ---
-                        node_ = node_.';
-                    end
-                end
+            if isempty(rot_axis)
+                return
             end
             % ---
-            obj.node = node_;
+            obj.node = f_rotaroundaxis(obj.node, ...
+                'rot_axis_origin',rot_axis_origin, ...
+                'rot_axis',rot_axis,'rot_angle',rot_angle);
             % ---
             obj.celem = obj.cal_celem;
             obj.cface = obj.cal_cface;

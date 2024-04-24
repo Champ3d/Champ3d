@@ -64,5 +64,23 @@ classdef MultiPhysicalModel < Xhandle
             % ---
             obj.time_system = time_system_;
         end
-    end
+        % -----------------------------------------------------------------
+        function solve(obj,args)
+            arguments
+                obj
+                args.coupling_scheme {mustBeMember(args.coupling_scheme,{'weak','strong'})} = 'weak';
+                args.emcoupling {mustBeMember(args.emcoupling,{'DomainDecomposition'})} = 'DomainDecomposition'
+            end
+            % ---
+            if any(f_strcmpi(args.coupling_scheme,{'weak'}))
+                argu = f_to_namedarg(args);
+                % ---
+                solveweak(obj,argu{:})
+            elseif any(f_strcmpi(args.coupling_scheme,{'strong'}))
+                argu = f_to_namedarg(args);
+                % ---
+                solvestrong(obj,argu{:})
+            end
+        end
+
 end

@@ -1,4 +1,4 @@
-function vecout = f_rotaroundaxis(vecin,args)
+function rotated_node = f_rotaroundaxis(node,args)
 % F_ROTAROUNDAXIS returns vector after rotation by angle a around an axis u
 % given by an unit vector.
 %--------------------------------------------------------------------------
@@ -12,10 +12,10 @@ function vecout = f_rotaroundaxis(vecin,args)
 %--------------------------------------------------------------------------
 
 arguments
-    vecin
+    node                              % n x 2,3
     args.rot_axis_origin = [0 0 0];   % rot around o-->axis
     args.rot_axis   = [1 0 0];
-    args.rot_angle  =  0;        % deg, counterclockwise convention
+    args.rot_angle  =  0;             % deg, counterclockwise convention
 end
 %--------------------------------------------------------------------------
 rot_axis_origin = args.rot_axis_origin;
@@ -24,7 +24,27 @@ rot_angle  = args.rot_angle;
 %--------------------------------------------------------------------------
 rot_axis = rot_axis ./ norm(rot_axis);
 %--------------------------------------------------------------------------
-a = rot_angle / 180 * pi;
+dim = size(node,1);
+if dim == 2
+    node = [node; zeros(1,size(node,2))];
+end
+%--------------------------------------------------------------------------
+if length(rot_axis) == 2
+    rot_axis = [rot_axis 0];
+end
+% ---
+if length(rot_axis_origin) == 2
+    rot_axis_origin = [rot_axis_origin 0];
+elseif length(rot_axis_origin) == 3 && dim == 2
+    rot_axis_origin(3) = [];
+end
+%--------------------------------------------------------------------------
+if rot_angle == 0
+    rotated_node = node;
+    return
+end
+%--------------------------------------------------------------------------
+a  = rot_angle / 180 * pi;
 ux = rot_axis(1);
 uy = rot_axis(2);
 uz = rot_axis(3);
@@ -33,11 +53,14 @@ R = [cos(a) + ux^2 * (1-cos(a))    ux*uy*(1-cos(a)) - uz*sin(a)   ux*uz*(1-cos(a
      uy*ux*(1-cos(a)) + uz*sin(a)  cos(a) + uy^2 * (1-cos(a))     uy*uz*(1-cos(a)) - ux*sin(a) ;...
      uz*ux*(1-cos(a)) - uy*sin(a)  uz*uy*(1-cos(a)) + ux*sin(a)   cos(a) + uz^2 * (1-cos(a))];
 %--------------------------------------------------------------------------
-vecin = vecin - rot_axis_origin;
+node = node - rot_axis_origin.';
 %--------------------------------------------------------------------------
-vecout = R * vecin.';
-vecout = vecout.';
+rotated_node = R * node;
 %--------------------------------------------------------------------------
-
-
+rotated_node = rotated_node + rot_axis_origin.';
+%--------------------------------------------------------------------------
+if dim == 2
+    rotated_node = rotated_node(1:2,:);
+end
+%--------------------------------------------------------------------------
 
