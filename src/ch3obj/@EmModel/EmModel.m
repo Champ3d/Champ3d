@@ -76,7 +76,7 @@ classdef EmModel < Xhandle
                 args.t0 {mustBeNumeric} = 0
                 args.t_end {mustBeNumeric} = 0
                 args.dnum {mustBeNumeric} = 1
-                args.ltime_obj {mustBeMember(args.ltime_obj,'LTime')}
+                args.ltime_obj {mustBeA(args.ltime_obj,'LTime')}
             end
             % ---
             if isfield(args,'ltime_obj')

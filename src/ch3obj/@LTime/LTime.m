@@ -25,23 +25,34 @@ classdef LTime < Xhandle
     methods
         function obj = LTime(args)
             arguments
-                args.ltime_array {mustBeNumeric} = []
-                args.t0 {mustBeNumeric} = 0
-                args.t_end {mustBeNumeric} = 0
-                args.dnum {mustBeNumeric} = 1
+                args.ltime_array {mustBeNumeric}
+                args.t0 {mustBeNumeric}
+                args.t_end {mustBeNumeric}
+                args.dnum {mustBeNumeric}
             end
             obj = obj@Xhandle;
             % ---
-            if nargin < 1
-                obj.ltime_array = 0;
+            if isfield(args,'ltime_array')
+                obj.ltime_array = args.ltime_array;
             else
-                if isempty(args.ltime_array)
-                    obj.ltime_array = [args.t0, ...
-                        args.t0 + cumsum((args.t_end-args.t0)/args.dnum .* ones(1,args.dnum))];
-                else
-                    obj.ltime_array = args.ltime_array;
+                % ---
+                t0 = 0;
+                t_end = 0;
+                dnum = 1;
+                % ---
+                if isfield(args,'t0')
+                    t0 = args.t0;
                 end
+                if isfield(args,'t_end')
+                    t_end = args.t_end;
+                end
+                if isfield(args,'dnum')
+                    dnum = args.dnum;
+                end
+                % ---
+                obj.ltime_array = [t0, t0 + cumsum((t_end-t0)/dnum .* ones(1,dnum))];
             end
+            % ---
         end
     end
 

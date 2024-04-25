@@ -26,7 +26,8 @@ classdef Parameter < Xhandle
                 args.depend_on {mustBeMember(args.depend_on,...
                     {'celem','cface', ...
                      'bv','jv','hv','pv','av','phiv','tv','omev','tempv',...
-                     'bs','js','hs','ps','as','phis','ts','omes','temps'})} = 'celem'
+                     'bs','js','hs','ps','as','phis','ts','omes','temps',...
+                     'ltime'})} = 'celem'
                 args.from = []
                 args.varargin_list = []
                 args.fvectorized = 0
@@ -186,7 +187,7 @@ classdef Parameter < Xhandle
             for i = 1:nb_arg
                 po = find(size_arg{i} == nb_elem);
                 if ~isempty(po)
-                    poidelem(i) = po;
+                    poidelem(i) = po(1);
                 end
             end
             %--------------------------------------------------------------
@@ -322,6 +323,8 @@ classdef Parameter < Xhandle
                 id_elem = dom.gid_elem;
             elseif isprop(dom,'gid_face')
                 id_elem = dom.gid_face;
+            else
+                id_elem = 1;
             end
             % ---
             fargs = cell(1,length(obj.depend_on));

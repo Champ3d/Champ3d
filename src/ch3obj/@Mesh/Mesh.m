@@ -41,8 +41,7 @@ classdef Mesh < Xhandle
         gid_edge
         gid_face
         flat_node
-        % --- moving frame
-        moving_frame {mustBeMember(moving_frame,'MovingFrame')}
+        % ---
     end
 
     % --- Dependent Properties
