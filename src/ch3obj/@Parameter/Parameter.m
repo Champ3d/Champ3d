@@ -74,9 +74,11 @@ classdef Parameter < Xhandle
     methods
         %------------------------------------------------------------------
         function vout = get_on(obj,dom)
+            % ---
             if nargin < 2
                 dom = [];
             end
+            % ---
             if obj.fvectorized
                 vout = obj.eval_fvectorized(dom);
                 vout = f_column_format(vout);
@@ -86,14 +88,35 @@ classdef Parameter < Xhandle
             end
         end
         %------------------------------------------------------------------
-        function vout = get_inverse_on(obj,dom)
+        function vout = get_inverse_on(obj,dom,args)
+            arguments
+                obj
+                dom
+                args.parameter_type {mustBeMember(args.parameter_type,{'auto','vector'})} = 'vector'
+            end
+            % ---
+            if nargin < 2
+                dom = [];
+            end
+            % ---
+            parameter_type = args.parameter_type;
+            % ---
             vout = [];
             vin  = obj.get_on(dom);
             sizev = size(vin);
-            lensv = length(sizev); 
+            lensv = length(sizev);
+            % ---
             if lensv == 2
                 if sizev(2) == 1
-                    vout = 1./vin;
+                    if any(sizev(1) == [1 2 3])
+                        if f_strcmpi(parameter_type,'vector')
+                            vout = - vin;
+                        else
+                            vout = 1./vin;
+                        end
+                    else
+                        vout = 1./vin;
+                    end
                 else
                     vout = - vin;
                 end
@@ -154,6 +177,15 @@ classdef Parameter < Xhandle
             else
                 f_fprintf(1,'Cannot inverse !',0,'\n');
             end
+            % --- 
+            if any(isinf(vout))
+                f_fprintf(1,'Inverse has Inf ! \n');
+            end
+            % --- 
+            if any(isnan(vout))
+                f_fprintf(1,'Inverse has NaN ! \n');
+            end
+            % ---
         end
         %------------------------------------------------------------------
         function vout = eval_fvectorized(obj,dom)
