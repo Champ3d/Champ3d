@@ -369,7 +369,7 @@ classdef ProcessingSurface3d < VolumeDom3d
                         id_phydom = id_econductor__{iec};
                         %------------------------------------------------------
                         [coefficient, coef_array_type] = ...
-                            model.column_format(model.econductor.(id_phydom).matrix.sigma_array);
+                            f_column_format(model.econductor.(id_phydom).matrix.sigma_array);
                         %------------------------------------------------------
                         id_elem = model.econductor.(id_phydom).matrix.gid_elem;
                         %------------------------------------------------------
