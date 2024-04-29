@@ -81,7 +81,7 @@ classdef JsCoilAphi < Xhandle
             rotj = rotj(id_edge_t_unknown,1);
             rotrot = rotrot(id_edge_t_unknown,id_edge_t_unknown);
             %--------------------------------------------------------------
-            t_jsfield = sparse(nb_edge,1);
+            t_jsfield = zeros(nb_edge,1);
             t_jsfield(id_edge_t_unknown) = f_solve_axb(rotrot,rotj);
             %--------------------------------------------------------------
             clear rotj rotrot wfjs

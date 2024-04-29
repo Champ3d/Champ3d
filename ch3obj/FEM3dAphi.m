@@ -235,7 +235,7 @@ classdef FEM3dAphi < EmModel
                     % ---
                     wewex = sparse(nb_edge,nb_edge);
                     for i = 1:nbEd_inEl
-                        for j = 1:nbEd_inEl
+                        for j = i+1:nbEd_inEl
                             wewex = wewex + ...
                                 sparse(id_edge_in_elem(i,:),id_edge_in_elem(j,:),...
                                 lmatrix(:,i,j),nb_edge,nb_edge);

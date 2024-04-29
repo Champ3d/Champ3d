@@ -17,6 +17,7 @@ classdef VolumeDom < Xhandle
         gid_elem
         condition
         submesh
+        gid
     end
 
     % --- Dependent Properties
@@ -34,6 +35,8 @@ classdef VolumeDom < Xhandle
                 args.gid_elem = []
                 args.condition = []
             end
+            % ---
+            obj = obj@Xhandle;
             % ---
             obj <= args;
             % ---
@@ -66,7 +69,12 @@ classdef VolumeDom < Xhandle
             obj.submesh = allmeshes;
         end
         % -----------------------------------------------------------------
-        function gid = gid(obj)
+        function gid = get_gid(obj)
+            if ~isempty(obj.gid)
+                gid = obj.gid;
+                return;
+            end
+            %--------------------------------------------------------------
             node = obj.parent_mesh.node;
             elem = obj.parent_mesh.elem(:,obj.gid_elem);
             elem_type = obj.parent_mesh.elem_type;
@@ -103,6 +111,8 @@ classdef VolumeDom < Xhandle
             gid.gid_inner_node = id_inner_node;
             gid.gid_inner_edge = id_inner_edge;
             gid.gid_inner_face = id_inner_face;
+            %--------------------------------------------------------------
+            obj.gid = gid;
             %--------------------------------------------------------------
         end
         % -----------------------------------------------------------------

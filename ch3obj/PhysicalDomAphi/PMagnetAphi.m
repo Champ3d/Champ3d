@@ -137,7 +137,7 @@ classdef PMagnetAphi < PMagnet
             rotb = rotb(id_edge_a_unknown,1);
             rotrot = rotrot(id_edge_a_unknown,id_edge_a_unknown);
             %--------------------------------------------------------------
-            a_pmagnet = sparse(nb_edge,1);
+            a_pmagnet = zeros(nb_edge,1);
             a_pmagnet(id_edge_a_unknown) = f_solve_axb(rotrot,rotb);
             clear rotb rotrot wfbr
             %--------------------------------------------------------------

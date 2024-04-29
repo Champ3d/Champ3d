@@ -129,7 +129,7 @@ classdef BsfieldAphi < Bsfield
             rotb = rotb(id_edge_a_unknown,1);
             rotrot = rotrot(id_edge_a_unknown,id_edge_a_unknown);
             %--------------------------------------------------------------
-            a_bsfield = sparse(nb_edge,1);
+            a_bsfield = zeros(nb_edge,1);
             a_bsfield(id_edge_a_unknown) = f_solve_axb(rotrot,rotb);
             %--------------------------------------------------------------
             clear rotb rotrot wfbs

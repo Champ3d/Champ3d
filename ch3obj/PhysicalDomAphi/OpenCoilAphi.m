@@ -124,7 +124,7 @@ classdef OpenCoilAphi < OpenCoil
                 RHS = - gradgrad * V;
                 gradgrad = gradgrad(id_node_v_unknown,id_node_v_unknown);
                 RHS = RHS(id_node_v_unknown,1);
-                V(id_node_v_unknown) = gradgrad \ RHS;
+                V(id_node_v_unknown) = f_solve_axb(gradgrad,RHS);
             end
             % ---
             dofJs = parent_mesh.discrete.grad * V;

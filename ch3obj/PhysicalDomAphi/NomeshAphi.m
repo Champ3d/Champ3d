@@ -72,6 +72,7 @@ classdef NomeshAphi < Nomesh
             end
             % ---
             dom = obj.dom;
+            obj.dom.get_gid;
             obj.matrix.gid_elem = dom.gid.gid_elem;
             obj.matrix.gid_inner_edge = dom.gid.gid_inner_edge;
             obj.matrix.gid_inner_node = dom.gid.gid_inner_node;
