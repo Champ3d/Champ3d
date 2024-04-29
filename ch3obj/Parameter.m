@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Parameter < Xhandle
+classdef Parameter %< Xhandle
     properties
         f
         depend_on
