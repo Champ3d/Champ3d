@@ -20,7 +20,14 @@ classdef QuadMeshFrom1d < QuadMesh
     properties (Dependent = true)
 
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'node','elem','parent_mesh','id_xline', ...
+                        'id_yline'};
+        end
+    end
     % --- Constructors
     methods
         function obj = QuadMeshFrom1d(args)
@@ -32,9 +39,6 @@ classdef QuadMeshFrom1d < QuadMesh
                 args.parent_mesh
                 args.id_xline
                 args.id_yline
-                % ---
-                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
-                args.gcoor
             end
             % ---
             obj@QuadMesh;

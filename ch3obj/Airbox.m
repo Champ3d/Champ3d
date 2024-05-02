@@ -13,12 +13,17 @@ classdef Airbox < PhysicalDom
     properties(Access = private)
         setup_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_model','id_dom2d','id_dom3d'};
+        end
+    end
     % --- Contructor
     methods
         function obj = Airbox(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d

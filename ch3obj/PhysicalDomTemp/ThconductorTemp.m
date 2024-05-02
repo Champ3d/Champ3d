@@ -21,7 +21,13 @@ classdef ThconductorTemp < Thconductor
         build_done = 0
         assembly_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = Thconductor.validargs;
+        end
+    end
     % --- Contructor
     methods
         function obj = ThconductorTemp(args)

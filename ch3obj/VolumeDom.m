@@ -24,12 +24,17 @@ classdef VolumeDom < Xhandle
     properties (Dependent = true)
         
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','elem_code','gid_elem','condition'};
+        end
+    end
     % --- Constructors
     methods
         function obj = VolumeDom(args)
             arguments
-                % ---
                 args.parent_mesh = []
                 args.elem_code = []
                 args.gid_elem = []

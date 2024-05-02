@@ -21,12 +21,17 @@ classdef CloseCoilAphi < CloseCoil
         build_done = 0
         assembly_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = CloseCoil.validargs;
+        end
+    end
     % --- Contructor
     methods
         function obj = CloseCoilAphi(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d

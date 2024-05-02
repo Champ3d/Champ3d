@@ -29,12 +29,18 @@ classdef Line1d < Xhandle
     properties (Dependent = true)
 
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'id','len','dtype','dnum','flog'};
+        end
+    end
     % --- Constructors
     methods
         function obj = Line1d(args)
             arguments
-                args.id char = '0'
+                args.id char
                 args.len {mustBeNumeric}  = 0
                 args.dtype {mustBeMember(args.dtype,{'lin','log+','log-','log+-','log-+','log='})} = 'lin'
                 args.dnum {mustBeInteger} = 1

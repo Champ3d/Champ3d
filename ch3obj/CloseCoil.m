@@ -26,11 +26,16 @@ classdef CloseCoil < Coil
         setup_done = 0
     end
     
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_model','id_dom2d','id_dom3d','etrode_equation'};
+        end
+    end
     % --- Contructor
     methods
         function obj = CloseCoil(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d

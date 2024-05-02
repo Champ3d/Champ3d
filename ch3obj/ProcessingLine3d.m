@@ -22,7 +22,13 @@ classdef ProcessingLine3d < ProcessingSurface3d
     properties (Dependent = true)
         
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_model','line','dtype','dnum','flog','id_dom3d'};
+        end
+    end
     % --- Constructors
     methods
         function obj = ProcessingLine3d(args)

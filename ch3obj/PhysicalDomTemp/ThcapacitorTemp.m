@@ -21,7 +21,13 @@ classdef ThcapacitorTemp < Thcapacitor
         build_done = 0
         assembly_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = Thcapacitor.validargs;
+        end
+    end
     % --- Contructor
     methods
         function obj = ThcapacitorTemp(args)

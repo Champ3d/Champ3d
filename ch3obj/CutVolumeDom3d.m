@@ -22,7 +22,13 @@ classdef CutVolumeDom3d < VolumeDom3d
     properties (Dependent = true)
         
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_model','id_dom3d','cut_equation'};
+        end
+    end
     % --- Constructors
     methods
         function obj = CutVolumeDom3d(args)

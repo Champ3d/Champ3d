@@ -21,7 +21,13 @@ classdef ThPvTemp < ThPv
         build_done = 0
         assembly_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = ThPv.validargs;
+        end
+    end
     % --- Contructor
     methods
         function obj = ThPvTemp(args)

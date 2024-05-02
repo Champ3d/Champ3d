@@ -23,7 +23,13 @@ classdef SurfaceDom < Xhandle
     properties (Dependent = true)
         
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','gid_face','defined_on','condition'};
+        end
+    end
     % --- Constructors
     methods
         function obj = SurfaceDom(args)

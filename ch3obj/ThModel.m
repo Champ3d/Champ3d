@@ -33,13 +33,17 @@ classdef ThModel < Xhandle
         assembly_done = 0
         solve_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','timesystem','Temp0'};
+        end
+    end
     % --- Constructor
     methods
         function obj = ThModel(args)
             arguments
-                args.id
-                % ---
                 args.parent_mesh
                 args.timesystem
                 args.Temp0

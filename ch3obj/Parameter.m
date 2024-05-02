@@ -17,7 +17,13 @@ classdef Parameter %< Xhandle
         fvectorized
         % ---
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'f','depend_on','from','varargin_list','fvectorized'};
+        end
+    end
     % --- Contructor
     methods
         function obj = Parameter(args)

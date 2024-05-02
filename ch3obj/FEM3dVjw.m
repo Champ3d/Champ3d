@@ -8,6 +8,28 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef FEM3dVjw < EmModel
-
+classdef FEM3dVjw < FEM3dV
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','frequency'};
+        end
+    end
+    % --- Contructor
+    methods
+        function obj = FEM3dVjw(args)
+            arguments
+                args.parent_mesh = []
+                args.frequency = 0
+            end
+            % ---
+            argu = f_to_namedarg(args);
+            obj = obj@FEM3dV(argu{:});
+            % ---
+            obj <= args;
+            % ---
+            obj.setup;
+        end
+    end
 end

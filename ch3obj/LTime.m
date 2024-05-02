@@ -20,7 +20,13 @@ classdef LTime < Xhandle
     properties (Dependent = true)
         ltime_now
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'ltime_array','t0','t_end','dnum'};
+        end
+    end
     % --- Constructors
     methods
         function obj = LTime(args)

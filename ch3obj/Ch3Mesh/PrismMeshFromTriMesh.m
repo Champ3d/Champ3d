@@ -21,7 +21,14 @@ classdef PrismMeshFromTriMesh < PrismMesh
     properties (Dependent = true)
 
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'node','elem','parent_mesh1d','parent_mesh2d', ...
+                        'id_zline'};
+        end
+    end
     % --- Constructors
     methods
         function obj = PrismMeshFromTriMesh(args)

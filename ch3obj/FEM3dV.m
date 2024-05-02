@@ -9,5 +9,27 @@
 %--------------------------------------------------------------------------
 
 classdef FEM3dV < EmModel
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','frequency'};
+        end
+    end
+    % --- Contructor
+    methods
+        function obj = FEM3dV(args)
+            arguments
+                args.parent_mesh = []
+                args.frequency = 0
+            end
+            % ---
+            argu = f_to_namedarg(args);
+            obj = obj@EmModel(argu{:});
+            % ---
+            obj <= args;
+            % ---
+            obj.setup;
+        end
+    end
 end

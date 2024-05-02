@@ -15,7 +15,13 @@ classdef LVector < Xhandle
         rot_axis
         rot_angle
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'main_value','main_dir','rot_axis','rot_angle'};
+        end
+    end
     % --- Contructor
     methods
         function obj = LVector(args)

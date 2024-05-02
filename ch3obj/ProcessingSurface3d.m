@@ -35,7 +35,15 @@ classdef ProcessingSurface3d < VolumeDom3d
     properties (Dependent = true)
         
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_model','parallel_line_1','parallel_line_2', ...
+                        'dtype_parallel','dtype_orthogonal','dnum_parallel', ...
+                        'dnum_orthogonal','flog','id_dom3d'};
+        end
+    end
     % --- Constructors
     methods
         function obj = ProcessingSurface3d(args)

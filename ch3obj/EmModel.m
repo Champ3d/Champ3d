@@ -36,12 +36,17 @@ classdef EmModel < Xhandle
         assembly_done = 0
         solve_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','frequency','ltime'};
+        end
+    end
     % --- Constructor
     methods
         function obj = EmModel(args)
             arguments
-                args.id
                 args.parent_mesh
                 args.frequency
                 args.ltime {mustBeMember(args.ltime,'LTime')}
@@ -82,7 +87,7 @@ classdef EmModel < Xhandle
             if isfield(args,'ltime_obj')
                 ltime_obj = args.ltime_obj;
             else
-                argu = f_to_namedarg(args,'with_out','ltime_obj');
+                argu = f_to_namedarg(args,'for','LTime','with_out','ltime_obj');
                 ltime_obj = LTime(argu{:});
             end
             % ---
@@ -101,7 +106,7 @@ classdef EmModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','Econductor');
             % ---
             if isa(obj,'FEM3dAphijw')
                 phydom = EconductorAphi(argu{:});
@@ -121,7 +126,7 @@ classdef EmModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','Airbox');
             % ---
             if isa(obj,'FEM3dAphijw')
                 phydom = AirboxAphi(argu{:});
@@ -141,7 +146,7 @@ classdef EmModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','Nomesh');
             % ---
             if isa(obj,'FEM3dAphijw')
                 phydom = NomeshAphi(argu{:});
@@ -165,7 +170,7 @@ classdef EmModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','Sibc');
             % ---
             if isa(obj,'FEM3dAphijw')
                 phydom = SibcAphijw(argu{:});
@@ -197,7 +202,7 @@ classdef EmModel < Xhandle
                 args.id_dom3d = 'default_domain';
             end
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','Bsfield');
             % ---
             if isa(obj,'FEM3dAphijw')
                 phydom = BsfieldAphi(argu{:});
@@ -285,11 +290,13 @@ classdef EmModel < Xhandle
                              'i_coil','coil_mode'};
             end
             % ---
-            argu = f_to_namedarg(args,'with_only',validargs);
+            %argu = f_to_namedarg(args,'with_only',validargs);
             % ---
             if isa(obj,'FEM3dAphijw')
                 % ---
                 coil_model = [coil_model 'Aphi'];
+                % ---
+                argu = f_to_namedarg(args,'for',coil_model);
                 % ---
                 phydom = feval(coil_model,argu{:});
             end
@@ -309,7 +316,7 @@ classdef EmModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','Mconductor');
             % ---
             if isa(obj,'FEM3dAphijw')
                 phydom = MconductorAphi(argu{:});
@@ -330,7 +337,7 @@ classdef EmModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','PMagnet');
             % ---
             if isa(obj,'FEM3dAphijw')
                 phydom = PMagnetAphi(argu{:});

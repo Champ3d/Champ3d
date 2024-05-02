@@ -14,7 +14,13 @@ classdef LinearMovingFrame < MovingFrame
         lin_dir       % linear mov direction
         lin_step      % linear mov step
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'lin_dir','lin_step'};
+        end
+    end
     % --- Contructor
     methods
         function obj = LinearMovingFrame(args)

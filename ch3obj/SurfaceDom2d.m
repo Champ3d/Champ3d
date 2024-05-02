@@ -22,7 +22,13 @@ classdef SurfaceDom2d < SurfaceDom
     properties (Dependent = true)
         
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {};
+        end
+    end
     % --- Constructors
     % --- XTODO
     methods

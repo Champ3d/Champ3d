@@ -10,6 +10,12 @@
 
 classdef FEM3dAphi < EmModel
     
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','frequency'};
+        end
+    end
     % --- Contructor
     methods
         function obj = FEM3dAphi(args)

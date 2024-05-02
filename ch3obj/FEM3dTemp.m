@@ -9,11 +9,17 @@
 %--------------------------------------------------------------------------
 
 classdef FEM3dTemp < ThModel
+
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','Temp0'};
+        end
+    end
     % --- Contructor
     methods
         function obj = FEM3dTemp(args)
             arguments
-                args.id = 'no_id'
                 args.parent_mesh = []
                 args.Temp0 = 0
             end

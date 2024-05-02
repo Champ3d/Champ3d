@@ -19,7 +19,13 @@ classdef HexMesh < Mesh3d
     properties (Dependent = true)
 
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'node','elem'};
+        end
+    end
     % --- Constructors
     methods
         function obj = HexMesh(args)

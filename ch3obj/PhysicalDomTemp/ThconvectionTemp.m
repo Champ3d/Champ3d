@@ -21,7 +21,13 @@ classdef ThconvectionTemp < Thconvection
         build_done = 0
         assembly_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = Thconvection.validargs;
+        end
+    end
     % --- Contructor
     methods
         function obj = ThconvectionTemp(args)

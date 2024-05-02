@@ -20,7 +20,14 @@ classdef VolumeDom2d < VolumeDom
     properties (Dependent = true)
         
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','id_xline','id_yline','elem_code', ...
+                        'gid_elem','condition'};
+        end
+    end
     % --- Constructors
     methods
         function obj = VolumeDom2d(args)

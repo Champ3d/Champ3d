@@ -19,7 +19,14 @@ classdef SurfaceDom3d < SurfaceDom
     properties (Dependent = true)
         
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','gid_face','condition', ...
+                        'defined_on','id_dom3d'};
+        end
+    end
     % --- Constructors
     methods
         function obj = SurfaceDom3d(args)

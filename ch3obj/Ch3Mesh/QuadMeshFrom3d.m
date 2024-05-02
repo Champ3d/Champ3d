@@ -25,7 +25,16 @@ classdef QuadMeshFrom3d < QuadMesh
     properties (Dependent = true)
 
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parallel_line_1','parallel_line_2', ...
+                        'dtype_parallel','dtype_orthogonal', ...
+                        'dnum_parallel','dnum_orthogonal', ...
+                        'flog'};
+        end
+    end
     % --- Constructors
     methods
         function obj = QuadMeshFrom3d(args)
@@ -38,9 +47,6 @@ classdef QuadMeshFrom3d < QuadMesh
                 args.dnum_parallel
                 args.dnum_orthogonal
                 args.flog
-                % ---
-                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
-                args.gcoor
             end
             % ---
             obj@QuadMesh;

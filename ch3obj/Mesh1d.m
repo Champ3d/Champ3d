@@ -41,7 +41,7 @@ classdef Mesh1d < Xhandle
                 args.flog {mustBeNumeric} = 1.05
             end
             % --- 
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','Line1d');
             line = Line1d(argu{:});
             % ---
             obj.dom.(args.id) = line;

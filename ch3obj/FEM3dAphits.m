@@ -9,6 +9,13 @@
 %--------------------------------------------------------------------------
 
 classdef FEM3dAphits < FEM3dAphi
+
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','frequency'};
+        end
+    end
     % --- Constructor
     methods
         function obj = FEM3dAphits(args)
