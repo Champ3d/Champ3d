@@ -45,8 +45,12 @@ classdef LTime < Xhandle
             obj = obj@Xhandle;
             % ---
             if isfield(args,'time_array')
-                obj.time_array = round(args.time_array,obj.nbdigit); % !!!
-            else
+                if ~isempty(args.time_array)
+                    obj.time_array = round(args.time_array,obj.nbdigit); % !!!
+                end
+            end
+            % ---
+            if isempty(obj.time_array)
                 % ---
                 t0 = 0;
                 t_end = 0;
@@ -63,7 +67,10 @@ classdef LTime < Xhandle
                 end
                 % ---
                 obj.time_array = [t0, t0 + cumsum((t_end-t0)/dnum .* ones(1,dnum))];
+                % ---
                 obj.time_array = round(obj.time_array,obj.nbdigit); % !!!
+                obj.time_array = uniquetol(obj.time_array); % !!!
+                % ---
             end
             % ---
         end

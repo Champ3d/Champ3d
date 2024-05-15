@@ -142,12 +142,29 @@ classdef PMagnetAphi < PMagnet
             end
             % ---
             argu = f_to_namedarg(args);
-            plot@OpenCoil(obj,argu{:});
+            plot@PMagnet(obj,argu{:});
             % ---
-            if ~isempty(obj.matrix.br)
-                hold on;
-                f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
-                         obj.matrix.br(:,obj.matrix.gid_elem).','sfactor',0.2);
+            if isfield(obj.matrix,'br')
+                if ~isempty(obj.matrix.br)
+                    hold on;
+                    f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
+                             obj.matrix.br(:,obj.matrix.gid_elem).','sfactor',0.2);
+                end
+            end
+        end
+    end
+
+    % --- reset
+    methods
+        function reset(obj)
+            if isprop(obj,'setup_done')
+                obj.setup_done = 0;
+            end
+            if isprop(obj,'build_done')
+                obj.build_done = 0;
+            end
+            if isprop(obj,'assembly_done')
+                obj.assembly_done = 0;
             end
         end
     end

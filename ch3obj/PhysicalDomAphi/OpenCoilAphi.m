@@ -144,10 +144,12 @@ classdef OpenCoilAphi < OpenCoil
             argu = f_to_namedarg(args);
             plot@OpenCoil(obj,argu{:});
             % ---
-            if ~isempty(obj.matrix.unit_current_field)
-                hold on;
-                f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
-                         obj.matrix.unit_current_field(:,obj.matrix.gid_elem),'sfactor',0.2);
+            if isfield(obj.matrix,'unit_current_field')
+                if ~isempty(obj.matrix.unit_current_field)
+                    hold on;
+                    f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
+                             obj.matrix.unit_current_field(:,obj.matrix.gid_elem),'sfactor',0.2);
+                end
             end
         end
     end
