@@ -15,6 +15,7 @@ classdef TimeSystem < Xhandle
         it = 1 % !!!
         t_array
         ltime
+        lit
     end
     % ---
     properties (Dependent)
@@ -91,6 +92,8 @@ classdef TimeSystem < Xhandle
             end
             % ---
             obj.ltime.(args.id) = ltime_;
+            % ---
+            obj.init;
         end
         % -----------------------------------------------------------------
         function increment(obj)
@@ -123,6 +126,13 @@ classdef TimeSystem < Xhandle
             end
             % ---
             t_array_ = sort(uniquetol(t_array_));
+            % ---
+            for i = 1:length(ltime_)
+                obj.lit{i} = floor(...
+                    interp1(obj.ltime.(ltime_{i}).t_array,...
+                            1:length(obj.ltime.(ltime_{i}).t_array),...
+                            t_array_));
+            end
             % ---
             obj.t_array = t_array_;
             % --- !!!
