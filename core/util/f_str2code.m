@@ -44,7 +44,7 @@ switch args.code_type
     case 'real'
         code = log10(code);
     case 'integer'
-        code = round(log10(code) * 1e12);
+        code = round(log10(code) * 1e8); % 1e8 adapted to limit of FEMM gr number
 end
 %--------------------------------------------------------------------------
 end
