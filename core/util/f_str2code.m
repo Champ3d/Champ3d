@@ -44,7 +44,7 @@ switch args.code_type
     case 'real'
         code = log10(code);
     case 'integer'
-        code = round(log10(code) * 1e8);
+        code = round(log10(code) * 1e12);
 end
 %--------------------------------------------------------------------------
 end
