@@ -35,6 +35,7 @@ classdef PrismMesh < Mesh3d
             end
             % ---
             obj = obj@Mesh3d;
+            obj.elem_type = 'prism';
             % ---
             if isempty(fieldnames(args))
                 return
@@ -50,7 +51,7 @@ classdef PrismMesh < Mesh3d
     % --- setup
     methods
         function setup(obj)
-            obj.elem_type = 'prism';
+            
         end
     end
 
