@@ -34,9 +34,11 @@ classdef FEMM2dMag < Xhandle
         box
         dom
         bound
-        % ---
+        % --- for champ3d
         mesh
+        dof
         field
+        matrix
         % ---
     end
     properties (Access = private)
@@ -394,13 +396,44 @@ classdef FEMM2dMag < Xhandle
                       0, 's \n');
         end
         % -----------------------------------------------------------------
-        function get(obj)
-            
-        end
-        % -----------------------------------------------------------------
-        function loadsolution(obj)
-            f_femm_loadsolution;
-            f_femm_zoomnatural;
+        function getdata(obj)
+            % --- load mesh and solution of A
+            mesh_ = TriMeshFromFemm('mesh_file',obj.meshfile);
+            % --- add dom by id number
+            nbdom = length(unique(mesh_.elem_code));
+            for i = 1:nbdom
+                id_dom = ['d_' num2str(i)];
+                mesh_.add_vdom('id',id_dom,'elem_code',i);
+            end
+            % ---
+            mesh_.build_intkit;
+            % ---
+            dof_.a = mesh_.data;
+            if f_strcmpi(obj.problem_type,'axi')
+                dof_.a = dof_.a ./ (2*pi*mesh_.node(1,:).');
+            end
+            % ---
+            nb_elem = size(mesh_.intkit.cgradWn{1},1);
+            dim = size(mesh_.intkit.cgradWn{1},2);
+            field_.b = zeros(nb_elem,dim);
+            field_.a = zeros(nb_elem,1);
+            for iN = 1:mesh_.refelem.nbNo_inEl
+                % ---
+                field_.b(:,2) = field_.b(:,2) + mesh_.intkit.cgradWn{1}(:,1,iN) .* dof_.a(mesh_.elem(iN,:));
+                field_.b(:,1) = field_.b(:,1) + mesh_.intkit.cgradWn{1}(:,2,iN) .* dof_.a(mesh_.elem(iN,:));
+                % ---
+                field_.a(:,1) = field_.a(:,1) + mesh_.intkit.cWn{1}(:,iN) .* dof_.a(mesh_.elem(iN,:));
+                % ---
+            end
+            field_.b(:,1) = - field_.b(:,1);
+            % ---
+            if f_strcmpi(obj.problem_type,'axi')
+                field_.b(:,2) = field_.b(:,2) + (1./mesh_.celem(1,:).') .* field_.a;
+            end
+            % -------------------------------------------------------------
+            obj.mesh = mesh_;
+            obj.dof  = dof_;
+            obj.field = field_;
         end
         
     end
