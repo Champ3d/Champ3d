@@ -59,6 +59,10 @@ classdef TriMeshFromFemm < TriMesh
             end
             % ----- 1/ read all -----
             fileID = fopen(obj.mesh_file);
+            if fileID < 3
+                warning([obj.mesh_file ' not found.']);
+                return
+            end
             fileDA = textscan(fileID,'%s %s %s %s %s %s %s %s %s');
             fclose(fileID);
             % ----- 2/ mesh and solution data -----

@@ -323,13 +323,37 @@ classdef VolumeDom < Xhandle
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
                 args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
+                args.id = ''
+            end
+            % --- id-info
+            elcode = [];
+            if ~isempty(obj.elem_code)
+                codemin = min(obj.elem_code);
+                codemax = max(obj.elem_code);
+                if codemax == codemin
+                    elcode = num2str(codemax);
+                else
+                    elcode = [num2str(codemin) '-' num2str(codemax)];
+                end
+                % ---
+                elcode = [args.id ':' elcode];
             end
             % ---
             obj.build_submesh;
             submesh_ = obj.submesh;
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'with_out','id');
             for i = 1:length(submesh_)
                 submesh_{i}.plot(argu{:}); hold on
+                % ---
+                submesh_{i}.build_meshds('get','celem');
+                cnode = submesh_{i}.celem(:,1);
+                if length(cnode) == 2
+                    t = text(cnode(1),cnode(2),elcode);
+                    t.FontWeight = 'bold';
+                elseif length(cnode) == 3
+                    t = text(cnode(1),cnode(2),cnode(3),elcode);
+                    t.FontWeight = 'bold';
+                end
             end
         end
     end

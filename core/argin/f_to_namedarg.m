@@ -75,19 +75,19 @@ end
 %--------------------------------------------------------------------------
 if ~isempty(validargslist)
     i2rm = 1:length(args_in_key);
-    i2rm = i2rm(~f_strcmpi(args_in_key,validargslist));
+    i2rm = i2rm(~f_strcmpi(args_in_key,validargslist) == 1);
     args_in_key(i2rm) = [];
     args_in_value(i2rm) = [];
 end
 %--------------------------------------------------------------------------
 if ~isempty(with_out)
     i2rm = 1:length(args_in_key);
-    i2rm = i2rm(f_strcmpi(args_in_key,with_out));
+    i2rm = i2rm(f_strcmpi(args_in_key,with_out) == 1);
     args_in_key(i2rm) = [];
     args_in_value(i2rm) = [];
 elseif ~isempty(with_only)
     i2rm = 1:length(args_in_key);
-    i2rm = i2rm(~f_strcmpi(args_in_key,with_only));
+    i2rm = i2rm(~f_strcmpi(args_in_key,with_only) == 1);
     args_in_key(i2rm) = [];
     args_in_value(i2rm) = [];
 end

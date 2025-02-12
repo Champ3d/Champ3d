@@ -385,12 +385,6 @@ classdef FEMM2dMag < Xhandle
                 end
             end
             % ---
-            %obj.check_completude;
-            %id__ = fieldnames(obj.material);
-            %for i = 1:length(id__)
-            %    obj.update_material(id__{i});
-            %end
-            % ---
             f_fprintf(0,'Solving 2d problem with FEMM',0,'\n');
             tic;
             mi_analyze(1);
@@ -469,9 +463,6 @@ classdef FEMM2dMag < Xhandle
             end
             % ---
             f_fprintf(0,'FEMM2d problem =',1,pb_type,0,'fr =',1,pb_fr,0,'depth =',1,pb_depth,0,'\n');
-        end
-        % -----------------------------------------------------------------
-        function x(obj)
         end
         % -----------------------------------------------------------------
     end
