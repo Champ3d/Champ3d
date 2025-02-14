@@ -84,7 +84,9 @@ classdef TriMeshFromFemm < TriMesh
             %--------------------------------------------------------------
             %----- check and correct mesh
             [node_,elem_] = f_reorg2d(node_,elem_);
-            % ---
+            %----- correct data (maybe necessary due to axi formulation)
+            data_(isnan(data_)) = 0;
+            %-----
             obj.node = node_;
             obj.elem = elem_;
             obj.elem_code = elem_code_;

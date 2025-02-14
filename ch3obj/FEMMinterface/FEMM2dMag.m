@@ -423,6 +423,8 @@ classdef FEMM2dMag < Xhandle
             if f_strcmpi(obj.problem_type,'axi')
                 dof_.a = dof_.a ./ (2*pi*mesh_.node(1,:).');
             end
+            % --- correct a (necessary due to singularity)
+            dof_.a(isnan(dof_.a)) = 0;
             % ---
             nb_elem = size(mesh_.intkit.cgradWn{1},1);
             dim = size(mesh_.intkit.cgradWn{1},2);
