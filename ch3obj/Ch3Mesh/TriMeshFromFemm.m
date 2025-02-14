@@ -74,7 +74,13 @@ classdef TriMeshFromFemm < TriMesh
             node_(1,:) = str2double(fileDA{1,1}(iNoeud+1 : iNoeud+nb_node,1));
             node_(2,:) = str2double(fileDA{1,2}(iNoeud+1 : iNoeud+nb_node,1));
             % 2/b/ potential A
-            data_ = str2double(fileDA{1,3}(iNoeud+1 : iNoeud+nb_node,1));
+            try 
+                data_ = str2double(fileDA{1,3}(iNoeud+1 : iNoeud+nb_node,1)) + ...
+                        1j .* ...
+                        str2double(fileDA{1,4}(iNoeud+1 : iNoeud+nb_node,1));
+            catch
+                data_ = str2double(fileDA{1,3}(iNoeud+1 : iNoeud+nb_node,1));
+            end
             % 2/c/ element
             elem_ = zeros(3,nb_elem);
             elem_(1,:) = str2double(fileDA{1,1}(iElem +1 : iElem +nb_elem ,1)) + 1 ;

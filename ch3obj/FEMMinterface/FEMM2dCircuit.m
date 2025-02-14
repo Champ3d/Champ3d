@@ -54,15 +54,15 @@ classdef FEMM2dCircuit < Xhandle
             flux_linkage = cirpro(3);
             % ---
             %V = cirpro(2);
-            V = -1j*2*pi*obj.parent_model.fr*flux_linkage;
+            V = +1j*2*pi*obj.parent_model.fr*flux_linkage; % '+' receiver, '-' transmitter
             % --- TODO
             %if any(f_strcmpi(obj.coil_wire_type,{'insulated_round_section','Litz'}))
             %    V = -1j * V;
             %end
             % ---
-            phi_i = angle(I);
-            phi_v = angle(V);
-            cosPhi = cos(phi_v - phi_i);
+            phi_I = angle(I);
+            phi_V = angle(V);
+            cosPhi = cos(phi_V - phi_I);
             % ---
             Irms = abs(I)/sqrt(2);
             Vrms = abs(V)/sqrt(2);
@@ -83,6 +83,9 @@ classdef FEMM2dCircuit < Xhandle
             % ---
             val.I = I;
             val.V = V;
+            val.phi_I = phi_I/pi*180;
+            val.phi_V = phi_V/pi*180;
+            val.dphi_VI = val.phi_V - val.phi_I;
             val.Irms = Irms;
             val.Vrms = Vrms;
             val.cosPhi = cosPhi;
