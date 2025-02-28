@@ -159,6 +159,10 @@ classdef FEMM2dVdom < Xhandle
             end
             mo_clearblock;
             % ---
+            val.resistive_losses = real(val.resistive_losses);
+            val.total_losses = real(val.total_losses);
+            val.loss_density = val.total_losses / val.volume;
+            % ---
         end
     end
     % --- Methods/protected
