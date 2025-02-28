@@ -422,6 +422,7 @@ classdef FEMM2dMag < Xhandle
             for i = 1:nbdom
                 id_dom = id_alldom{i};
                 mesh_.add_vdom('id',id_dom,'elem_code',id_femm(i));
+                obj.dom.(id_dom).meshdom = mesh_.dom.(id_dom);
             end
             % ---
             mesh_.build_intkit;

@@ -25,6 +25,7 @@ classdef FEMM2dVdom < Xhandle
         parent_model
         % ---
         id_femm
+        meshdom
     end
     properties (Hidden)
         is_material = 0
@@ -168,6 +169,21 @@ classdef FEMM2dVdom < Xhandle
             obj.quantity.skin_losses = obj.quantity.resistive_losses;
             obj.quantity.prox_losses = obj.quantity.lamination_losses;
             % ---
+        end
+    end
+    % --- Methods/plot
+    methods (Access = public)
+        function plot(obj,args)
+            arguments
+                obj
+                args.edge_color = [0.4940 0.1840 0.5560]
+                args.face_color = 'c'
+                args.alpha {mustBeNumeric} = 0.9
+            end
+            % ---
+            argu = f_to_namedarg(args);
+            obj.meshdom.plot(argu{:})
+            %--------------------------------------------------------------
         end
     end
     % --- Methods/protected
