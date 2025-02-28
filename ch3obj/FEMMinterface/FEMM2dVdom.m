@@ -31,7 +31,7 @@ classdef FEMM2dVdom < Xhandle
         is_pmagnet = 0
         is_coil = 0
     end
-    properties (Dependent)
+    properties %(Dependent)
         quantity
     end
     % --- Constructor
@@ -133,9 +133,9 @@ classdef FEMM2dVdom < Xhandle
         end
     end
     % --- Methods/get
-    methods
+    methods (Access = public)
         % -----------------------------------------------------------------
-        function val = get.quantity(obj)
+        function get_quantity(obj)
             % get integral quantities
             try
                 mi_loadsolution;
@@ -157,13 +157,13 @@ classdef FEMM2dVdom < Xhandle
                      'int_J_ds',...
                      'volume'};
             for i = 1:length(quan_)
-                val.(quan_{i}) = mo_blockintegral(obj.get_id_quantity(quan_{i}));
+                obj.quantity.(quan_{i}) = mo_blockintegral(obj.get_id_quantity(quan_{i}));
             end
             mo_clearblock;
             % ---
-            val.resistive_losses = real(val.resistive_losses);
-            val.total_losses = real(val.total_losses);
-            val.loss_density = val.total_losses / val.volume;
+            obj.quantity.resistive_losses = real(obj.quantity.resistive_losses);
+            obj.quantity.total_losses = real(obj.quantity.total_losses);
+            obj.quantity.loss_density = obj.quantity.total_losses / obj.quantity.volume;
             % ---
         end
     end
