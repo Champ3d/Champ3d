@@ -189,26 +189,23 @@ classdef FEMM2dVdom < Xhandle
             arguments
                 obj
                 args.edge_color = [0.4940 0.1840 0.5560]
-                args.face_color = 'none'
                 args.alpha {mustBeNumeric} = 0.9
             end
             % ---
             edge_color_  = args.edge_color;
-            face_color_  = args.face_color;
             alpha_       = args.alpha;
             %--------------------------------------------------------------
             clear msh;
             %--------------------------------------------------------------
-            msh.Faces = obj.parent_model.mesh.elem(1:3,:).';
+            msh.Vertices = obj.parent_model.mesh.node.';
+            msh.Faces = obj.parent_model.mesh.elem(1:3,obj.meshdom.gid_elem).';
             msh.FaceColor = 'flat';
             msh.EdgeColor = edge_color_; % [0.7 0.7 0.7] --> gray
-            msh.FaceVertexCData = obj.parent_model.field.pv(obj.meshdom.gid_elem);
+            msh.FaceVertexCData = obj.parent_model.field.pv(obj.meshdom.gid_elem).';
             %--------------------------------------------------------------
             patch(msh);
+            f_colormap; colorbar;
             xlabel('x (m)'); ylabel('y (m)');
-            if size(obj.node,1) == 3
-                zlabel('z (m)'); view(3);
-            end
             axis equal; axis tight; alpha(alpha_); hold on
             %--------------------------------------------------------------
             f_chlogo;
