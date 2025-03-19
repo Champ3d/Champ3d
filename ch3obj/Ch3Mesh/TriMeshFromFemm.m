@@ -54,16 +54,15 @@ classdef TriMeshFromFemm < TriMesh
     methods
         % -----------------------------------------------------------------
         function obj = setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
             if isempty(obj.mesh_file)
                 return
             end
             % ----- 1/ read all -----
             fileID = fopen(obj.mesh_file);
+            if fileID < 3
+                warning([obj.mesh_file ' not found.']);
+                return
+            end
             fileDA = textscan(fileID,'%s %s %s %s %s %s %s %s %s');
             fclose(fileID);
             % ----- 2/ mesh and solution data -----
@@ -75,7 +74,13 @@ classdef TriMeshFromFemm < TriMesh
             node_(1,:) = str2double(fileDA{1,1}(iNoeud+1 : iNoeud+nb_node,1));
             node_(2,:) = str2double(fileDA{1,2}(iNoeud+1 : iNoeud+nb_node,1));
             % 2/b/ potential A
-            data_ = str2double(fileDA{1,3}(iNoeud+1 : iNoeud+nb_node,1));
+            try 
+                data_ = str2double(fileDA{1,3}(iNoeud+1 : iNoeud+nb_node,1)) + ...
+                        1j .* ...
+                        str2double(fileDA{1,4}(iNoeud+1 : iNoeud+nb_node,1));
+            catch
+                data_ = str2double(fileDA{1,3}(iNoeud+1 : iNoeud+nb_node,1));
+            end
             % 2/c/ element
             elem_ = zeros(3,nb_elem);
             elem_(1,:) = str2double(fileDA{1,1}(iElem +1 : iElem +nb_elem ,1)) + 1 ;
@@ -85,7 +90,9 @@ classdef TriMeshFromFemm < TriMesh
             %--------------------------------------------------------------
             %----- check and correct mesh
             [node_,elem_] = f_reorg2d(node_,elem_);
-            % ---
+            %----- correct data (maybe necessary due to axi formulation)
+            data_(isnan(data_)) = 0;
+            %-----
             obj.node = node_;
             obj.elem = elem_;
             obj.elem_code = elem_code_;

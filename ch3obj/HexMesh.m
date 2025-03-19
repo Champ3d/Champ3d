@@ -35,6 +35,7 @@ classdef HexMesh < Mesh3d
             end
             % ---
             obj@Mesh3d;
+            obj.elem_type = 'hexa';
             % ---
             if isempty(fieldnames(args))
                 return
@@ -52,7 +53,7 @@ classdef HexMesh < Mesh3d
     % --- setup
     methods
         function setup(obj)
-            obj.elem_type = 'hexa';
+            
         end
     end
 

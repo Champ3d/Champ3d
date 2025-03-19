@@ -69,7 +69,7 @@ classdef PhysicalDom < Xhandle
             % ---
             paramlist = {'sigma','mur','bs','br','r_ht','r_et',...
                          'i_coil','v_coil','j_coil',...
-                         'rho','cp','lambda','ps','pv'};
+                         'rho','cp','lambda','h','ps','pv'};
             % ---
             for i = 1:length(paramlist)
                 param = paramlist{i};

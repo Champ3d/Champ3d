@@ -36,27 +36,15 @@ classdef FEM3dTemp < ThModel
         % -----------------------------------------------------------------
         function build(obj)
             %--------------------------------------------------------------------------
-            if obj.build_done
-                return
-            end
-            %--------------------------------------------------------------------------
             tic;
             f_fprintf(0,'Build',1,class(obj),0,'\n');
             f_fprintf(0,'   ');
             % ---
             parent_mesh = obj.parent_mesh;
             % ---
-            if ~parent_mesh.build_meshds_done
-                parent_mesh.build_meshds;
-            end
-            % ---
-            if ~parent_mesh.build_discrete_done
-                parent_mesh.build_discrete;
-            end
-            % ---
-            if ~parent_mesh.build_intkit_done
-                parent_mesh.build_intkit;
-            end
+            parent_mesh.build_meshds;
+            parent_mesh.build_discrete;
+            parent_mesh.build_intkit;
             %--------------------------------------------------------------------------
             allowed_physical_dom = {'thconductor','thcapacitor','convection',...
                 'ps','pv'};
@@ -85,7 +73,7 @@ classdef FEM3dTemp < ThModel
                 end
             end
             %--------------------------------------------------------------------------
-            obj.build_done = 1;
+            %obj.build_done = 1;
             %--------------------------------------------------------------------------
         end
         %--------------------------------------------------------------------------
@@ -96,9 +84,9 @@ classdef FEM3dTemp < ThModel
             %--------------------------------------------------------------------------
             obj.build;
             %--------------------------------------------------------------------------
-            if obj.assembly_done
-                return
-            end
+%             if obj.assembly_done
+%                 return
+%             end
             %--------------------------------------------------------------------------
             parent_mesh = obj.parent_mesh;
             nb_edge = parent_mesh.nb_edge;

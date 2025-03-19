@@ -35,6 +35,7 @@ classdef QuadMesh < Mesh2d
             end
             % ---
             obj = obj@Mesh2d;
+            obj.elem_type = 'quad';
             % ---
             if isempty(fieldnames(args))
                 return
@@ -49,7 +50,6 @@ classdef QuadMesh < Mesh2d
     % --- setup
     methods
         function setup(obj)
-            obj.elem_type = 'quad';
             obj.cal_flatnode;
         end
     end

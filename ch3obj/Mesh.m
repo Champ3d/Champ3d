@@ -22,6 +22,9 @@ classdef Mesh < Xhandle
         cface
         cedge
         % ---
+        selem
+        velem
+        % ---
         dom
         % ---
         meshds
@@ -359,9 +362,9 @@ classdef Mesh < Xhandle
                 return
             end
             %--------------------------------------------------------------
-            tic
-            f_fprintf(0,'Make #meshds \n');
-            fprintf('   ');
+            %tic
+            %f_fprintf(0,'Make #meshds \n');
+            %fprintf('   ');
             % ---
             get = args.get;
             % ---
@@ -481,9 +484,9 @@ classdef Mesh < Xhandle
             end
             %--------------------------------------------------------------
             %--- Log message
-            f_fprintf(0,'--- in',...
-                1,toc, ...
-                0,'s \n');
+            %f_fprintf(0,'--- in',...
+            %    1,toc, ...
+            %    0,'s \n');
         end
         function obj = build_discrete(obj,args)
             arguments
@@ -701,6 +704,12 @@ classdef Mesh < Xhandle
             cWe = obj.we('u',cU,'v',cV,'w',cW,'wn',cWn,'gradf',cgradF,'jinv',cJinv);
             cWf = obj.wf('u',cU,'v',cV,'w',cW,'wn',cWn,'gradf',cgradF,'jinv',cJinv);
             cWv = obj.wv('cdetJ',cdetJ);
+            %--------------------------------------------------------------
+            if any(f_strcmpi(obj.elem_type,{'tri','triangle','quad'}))
+                obj.selem = 1./cWv{1};
+            elseif any(f_strcmpi(obj.elem_type,{'tet','tetra','prism','hex','hexa'}))
+                obj.velem = 1./cWv{1};
+            end
             %--------------------------------------------------------------
             obj.build_meshds('get','celem');
             %--------------------------------------------------------------

@@ -35,6 +35,7 @@ classdef TetMesh < Mesh3d
             end
             % ---
             obj@Mesh3d;
+            obj.elem_type = 'tetra';
             % ---
             if isempty(fieldnames(args))
                 return
@@ -50,7 +51,7 @@ classdef TetMesh < Mesh3d
     % --- setup
     methods
         function setup(obj)
-            obj.elem_type = 'tetra';
+            
         end
     end
 

@@ -25,7 +25,7 @@ if isnumeric(ccode)
     if ccode <= length(allcode)
         color = allcode{ccode};
     else
-        color = allcode{11};
+        color = allcode{mod(ccode,length(allcode)) + 1};
     end
 else
     color = ccode;

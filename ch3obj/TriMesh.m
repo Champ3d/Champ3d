@@ -35,6 +35,7 @@ classdef TriMesh < Mesh2d
             end
             % ---
             obj = obj@Mesh2d;
+            obj.elem_type = 'tri';
             % ---
             if isempty(fieldnames(args))
                 return
@@ -49,7 +50,6 @@ classdef TriMesh < Mesh2d
     % --- setup
     methods
         function setup(obj)
-            obj.elem_type = 'tri';
             obj.cal_flatnode;
         end
     end
