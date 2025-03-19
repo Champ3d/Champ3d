@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef FEM3dTemp < ThModel
+classdef FEM3dTherm < ThModel
 
     % --- Valid args list
     methods (Static)
@@ -18,7 +18,7 @@ classdef FEM3dTemp < ThModel
     end
     % --- Contructor
     methods
-        function obj = FEM3dTemp(args)
+        function obj = FEM3dTherm(args)
             arguments
                 args.parent_mesh = []
                 args.Temp0 = 0
