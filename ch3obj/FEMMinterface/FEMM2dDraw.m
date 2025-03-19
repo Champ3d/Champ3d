@@ -16,10 +16,10 @@ classdef FEMM2dDraw < Xhandle
         % ---
         ref_point     % must be in Oxy coordinates
         % ---
-        cen_x
-        cen_y
-        cen_r
-        cen_theta
+        cen_x = 0
+        cen_y = 0
+        cen_r = 0
+        cen_theta = 0
         % ---
         base_x
         base_y
@@ -37,6 +37,8 @@ classdef FEMM2dDraw < Xhandle
         bottomleft
         topright
         topleft
+        % ---
+        bound
         % ---
         center = [0,0]  % given in Oxy coordinates
         base

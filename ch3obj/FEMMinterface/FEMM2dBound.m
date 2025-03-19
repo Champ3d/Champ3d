@@ -31,12 +31,20 @@ classdef FEMM2dBound < Xhandle
     % --- Methods/public
     methods (Access = public)
         function setup(obj)
-            boline = obj.parent_model.box.(obj.id_box).bound.(obj.choosed_by);
-            mi_selectgroup(boline.id);
-            if any(f_strcmpi(boline.type,{'segment','line'}))
-                mi_setsegmentprop(obj.id_bc,obj.max_segment_len,obj.auto_mesh,0,boline.id);
-            elseif any(f_strcmpi(boline.type,{'arc_segment','arc'}))
-                mi_setarcsegmentprop(obj.max_segment_arclen,obj.id_bc,0,boline.id);
+            if f_strcmpi(obj.choosed_by,{'all'})
+                choosed_by_ = {'bottom','top','left','right'};
+            else
+                choosed_by_ = {obj.choosed_by};
+            end
+            % ---
+            for i = 1:length(choosed_by_)
+                boline = obj.parent_model.box.(obj.id_box).bound.(choosed_by_{i});
+                mi_selectgroup(boline.id);
+                if any(f_strcmpi(boline.type,{'segment','line'}))
+                    mi_setsegmentprop(obj.id_bc,obj.max_segment_len,obj.auto_mesh,0,boline.id);
+                elseif any(f_strcmpi(boline.type,{'arc_segment','arc'}))
+                    mi_setarcsegmentprop(obj.max_segment_arclen,obj.id_bc,0,boline.id);
+                end
             end
         end
     end

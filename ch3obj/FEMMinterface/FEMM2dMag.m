@@ -209,7 +209,7 @@ classdef FEMM2dMag < Xhandle
             arguments
                 obj
                 args.id_box = 'undefined';
-                args.draw {mustBeA(args.draw,{'FEMM2dRectangle','FEMM2dHalfDisk','FEMM2dArcRectangle'})}
+                args.draw {mustBeA(args.draw,{'FEMM2dRectangle','FEMM2dHalfDisk','FEMM2dArcRectangle','FEMM2dCircle'})}
             end
             % ---
             if f_strcmpi(args.id_box,'undefined')
@@ -261,7 +261,7 @@ classdef FEMM2dMag < Xhandle
                 args.id_bc = [];
                 args.id_box
                 args.choosed_by {mustBeMember(args.choosed_by,...
-                    {'','bottom','top','right','left'})} = ''
+                    {'all','bottom','top','right','left'})} = 'all'
                 args.max_segment_len = 0
                 args.max_segment_arclen = 0
                 args.auto_mesh = 1
@@ -292,46 +292,62 @@ classdef FEMM2dMag < Xhandle
         function setup(obj)
             if obj.reset_mesh
                 % --- must setup box first !!!
-                id__ = fieldnames(obj.box);
-                for i = 1:length(id__)
-                    obj.box.(id__{i}).setup;
-                    obj.box.(id__{i}).setbound(id__{i});
+                if ~isempty(obj.box)
+                    id__ = fieldnames(obj.box);
+                    for i = 1:length(id__)
+                        obj.box.(id__{i}).setup;
+                        obj.box.(id__{i}).setbound(id__{i});
+                    end
                 end
                 % ---
-                id__ = fieldnames(obj.bc);
-                for i = 1:length(id__)
-                    obj.bc.(id__{i}).setup(id__{i});
+                if ~isempty(obj.bc)
+                    id__ = fieldnames(obj.bc);
+                    for i = 1:length(id__)
+                        obj.bc.(id__{i}).setup(id__{i});
+                    end
                 end
                 % ---
-                id__ = fieldnames(obj.bound);
-                for i = 1:length(id__)
-                    obj.bound.(id__{i}).setup;
+                if ~isempty(obj.bound)
+                    id__ = fieldnames(obj.bound);
+                    for i = 1:length(id__)
+                        obj.bound.(id__{i}).setup;
+                    end
                 end
                 % ---
-                id__ = fieldnames(obj.material);
-                for i = 1:length(id__)
-                    obj.material.(id__{i}).setup(id__{i});
+                if ~isempty(obj.material)
+                    id__ = fieldnames(obj.material);
+                    for i = 1:length(id__)
+                        obj.material.(id__{i}).setup(id__{i});
+                    end
                 end
                 % ---
-                id__ = fieldnames(obj.circuit);
-                for i = 1:length(id__)
-                    obj.circuit.(id__{i}).setup;
+                if ~isempty(obj.circuit)
+                    id__ = fieldnames(obj.circuit);
+                    for i = 1:length(id__)
+                        obj.circuit.(id__{i}).setup;
+                    end
                 end
                 % ---
-                id__ = fieldnames(obj.coil);
-                for i = 1:length(id__)
-                    obj.coil.(id__{i}).setup(id__{i});
+                if ~isempty(obj.coil)
+                    id__ = fieldnames(obj.coil);
+                    for i = 1:length(id__)
+                        obj.coil.(id__{i}).setup(id__{i});
+                    end
                 end
                 % ---
-                id__ = fieldnames(obj.draw);
-                for i = 1:length(id__)
-                    obj.draw.(id__{i}).setup;
+                if ~isempty(obj.draw)
+                    id__ = fieldnames(obj.draw);
+                    for i = 1:length(id__)
+                        obj.draw.(id__{i}).setup;
+                    end
                 end
                 % ---
-                id__ = fieldnames(obj.dom);
-                for i = 1:length(id__)
-                    obj.dom.(id__{i}).setup(id__{i});
-                    obj.dom.(id__{i}).id_femm = i; % id in femm file
+                if ~isempty(obj.dom)
+                    id__ = fieldnames(obj.dom);
+                    for i = 1:length(id__)
+                        obj.dom.(id__{i}).setup(id__{i});
+                        obj.dom.(id__{i}).id_femm = i; % id in femm file
+                    end
                 end
                 % ---
                 obj.reset_mesh = 0;
@@ -339,9 +355,11 @@ classdef FEMM2dMag < Xhandle
             end
             % ---
             if obj.reset_dom
-                id__ = fieldnames(obj.dom);
-                for i = 1:length(id__)
-                    obj.dom.(id__{i}).setup(id__{i});
+                if ~isempty(obj.dom)
+                    id__ = fieldnames(obj.dom);
+                    for i = 1:length(id__)
+                        obj.dom.(id__{i}).setup(id__{i});
+                    end
                 end
                 obj.reset_dom = 0;
             end
@@ -377,25 +395,33 @@ classdef FEMM2dMag < Xhandle
             % --- update b-h data
             % --- update circuit properties
             % ---
-            id__ = fieldnames(obj.bc);
-            for i = 1:length(id__)
-                obj.bc.(id__{i}).setup(id__{i});
+            if ~isempty(obj.bc)
+                id__ = fieldnames(obj.bc);
+                for i = 1:length(id__)
+                    obj.bc.(id__{i}).setup(id__{i});
+                end
             end
             % ---
-            id__ = fieldnames(obj.material);
-            for i = 1:length(id__)
-                obj.material.(id__{i}).setup(id__{i});
+            if ~isempty(obj.material)
+                id__ = fieldnames(obj.material);
+                for i = 1:length(id__)
+                    obj.material.(id__{i}).setup(id__{i});
+                end
             end
             % ---
-            id__ = fieldnames(obj.circuit);
-            for i = 1:length(id__)
-                obj.circuit.(id__{i}).setup;
+            if ~isempty(obj.circuit)
+                id__ = fieldnames(obj.circuit);
+                for i = 1:length(id__)
+                    obj.circuit.(id__{i}).setup;
+                end
             end
             % ---
-            id__ = fieldnames(obj.dom);
-            for i = 1:length(id__)
-                if obj.dom.(id__{i}).is_pmagnet
-                    obj.dom.(id__{i}).setpmdir;
+            if ~isempty(obj.dom)
+                id__ = fieldnames(obj.dom);
+                for i = 1:length(id__)
+                    if obj.dom.(id__{i}).is_pmagnet
+                        obj.dom.(id__{i}).setpmdir;
+                    end
                 end
             end
             % ---
@@ -465,6 +491,29 @@ classdef FEMM2dMag < Xhandle
             % ---
             if isfile(obj.meshfile)
                 mi_loadsolution;
+            end
+        end
+        % -----------------------------------------------------------------
+        function createmesh(obj)
+            try 
+                % --- update mesh / dom
+                if obj.reset_mesh || obj.reset_dom
+                    obj.setup;
+                end
+                mi_analyse;
+            catch
+                fprintf(['No FEMM opened. \n']);
+                fprintf(['Load ' obj.femmfile '\n']);
+                % ---
+                closefemm;
+                openfemm;
+                opendocument(obj.femmfile);
+                % --- update mesh / dom
+                if obj.reset_mesh || obj.reset_dom
+                    obj.setup;
+                end
+                mi_analyse;
+                % ---
             end
         end
         % -----------------------------------------------------------------

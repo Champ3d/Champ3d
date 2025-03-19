@@ -83,10 +83,52 @@ classdef FEMM2dRectangle < FEMM2dDraw
             bottomleft  = obj.center + diagvec1*(1-1/obj.sfactor);
             topleft     = obj.center + diagvec2*(1-1/obj.sfactor);
             % -------------------------------------------------------------
+            bottom = obj.center + rsizevec*(1-1/obj.sfactor);
+            top    = obj.center - rsizevec*(1-1/obj.sfactor);
+            left   = obj.center + tsizevec*(1-1/obj.sfactor);
+            right  = obj.center - tsizevec*(1-1/obj.sfactor);
+            % -------------------------------------------------------------
             obj.bottomright = bottomright;
             obj.bottomleft  = bottomleft;
             obj.topright = topright;
             obj.topleft  = topleft;
+            % -------------------------------------------------------------
+            obj.bottom = bottom;
+            obj.top    = top;
+            obj.left   = left;
+            obj.right  = right;
+            % -------------------------------------------------------------
+        end
+        % -----------------------------------------------------------------
+        function setbound(obj,id_box)
+            arguments
+                obj
+                id_box
+            end
+            % ---
+            id_bound_ = [id_box '_bottom_bound'];
+            obj.bound.bottom.id = f_str2code(id_bound_,'code_type','integer');
+            obj.bound.bottom.type = 'segment';
+            mi_selectsegment(obj.bottom(1),obj.bottom(2));
+            mi_setgroup(obj.bound.bottom.id);
+            % ---
+            id_bound_ = [id_box '_top_bound'];
+            obj.bound.top.id = f_str2code(id_bound_,'code_type','integer');
+            obj.bound.top.type = 'segment';
+            mi_selectsegment(obj.top(1),obj.top(2));
+            mi_setgroup(obj.bound.top.id);
+            % ---
+            id_bound_ = [id_box '_left_bound'];
+            obj.bound.left.id = f_str2code(id_bound_,'code_type','integer');
+            obj.bound.left.type = 'segment';
+            mi_selectsegment(obj.left(1),obj.left(2));
+            mi_setgroup(obj.bound.left.id);
+            % ---
+            id_bound_ = [id_box '_right_bound'];
+            obj.bound.right.id = f_str2code(id_bound_,'code_type','integer');
+            obj.bound.right.type = 'segment';
+            mi_selectsegment(obj.right(1),obj.right(2));
+            mi_setgroup(obj.bound.right.id);
             % -------------------------------------------------------------
         end
         % -----------------------------------------------------------------
