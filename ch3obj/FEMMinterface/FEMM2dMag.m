@@ -71,6 +71,8 @@ classdef FEMM2dMag < Xhandle
             obj.femmfile  = [obj.id_project '.fem'];
             obj.meshfile  = [obj.id_project '.ans'];
             % ---
+            obj.add_material('id_material','by_default','material',FEMM2dMaterial());
+            % ---
             obj.save;
         end
     end
@@ -228,7 +230,7 @@ classdef FEMM2dMag < Xhandle
                 obj
                 args.id_dom = 'undefined';
                 args.id_draw = 'undefined';
-                args.id_material = '<No Mesh>';
+                args.id_material = 'by_default';
                 args.id_coil
                 args.choosed_by {mustBeMember(args.choosed_by,...
                     {'center','bottomleft','bottomright',...
@@ -245,6 +247,10 @@ classdef FEMM2dMag < Xhandle
             % ---
             if f_strcmpi(args.id_draw,'undefined')
                 warning('id_draw undefined');
+            end
+            % ---
+            if any(f_strcmpi(args.id_material,{'<no mesh>','nomesh','no_mesh','none'}))
+                args.id_material = '<No Mesh>';
             end
             % ---
             obj.dom.(args.id_dom) = FEMM2dVdom;
