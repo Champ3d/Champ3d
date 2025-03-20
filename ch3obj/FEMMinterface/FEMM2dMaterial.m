@@ -135,7 +135,9 @@ classdef FEMM2dMaterial < Xhandle
                 b = f_tocolv(obj.b_data);
                 h = f_tocolv(obj.h_data);
                 mi_clearbhpoints(id_material);
-                mi_addbhpoints(id_material,b,h);
+                for i = 1:length(b)
+                    mi_addbhpoints(id_material,b(i),h(i));
+                end
             end
             % -------------------------------------------------------------
         end
