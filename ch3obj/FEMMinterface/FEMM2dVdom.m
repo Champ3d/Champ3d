@@ -26,11 +26,16 @@ classdef FEMM2dVdom < Xhandle
         % ---
         id_femm
         meshdom
+        % ---
+        choosing_point
     end
     properties (Hidden)
         is_material = 0
         is_pmagnet = 0
         is_coil = 0
+        % ---
+        original_choosing_point
+        is_labeled = 0;
     end
     properties %(Dependent)
         quantity
@@ -82,26 +87,36 @@ classdef FEMM2dVdom < Xhandle
                 error('id_material or id_coil must be defined');
             end
             %--------------------------------------------------------------
-            if ~isempty(obj.id_group)
-                if obj.id_group == 0
-                    first_set_groupe = 1;
-                end
-            else
-                first_set_groupe = 1;
+            if isempty(obj.original_choosing_point)
+                obj.get_original_choosing_point;
             end
-            % ---
-            if first_set_groupe
-                [px, py] = obj.get_choosed_point;
-                % ---
-                id_groupe_ = [id_dom '_dom'];
-                obj.id_group = f_str2code(id_groupe_,'code_type','integer');
-                %----------------------------------------------------------
-                mi_clearselected;
-                mi_addblocklabel(px,py);
-                mi_selectlabel(px,py);
-                mi_setgroup(obj.id_group);
-                mi_clearselected;
+            %--------------------------------------------------------------
+            if ~obj.is_labeled
+                obj.labeling;
+                obj.is_labeled = 1;
             end
+            %--------------------------------------------------------------
+%             first_set_groupe = 0;
+%             if ~isempty(obj.id_group)
+%                 if obj.id_group == 0
+%                     first_set_groupe = 1;
+%                 end
+%             else
+%                 first_set_groupe = 1;
+%             end
+%             % ---
+%             if first_set_groupe
+%                 [px, py] = obj.get_original_choosing_point;
+%                 % ---
+%                 id_groupe_ = [id_dom '_dom'];
+%                 obj.id_group = f_str2code(id_groupe_,'code_type','integer');
+%                 %----------------------------------------------------------
+%                 mi_clearselected;
+%                 mi_addblocklabel(px,py);
+%                 mi_selectlabel(px,py);
+%                 mi_setgroup(obj.id_group);
+%                 mi_clearselected;
+%             end
             %--------------------------------------------------------------
             if obj.is_material
                 obj.setup_material;
@@ -113,8 +128,13 @@ classdef FEMM2dVdom < Xhandle
         end
         % -----------------------------------------------------------------
         function setup_material(obj)
-            mi_clearselected;
-            mi_selectgroup(obj.id_group);
+%             mi_clearselected;
+%             mi_selectgroup(obj.id_group);
+%             mi_setblockprop(obj.id_material,0,obj.mesh_size,[],...
+%                             0,obj.id_group,0);
+%             mi_clearselected;
+            % ---
+            obj.selectlabel;
             mi_setblockprop(obj.id_material,0,obj.mesh_size,[],...
                             0,obj.id_group,0);
             mi_clearselected;
@@ -124,17 +144,32 @@ classdef FEMM2dVdom < Xhandle
             if ~isempty(obj.auto_pm_direction)
                 obj.pm_direction = obj.orientation + obj.auto_pm_direction;
             end
-            mi_clearselected;
-            mi_selectgroup(obj.id_group);
+%             mi_clearselected;
+%             mi_selectgroup(obj.id_group);
+%             mi_setblockprop(obj.id_material,...
+%                             0,obj.mesh_size,[],...
+%                             obj.pm_direction,obj.id_group,0);
+%             mi_clearselected;
+            % ---
+            obj.selectlabel;
             mi_setblockprop(obj.id_material,...
                             0,obj.mesh_size,[],...
                             obj.pm_direction,obj.id_group,0);
             mi_clearselected;
+            mi_clearselected;
         end
         % -----------------------------------------------------------------
         function setup_coil(obj)
-            mi_clearselected;
-            mi_selectgroup(obj.id_group);
+%             mi_clearselected;
+%             mi_selectgroup(obj.id_group);
+%             mi_setblockprop(obj.parent_model.coil.(obj.id_coil).id_material,...
+%                             0,obj.mesh_size,...
+%                             obj.parent_model.coil.(obj.id_coil).id_circuit,...
+%                             0,obj.id_group,...
+%                             obj.parent_model.coil.(obj.id_coil).nb_turn);
+%             mi_clearselected;
+            % ---
+            obj.selectlabel;
             mi_setblockprop(obj.parent_model.coil.(obj.id_coil).id_material,...
                             0,obj.mesh_size,...
                             obj.parent_model.coil.(obj.id_coil).id_circuit,...
@@ -154,8 +189,7 @@ classdef FEMM2dVdom < Xhandle
                 obj.parent_model.open;
             end
             % ---
-            mo_clearblock;
-            mo_groupselectblock(obj.id_group);
+            obj.selectblock;
             % ---
             quan_ = {'int_AxJ_ds',...
                      'int_A_ds',...
@@ -227,7 +261,33 @@ classdef FEMM2dVdom < Xhandle
     end
     % --- Methods/private
     methods (Access = private)
-        function [px, py] = get_choosed_point(obj)
+        %------------------------------------------------------------------
+        function labeling(obj)
+            mi_clearselected;
+            mi_addblocklabel(obj.original_choosing_point.x,obj.original_choosing_point.y);
+            id_groupe_ = [id_dom '_dom'];
+            obj.original_id_group = f_str2code(id_groupe_,'code_type','integer');
+        end
+        %------------------------------------------------------------------
+        function selectlabel(obj)
+            if isempty(obj.choosing_point)
+                obj.choosing_point.x = obj.original_choosing_point.x;
+                obj.choosing_point.y = obj.original_choosing_point.y;
+            end
+            % ---
+            mi_selectlabel(obj.choosing_point.x,obj.choosing_point.y);
+        end
+        %------------------------------------------------------------------
+        function selectblock(obj)
+            if isempty(obj.choosing_point)
+                obj.choosing_point.x = obj.original_choosing_point.x;
+                obj.choosing_point.y = obj.original_choosing_point.y;
+            end
+            % ---
+            mo_selectblock(obj.choosing_point.x,obj.choosing_point.y);
+        end
+        %------------------------------------------------------------------
+        function get_original_choosing_point(obj)
             % ---
             def_in   = obj.id_draw;
             drawlist = fieldnames(obj.parent_model.draw);
@@ -270,6 +330,10 @@ classdef FEMM2dVdom < Xhandle
                     px = domobj.left(1);
                     py = domobj.left(2);
             end
+            % -------------------------------------------------------------
+            obj.original_choosing_point.x = px;
+            obj.original_choosing_point.y = py;
+            % -------------------------------------------------------------
         end
         % ---
         function id_quantity = get_id_quantity(obj,quantity)

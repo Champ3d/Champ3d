@@ -34,6 +34,7 @@ classdef FEMM2dMag < Xhandle
         box
         dom
         bound
+        moveframe
         % --- for champ3d
         mesh
         dof
@@ -41,7 +42,7 @@ classdef FEMM2dMag < Xhandle
         matrix
         % ---
     end
-    properties (Access = private)
+    properties (Hidden)
         reset_mesh = 1
         reset_dom = 1;
         % ---
@@ -224,6 +225,24 @@ classdef FEMM2dMag < Xhandle
             obj.box.(args.id_box).parent_model = obj;
             % ---
             obj.reset_mesh = 1;
+            % -------------------------------------------------------------
+        end
+        % -----------------------------------------------------------------
+        function add_moveframe(obj,args)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                args.id_moveframe = 'undefined';
+                args.moveframe {mustBeA(args.moveframe,'FEMM2dMovingFrame')}
+            end
+            % ---
+            if f_strcmpi(args.id_moveframe,'undefined')
+                warning('id_moveframe undefined');
+            end
+            % ---
+            obj.moveframe.(args.id_moveframe) =+ args.moveframe;
+            obj.moveframe.(args.id_moveframe).parent_model = obj;
+            obj.moveframe.(args.id_moveframe).id_moveframe = args.id_moveframe;
             % -------------------------------------------------------------
         end
         % -----------------------------------------------------------------
