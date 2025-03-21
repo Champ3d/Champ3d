@@ -82,16 +82,26 @@ classdef FEMM2dVdom < Xhandle
                 error('id_material or id_coil must be defined');
             end
             %--------------------------------------------------------------
-            [px, py] = obj.get_choosed_point;
+            if ~isempty(obj.id_group)
+                if obj.id_group == 0
+                    first_set_groupe = 1;
+                end
+            else
+                first_set_groupe = 1;
+            end
             % ---
-            id_groupe_ = [id_dom '_dom'];
-            obj.id_group = f_str2code(id_groupe_,'code_type','integer');
-            %--------------------------------------------------------------
-            mi_clearselected;
-            mi_addblocklabel(px,py);
-            mi_selectlabel(px,py);
-            mi_setgroup(obj.id_group);
-            mi_clearselected;
+            if first_set_groupe
+                [px, py] = obj.get_choosed_point;
+                % ---
+                id_groupe_ = [id_dom '_dom'];
+                obj.id_group = f_str2code(id_groupe_,'code_type','integer');
+                %----------------------------------------------------------
+                mi_clearselected;
+                mi_addblocklabel(px,py);
+                mi_selectlabel(px,py);
+                mi_setgroup(obj.id_group);
+                mi_clearselected;
+            end
             %--------------------------------------------------------------
             if obj.is_material
                 obj.setup_material;

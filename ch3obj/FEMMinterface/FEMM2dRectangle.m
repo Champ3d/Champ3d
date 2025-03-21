@@ -19,9 +19,15 @@ classdef FEMM2dRectangle < FEMM2dDraw
         len_theta
     end
     properties (Hidden)
+        % ---
         sfactor = 1e2;
         cenxy_defined = 0;
         lenxy_defined = 0;
+        % ---
+        rsizevec
+        tsizevec
+        diagvec1
+        diagvec2
     end
     % --- Constructor
     methods
@@ -57,47 +63,17 @@ classdef FEMM2dRectangle < FEMM2dDraw
         end
         % -----------------------------------------------------------------
         function setup(obj)
-            if obj.lenxy_defined
-                rsizevec = [obj.len_x/2, 0];
-                tsizevec = [0, obj.len_y/2];
-            else
-                rsizevec = obj.len_r/2 .* [cosd(obj.cen_theta) sind(obj.cen_theta)];
-                tsizevec = obj.len_theta/2 .* [cosd(obj.cen_theta+90) sind(obj.cen_theta+90)];
-            end
             % ---
-            diagvec1 = +rsizevec + tsizevec;
-            diagvec2 = -rsizevec + tsizevec;
-            % ---
-            d1 = obj.center - diagvec1;
-            d2 = obj.center - diagvec2;
-            d3 = obj.center + diagvec1;
-            d4 = obj.center + diagvec2;
+            d1 = obj.center - obj.diagvec1;
+            d2 = obj.center - obj.diagvec2;
+            d3 = obj.center + obj.diagvec1;
+            d4 = obj.center + obj.diagvec2;
             % ---
             mi_drawline(d1(1),d1(2),d2(1),d2(2));
             mi_drawline(d2(1),d2(2),d3(1),d3(2));
             mi_drawline(d3(1),d3(2),d4(1),d4(2));
             mi_drawline(d4(1),d4(2),d1(1),d1(2));
-            % -------------------------------------------------------------
-            bottomright = obj.center - diagvec1*(1-1/obj.sfactor);
-            topright    = obj.center - diagvec2*(1-1/obj.sfactor);
-            bottomleft  = obj.center + diagvec1*(1-1/obj.sfactor);
-            topleft     = obj.center + diagvec2*(1-1/obj.sfactor);
-            % -------------------------------------------------------------
-            bottom = obj.center + rsizevec*(1-1/obj.sfactor);
-            top    = obj.center - rsizevec*(1-1/obj.sfactor);
-            left   = obj.center + tsizevec*(1-1/obj.sfactor);
-            right  = obj.center - tsizevec*(1-1/obj.sfactor);
-            % -------------------------------------------------------------
-            obj.bottomright = bottomright;
-            obj.bottomleft  = bottomleft;
-            obj.topright = topright;
-            obj.topleft  = topleft;
-            % -------------------------------------------------------------
-            obj.bottom = bottom;
-            obj.top    = top;
-            obj.left   = left;
-            obj.right  = right;
-            % -------------------------------------------------------------
+            % ---
         end
         % -----------------------------------------------------------------
         function setbound(obj,id_box)
@@ -154,6 +130,53 @@ classdef FEMM2dRectangle < FEMM2dDraw
                 warning('len_... is not defined');
             end
             % ---
+            if obj.lenxy_defined
+                rsizevec_ = [obj.len_x/2, 0];
+                tsizevec_ = [0, obj.len_y/2];
+            else
+                rsizevec_ = obj.len_r/2 .* [cosd(obj.cen_theta) sind(obj.cen_theta)];
+                tsizevec_ = obj.len_theta/2 .* [cosd(obj.cen_theta+90) sind(obj.cen_theta+90)];
+            end
+            % ---
+            diagvec1_ = +rsizevec_ + tsizevec_;
+            diagvec2_ = -rsizevec_ + tsizevec_;
+            % -------------------------------------------------------------
+            bottomright = obj.center - diagvec2_*(1-1/obj.sfactor);
+            topright    = obj.center + diagvec1_*(1-1/obj.sfactor);
+            bottomleft  = obj.center - diagvec1_*(1-1/obj.sfactor);
+            topleft     = obj.center + diagvec2_*(1-1/obj.sfactor);
+            % -------------------------------------------------------------
+            bottom = obj.center - tsizevec_*(1-1/obj.sfactor);
+            top    = obj.center + tsizevec_*(1-1/obj.sfactor);
+            left   = obj.center - rsizevec_*(1-1/obj.sfactor);
+            right  = obj.center + rsizevec_*(1-1/obj.sfactor);
+            % -------------------------------------------------------------
+            % for choose (selectrectangle)
+            out_bottomright = obj.center - diagvec2_*(1+1/obj.sfactor);
+            out_topright    = obj.center + diagvec1_*(1+1/obj.sfactor);
+            out_bottomleft  = obj.center - diagvec1_*(1+1/obj.sfactor);
+            out_topleft     = obj.center + diagvec2_*(1+1/obj.sfactor);
+            % -------------------------------------------------------------
+            obj.rsizevec = rsizevec_;
+            obj.tsizevec = tsizevec_;
+            obj.diagvec1 = diagvec1_;
+            obj.diagvec2 = diagvec2_;
+            % -------------------------------------------------------------
+            obj.bottomright = bottomright;
+            obj.bottomleft  = bottomleft;
+            obj.topright = topright;
+            obj.topleft  = topleft;
+            % -------------------------------------------------------------
+            obj.bottom = bottom;
+            obj.top    = top;
+            obj.left   = left;
+            obj.right  = right;
+            % -------------------------------------------------------------
+            obj.out_bottomright = out_bottomright;
+            obj.out_topright  = out_topright;
+            obj.out_bottomleft = out_bottomleft;
+            obj.out_topleft  = out_topleft;
+            % -------------------------------------------------------------
         end
         % -----------------------------------------------------------------
     end

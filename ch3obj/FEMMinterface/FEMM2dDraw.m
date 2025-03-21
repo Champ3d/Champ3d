@@ -37,6 +37,11 @@ classdef FEMM2dDraw < Xhandle
         bottomleft
         topright
         topleft
+        % --- for choose
+        out_bottomright
+        out_topright
+        out_bottomleft
+        out_topleft
         % ---
         bound
         % ---
