@@ -17,6 +17,9 @@ classdef FEMM2dRectangle < FEMM2dDraw
         len_y
         len_r
         len_theta
+        % ---
+        rsizevec
+        tsizevec
     end
     properties (Hidden)
         % ---
@@ -24,8 +27,6 @@ classdef FEMM2dRectangle < FEMM2dDraw
         cenxy_defined = 0;
         lenxy_defined = 0;
         % ---
-        rsizevec
-        tsizevec
         diagvec1
         diagvec2
     end

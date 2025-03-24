@@ -14,7 +14,6 @@
 classdef FEMM2dCircMovingFrame < FEMM2dMovingFrame
     properties
         r
-        center
     end
     properties (Access = private)
         

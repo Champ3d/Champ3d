@@ -265,8 +265,8 @@ classdef FEMM2dVdom < Xhandle
         function labeling(obj)
             mi_clearselected;
             mi_addblocklabel(obj.original_choosing_point.x,obj.original_choosing_point.y);
-            id_groupe_ = [id_dom '_dom'];
-            obj.original_id_group = f_str2code(id_groupe_,'code_type','integer');
+            %id_groupe_ = [id_dom '_dom'];
+            %obj.original_id_group = f_str2code(id_groupe_,'code_type','integer');
         end
         %------------------------------------------------------------------
         function selectlabel(obj)

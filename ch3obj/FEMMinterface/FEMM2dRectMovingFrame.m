@@ -15,11 +15,13 @@ classdef FEMM2dRectMovingFrame < FEMM2dMovingFrame
     properties
         len_x = 0
         len_y = 0
-        len_r = 0
-        len_theta = 0
+        %len_r = 0
+        %len_theta = 0
         % ---
         topleft
         bottomright
+        rsizevec
+        tsizevec
     end
     properties (Access = private)
         reset_group = 1
@@ -36,8 +38,8 @@ classdef FEMM2dRectMovingFrame < FEMM2dMovingFrame
                 args.cen_theta = []
                 args.len_x = []
                 args.len_y = []
-                args.len_r = []
-                args.len_theta = []
+                %args.len_r = []
+                %args.len_theta = []
             end
             % ---
             obj@FEMM2dMovingFrame;
@@ -47,8 +49,11 @@ classdef FEMM2dRectMovingFrame < FEMM2dMovingFrame
             argu = f_to_namedarg(args);
             choosewindow = FEMM2dRectangle(argu{:});
             % ---
+            obj.center = choosewindow.center;
             obj.topleft = choosewindow.out_topleft;
             obj.bottomright = choosewindow.out_bottomright;
+            obj.rsizevec = choosewindow.rsizevec;
+            obj.tsizevec = choosewindow.tsizevec;
             % ---
             clear choosewindow;
             % ---
@@ -73,10 +78,19 @@ classdef FEMM2dRectMovingFrame < FEMM2dMovingFrame
                 % ---
                 id_dom_ = fieldnames(obj.parent_model.dom);
                 nb_dom  = length(id_dom_);
+                k = 0;
                 for i = 1:nb_dom
-                    if obj.parent_model.dom.(id_dom_{i}).original_id_group ...
-                            ~= obj.parent_model.dom.(id_dom_{i}).id_group
-                        obj.id_dom{i} = id_dom_{i};
+                    % ---
+                    vdom = obj.parent_model.dom.(id_dom_{i});
+                    vpt  = [0;0];
+                    vpt(1) = vdom.original_choosing_point.x - obj.center(1);
+                    vpt(2) = vdom.original_choosing_point.y - obj.center(2);
+                    d_r = abs(dot(vpt,f_normalize(f_tocolv(obj.rsizevec))));
+                    d_t = abs(dot(vpt,f_normalize(f_tocolv(obj.tsizevec))));
+                    % ---
+                    if (d_r <= obj.len_x) && (d_t <= obj.len_y)
+                        k = k + 1;
+                        obj.id_dom{k} = id_dom_{i};
                     end
                 end
                 % ---
