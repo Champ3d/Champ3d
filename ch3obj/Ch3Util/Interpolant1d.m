@@ -27,7 +27,7 @@ classdef Interpolant1d < Xhandle
             arguments
                 args.xdata = []
                 args.ydata = []
-                args.algorithme {mustBeMember(args.algorithme,{'makima','spline','pchip'})} = 'spline'
+                args.algorithme {mustBeMember(args.algorithme,{'makima','spline','pchip'})} = 'makima'
             end
             % ---
             obj@Xhandle;
