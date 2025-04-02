@@ -138,7 +138,7 @@ classdef VolumeDom < Xhandle
             %--------------------------------------------------------------
             nbEqcond = length(eqcond);
             %--------------------------------------------------------------
-            refelem = obj.refelem;
+            refelem = obj.parent_mesh.refelem;
             nbNo_inEl = refelem.nbNo_inEl;
             nbElem = size(elem,2);
             % ---

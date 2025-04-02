@@ -500,9 +500,9 @@ classdef Mesh < Xhandle
                 return
             end
             %--------------------------------------------------------------
-            tic
-            f_fprintf(0,'Make #discrete \n');
-            fprintf('   ');
+            %tic
+            %f_fprintf(0,'Make #discrete \n');
+            %fprintf('   ');
             % ---
             get = args.get;
             % ---
@@ -647,9 +647,9 @@ classdef Mesh < Xhandle
             end
             %--------------------------------------------------------------
             %--- Log message
-            f_fprintf(0,'--- in',...
-                1,toc, ...
-                0,'s \n');
+            %f_fprintf(0,'--- in',...
+            %    1,toc, ...
+            %    0,'s \n');
         end
         % -----------------------------------------------------------------
     end
@@ -815,9 +815,9 @@ classdef Mesh < Xhandle
                 return
             end
             %--------------------------------------------------------------
-            tic
-            f_fprintf(0,'Make #prokit \n');
-            fprintf('   ');
+            %tic
+            %f_fprintf(0,'Make #prokit \n');
+            %fprintf('   ');
             %--------------------------------------------------------------
             refelem_ = obj.refelem;
             U = refelem_.iU;
@@ -874,9 +874,9 @@ classdef Mesh < Xhandle
             obj.build_prokit_done = 1;
             %--------------------------------------------------------------
             %--- Log message
-            f_fprintf(0,'--- in',...
-                1,toc, ...
-                0,'s \n');
+            %f_fprintf(0,'--- in',...
+            %    1,toc, ...
+            %    0,'s \n');
         end
         % -----------------------------------------------------------------
         function node_i = get_interpnode(obj,node)

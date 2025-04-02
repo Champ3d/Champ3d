@@ -26,7 +26,7 @@ classdef CutVolumeDom3d < VolumeDom3d
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom3d','cut_equation'};
+            argslist = {'parent_mesh','id_dom3d','cut_equation'};
         end
     end
     % --- Constructors
