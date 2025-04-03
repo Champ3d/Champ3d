@@ -30,10 +30,10 @@ classdef Parameter %< Xhandle
             arguments
                 args.f = []
                 args.depend_on {mustBeMember(args.depend_on,...
-                    {'','celem','cface', ...
+                    {'celem','cface', ...
                      'bv','jv','hv','pv','av','phiv','tv','omev','tempv',...
                      'bs','js','hs','ps','as','phis','ts','omes','temps',...
-                     'ltime'})} = ''
+                     'ltime'})}
                 args.from = []
                 args.varargin_list = []
                 args.fvectorized = 0
@@ -41,6 +41,10 @@ classdef Parameter %< Xhandle
             % ---
             if isempty(args.f)
                 error('#f must be given ! Give a function handle or numeric value');
+            end
+            % ---
+            if ~isfield(args,'depend_on')
+                args.depend_on = '';
             end
             % ---
             if isnumeric(args.f)
