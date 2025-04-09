@@ -125,7 +125,7 @@ classdef FEM3dTherm < ThModel
             if obj.ltime.it <= 1
                 Tprev = 0;
             else
-                Tprev = obj.dof{obj.ltime.it - 1}.T.value - obj.T0;
+                Tprev = obj.dof{obj.ltime.it - 1}.T.value;
             end
             delta_t = 1;
             %--------------------------------------------------------------
@@ -174,7 +174,7 @@ classdef FEM3dTherm < ThModel
             if it == 1
                 % ---
                 obj.dof{it}.T = ...
-                    NodeDof('parent_mesh',obj.parent_mesh,'value',obj.T0);
+                    NodeDof('parent_mesh',obj.parent_mesh,'value',0);
                 % ---
                 x0 = obj.dof{it}.T.value;
             else
