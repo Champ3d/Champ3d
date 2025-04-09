@@ -69,33 +69,29 @@ classdef FEM3dTherm < ThModel
                     phydom.build;
                 end
             end
-            %--------------------------------------------------------------------------
-            %obj.build_done = 1;
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
         end
-        %--------------------------------------------------------------------------
+        %------------------------------------------------------------------
         function assembly(obj)
-            %--------------------------------------------------------------------------
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             obj.build;
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             parent_mesh = obj.parent_mesh;
             nb_edge = parent_mesh.nb_edge;
             nb_node = parent_mesh.nb_node;
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             obj.matrix.id_node_t  = [];
             obj.matrix.lambdawewe = sparse(nb_edge,nb_edge);
             obj.matrix.rhocpwnwn  = sparse(nb_node,nb_node);
             obj.matrix.hwnwn      = sparse(nb_node,nb_node);
             obj.matrix.pswn       = sparse(nb_node,1);
             obj.matrix.pvwn       = sparse(nb_node,1);
-            obj.dof.temp          = sparse(nb_node,1);
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             obj.matrix.id_elem_nomesh = [];
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             allowed_physical_dom = {'thconductor','thcapacitor','convection',...
                 'ps','pv'};
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             for i = 1:length(allowed_physical_dom)
                 phydom_type = allowed_physical_dom{i};
                 % ---
@@ -118,106 +114,136 @@ classdef FEM3dTherm < ThModel
                     phydom.assembly;
                 end
             end
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             id_node_t = unique(obj.matrix.id_node_t);
             obj.matrix.id_node_t = id_node_t;
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             %
             %               MATRIX SYSTEM
             %
-            %--------------------------------------------------------------------------
-            Temp_prev = 0;%obj.matrix.Temp_prev;
+            %--------------------------------------------------------------
+            if obj.ltime.it <= 1
+                Tprev = obj.T0;
+            else
+                Tprev = obj.dof{obj.ltime.it - 1}.T.value;
+            end
             delta_t = 1;
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             % --- LSH
             LHS = (1./delta_t) .* obj.matrix.rhocpwnwn + ...
                 obj.parent_mesh.discrete.grad.' * obj.matrix.lambdawewe * obj.parent_mesh.discrete.grad + ...
                 obj.matrix.hwnwn;
             % ---
             LHS = LHS(id_node_t,id_node_t);
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             % --- RHS
             RHS = obj.matrix.pvwn + obj.matrix.pswn + ...
-                (1./delta_t) .* obj.matrix.rhocpwnwn * Temp_prev;
+                (1./delta_t) .* obj.matrix.rhocpwnwn * f_tocolv(Tprev);
             % ---
             RHS = RHS(id_node_t,1);
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             obj.matrix.LHS = LHS;
             obj.matrix.RHS = RHS;
-            %--------------------------------------------------------------------------
-%             obj.assembly_done = 1;
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
         end
         % -----------------------------------------------------------------
         function solve(obj)
-            %--------------------------------------------------------------------------
-            f_fprintf(0,'Solve',1,class(obj),0,'\n');
-            f_fprintf(0,'   ');
-            %--------------------------------------------------------------------------
-            erro0 = 1;
-            tole0 = 1e-3;
-            maxi0 = 3;
-            erro1 = 1;
-            tole1 = 1e-6;
-            maxi1 = 1e3;
-            %--------------------------------------------------------------------------
-            nite0 = 0;
-            % ---
-            while erro0 > tole0 & nite0 < maxi0
-                % ---
-                %obj.build_done = 0;
-                %obj.assembly_done = 0;
-                obj.assembly;
-                % ---
-                nite0 = nite0 + 1;
-                f_fprintf(0,'--- iter-out',1,nite0);
-                % ---
-                if nite0 == 1
-                    x0 = [];
-                end
-                % ---
-                M = sqrt(diag(diag(obj.matrix.LHS)));
-                [x,flag,relres,niter,resvec] = ...
-                    qmr(obj.matrix.LHS,obj.matrix.RHS,tole1,maxi1,M.',M,x0);
-                % ---
-                if nite0 == 1
-                    erro0 = 1;
-                    x0 = x;
-                elseif niter > 1
-                    erro0 = norm(x0 - x)/norm(x0);
-                    x0 = x;
-                else
-                    erro0 = 0;
-                    x = x0;
-                end
-                % ---
-                f_fprintf(0,'e',1,erro0,0,'\n');
-                f_fprintf(0,'--- iter-in',1,niter,0,'relres',1,relres,0,'\n');
-                %----------------------------------------------------------------------
-                % --- postpro
-                id_node_t = obj.matrix.id_node_t;
-                nb_node = obj.parent_mesh.nb_node;
-                %----------------------------------------------------------------------
-                obj.dof.temp = zeros(nb_node,1);
-                obj.dof.temp(id_node_t) = x;
-                %----------------------------------------------------------------------
-                obj.field.tempv = obj.parent_mesh.field_wn('dof',obj.dof.temp);
-                obj.field.temp  = obj.dof.temp;
-                Temp_prev = obj.dof.temp;
-                %----------------------------------------------------------------------
-                %obj.postpro;
-                %----------------------------------------------------------------------
+            obj.ltime.it = 1;
+            while obj.ltime.t_now < obj.ltime.t_end
+                obj.solveone;
+                obj.ltime.it = obj.ltime.it + 1;
             end
         end
         %------------------------------------------------------------------
-        function solveone(obj,it = [])
-            if isempty(it)
-                it = obj.ltime.it;
+        function solveone(obj,args)
+            arguments
+                obj
+                args.it = []
+                args.tol_out = 1e-3; % tolerance of outer loop
+                args.tol_in  = 1e-6; % tolerance of inner loop
+                args.maxniter_out = 3; % maximum iteration of outer loop
+                args.maxniter_in = 1e3; % maximum iteration of inner loop
+            end
+            % --- which it
+            if isempty(args.it)
+                it = obj.ltime.it; % it = obj.gtime.it ??
+            else
+                it = args.it;
+            end
+            %--------------------------------------------------------------
+            if it == 1
+                % ---
+                obj.dof{it}.T = ...
+                    NodeDof('parent_mesh',obj.parent_mesh,'value',obj.T0);
+                % ---
+                x0 = obj.dof{it}.T.value;
+            else
+                % ---
+                obj.dof{it}.T = ...
+                    NodeDof('parent_mesh',obj.parent_mesh);
+                % ---
+                x0 = obj.dof{it-1}.T.value;
             end
             % ---
-            obj.dof{it}.T = NodeDof()
-            obj.field{it}.T.node = 
+            obj.field{it}.T.elem = ...
+                ScalarElemField('parent_mesh',obj.parent_mesh,'dof',obj.dof{it}.T);
+            obj.field{it}.T.node = ...
+                ScalarNodeField('parent_mesh',obj.parent_mesh,'dof',obj.dof{it}.T);
             % ---
+            id_node_t = obj.matrix.id_node_t;
+            nb_node = obj.parent_mesh.nb_node;
+            %--------------------------------------------------------------
+            if it > 1
+                %----------------------------------------------------------
+                f_fprintf(0,'Solveone',1,class(obj),0,'it ---',1,num2str(it),0,'\n');
+                %----------------------------------------------------------
+                tol_out = args.tol_out;
+                maxniter_out = args.maxniter_out;
+                tol_in = args.tol_in;
+                maxniter_in = args.maxniter_in;
+                %----------------------------------------------------------
+                erro = 1;
+                niter_out = 0;
+                % ---
+                while erro > tol_out && niter_out < maxniter_out
+                    % ---
+                    obj.assembly;
+                    % ---
+                    niter_out = niter_out + 1;
+                    f_fprintf(0,'--- iter-out',1,niter_out);
+                    % ---
+                    if niter_out == 1
+                        x0 = [];
+                    end
+                    % --- qmr + jacobi
+                    M = sqrt(diag(diag(obj.matrix.LHS)));
+                    [x,flag,relres,niter,resvec] = ...
+                        qmr(obj.matrix.LHS, obj.matrix.RHS, ...
+                            tol_in, maxniter_in, M.', M, x0);
+                    % ---
+                    if niter_out == 1
+                        % out-loop one more time
+                        erro = 1;
+                        x0 = x;
+                    elseif niter > 1
+                        % for linear prob, niter = 0 for 2nd out-loop
+                        erro = norm(x0 - x)/norm(x0);
+                        x0 = x;
+                    else
+                        erro = 0;
+                        x = x0;
+                    end
+                    % ---
+                    f_fprintf(0,'e',1,erro,0,'\n');
+                    f_fprintf(0,'--- iter-in',1,niter,0,'relres',1,relres,0,'\n');
+                    %------------------------------------------------------
+                    % --- update now, for assembly
+                    %------------------------------------------------------
+                    obj.dof{it}.T.value = zeros(nb_node,1);
+                    obj.dof{it}.T.value(id_node_t) = x;
+                    %------------------------------------------------------
+                end
+            end
         end
     end
     % --- Methods/protected

@@ -8,17 +8,18 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ScalarVolumeField < MeshField
+classdef ScalarElemField < MeshField
     properties
         parent_mesh
         dof
     end
     properties (Dependent)
         value
+        node
     end
     % --- Contructor
     methods
-        function obj = ScalarVolumeField(args)
+        function obj = ScalarElemField(args)
             arguments
                 args.parent_mesh {mustBeA(args.parent_mesh,'Mesh')}
                 args.dof {mustBeA(args.dof,'NodeDof')}
@@ -37,6 +38,10 @@ classdef ScalarVolumeField < MeshField
         % -----------------------------------------------------------------
         function val = get.value(obj)
             val = obj.parent_mesh.field_wn('dof',obj.dof.value,'on','center');
+        end
+        % -----------------------------------------------------------------
+        function val = get.node(obj)
+            val = obj.parent_mesh.celem;
         end
     end
 end

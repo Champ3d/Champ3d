@@ -25,6 +25,7 @@ classdef LTime < Xhandle
     properties (Dependent = true)
         it_max
         t_now
+        t_end
     end
     
     % --- Valid args list
@@ -80,10 +81,18 @@ classdef LTime < Xhandle
     methods
         function val = get.t_now(obj)
             if obj.it > 0
-                val = obj.t_array(obj.it);
+                if obj.it <= obj.it_max
+                    val = obj.t_array(obj.it);
+                else
+                    val = +Inf;
+                end
             else
-                val = -inf;
+                val = -Inf;
             end
+        end
+        % ---
+        function val = get.t_end(obj)
+            val = obj.t_array(end);
         end
         % ---
         function val = get.it_max(obj)

@@ -10,9 +10,9 @@
 
 classdef MeshField < Xhandle
     properties
-        parent_mesh
+        %parent_mesh
         % ---
-        dof
+        %dof
     end
     
     % --- Contructor

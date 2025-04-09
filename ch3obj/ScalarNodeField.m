@@ -8,42 +8,40 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef NodeDof < MeshDof
+classdef ScalarNodeField < MeshField
     properties
-        
+        parent_mesh
+        dof
+    end
+    properties (Dependent)
+        value
+        node
     end
     % --- Contructor
     methods
-        function obj = NodeDof(args)
+        function obj = ScalarNodeField(args)
             arguments
                 args.parent_mesh {mustBeA(args.parent_mesh,'Mesh')}
-                args.value = []
+                args.dof {mustBeA(args.dof,'NodeDof')}
             end
             % ---
-            obj = obj@MeshDof;
+            obj = obj@MeshField;
             % ---
+            if ~isfield(args,'parent_mesh') || ~isfield(args,'dof')
+                error('#parent_mesh and #dof must be given !');
+            end
             obj <= args;
-            % ---
-            if isfield(args,'parent_mesh') && isfield(args,'value')
-                if ~isempty(args.value)
-                    obj.setup;
-                end
-            end
-            % ---
         end
     end
     % --- Methods/public
     methods
         % -----------------------------------------------------------------
-        function setup(obj)
-            nb_node = obj.parent_mesh.nb_node;
-            if numel(obj.value) == 1
-                obj.value = obj.value .* ones(1,nb_node);
-            else
-                if numel(obj.value) ~= nb_node
-                    error('#value must correspond to mesh node, check size !');
-                end
-            end
+        function val = get.value(obj)
+            val = obj.parent_mesh.field_wn('dof',obj.dof.value,'on','center');
+        end
+        % -----------------------------------------------------------------
+        function val = get.node(obj)
+            val = obj.parent_mesh.node;
         end
     end
 end
