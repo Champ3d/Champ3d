@@ -148,10 +148,10 @@ classdef FEM3dTherm < ThModel
         end
         % -----------------------------------------------------------------
         function solve(obj)
-            obj.ltime.it = 1;
-            while obj.ltime.t_now < obj.ltime.t_end
-                obj.solveone;
+            obj.ltime.it = 0;
+            while obj.ltime.t_now <= obj.ltime.t_end
                 obj.ltime.it = obj.ltime.it + 1;
+                obj.solveone;
             end
         end
         %------------------------------------------------------------------

@@ -291,7 +291,7 @@ classdef Mesh < Xhandle
             cedge = mean(reshape(node_(:,edge_(1:nbNo_inEd,:)),dim_,nbNo_inEd,nb_edge_),2);
             cedge = squeeze(cedge);
         end
-        function obj = cal_flatnode(obj)
+        function cal_flatnode(obj)
             % ---
             node_ = obj.node;
             face_ = obj.elem;

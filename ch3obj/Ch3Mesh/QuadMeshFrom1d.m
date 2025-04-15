@@ -153,6 +153,9 @@ classdef QuadMeshFrom1d < QuadMesh
             obj.elem_code = elem_code_;
         end
         % -----------------------------------------------------------------
+        function reset(obj)
+            obj.setup;
+        end
         % -----------------------------------------------------------------
     end
     

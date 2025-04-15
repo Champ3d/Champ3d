@@ -73,9 +73,9 @@ classdef HexMesh < Mesh3d
             face_color_  = args.face_color;
             alpha_       = args.alpha;
             %--------------------------------------------------------------
-            if isempty(obj.face)
-                obj.build_meshds('get','face');
-            end
+            %if isempty(obj.face)
+            %    obj.build_meshds('get','face');
+            %end
             %--------------------------------------------------------------
             clear msh;
             %--------------------------------------------------------------
