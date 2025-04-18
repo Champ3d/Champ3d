@@ -12,12 +12,22 @@ classdef VolumeDom < Xhandle
 
     % --- Properties
     properties
-        parent_mesh
         elem_code
         gid_elem
         condition
         submesh
         gid
+    end
+
+    % --- subfields to build
+    properties
+        parent_mesh
+    end
+
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
     end
 
     % --- Dependent Properties
@@ -43,13 +53,71 @@ classdef VolumeDom < Xhandle
             % ---
             obj = obj@Xhandle;
             % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
             obj <= args;
+            % ---
+            % call setup in constructor
+            % ,,, for direct verification
+            % ,,, setup must be static
+            VolumeDom.setup(obj);
+            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+        end
+    end
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            obj.setup_done = 1;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            VolumeDom.setup(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            obj.callsubfieldbuild('field_name','parent_mesh');
             % ---
             if ~isempty(obj.gid_elem)
                 obj.build_from_gid_elem;
             elseif ~isempty(obj.elem_code)
                 obj.build_from_elem_code;
             end
+            % ---
+            obj.build_done = 1;
+            % ---
+        end
+    end
+    methods
+        function assembly(obj)
+            % ---
+            % may return to build of subclass obj
+            % ... subclass build must call superclass build
+            obj.build;
+            % ---
         end
     end
 
@@ -63,7 +131,8 @@ classdef VolumeDom < Xhandle
                 allmeshes{1}.node = obj.parent_mesh.node;
                 return
             end
-            % ---
+            % --- need parent_mesh
+            obj.parent_mesh.build;
             node = obj.parent_mesh.node;
             elem = obj.parent_mesh.elem(:,obj.gid_elem);
             % -------------------------------------------------------------
@@ -325,6 +394,9 @@ classdef VolumeDom < Xhandle
                 args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
                 args.id = ''
             end
+            % ---
+            obj.build;
+            obj.parent_mesh.build;
             % --- id-info
             elcode = [];
             if ~isempty(obj.elem_code)

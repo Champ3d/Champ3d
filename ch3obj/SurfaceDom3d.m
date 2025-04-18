@@ -15,6 +15,17 @@ classdef SurfaceDom3d < SurfaceDom
         id_dom3d
     end
 
+    % --- subfields to build
+    properties
+        
+    end
+
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
+    end
+
     % --- Dependent Properties
     properties (Dependent = true)
         
@@ -42,7 +53,28 @@ classdef SurfaceDom3d < SurfaceDom
             % ---
             obj = obj@SurfaceDom;
             % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
             obj <= args;
+            % ---
+            SurfaceDom3d.setup(obj);
+            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+        end
+    end
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            setup@SurfaceDom(obj);
             % ---
             if ~isempty(obj.gid_face)
                 obj.build_from_gid_face
@@ -54,9 +86,47 @@ classdef SurfaceDom3d < SurfaceDom
                         obj.build_from_interface;
                 end
             end
+            % ---
+            obj.setup_done = 1;
+            % ---
         end
     end
-
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+            % ---
+            % must call super reset
+            % ,,, with obj as argument
+            reset@SurfaceDom(obj);
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            SurfaceDom3d.setup(obj);
+            % ---
+            build@SurfaceDom(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            obj.build_done = 1;
+            % ---
+        end
+    end
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
+            assembly@SurfaceDom(obj);
+            % ---
+        end
+    end
     % --- Methods
     methods (Access = protected, Hidden)
         % -----------------------------------------------------------------
@@ -142,10 +212,8 @@ classdef SurfaceDom3d < SurfaceDom
             %--------------------------------------------------------------
             obj.gid_face = gid_face_;
             % -------------------------------------------------------------
-
         end
     end
-
 end
 
 

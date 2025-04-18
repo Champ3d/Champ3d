@@ -47,17 +47,18 @@ classdef ThconductorTherm < Thconductor
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
+            ThconductorTherm.setup(obj);
+            % ---
+            % must reset build+assembly
             obj.build_done = 0;
             obj.assembly_done = 0;
-            % ---
-            obj.setup;
         end
     end
 
-    % --- setup
-    methods
+    % --- setup/reset/build/assembly
+    methods (Static)
         function setup(obj)
+            % ---
             if obj.setup_done
                 return
             end
@@ -66,16 +67,28 @@ classdef ThconductorTherm < Thconductor
             % ---
             obj.setup_done = 1;
             % ---
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
-
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+            % ---
+            % must call super reset
+            % ,,, with obj as argument
+            reset@Thconductor(obj);
+        end
+    end
     % --- build
     methods
         function build(obj)
             % ---
-            obj.setup;
+            ThconductorTherm.setup(obj);
+            % ---
+            build@Thconductor(obj);
             % ---
             if obj.build_done
                 return
@@ -99,7 +112,6 @@ classdef ThconductorTherm < Thconductor
             obj.matrix.lambda_array = lambda_array;
             % ---
             obj.build_done = 1;
-            obj.assembly_done = 0;
         end
     end
 
@@ -108,10 +120,7 @@ classdef ThconductorTherm < Thconductor
         function assembly(obj)
             % ---
             obj.build;
-            % ---
-            if obj.assembly_done
-                return
-            end
+            assembly@Thconductor(obj);
             %--------------------------------------------------------------
             id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
             id_edge_in_elem = obj.parent_model.parent_mesh.meshds.id_edge_in_elem;
@@ -149,22 +158,6 @@ classdef ThconductorTherm < Thconductor
             obj.parent_model.matrix.id_node_t = ...
                 [obj.parent_model.matrix.id_node_t obj.matrix.gid_node_t];
             %--------------------------------------------------------------
-            obj.assembly_done = 1;
-        end
-    end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
         end
     end
 end

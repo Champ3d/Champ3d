@@ -11,7 +11,7 @@
 classdef OpenCoil < Coil
 
     % --- entry
-    properties (SetObservable)
+    properties
         etrode_equation
     end
 
@@ -19,6 +19,12 @@ classdef OpenCoil < Coil
     properties
         gid_node_petrode
         gid_node_netrode
+    end
+
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
     end
     
     % --- Valid args list
@@ -45,19 +51,71 @@ classdef OpenCoil < Coil
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            OpenCoil.setup(obj);
+            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.assembly_done = 0;
         end
     end
     
-    % --- setup
-    methods
+    % --- setup/reset/build/assembly
+    methods (Static)
         function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
             % ---
             setup@Coil(obj);
             % ---
             obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
             % ---
             obj.get_electrode;
+            % ---
+            obj.setup_done = 1;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+            % ---
+            % must call super reset
+            % ,,, with obj as argument
+            reset@Coil(obj);
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            OpenCoil.setup(obj);
+            % ---
+            build@Coil(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            obj.build_done = 1;
+            % ---
+        end
+    end
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
+            assembly@Coil(obj);
+            % ---
+            if obj.assembly_done
+                return
+            end
+            % ---
+            obj.assembly_done = 1;
             % ---
         end
     end

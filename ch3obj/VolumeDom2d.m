@@ -16,6 +16,17 @@ classdef VolumeDom2d < VolumeDom
         id_yline
     end
 
+    % --- subfields to build
+    properties
+        
+    end
+
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
+    end
+
     % --- Dependent Properties
     properties (Dependent = true)
         
@@ -43,15 +54,71 @@ classdef VolumeDom2d < VolumeDom
             % ---
             obj = obj@VolumeDom;
             % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
             obj <= args;
             % ---
-            if ~isempty(obj.elem_code)
-                obj.build_from_elem_code;
-            elseif ~isempty(obj.gid_elem)
-                obj.build_from_gid_elem
-            elseif ~isempty(obj.id_xline) && ~isempty(obj.id_yline)
+            VolumeDom2d.setup(obj);
+            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+        end
+    end
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            setup@VolumeDom(obj);
+            % ---
+            if ~isempty(obj.id_xline) && ~isempty(obj.id_yline)
                 obj.build_from_idmesh1d;
             end
+            % ---
+            obj.setup_done = 1;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+            % ---
+            % must call super reset
+            % ,,, with obj as argument
+            reset@VolumeDom(obj);
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            VolumeDom2d.setup(obj);
+            % ---
+            build@VolumeDom(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            obj.build_done = 1;
+            % ---
+        end
+    end
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
+            assembly@VolumeDom(obj);
+            % ---
         end
     end
 
@@ -108,7 +175,6 @@ classdef VolumeDom2d < VolumeDom
             % -------------------------------------------------------------
         end
     end
-
 end
 
 

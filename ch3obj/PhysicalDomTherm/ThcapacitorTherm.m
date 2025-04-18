@@ -48,17 +48,18 @@ classdef ThcapacitorTherm < Thcapacitor
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
+            ThcapacitorTherm.setup(obj);
+            % ---
+            % must reset build+assembly
             obj.build_done = 0;
             obj.assembly_done = 0;
-            % ---
-            obj.setup;
         end
     end
 
-    % --- setup
-    methods
+    % --- setup/reset/build/assembly
+    methods (Static)
         function setup(obj)
+            % ---
             if obj.setup_done
                 return
             end
@@ -67,8 +68,19 @@ classdef ThcapacitorTherm < Thcapacitor
             % ---
             obj.setup_done = 1;
             % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
             obj.build_done = 0;
             obj.assembly_done = 0;
+            % ---
+            % must call super reset
+            % ,,, with obj as argument
+            reset@Thcapacitor(obj);
         end
     end
 
@@ -76,7 +88,9 @@ classdef ThcapacitorTherm < Thcapacitor
     methods
         function build(obj)
             % ---
-            obj.setup;
+            ThcapacitorTherm.setup(obj);
+            % ---
+            build@Thcapacitor(obj);
             % ---
             if obj.build_done
                 return
@@ -104,7 +118,6 @@ classdef ThcapacitorTherm < Thcapacitor
             obj.matrix.rho_cp_array = rho_cp_array;
             % ---
             obj.build_done = 1;
-            obj.assembly_done = 0;
         end
     end
 
@@ -113,10 +126,7 @@ classdef ThcapacitorTherm < Thcapacitor
         function assembly(obj)
             % ---
             obj.build;
-            % ---
-            if obj.assembly_done
-                return
-            end
+            assembly@Thcapacitor(obj);
             %--------------------------------------------------------------
             id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
             elem = obj.parent_model.parent_mesh.elem;
@@ -155,21 +165,6 @@ classdef ThcapacitorTherm < Thcapacitor
                 [obj.parent_model.matrix.id_node_t obj.matrix.gid_node_t];
             %--------------------------------------------------------------
             obj.assembly_done = 1;
-        end
-    end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
         end
     end
 end

@@ -12,11 +12,21 @@ classdef SurfaceDom < Xhandle
 
     % --- Properties
     properties
-        parent_mesh
         gid_face
         defined_on
         condition
         submesh
+    end
+
+    % --- subfields to build
+    properties
+        parent_mesh
+    end
+
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
     end
 
     % --- Dependent Properties
@@ -41,14 +51,70 @@ classdef SurfaceDom < Xhandle
                 args.condition = []
             end
             % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
             obj <= args;
+            % call setup in constructor
+            % ,,, for direct verification
+            % ,,, setup must be static
+            SurfaceDom.setup(obj);
+            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+        end
+    end
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
             % ---
             if ~isempty(obj.gid_face)
                 obj.build_from_gid_face;
             end
+            % ---
+            obj.setup_done = 1;
+            % ---
         end
     end
-
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            SurfaceDom.setup(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            %obj.callsubfieldbuild('field_name','parent_mesh');
+            % ---
+            obj.build_done = 1;
+            % ---
+        end
+    end
+    methods
+        function assembly(obj)
+            % ---
+            % may return to build of subclass obj
+            % ... subclass build must call superclass build
+            obj.build;
+            % ---
+        end
+    end
     % --- Methods
     methods
         function allmeshes = build_submesh(obj)
@@ -60,7 +126,8 @@ classdef SurfaceDom < Xhandle
                 end
                 return
             end
-            % ---
+            % --- need parent_mesh
+            obj.parent_mesh.build;
             node = obj.parent_mesh.node;
             face = obj.parent_mesh.face(:,obj.gid_face);
             % ---

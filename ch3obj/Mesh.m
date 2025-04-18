@@ -25,8 +25,6 @@ classdef Mesh < Xhandle
         selem
         velem
         % ---
-        dom
-        % ---
         meshds
         discrete
         intkit
@@ -40,13 +38,22 @@ classdef Mesh < Xhandle
         flat_node
         % ---
     end
+    % --- subfields to build
+    properties
+        dom
+    end
 
-    % --- Dependent Properties
+    % ---
     properties (Access = private, Hidden)
         build_meshds_done = 0
         build_discrete_done = 0
         build_intkit_done = 0
         build_prokit_done = 0
+    end
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
     end
 
     % --- Dependent Properties
@@ -64,6 +71,26 @@ classdef Mesh < Xhandle
     % --- Constructors
     methods
         function obj = Mesh()
+            % ---
+            obj@Xhandle;
+            % ---
+            % call setup in constructor
+            % ,,, for direct verification
+            % ,,, setup must be static
+            Mesh.setup(obj);
+            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+        end
+    end
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
             % ---
             obj.meshds.id_edge_in_elem = [];
             obj.meshds.ori_edge_in_elem = [];
@@ -103,6 +130,41 @@ classdef Mesh < Xhandle
             obj.prokit.Wf = {};
             obj.prokit.Wn = {};
             obj.prokit.node = {};
+            % ---
+            obj.setup_done = 1;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            Mesh.setup(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            %obj.callsubfieldbuild('field_name',{'dom'});
+            % ---
+            obj.build_done = 1;
+            % ---
+        end
+    end
+    methods
+        function assembly(obj)
+            % ---
+            % may return to build of subclass obj
+            % ... subclass build must call superclass build
+            obj.build;
             % ---
         end
     end

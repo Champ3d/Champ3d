@@ -9,7 +9,11 @@
 %--------------------------------------------------------------------------
 
 classdef FEM3dTherm < ThModel
-
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
+    end
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -29,52 +33,71 @@ classdef FEM3dTherm < ThModel
             % ---
             obj <= args;
             % ---
+            FEM3dTherm.setup(obj);
+            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+        end
+    end
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            setup@ThModel(obj);
+            % ---
+            obj.setup_done = 1;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+            % ---
+            % must call super reset
+            % ,,, with obj as argument
+            reset@ThModel(obj);
         end
     end
     % --- Methods/public
     methods (Access = public)
         % -----------------------------------------------------------------
         function build(obj)
-            %--------------------------------------------------------------------------
+            % ---
+            FEM3dTherm.setup(obj);
+            % ---
+            build@ThModel(obj);
+            % ---
+            if obj.build_done
+                return
+            end
             % ---
             parent_mesh = obj.parent_mesh;
             % ---
-            parent_mesh.build_meshds;
-            parent_mesh.build_discrete;
-            parent_mesh.build_intkit;
-            %--------------------------------------------------------------------------
+            %parent_mesh.build_meshds;
+            %parent_mesh.build_discrete;
+            %parent_mesh.build_intkit;
+            %--------------------------------------------------------------
             allowed_physical_dom = {'thconductor','thcapacitor','convection',...
                 'ps','pv'};
-            %--------------------------------------------------------------------------
-            for i = 1:length(allowed_physical_dom)
-                phydom_type = allowed_physical_dom{i};
-                % ---
-                if isprop(obj,phydom_type)
-                    if isempty(obj.(phydom_type))
-                        continue
-                    end
-                else
-                    continue
-                end
-                % ---
-                allphydomid = fieldnames(obj.(phydom_type));
-                for j = 1:length(allphydomid)
-                    id_phydom = allphydomid{j};
-                    % ---
-                    f_fprintf(0,['Build #' phydom_type],1,id_phydom,0,'\n');
-                    % ---
-                    phydom = obj.(phydom_type).(id_phydom);
-                    % ---
-                    phydom.reset;
-                    phydom.build;
-                end
-            end
+            obj.callsubfieldbuild('field_name',allowed_physical_dom);
             %--------------------------------------------------------------
+            obj.build_done = 1;
+            % ---
         end
         %------------------------------------------------------------------
         function assembly(obj)
-            %--------------------------------------------------------------
+            % ---
             obj.build;
+            assembly@ThModel(obj);
             %--------------------------------------------------------------
             parent_mesh = obj.parent_mesh;
             nb_edge = parent_mesh.nb_edge;
@@ -92,28 +115,7 @@ classdef FEM3dTherm < ThModel
             allowed_physical_dom = {'thconductor','thcapacitor','convection',...
                 'ps','pv'};
             %--------------------------------------------------------------
-            for i = 1:length(allowed_physical_dom)
-                phydom_type = allowed_physical_dom{i};
-                % ---
-                if isprop(obj,phydom_type)
-                    if isempty(obj.(phydom_type))
-                        continue
-                    end
-                else
-                    continue
-                end
-                % ---
-                allphydomid = fieldnames(obj.(phydom_type));
-                for j = 1:length(allphydomid)
-                    id_phydom = allphydomid{j};
-                    phydom = obj.(phydom_type).(id_phydom);
-                    % ---
-                    f_fprintf(0,['Assembly #' phydom_type],1,id_phydom,0,'\n');
-                    % ---
-                    phydom.reset;
-                    phydom.assembly;
-                end
-            end
+            obj.callsubfieldassembly('field_name',allowed_physical_dom);
             %--------------------------------------------------------------
             id_node_t = unique(obj.matrix.id_node_t);
             obj.matrix.id_node_t = id_node_t;
@@ -126,8 +128,9 @@ classdef FEM3dTherm < ThModel
                 Tprev = 0;
             else
                 Tprev = obj.dof{obj.ltime.it - 1}.T.value;
+                delta_t = obj.ltime.t_array(obj.ltime.it) - obj.ltime.t_array(obj.ltime.it - 1);
             end
-            delta_t = 1;
+            %delta_t = 1;
             %--------------------------------------------------------------
             % --- LSH
             LHS = (1./delta_t) .* obj.matrix.rhocpwnwn + ...
@@ -149,7 +152,7 @@ classdef FEM3dTherm < ThModel
         % -----------------------------------------------------------------
         function solve(obj)
             obj.ltime.it = 0;
-            while obj.ltime.t_now <= obj.ltime.t_end
+            while obj.ltime.t_now < obj.ltime.t_end
                 obj.ltime.it = obj.ltime.it + 1;
                 obj.solveone;
             end
@@ -169,6 +172,7 @@ classdef FEM3dTherm < ThModel
                 it = obj.ltime.it; % it = obj.gtime.it ??
             else
                 it = args.it;
+                obj.ltime.it = it;
             end
             %--------------------------------------------------------------
             if it == 1
@@ -191,9 +195,6 @@ classdef FEM3dTherm < ThModel
             obj.field{it}.T.node = ...
                 ScalarNodeField('parent_mesh',obj.parent_mesh,'dof',obj.dof{it}.T,...
                 'reference_potential',obj.T0);
-            % ---
-            id_node_t = obj.matrix.id_node_t;
-            nb_node = obj.parent_mesh.nb_node;
             %--------------------------------------------------------------
             if it > 1
                 %----------------------------------------------------------
@@ -233,7 +234,7 @@ classdef FEM3dTherm < ThModel
                         x0 = x;
                     else
                         erro = 0;
-                        x = x0;
+                        %x = x0;
                     end
                     % ---
                     f_fprintf(0,'e',1,erro,0,'\n');
@@ -241,21 +242,12 @@ classdef FEM3dTherm < ThModel
                     %------------------------------------------------------
                     % --- update now, for assembly
                     %------------------------------------------------------
-                    obj.dof{it}.T.value = zeros(nb_node,1);
-                    obj.dof{it}.T.value(id_node_t) = x;
+                    % ---
+                    obj.dof{it}.T.value = zeros(obj.parent_mesh.nb_node,1);
+                    obj.dof{it}.T.value(obj.matrix.id_node_t) = x;
                     %------------------------------------------------------
                 end
             end
         end
-    end
-    % --- Methods/protected
-    methods (Access = protected)
-        % -----------------------------------------------------------------
-        % -----------------------------------------------------------------
-    end
-    % --- Methods/public
-    methods (Access = private)
-        % -----------------------------------------------------------------
-        % -----------------------------------------------------------------
     end
 end

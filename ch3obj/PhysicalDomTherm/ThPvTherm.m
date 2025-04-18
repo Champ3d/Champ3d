@@ -47,17 +47,18 @@ classdef ThPvTherm < ThPv
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
+            ThPvTherm.setup(obj);
+            % ---
+            % must reset build+assembly
             obj.build_done = 0;
             obj.assembly_done = 0;
-            % ---
-            obj.setup;
         end
     end
 
-    % --- setup
-    methods
+    % --- setup/reset/build/assembly
+    methods (Static)
         function setup(obj)
+            % ---
             if obj.setup_done
                 return
             end
@@ -66,8 +67,19 @@ classdef ThPvTherm < ThPv
             % ---
             obj.setup_done = 1;
             % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
             obj.build_done = 0;
             obj.assembly_done = 0;
+            % ---
+            % must call super reset
+            % ,,, with obj as argument
+            reset@ThPv(obj);
         end
     end
 
@@ -75,7 +87,9 @@ classdef ThPvTherm < ThPv
     methods
         function build(obj)
             % ---
-            obj.setup;
+            ThPvTherm.setup(obj);
+            % ---
+            build@ThPv(obj);
             % ---
             if obj.build_done
                 return
@@ -99,7 +113,6 @@ classdef ThPvTherm < ThPv
             obj.matrix.pv_array = pv_array;
             % ---
             obj.build_done = 1;
-            obj.assembly_done = 0;
         end
     end
 
@@ -108,10 +121,7 @@ classdef ThPvTherm < ThPv
         function assembly(obj)
             % ---
             obj.build;
-            % ---
-            if obj.assembly_done
-                return
-            end
+            assembly@ThPv(obj);
             %--------------------------------------------------------------
             id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
             elem = obj.parent_model.parent_mesh.elem;
@@ -138,22 +148,6 @@ classdef ThPvTherm < ThPv
             obj.parent_model.matrix.id_node_t = ...
                 [obj.parent_model.matrix.id_node_t obj.matrix.gid_node_t];
             %--------------------------------------------------------------
-            obj.assembly_done = 1;
-        end
-    end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
         end
     end
 end

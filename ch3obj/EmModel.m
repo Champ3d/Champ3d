@@ -26,6 +26,11 @@ classdef EmModel < PhysicalModel
         embc
         % ---
     end
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
+    end
     
     % --- Valid args list
     methods (Static)
@@ -44,22 +49,90 @@ classdef EmModel < PhysicalModel
             % ---
             obj@PhysicalModel;
             % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
             obj <= args;
+            % ---
+            EmModel.setup(obj);
+            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+        end
+    end
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            setup@PhysicalModel(obj);
             % ---
             obj.jome = 1j*2*pi*obj.frequency;
             % ---
-            f_initobj(obj,'property_name','field',...
-                     'field_name',{'bv','jv','hv','pv','av','phiv','tv','omev',...
-                     'bs','js','hs','ps','as','phis','ts','omes'}, ...
-                     'init_value',[]);
+            nb_elem = obj.parent_mesh.nb_elem;
+            nb_face = obj.parent_mesh.nb_face;
             % ---
-            if isempty(obj.ltime)
-                obj.ltime = LTime;
-            end
+            obj.field.av = sparse(3,nb_elem);
+            obj.field.bv = sparse(3,nb_elem);
+            obj.field.ev = sparse(3,nb_elem);
+            obj.field.phiv = sparse(3,nb_elem);
+            obj.field.phi = [];
+            obj.field.jv = sparse(3,nb_elem);
+            obj.field.pv = sparse(1,nb_elem);
+            obj.field.js = sparse(2,nb_face);
+            obj.field.ps = sparse(1,nb_face);
+            % ---
+            obj.setup_done = 1;
             % ---
         end
     end
-
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+            % ---
+            % must call super reset
+            % ,,, with obj as argument
+            reset@PhysicalModel(obj);
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            EmModel.setup(obj);
+            % ---
+            build@PhysicalModel(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            obj.build_done = 1;
+            % ---
+        end
+    end
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
+            assembly@PhysicalModel(obj);
+            % ---
+            if obj.assembly_done
+                return
+            end
+            % ---
+            obj.assembly_done = 1;
+            % ---
+        end
+    end
     % --- Methods
     methods
         % -----------------------------------------------------------------
@@ -362,23 +435,5 @@ classdef EmModel < PhysicalModel
             obj.pmagnet.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
-    end
-
-    % --- Methods
-    methods
-        function setup(obj)
-            nb_elem = obj.parent_mesh.nb_elem;
-            nb_face = obj.parent_mesh.nb_face;
-            % ---
-            obj.field.av = sparse(3,nb_elem);
-            obj.field.bv = sparse(3,nb_elem);
-            obj.field.ev = sparse(3,nb_elem);
-            obj.field.phiv = sparse(3,nb_elem);
-            obj.field.phi = [];
-            obj.field.jv = sparse(3,nb_elem);
-            obj.field.pv = sparse(1,nb_elem);
-            obj.field.js = sparse(2,nb_face);
-            obj.field.ps = sparse(1,nb_face);
-        end
     end
 end

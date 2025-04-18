@@ -10,8 +10,8 @@
 
 classdef IsCoilAphi < Xhandle
 
-    % --- computed
     properties (Access = private)
+        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
@@ -20,18 +20,45 @@ classdef IsCoilAphi < Xhandle
     methods
         function obj = IsCoilAphi()
             obj@Xhandle;
+            % ---
+            % call setup in constructor
+            % ,,, for direct verification
+            % ,,, setup must be static
+            IsCoilAphi.setup(obj);
+            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.assembly_done = 0;
         end
     end
-    
-    % --- setup
-    methods
+    % --- setup/reset/build/assembly
+    methods (Static)
         function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+
+            % ---
+            obj.setup_done = 1;
+            % ---
         end
     end
-
-    % --- build
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+        end
+    end
     methods
         function build(obj)
+            % ---
+            IsCoilAphi.setup(obj);
+            % ---
             if obj.build_done
                 return
             end
@@ -40,14 +67,14 @@ classdef IsCoilAphi < Xhandle
             obj.matrix.i_coil = obj.i_coil.get('in_dom',dom);
             % ---
             obj.build_done = 1;
-            obj.assembly_done = 0;
+            % ---
         end
     end
-
-    % --- assembly
     methods
         function assembly(obj)
             % ---
+            % may return to build of subclass obj
+            % ... subclass build must call superclass build
             obj.build;
             % ---
             if obj.assembly_done
@@ -61,21 +88,6 @@ classdef IsCoilAphi < Xhandle
             % ---
             obj.assembly_done = 1;
             % ---
-        end
-    end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
         end
     end
 end

@@ -15,8 +15,8 @@ classdef EconductorAphi < Econductor
         matrix = struct('gid_elem',[],'gid_node_phi',[],'sigmawewe',[],'sigma_array',[])
     end
 
-    % --- computed
     properties (Access = private)
+        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
@@ -45,14 +45,39 @@ classdef EconductorAphi < Econductor
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            EconductorAphi.setup(obj);
+            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.assembly_done = 0;
         end
     end
 
-    % --- setup
-    methods
+    % --- setup/reset/build/assembly
+    methods (Static)
         function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
             setup@Econductor(obj);
+            % ---
+            obj.setup_done = 1;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+            % ---
+            % must call super reset
+            % ,,, with obj as argument
+            reset@Econductor(obj);
         end
     end
 
@@ -60,7 +85,9 @@ classdef EconductorAphi < Econductor
     methods
         function build(obj)
             % ---
-            obj.setup;
+            EconductorAphi.setup(obj);
+            % ---
+            build@Econductor(obj);
             % ---
             if obj.build_done
                 return
@@ -84,7 +111,6 @@ classdef EconductorAphi < Econductor
             obj.matrix.sigma_array = sigma_array;
             % ---
             obj.build_done = 1;
-            obj.assembly_done = 0;
         end
     end
 
@@ -93,6 +119,7 @@ classdef EconductorAphi < Econductor
         function assembly(obj)
             % ---
             obj.build;
+            assembly@Econductor(obj);
             % ---
             if obj.assembly_done
                 return
@@ -172,21 +199,6 @@ classdef EconductorAphi < Econductor
             obj.parent_model.field.pv(:,gid_elem) = ...
                 real(1/2 .* sum(ev .* conj(jv)));
             %--------------------------------------------------------------
-        end
-    end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
         end
     end
 end

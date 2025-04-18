@@ -24,8 +24,8 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
         L0
     end
 
-    % --- computed
     properties (Access = private)
+        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
@@ -53,6 +53,7 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
             % ---
             obj@OpenCoilAphi;
             obj@SolidCoilAphi;
+            obj@IsCoilAphi;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -60,15 +61,25 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            SolidOpenIsCoilAphi.setup(obj);
+            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.assembly_done = 0;
         end
     end
 
-    % --- setup
-    methods
+    % --- setup/reset/build/assembly
+    methods (Static)
         function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
             setup@OpenCoilAphi(obj);
             setup@SolidCoilAphi(obj);
+            setup@IsCoilAphi(obj);
             % --- update by-default coil mode
             if isempty(obj.i_coil)
                 obj.coil_mode = 'rx';
@@ -78,44 +89,40 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
                 end
             end
             % ---
+            obj.setup_done = 1;
+            % ---
         end
     end
-
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+            % ---
+            % must call super reset
+            % ,,, with obj as argument
+            reset@OpenCoilAphi(obj);
+            reset@SolidCoilAphi(obj);
+            reset@IsCoilAphi(obj);
+        end
+    end
     % --- build
     methods
         function build(obj)
             % ---
-            obj.setup;
+            SolidOpenIsCoilAphi.setup(obj);
+            % ---
+            build@OpenCoilAphi(obj);
+            build@SolidCoilAphi(obj);
+            build@IsCoilAphi(obj);
             % ---
             if obj.build_done
                 return
             end
             % ---
-            build@OpenCoilAphi(obj);
-            build@IsCoilAphi(obj);
-            % ---
             obj.build_done = 1;
         end
     end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
-            % ---
-            reset@OpenCoilAphi(obj);
-            reset@SolidCoilAphi(obj);
-            reset@IsCoilAphi(obj);
-            % ---
-        end
-    end
-
 end

@@ -15,8 +15,8 @@ classdef OpenCoilAphi < OpenCoil
         matrix
     end
 
-    % --- computed
     properties (Access = private)
+        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
@@ -45,31 +45,56 @@ classdef OpenCoilAphi < OpenCoil
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            OpenCoilAphi.setup(obj);
+            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.assembly_done = 0;
         end
     end
 
-    % --- setup
-    methods
+    % --- setup/reset/build/assembly
+    methods (Static)
         function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
             setup@OpenCoil(obj);
+            % ---
+            obj.setup_done = 1;
+            % ---
         end
     end
-
-    % --- build
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+            % ---
+            % must call super reset
+            % ,,, with obj as argument
+            reset@OpenCoil(obj);
+        end
+    end
     methods
         function build(obj)
             % ---
-            obj.setup;
+            OpenCoilAphi.setup(obj);
+            % ---
+            build@OpenCoil(obj);
             % ---
             if obj.build_done
                 return
             end
             % ---
             parent_mesh = obj.dom.parent_mesh;
-            parent_mesh.build_meshds;
-            parent_mesh.build_discrete;
-            parent_mesh.build_intkit;
+            %parent_mesh.build_meshds;
+            %parent_mesh.build_discrete;
+            %parent_mesh.build_intkit;
             % --- current field
             unit_current_field = sparse(3,parent_mesh.nb_elem);
             % ---
@@ -130,7 +155,20 @@ classdef OpenCoilAphi < OpenCoil
             obj.build_done = 1;
         end
     end
-
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
+            assembly@OpenCoil(obj);
+            % ---
+            if obj.assembly_done
+                return
+            end
+            % ---
+            obj.assembly_done = 1;
+            % ---
+        end
+    end
     % --- Methods
     methods
         function plot(obj,args)
@@ -153,20 +191,4 @@ classdef OpenCoilAphi < OpenCoil
             end
         end
     end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
-        end
-    end
-
 end

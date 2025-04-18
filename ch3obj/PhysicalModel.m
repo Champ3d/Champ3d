@@ -9,12 +9,23 @@
 %--------------------------------------------------------------------------
 
 classdef PhysicalModel < Xhandle
+    % --- computed
     properties
-        ltime
-        moving_frame
         matrix
         field
         dof
+    end
+    % --- subfields to build
+    properties
+        parent_mesh
+        ltime
+        moving_frame
+    end
+    % ---
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
     end
     
     % --- Valid args list
@@ -29,14 +40,63 @@ classdef PhysicalModel < Xhandle
             % ---
             obj@Xhandle;
             % ---
-            obj.ltime = LTime;
+            % call setup in constructor
+            % ,,, for direct verification
+            % ,,, setup must be static
+            PhysicalModel.setup(obj);
+            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.assembly_done = 0;
         end
     end
-    % --- Methods
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            obj.ltime = LTime;
+            % ---
+            obj.setup_done = 1;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+        end
+    end
     methods
-        function solve_all(obj)
-            timemodel = TimeVaryingModel(obj);
-            timemodel.solve;
+        function build(obj)
+            % ---
+            PhysicalModel.setup(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            obj.parent_mesh.build_meshds;
+            obj.parent_mesh.build_discrete;
+            obj.parent_mesh.build_intkit;
+            % ---
+            obj.build_done = 1;
+            % ---
+        end
+    end
+    methods
+        function assembly(obj)
+            % ---
+            % may return to build of subclass obj
+            % ... subclass build must call superclass build
+            obj.build;
+            % ---
         end
     end
 end

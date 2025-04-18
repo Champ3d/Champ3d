@@ -9,7 +9,11 @@
 %--------------------------------------------------------------------------
 
 classdef FEM3dAphi < EmModel
-    
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
+    end
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -31,17 +35,74 @@ classdef FEM3dAphi < EmModel
             end
             % ---
             obj <= args;
+            % ---
+            FEM3dAphi.setup(obj);
+            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.assembly_done = 0;
         end
     end
-    
-    % --- Methods/public
-    methods (Access = public)
-
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            setup@EmModel(obj);
+            % ---
+            obj.setup_done = 1;
+            % ---
+        end
     end
-    % --- Methods/protected
-    methods (Access = protected)
-        % -----------------------------------------------------------------
-        
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+            % ---
+            % must call super reset
+            % ,,, with obj as argument
+            reset@EmModel(obj);
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            FEM3dAphi.setup(obj);
+            % ---
+            build@EmModel(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            obj.build_base_matrix;
+            % ---
+            obj.build_done = 1;
+            % ---
+        end
+    end
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
+            assembly@EmModel(obj);
+            % ---
+            if obj.assembly_done
+                return
+            end
+            % ---
+            obj.assembly_done = 1;
+            % ---
+        end
+    end
+    % --- Methods/private
+    methods (Access = private)
         % -----------------------------------------------------------------
         function build_base_matrix(obj)
             %--------------------------------------------------------------
@@ -318,16 +379,6 @@ classdef FEM3dAphi < EmModel
             obj.matrix.wewfx = wewfx; clear wewfx
             %--------------------------------------------------------------
         end
-        % -----------------------------------------------------------------
-    end
-    % --- Methods/protected
-    methods (Access = protected)
-        % -----------------------------------------------------------------
-        % -----------------------------------------------------------------
-    end
-    % --- Methods/public
-    methods (Access = private)
-        % -----------------------------------------------------------------
         % -----------------------------------------------------------------
     end
 end

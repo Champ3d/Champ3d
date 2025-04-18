@@ -11,20 +11,22 @@
 classdef PhysicalDom < Xhandle
 
     % --- entry
-    properties (SetObservable)
+    properties
         parent_model
         id_dom2d
         id_dom3d
     end
 
     % --- computed
-    properties (SetObservable)
+    properties
         dom
     end
 
     % ---
-    properties(Access = private, Hidden)
-
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
     end
     % ---
     
@@ -57,13 +59,24 @@ classdef PhysicalDom < Xhandle
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            % call setup in constructor
+            % ,,, for direct verification
+            % ,,, setup must be static
+            PhysicalDom.setup(obj);
+            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.assembly_done = 0;
         end
     end
     
-    % --- Methods
-    methods
+    % --- setup/reset/build/assembly
+    methods (Static)
         function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
             % ---
             obj.get_geodom;
             % ---
@@ -81,6 +94,41 @@ classdef PhysicalDom < Xhandle
                     end
                 end
             end
+            % ---
+            obj.setup_done = 1;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            PhysicalDom.setup(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            obj.callsubfieldbuild('field_name','dom');
+            % ---
+            obj.build_done = 1;
+            % ---
+        end
+    end
+    methods
+        function assembly(obj)
+            % ---
+            % may return to build of subclass obj
+            % ... subclass build must call superclass build
+            obj.build;
             % ---
         end
     end
@@ -123,6 +171,8 @@ classdef PhysicalDom < Xhandle
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
             end
+            % ---
+            obj.build;
             % ---
             argu = f_to_namedarg(args);
             obj.dom.plot(argu{:});

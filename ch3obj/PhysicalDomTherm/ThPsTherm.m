@@ -47,17 +47,18 @@ classdef ThPsTherm < ThPs
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
+            ThPsTherm.setup(obj);
+            % ---
+            % must reset build+assembly
             obj.build_done = 0;
             obj.assembly_done = 0;
-            % ---
-            obj.setup;
         end
     end
 
-    % --- setup
-    methods
+    % --- setup/reset/build/assembly
+    methods (Static)
         function setup(obj)
+            % ---
             if obj.setup_done
                 return
             end
@@ -66,8 +67,19 @@ classdef ThPsTherm < ThPs
             % ---
             obj.setup_done = 1;
             % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
             obj.build_done = 0;
             obj.assembly_done = 0;
+            % ---
+            % must call super reset
+            % ,,, with obj as argument
+            reset@ThPs(obj);
         end
     end
 
@@ -75,7 +87,9 @@ classdef ThPsTherm < ThPs
     methods
         function build(obj)
             % ---
-            obj.setup;
+            ThPsTherm.setup(obj);
+            % ---
+            build@ThPs(obj);
             % ---
             if obj.build_done
                 return
@@ -111,7 +125,6 @@ classdef ThPsTherm < ThPs
             obj.matrix.ps_array = ps_array;
             % ---
             obj.build_done = 1;
-            obj.assembly_done = 0;
         end
     end
 
@@ -120,10 +133,7 @@ classdef ThPsTherm < ThPs
         function assembly(obj)
             % ---
             obj.build;
-            % ---
-            if obj.assembly_done
-                return
-            end
+            assembly@ThPs(obj);
             %--------------------------------------------------------------
             face = obj.parent_model.parent_mesh.face;
             nb_node = obj.parent_model.parent_mesh.nb_node;
@@ -148,22 +158,6 @@ classdef ThPsTherm < ThPs
             obj.parent_model.matrix.id_node_t = ...
                 [obj.parent_model.matrix.id_node_t obj.matrix.gid_node_t];
             %--------------------------------------------------------------
-            obj.assembly_done = 1;
-        end
-    end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
         end
     end
 end

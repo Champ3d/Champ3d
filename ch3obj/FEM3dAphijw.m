@@ -9,12 +9,11 @@
 %--------------------------------------------------------------------------
 
 classdef FEM3dAphijw < FEM3dAphi
-    properties
+    properties (Access = private)
+        setup_done = 0
         build_done = 0
         assembly_done = 0
-        solve_done = 0
     end
-
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -37,27 +36,53 @@ classdef FEM3dAphijw < FEM3dAphi
             % ---
             obj <= args;
             % ---
+            FEM3dAphijw.setup(obj);
+            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.assembly_done = 0;
         end
     end
-
-    % --- Methods/public
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            setup@FEM3dAphi(obj);
+            % ---
+            obj.setup_done = 1;
+            % ---
+        end
+    end
     methods (Access = public)
-        % -----------------------------------------------------------------
+        function reset(obj)
+            % ---
+            % must reset setup+build+assembly
+            obj.setup_done = 0;
+            obj.build_done = 0;
+            obj.assembly_done = 0;
+            % ---
+            % must call super reset
+            % ,,, with obj as argument
+            reset@FEM3dAphi(obj);
+        end
+    end
+    methods
         function build(obj)
-            %--------------------------------------------------------------
+            % ---
+            FEM3dAphijw.setup(obj);
+            % ---
+            build@FEM3dAphi(obj);
+            % ---
             if obj.build_done
                 return
             end
             %--------------------------------------------------------------
             tic;
             f_fprintf(0,'Build',1,class(obj),0,'\n');
-            f_fprintf(0,'   ');
-            % ---
-            parent_mesh = obj.parent_mesh;
-            % ---
-            parent_mesh.build_meshds;
-            parent_mesh.build_discrete;
-            parent_mesh.build_intkit;
             %--------------------------------------------------------------
             if isempty(obj.airbox)
                 if ~isfield(obj.parent_mesh.dom,'default_domain')
@@ -69,45 +94,24 @@ classdef FEM3dAphijw < FEM3dAphi
             allowed_physical_dom = {'econductor','mconductor','airbox','sibc',...
                 'bsfield','coil','nomesh','pmagnet','embc'};
             %--------------------------------------------------------------
-            for i = 1:length(allowed_physical_dom)
-                phydom_type = allowed_physical_dom{i};
-                % ---
-                if isprop(obj,phydom_type)
-                    if isempty(obj.(phydom_type))
-                        continue
-                    end
-                else
-                    continue
-                end
-                % ---
-                allphydomid = fieldnames(obj.(phydom_type));
-                for j = 1:length(allphydomid)
-                    id_phydom = allphydomid{j};
-                    % ---
-                    f_fprintf(0,['Build #' phydom_type],1,id_phydom,0,'\n');
-                    % ---
-                    phydom = obj.(phydom_type).(id_phydom);
-                    % ---
-                    phydom.reset;
-                    phydom.build;
-                end
-            end
+            obj.callsubfieldbuild('field_name',allowed_physical_dom);
             %--------------------------------------------------------------
             obj.build_done = 1;
-            %--------------------------------------------------------------
+            % ---
         end
-        % -----------------------------------------------------------------
+    end
+    methods
         function assembly(obj)
-            %--------------------------------------------------------------
-            tic;
-            f_fprintf(0,'Assembly',1,class(obj),0,'\n');
-            %--------------------------------------------------------------
+            % ---
             obj.build;
-            obj.build_base_matrix;
-            %--------------------------------------------------------------
+            assembly@FEM3dAphi(obj);
+            % ---
             if obj.assembly_done
                 return
             end
+            %--------------------------------------------------------------
+            tic;
+            f_fprintf(0,'Assembly',1,class(obj),0,'\n');
             %--------------------------------------------------------------
             parent_mesh = obj.parent_mesh;
             nb_elem = parent_mesh.nb_elem;
@@ -129,28 +133,7 @@ classdef FEM3dAphijw < FEM3dAphi
             allowed_physical_dom = {'econductor','mconductor','airbox','sibc',...
                 'bsfield','coil','nomesh','pmagnet','embc'};
             %--------------------------------------------------------------
-            for i = 1:length(allowed_physical_dom)
-                phydom_type = allowed_physical_dom{i};
-                % ---
-                if isprop(obj,phydom_type)
-                    if isempty(obj.(phydom_type))
-                        continue
-                    end
-                else
-                    continue
-                end
-                % ---
-                allphydomid = fieldnames(obj.(phydom_type));
-                for j = 1:length(allphydomid)
-                    id_phydom = allphydomid{j};
-                    phydom = obj.(phydom_type).(id_phydom);
-                    % ---
-                    f_fprintf(0,['Assembly #' phydom_type],1,id_phydom,0,'\n');
-                    % ---
-                    phydom.reset;
-                    phydom.assembly;
-                end
-            end
+            obj.callsubfieldassembly('field_name',allowed_physical_dom);
             %--------------------------------------------------------------
             id_edge_in_face = parent_mesh.meshds.id_edge_in_face;
             id_face_in_elem = parent_mesh.meshds.id_face_in_elem;
@@ -267,7 +250,11 @@ classdef FEM3dAphijw < FEM3dAphi
             obj.matrix.RHS = RHS; clear RHS;
             %--------------------------------------------------------------
             obj.assembly_done = 1;
+            % ---
         end
+    end
+    % --- Methods/public
+    methods (Access = public)
         % -----------------------------------------------------------------
         function solve(obj)
             %--------------------------------------------------------------
@@ -397,15 +384,5 @@ classdef FEM3dAphijw < FEM3dAphi
             f_fprintf(0,'\n');
             %--------------------------------------------------------------------------
         end
-    end
-    % --- Methods/protected
-    methods (Access = protected)
-        % -----------------------------------------------------------------
-        % -----------------------------------------------------------------
-    end
-    % --- Methods/private
-    methods (Access = private)
-        % -----------------------------------------------------------------
-        % -----------------------------------------------------------------
     end
 end
