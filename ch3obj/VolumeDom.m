@@ -432,6 +432,9 @@ classdef VolumeDom < Xhandle
 
     % --- Methods
     methods
+        % XTODO
+        % take care of passing dependent_obj, defining_obj
+        % must call reset
         function objy = plus(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
             objy.gid_elem = [f_torowv(obj.gid_elem) f_torowv(objx.gid_elem)];

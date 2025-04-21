@@ -52,6 +52,94 @@ classdef Xhandle < matlab.mixin.Copyable
     %----------------------------------------------------------------------
     % setup/build/assembly scheme
     methods
+        function is_defining_obj_of(obj,dependent_obj)
+            % ---
+            if isobject(dependent_obj)
+                if isprop(dependent_obj,'defining_obj')
+                    len = length(dependent_obj.defining_obj);
+                    dependent_obj.defining_obj{len+1} = obj;
+                    % ---
+                    dependent_obj.defining_obj = f_unique(dependent_obj.defining_obj);
+                end
+            end
+            % ---
+            if isprop(obj,'dependent_obj')
+                len = length(obj.dependent_obj);
+                if isobject(dependent_obj)
+                    obj.dependent_obj{len+1} = dependent_obj;
+                    % ---
+                    obj.dependent_obj = f_unique(obj.dependent_obj);
+                end
+            end
+        end
+        % ---
+        function depend_on_obj(obj,defining_obj)
+            % ---
+            if isobject(defining_obj)
+                if isprop(defining_obj,'dependent_obj')
+                    len = length(defining_obj.dependent_obj);
+                    defining_obj.dependent_obj{len+1} = obj;
+                    % ---
+                    defining_obj.dependent_obj = f_unique(defining_obj.dependent_obj);
+                end
+            end
+            % ---
+            if isprop(obj,'defining_obj')
+                len = length(obj.defining_obj);
+                if isobject(defining_obj)
+                    obj.defining_obj{len+1} = defining_obj;
+                    % ---
+                    obj.defining_obj = f_unique(obj.defining_obj);
+                end
+            end
+        end
+        % ---
+        function reset_dependent_obj(obj)
+            if isprop(obj,'dependent_obj')
+                len = length(obj.dependent_obj);
+                for i = 1:len
+                    depobj = obj.dependent_obj{i};
+                    if isobject(depobj)
+                        if ismethod(depobj,'reset')
+                            depobj.reset;
+                        end
+                    end
+                end
+            end
+        end
+        % ---
+        function build_defining_obj(obj)
+            if isprop(obj,'defining_obj')
+                len = length(obj.defining_obj);
+                for i = 1:len
+                    defobj = obj.defining_obj{i};
+                    if isobject(defobj)
+                        if ismethod(defobj,'build')
+                            defobj.build;
+                        end
+                    end
+                end
+            end
+        end
+        % ---
+        function assembly_defining_obj(obj)
+            if isprop(obj,'defining_obj')
+                len = length(obj.defining_obj);
+                for i = 1:len
+                    defobj = obj.defining_obj{i};
+                    if isobject(defobj)
+                        if ismethod(defobj,'assembly')
+                            defobj.assembly;
+                        end
+                    end
+                end
+            end
+        end
+        % ---
+    end
+    %----------------------------------------------------------------------
+    % setup/build/assembly scheme
+    methods
         function callsubfieldbuild(obj,args)
             arguments
                 obj
