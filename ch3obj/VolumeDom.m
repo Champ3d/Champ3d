@@ -126,7 +126,6 @@ classdef VolumeDom < Xhandle
             %     return
             % end
             % --- need parent_mesh
-            % obj.parent_mesh.build;
             node = obj.parent_mesh.node;
             elem = obj.parent_mesh.elem(:,obj.gid_elem);
             % -------------------------------------------------------------

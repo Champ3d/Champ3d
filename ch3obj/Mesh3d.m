@@ -9,21 +9,19 @@
 %--------------------------------------------------------------------------
 
 classdef Mesh3d < Mesh
+
     properties (Access = private)
         setup_done = 0
         build_done = 0
-        assembly_done = 0
     end
+
     % --- Constructors
     methods
         function obj = Mesh3d()
-            obj@Mesh;
+            obj = obj@Mesh;
             % ---
             Mesh3d.setup(obj);
             % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
     % --- setup/reset/build/assembly
@@ -37,27 +35,26 @@ classdef Mesh3d < Mesh
             setup@Mesh(obj);
             % ---
             obj.setup_done = 1;
+            obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % ---
-            % must reset setup+build+assembly
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
-            % must call super reset
-            % ,,, with obj as argument
+            % reset super
             reset@Mesh(obj);
+            % ---
+            obj.setup_done = 0;
+            Mesh3d.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
         end
     end
     methods
         function build(obj)
             % ---
             Mesh3d.setup(obj);
-            % ---
+            % --- call super
             build@Mesh(obj);
             % ---
             if obj.build_done
@@ -68,14 +65,7 @@ classdef Mesh3d < Mesh
             % ---
         end
     end
-    methods
-        function assembly(obj)
-            % ---
-            obj.build;
-            assembly@Mesh(obj);
-            % ---
-        end
-    end
+
     % --- Methods - Add dom
     methods
         % ---
@@ -99,12 +89,14 @@ classdef Mesh3d < Mesh
             % ---
             if isempty(args.id_dom3d) && isempty(args.cut_equation)
                 argu = f_to_namedarg(args,'for','VolumeDom3d');
-                vdom = VolumeDom3d(argu{:});
+                dom = VolumeDom3d(argu{:});
             else
                 argu = f_to_namedarg(args,'for','CutVolumeDom3d');
-                vdom = CutVolumeDom3d(argu{:});
+                dom = CutVolumeDom3d(argu{:});
             end
-            obj.dom.(args.id) = vdom;
+            obj.dom.(args.id) = dom;
+            % ---
+            obj.is_defining_obj_of(dom);
             % ---
         end
         % -----------------------------------------------------------------
@@ -125,8 +117,10 @@ classdef Mesh3d < Mesh
             args.parent_mesh = obj;
             % ---
             argu = f_to_namedarg(args,'for','SurfaceDom3d');
-            sdom = SurfaceDom3d(argu{:});
-            obj.dom.(args.id) = sdom;
+            dom = SurfaceDom3d(argu{:});
+            obj.dom.(args.id) = dom;
+            % ---
+            obj.is_defining_obj_of(dom);
             % ---
         end
     end

@@ -23,10 +23,19 @@ classdef SurfaceDom < Xhandle
         parent_mesh
     end
 
+    % --- subfields to build
+    properties
+        building_formular
+    end
+
     properties (Access = private)
         setup_done = 0
         build_done = 0
-        assembly_done = 0
+    end
+
+    properties
+        dependent_obj = []
+        defining_obj = []
     end
 
     % --- Dependent Properties
@@ -51,19 +60,16 @@ classdef SurfaceDom < Xhandle
                 args.condition = []
             end
             % ---
+            obj = obj@Xhandle;
+            % ---
             if isempty(fieldnames(args))
                 return
             end
             % ---
             obj <= args;
-            % call setup in constructor
-            % ,,, for direct verification
-            % ,,, setup must be static
+            % ---
             SurfaceDom.setup(obj);
             % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
     % --- setup/reset/build/assembly
@@ -73,22 +79,36 @@ classdef SurfaceDom < Xhandle
             if obj.setup_done
                 return
             end
+            % --- XTODO : which come first
+            % build_from_boundface
+            % build_from_interface
+            % build_from_gid_face
+            % if ~isempty(obj.gid_face)
+            %     obj.build_from_gid_face;
+            % end
             % ---
-            if ~isempty(obj.gid_face)
-                obj.build_from_gid_face;
+            if ~isempty(obj.building_formular)
+                if ~isempty(obj.building_formular.arg1) && ...
+                   ~isempty(obj.building_formular.arg2) && ...
+                   ~isempty(obj.building_formular.operation)
+                    obj.build_from_formular;
+                end
             end
             % ---
+            fprintf('SurfaceDom setup \n')
+            % ---
             obj.setup_done = 1;
+            obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
             % ---
-            % must reset setup+build+assembly
             obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
+            SurfaceDom.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
         end
     end
     methods
@@ -100,34 +120,25 @@ classdef SurfaceDom < Xhandle
                 return
             end
             % ---
-            %obj.callsubfieldbuild('field_name','parent_mesh');
+            obj.build_defining_obj;
             % ---
             obj.build_done = 1;
             % ---
         end
     end
-    methods
-        function assembly(obj)
-            % ---
-            % may return to build of subclass obj
-            % ... subclass build must call superclass build
-            obj.build;
-            % ---
-        end
-    end
+
     % --- Methods
     methods
         function allmeshes = build_submesh(obj)
             % ---
-            if ~isempty(obj.submesh)
-                allmeshes = obj.submesh;
-                for i = 1:length(allmeshes)
-                    allmeshes{i}.node = obj.parent_mesh.node;
-                end
-                return
-            end
+            % if ~isempty(obj.submesh)
+            %     allmeshes = obj.submesh;
+            %     for i = 1:length(allmeshes)
+            %         allmeshes{i}.node = obj.parent_mesh.node;
+            %     end
+            %     return
+            % end
             % --- need parent_mesh
-            obj.parent_mesh.build;
             node = obj.parent_mesh.node;
             face = obj.parent_mesh.face(:,obj.gid_face);
             % ---
@@ -161,7 +172,7 @@ classdef SurfaceDom < Xhandle
     end
 
     % --- Methods
-    methods (Access = protected, Hidden)
+    methods (Access = protected)
         % -----------------------------------------------------------------
         function build_from_gid_face(obj)
             % ---
@@ -183,6 +194,41 @@ classdef SurfaceDom < Xhandle
             % -------------------------------------------------------------
             obj.gid_face = unique(gid_face_);
             % -------------------------------------------------------------
+        end
+        % -----------------------------------------------------------------
+        function build_from_formular(obj)
+            % ---
+            building_formular_ = obj.building_formular;
+            % ---
+            resobj = [];
+            for i = 1:length(obj.building_formular.operation)
+                dom1 = obj.building_formular.arg1{i};
+                dom2 = obj.building_formular.arg2{i};
+                oper = obj.building_formular.operation{i};
+                if i == 1
+                    switch oper
+                        case '+'
+                            resobj = (dom1 + dom2);
+                        case '-'
+                            resobj = (dom1 - dom2);
+                        case '^'
+                            resobj = (dom1 ^ dom2);
+                    end
+                elseif i > 1
+                    switch oper
+                        case '+'
+                            resobj = resobj + (dom1 + dom2);
+                        case '-'
+                            resobj = resobj + (dom1 - dom2);
+                        case '^'
+                            resobj = resobj + (dom1 ^ dom2);
+                    end
+                end
+            end
+            % ---
+            obj = resobj;
+            obj.building_formular = building_formular_;
+            % ---
         end
         % -----------------------------------------------------------------
     end
@@ -215,7 +261,22 @@ classdef SurfaceDom < Xhandle
             objy.gid_face = [f_torowv(obj.gid_face) f_torowv(objx.gid_face)];
             objy.build_from_gid_face;
             % ---
-            obj.transfer_dep_def(objx,objy);
+            %obj.transfer_dep_def(objx,objy);
+            % ---
+            obj.is_defining_obj_of(objy);
+            objx.is_defining_obj_of(objy);
+            % ---
+            if isfield(objy.building_formular,'operation')
+                len = length(objy.building_formular.operation);
+            else
+                objy.building_formular.arg1 = [];
+                objy.building_formular.arg2 = [];
+                objy.building_formular.operation = [];
+                len = 0;
+            end
+            objy.building_formular.arg1{len+1} = obj;
+            objy.building_formular.arg2{len+1} = objx;
+            objy.building_formular.operation{len+1} = '+';
             % ---
         end
         function objy = minus(obj,objx)
@@ -223,7 +284,22 @@ classdef SurfaceDom < Xhandle
             objy.gid_face = setdiff(f_torowv(obj.gid_face),f_torowv(objx.gid_face));
             objy.build_from_gid_face;
             % ---
-            obj.transfer_dep_def(objx,objy);
+            %obj.transfer_dep_def(objx,objy);
+            % ---
+            obj.is_defining_obj_of(objy);
+            objx.is_defining_obj_of(objy);
+            % ---
+            if isfield(objy.building_formular,'operation')
+                len = length(objy.building_formular.operation);
+            else
+                objy.building_formular.arg1 = [];
+                objy.building_formular.arg2 = [];
+                objy.building_formular.operation = [];
+                len = 0;
+            end
+            objy.building_formular.arg1{len+1} = obj;
+            objy.building_formular.arg2{len+1} = objx;
+            objy.building_formular.operation{len+1} = '-';
             % ---
         end
         function objy = mpower(obj,objx)
@@ -231,7 +307,22 @@ classdef SurfaceDom < Xhandle
             objy.gid_face = intersect(f_torowv(obj.gid_face),f_torowv(objx.gid_face));
             objy.build_from_gid_face;
             % ---
-            obj.transfer_dep_def(objx,objy);
+            %obj.transfer_dep_def(objx,objy);
+            % ---
+            obj.is_defining_obj_of(objy);
+            objx.is_defining_obj_of(objy);
+            % ---
+            if isfield(objy.building_formular,'operation')
+                len = length(objy.building_formular.operation);
+            else
+                objy.building_formular.arg1 = [];
+                objy.building_formular.arg2 = [];
+                objy.building_formular.operation = [];
+                len = 0;
+            end
+            objy.building_formular.arg1{len+1} = obj;
+            objy.building_formular.arg2{len+1} = objx;
+            objy.building_formular.operation{len+1} = '^';
             % ---
         end
     end
