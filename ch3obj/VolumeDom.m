@@ -97,7 +97,7 @@ classdef VolumeDom < Xhandle
             obj.setup_done = 0;
             VolumeDom.setup(obj);
             % --- reset dependent obj
-            obj.reset_dependent_obj;
+            % obj.reset_dependent_obj;
         end
     end
     methods

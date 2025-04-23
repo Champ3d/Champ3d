@@ -95,8 +95,6 @@ classdef SurfaceDom < Xhandle
                 end
             end
             % ---
-            fprintf('SurfaceDom setup \n')
-            % ---
             obj.setup_done = 1;
             obj.build_done = 0;
             % ---
@@ -108,7 +106,7 @@ classdef SurfaceDom < Xhandle
             obj.setup_done = 0;
             SurfaceDom.setup(obj);
             % --- reset dependent obj
-            obj.reset_dependent_obj;
+            % obj.reset_dependent_obj;
         end
     end
     methods
