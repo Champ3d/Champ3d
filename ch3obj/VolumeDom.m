@@ -319,7 +319,7 @@ classdef VolumeDom < Xhandle
     end
 
     % --- Methods
-    methods (Access = protected, Hidden)
+    methods (Access = protected)
         % -----------------------------------------------------------------
         function build_from_elem_code(obj)
             % ---

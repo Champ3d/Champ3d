@@ -48,7 +48,7 @@ classdef Mesh2d < Mesh
             obj.setup_done = 0;
             Mesh2d.setup(obj);
             % --- reset dependent objs
-            obj.reset_dependent_obj;
+            % obj.reset_dependent_obj;
         end
     end
     
