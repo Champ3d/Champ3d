@@ -116,7 +116,7 @@ classdef VolumeDom2d < VolumeDom
                         % ---
                         xlineobj = obj.parent_mesh.parent_mesh.dom.(valid_idx{m});
                         % ---
-                        xlineobj.is_defining_obj_of(obj);
+                        % xlineobj.is_defining_obj_of(obj);
                         % ---
                         codeidx = xlineobj.elem_code;
                         % ---
@@ -128,7 +128,7 @@ classdef VolumeDom2d < VolumeDom
                                 % ---
                                 ylineobj = obj.parent_mesh.parent_mesh.dom.(valid_idy{l});
                                 % ---
-                                ylineobj.is_defining_obj_of(obj);
+                                % ylineobj.is_defining_obj_of(obj);
                                 % ---
                                 codeidy = ylineobj.elem_code;
                                 % ---

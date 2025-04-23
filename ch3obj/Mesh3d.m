@@ -120,7 +120,7 @@ classdef Mesh3d < Mesh
             dom = SurfaceDom3d(argu{:});
             obj.dom.(args.id) = dom;
             % ---
-            obj.is_defining_obj_of(dom);
+            % obj.is_defining_obj_of(dom);
             % ---
         end
     end

@@ -147,7 +147,7 @@ classdef VolumeDom3d < VolumeDom
                                 for l = 1:length(valid_idz)
                                     % ---
                                     zline = obj.parent_mesh.parent_mesh1d.dom.(valid_idz{l});
-                                    zline.is_defining_obj_of(obj);
+                                    % zline.is_defining_obj_of(obj);
                                     % ---
                                     codeidz = zline.elem_code;
                                     % ---

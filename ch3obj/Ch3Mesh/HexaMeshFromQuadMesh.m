@@ -82,8 +82,10 @@ classdef HexaMeshFromQuadMesh < HexMesh
                 end
             end
             % ---
-            obj.parent_mesh1d.is_defining_obj_of(obj);
             obj.parent_mesh2d.is_defining_obj_of(obj);
+            if obj.parent_mesh2d.parent_mesh ~= obj.parent_mesh1d
+                obj.parent_mesh1d.is_defining_obj_of(obj);
+            end
             %--------------------------------------------------------------
             obj.id_zline = f_to_scellargin(obj.id_zline);
             % ---
@@ -96,7 +98,7 @@ classdef HexaMeshFromQuadMesh < HexMesh
                 for j = 1:length(valid_id)
                     % ---
                     dom1d = obj.parent_mesh1d.dom.(valid_id{j});
-                    dom1d.is_defining_obj_of(obj);
+                    % dom1d.is_defining_obj_of(obj);
                     % ---
                     zline = [zline dom1d];
                 end

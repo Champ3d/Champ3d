@@ -198,11 +198,6 @@ classdef SurfaceDom < Xhandle
         % -----------------------------------------------------------------
         function build_from_formular(obj)
             % ---
-            building_formular_ = obj.building_formular;
-            defining_obj_ = obj.defining_obj;
-            dependent_obj_ = obj.dependent_obj;
-            % ---
-            %resobj = [];
             gid_face_ = [];
             for i = 1:length(obj.building_formular.operation)
                 dom1 = obj.building_formular.arg1{i};
@@ -215,29 +210,19 @@ classdef SurfaceDom < Xhandle
                         case '-'
                             gid_face_ = f_unique(setdiff(f_torowv(dom1.gid_face),f_torowv(dom2.gid_face)).');
                         case '^'
-                            gid_face_ = f_unique(intersect(f_torowv(obj.gid_face),f_torowv(objx.gid_face)).');
+                            gid_face_ = f_unique(intersect(f_torowv(dom1.gid_face),f_torowv(dom2.gid_face)).');
                     end
                 elseif i > 1
                     switch oper
                         case '+'
-                            resobj = resobj + (dom1 + dom2);
+                            
                         case '-'
-                            resobj = resobj + (dom1 - dom2);
+                            
                         case '^'
-                            resobj = resobj + (dom1 ^ dom2);
+                            
                     end
                 end
             end
-            % ---
-            %obj = resobj;
-            % obj.building_formular = building_formular_;
-            % ---
-            % for i = 1:length(defining_obj_)
-            %     defining_obj_{i}.is_defining_obj_of(obj);
-            % end
-            % for i = 1:length(dependent_obj_)
-            %     obj.is_defining_obj_of(dependent_obj_{i});
-            % end
             % ---
             obj.gid_face = gid_face_;
             obj.build_from_gid_face;
