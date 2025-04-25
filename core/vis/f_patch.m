@@ -49,6 +49,10 @@ for i = 1:length(fs)
         msh.FaceColor = face_color;
         msh.EdgeColor = edge_color;
         %------------------------------------------------------------------
+        id_node = f_uniquenode(elem);
+        maxfs = max(fs{i}(id_node));
+        minfs = min(fs{i}(id_node));
+        %------------------------------------------------------------------
         if numel(fs{i}) == size(elem,2)
             id_tria = find(elem(4,:) == 0);
             id_quad = setdiff(1:size(elem,2),id_tria);
@@ -73,7 +77,10 @@ for i = 1:length(fs)
             patch(msh); hold on
         end
         % ---
-        axis equal; axis tight; f_colormap; hold on
+        if maxfs > minfs
+            caxis([minfs maxfs]);
+        end
+        axis equal; axis tight; f_colormap;
         %------------------------------------------------------------------
         f_chlogo;
     else

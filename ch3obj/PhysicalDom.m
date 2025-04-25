@@ -267,8 +267,11 @@ classdef PhysicalDom < Xhandle
             if isa(obj.dom,'SurfaceDom3d')
                 node = obj.parent_model.parent_mesh.node;
                 face = obj.parent_model.parent_mesh.face(:,obj.dom.gid_face);
-                fs = obj.parent_model.field.(args.field_name);
-                fs = fs(obj.dom.gid_face);
+                % ---
+                it = obj.parent_model.ltime.it;
+                fs = obj.parent_model.field{it}.(args.field_name).node.value;
+                %fs = fs(obj.dom.gid_face);
+                % ---
                 f_patch(node,face,'defined_on','face','scalar_field',fs);
             end
         end
