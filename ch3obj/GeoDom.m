@@ -55,7 +55,6 @@ classdef GeoDom < Xhandle
                 val.zcen = 0;
             end
             % ---
-            fprintf('get geoextension \n');
         end
     end
 end
