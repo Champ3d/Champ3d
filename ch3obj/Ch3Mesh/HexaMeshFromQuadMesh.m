@@ -9,14 +9,11 @@
 %--------------------------------------------------------------------------
 
 classdef HexaMeshFromQuadMesh < HexMesh
-    % ---
-    properties
-        id_zline
-    end
-    % --- subfields to build
+
     properties
         parent_mesh1d
         parent_mesh2d
+        id_zline
     end
 
     properties (Access = private)
@@ -177,6 +174,9 @@ classdef HexaMeshFromQuadMesh < HexMesh
             obj.celem = celem_;
             obj.cedge = cedge_;
             obj.cface = cface_;
+            % ---
+            obj.velem = f_volume(node_,elem_,'elem_type',obj.elem_type);
+            obj.sface = f_area(node_,face_);
             % ---
             obj.setup_done = 1;
             obj.build_done = 0;

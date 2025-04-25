@@ -10,7 +10,6 @@
 
 classdef QuadMeshFrom3d < QuadMesh
 
-    % --- Properties
     properties
         parallel_line_1
         parallel_line_2
@@ -19,6 +18,11 @@ classdef QuadMeshFrom3d < QuadMesh
         dnum_parallel = 6
         dnum_orthogonal = 6
         flog = 1.05
+    end
+
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
     end
 
     % --- Dependent Properties
@@ -57,15 +61,21 @@ classdef QuadMeshFrom3d < QuadMesh
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            QuadMeshFrom3d.setup(obj);
             % ---
         end
     end
 
     % --- Methods
-    methods
+    methods (Static)
         % -----------------------------------------------------------------
         function obj = setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            setup@QuadMesh(obj);
             % ---
             if isempty(obj.parallel_line_1) || isempty(obj.parallel_line_2)
                 return
@@ -98,9 +108,9 @@ classdef QuadMeshFrom3d < QuadMesh
             vec1 = br - bl;
             vec2 = tr - tl;
             % ---
-            if abs(dot(cross(vec1,vec2),vec1)) < 1e-9
-                error('Lines are not in plane !')
-            end
+            % if abs(dot(cross(vec1,vec2),vec1)) < 1e-9
+            %     error('Lines are not in plane !')
+            % end
             % ---
             if dot(vec1,vec2) < 0
                 tmp = tl;
@@ -140,10 +150,45 @@ classdef QuadMeshFrom3d < QuadMesh
             obj.node = node;
             obj.elem = elem;
             obj.elem_code = elem_code;
+            % --- 2d elem surface
+            obj.velem = f_volume(node,elem,'elem_type',obj.elem_type);
+            % --- edge length
+            % obj.sface = f_area(node_,face_);
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
         end
         % -----------------------------------------------------------------
     end
-    
+
+    methods (Access = public)
+        function reset(obj)
+            % reset super class
+            reset@QuadMesh(obj);
+            % ---
+            obj.setup_done = 0;
+            QuadMeshFrom3d.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
+        end
+    end
+
+    methods
+        function build(obj)
+            % ---
+            QuadMeshFrom3d.setup(obj);
+            % ---
+            build@QuadMesh(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            
+            % ---
+            obj.build_done = 1;
+        end
+    end
 end
 
 

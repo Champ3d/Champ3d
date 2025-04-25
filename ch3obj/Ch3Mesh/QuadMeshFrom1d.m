@@ -10,7 +10,6 @@
 
 classdef QuadMeshFrom1d < QuadMesh
 
-    % --- Properties
     properties
         id_xline
         id_yline
@@ -67,6 +66,8 @@ classdef QuadMeshFrom1d < QuadMesh
             if obj.setup_done
                 return
             end
+            % ---
+            setup@QuadMesh(obj);
             % ---
             if isempty(obj.parent_mesh) || isempty(obj.id_xline) || ...
                     isempty(obj.id_yline)
@@ -160,6 +161,10 @@ classdef QuadMeshFrom1d < QuadMesh
             obj.node = node_;
             obj.elem = elem_;
             obj.elem_code = elem_code_;
+            % --- 2d elem surface
+            obj.velem = f_volume(node_,elem_,'elem_type',obj.elem_type);
+            % --- edge length
+            % obj.sface = f_area(node_,face_);
             % ---
             obj.setup_done = 1;
             obj.build_done = 0;

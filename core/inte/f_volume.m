@@ -35,18 +35,21 @@ if ~isempty(cdetJ)
     return
 end
 %--------------------------------------------------------------------------
+refelem = f_refelem(elem_type);
+cU  = refelem.cU;
+cV  = refelem.cV;
 if any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
-    refelem = f_refelem(elem_type);
-    cU  = refelem.cU;
-    cV  = refelem.cV;
-    cW  = refelem.cW;
-    cWeigh = refelem.cWeigh;
-    %----------------------------------------------------------------------
-    [vol, ~] = f_jacobien(node,elem,'elem_type',elem_type,...
-                          'u',cU,'v',cV,'w',cW);
-    %----------------------------------------------------------------------
-    vol = vol{1} .* cWeigh;
-    %----------------------------------------------------------------------
+    cW = refelem.cW;
+else
+    cW = [];
 end
+cWeigh = refelem.cWeigh;
+%--------------------------------------------------------------------------
+[vol, ~] = f_jacobien(node,elem,'elem_type',elem_type,...
+                      'u',cU,'v',cV,'w',cW);
+%--------------------------------------------------------------------------
+vol = vol{1} .* cWeigh;
+%--------------------------------------------------------------------------
+
 
 

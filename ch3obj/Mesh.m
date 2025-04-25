@@ -22,7 +22,8 @@ classdef Mesh < Xhandle
         cface
         cedge
         % ---
-        selem
+        ledge
+        sface
         velem
         % ---
         meshds
@@ -767,11 +768,12 @@ classdef Mesh < Xhandle
             cWf = obj.wf('u',cU,'v',cV,'w',cW,'wn',cWn,'gradf',cgradF,'jinv',cJinv);
             cWv = obj.wv('cdetJ',cdetJ);
             %--------------------------------------------------------------
-            if any(f_strcmpi(obj.elem_type,{'tri','triangle','quad'}))
-                obj.selem = 1./cWv{1};
-            elseif any(f_strcmpi(obj.elem_type,{'tet','tetra','prism','hex','hexa'}))
-                obj.velem = 1./cWv{1};
-            end
+            % if any(f_strcmpi(obj.elem_type,{'tri','triangle','quad'}))
+            %     obj.selem = 1./cWv{1};
+            %     obj.velem = 0;
+            % elseif any(f_strcmpi(obj.elem_type,{'tet','tetra','prism','hex','hexa'}))
+            %     obj.velem = 1./cWv{1};
+            % end
             %--------------------------------------------------------------
             obj.build_meshds('get','celem');
             %--------------------------------------------------------------

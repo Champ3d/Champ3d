@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef VolumeDom < Xhandle
+classdef VolumeDom < GeoDom
 
     % --- Properties
     properties
@@ -55,7 +55,7 @@ classdef VolumeDom < Xhandle
                 args.condition = []
             end
             % ---
-            obj = obj@Xhandle;
+            obj = obj@GeoDom;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -137,10 +137,6 @@ classdef VolumeDom < Xhandle
         end
         % -----------------------------------------------------------------
         function gid = get_gid(obj)
-            if ~isempty(obj.gid)
-                gid = obj.gid;
-                return;
-            end
             %--------------------------------------------------------------
             node = obj.parent_mesh.node;
             elem = obj.parent_mesh.elem(:,obj.gid_elem);

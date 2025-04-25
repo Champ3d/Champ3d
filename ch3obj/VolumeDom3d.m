@@ -10,15 +10,9 @@
 
 classdef VolumeDom3d < VolumeDom
 
-    % --- Properties
     properties
         id_dom2d
         id_zline
-    end
-
-    % --- subfields to build
-    properties
-        
     end
 
     properties (Access = private)

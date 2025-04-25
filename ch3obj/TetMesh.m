@@ -10,9 +10,9 @@
 
 classdef TetMesh < Mesh3d
 
-    % --- Properties
-    properties
-
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
     end
 
     % --- Dependent Properties
@@ -35,7 +35,6 @@ classdef TetMesh < Mesh3d
             end
             % ---
             obj@Mesh3d;
-            obj.elem_type = 'tetra';
             % ---
             if isempty(fieldnames(args))
                 return
@@ -43,15 +42,52 @@ classdef TetMesh < Mesh3d
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            TetMesh.setup(obj);
             % ---
         end
     end
 
-    % --- setup
-    methods
+    % --- setup/reset/build/assembly
+    methods (Static)
         function setup(obj)
-            
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            setup@Mesh3d(obj);
+            % ---
+            obj.elem_type = 'tetra';
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % reset super
+            reset@Mesh3d(obj);
+            % ---
+            obj.setup_done = 0;
+            TetMesh.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            TetMesh.setup(obj);
+            % --- call super
+            build@Mesh3d(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            obj.build_done = 1;
+            % ---
         end
     end
 

@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef SurfaceDom < Xhandle
+classdef SurfaceDom < GeoDom
 
     % --- Properties
     properties
@@ -60,7 +60,7 @@ classdef SurfaceDom < Xhandle
                 args.condition = []
             end
             % ---
-            obj = obj@Xhandle;
+            obj = obj@GeoDom;
             % ---
             if isempty(fieldnames(args))
                 return
