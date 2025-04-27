@@ -50,13 +50,37 @@ classdef DofBasedScalarNodeField < DofBaseMeshField
         function plot(obj,args)
             arguments
                 obj
-                args.mesh_dom {mustBeA(args.mesh_dom,{'VolumeDom','SurfaceDom'})}
+                args.id_mesh_dom = []
                 args.id_elem = []
+                args.id_face = []
                 args.show_dom = 1
             end
             % ---
-            if isfield(args,'mesh_dom')
-                dom = args.mesh_dom;
+            if isempty(args.id_mesh_dom)
+                args.show_dom = 0;
+                % ---
+                if isempty(args.id_elem)
+                    if isempty(args.id_face)
+                        text(0,0,'Nothing to plot !');
+                        return
+                    else
+                        dom = SurfaceDom3d;
+                        gid_face = args.id_face;
+                    end
+                else
+                    dom = VolumeDom3d;
+                    gid_elem = args.id_elem;
+                end
+            else
+                dom = obj.parent_model.parent_mesh.dom.(args.id_mesh_dom);
+                % ---
+                if isa(dom,'VolumeDom3d')
+                    gid_elem = dom.gid_elem;
+                end
+                % ---
+                if isa(dom,'SurfaceDom3d')
+                    gid_face = dom.gid_face;
+                end
             end
             % ---
             if args.show_dom
@@ -65,25 +89,18 @@ classdef DofBasedScalarNodeField < DofBaseMeshField
             % ---
             if isa(dom,'VolumeDom3d')
                 node = obj.parent_model.parent_mesh.node;
-                elem = obj.parent_model.parent_mesh.elem(:,dom.gid_elem);
+                elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
                 elem_type = f_elemtype(elem);
                 face = f_boundface(elem,node,'elem_type',elem_type);
                 % ---
-                it = obj.dof.parent_model.ltime.it;
-                fs = obj.dof.parent_model.field{it}.(args.field_name).node.value;
-                % ---
-                f_patch(node,face,'defined_on','face','scalar_field',fs);
+                f_patch(node,face,'defined_on','face','scalar_field',obj.value);
             end
             % ---
-            if isa(obj.dom,'SurfaceDom3d')
+            if isa(dom,'SurfaceDom3d')
                 node = obj.parent_model.parent_mesh.node;
-                face = obj.parent_model.parent_mesh.face(:,dom.gid_face);
+                face = obj.parent_model.parent_mesh.face(:,gid_face);
                 % ---
-                it = obj.parent_model.ltime.it;
-                fs = obj.parent_model.field{it}.(args.field_name).node.value;
-                %fs = fs(obj.dom.gid_face);
-                % ---
-                f_patch(node,face,'defined_on','face','scalar_field',fs);
+                f_patch(node,face,'defined_on','face','scalar_field',obj.value);
             end
         end
         % -----------------------------------------------------------------

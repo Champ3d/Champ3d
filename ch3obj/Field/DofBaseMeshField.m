@@ -10,7 +10,7 @@
 
 classdef DofBaseMeshField < Xhandle
     properties
-        parent_mesh
+        parent_model
         dof
     end
     
