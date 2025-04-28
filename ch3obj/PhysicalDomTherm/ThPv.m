@@ -93,8 +93,13 @@ classdef ThPv < PhysicalDom
             gid_node_t = f_uniquenode(elem);
             % ---
             pv_array = obj.pv.get('in_dom',dom);
+            % --- save
+            it = obj.parent_model.ltime.it;
+            %obj.field{it}.pv.elem = FreeScalarElemField('parent_model',obj,'dof',obj.dof{it}.T,...
+            %    'reference_potential',obj.T0);
+            %pv_array;
             % --- check changes
-
+            
             %--------------------------------------------------------------
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.gid_node_t = gid_node_t;

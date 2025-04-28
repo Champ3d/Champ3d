@@ -22,7 +22,7 @@ classdef DofBasedScalarElemField < DofBaseMeshField
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
                 args.dof {mustBeA(args.dof,'NodeDof')}
-                args.reference_potential = 0;
+                args.reference_potential = 0
             end
             % ---
             obj = obj@DofBaseMeshField;

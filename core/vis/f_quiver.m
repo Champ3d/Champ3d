@@ -200,34 +200,36 @@ else
     xlabel('x (m)'); ylabel('y (m)'); zlabel('z (m)');
 end
 %--------------------------------------------------------------------------
-c3name = '$\overrightarrow{champ}{3d}$';
-c3_already = 0;
+f_chlogo;
 %--------------------------------------------------------------------------
-% ztchamp3d = findobj(gcf, 'Type', 'Text');
-% ztchamp3d = ztchamp3d.String;
-% if iscell(ztchamp3d)
-%     for i = 1:length(ztchamp3d)
-%         if strcmpi(ztchamp3d{i},c3name)
-%             c3_already = 1;
-%         end
-%     end
-% elseif ischar(ztchamp3d)
-%     if strcmpi(ztchamp3d,c3name)
-%         c3_already = 1;
-%     end
+% c3name = '$\overrightarrow{champ}{3d}$';
+% c3_already = 0;
+% %--------------------------------------------------------------------------
+% % ztchamp3d = findobj(gcf, 'Type', 'Text');
+% % ztchamp3d = ztchamp3d.String;
+% % if iscell(ztchamp3d)
+% %     for i = 1:length(ztchamp3d)
+% %         if strcmpi(ztchamp3d{i},c3name)
+% %             c3_already = 1;
+% %         end
+% %     end
+% % elseif ischar(ztchamp3d)
+% %     if strcmpi(ztchamp3d,c3name)
+% %         c3_already = 1;
+% %     end
+% % end
+% %--------------------------------------------------------------------------
+% if ~c3_already
+%     texpos = get(gca, 'OuterPosition');
+%     hold on;
+%     text(texpos(1),texpos(2)+1.05, ...
+%          c3name, ...
+%          'FontSize',10, ...
+%          'FontWeight','bold',...
+%          'Color','blue', ...
+%          'Interpreter','latex',...
+%          'Units','normalized', ...
+%          'VerticalAlignment', 'baseline', ...
+%          'HorizontalAlignment', 'right');
 % end
-%--------------------------------------------------------------------------
-if ~c3_already
-    texpos = get(gca, 'OuterPosition');
-    hold on;
-    text(texpos(1),texpos(2)+1.05, ...
-         c3name, ...
-         'FontSize',10, ...
-         'FontWeight','bold',...
-         'Color','blue', ...
-         'Interpreter','latex',...
-         'Units','normalized', ...
-         'VerticalAlignment', 'baseline', ...
-         'HorizontalAlignment', 'right');
-end
-%--------------------------------------------------------------------------
+% %--------------------------------------------------------------------------

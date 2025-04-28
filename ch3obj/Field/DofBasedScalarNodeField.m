@@ -22,7 +22,7 @@ classdef DofBasedScalarNodeField < DofBaseMeshField
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
                 args.dof {mustBeA(args.dof,'NodeDof')}
-                args.reference_potential = 0;
+                args.reference_potential = 0
             end
             % ---
             obj = obj@DofBaseMeshField;
@@ -50,29 +50,42 @@ classdef DofBasedScalarNodeField < DofBaseMeshField
         function plot(obj,args)
             arguments
                 obj
-                args.id_mesh_dom = []
+                args.meshdom_obj = []
+                args.id_meshdom = []
                 args.id_elem = []
                 args.id_face = []
                 args.show_dom = 1
             end
             % ---
-            if isempty(args.id_mesh_dom)
+            if isempty(args.id_meshdom)
                 args.show_dom = 0;
                 % ---
-                if isempty(args.id_elem)
-                    if isempty(args.id_face)
-                        text(0,0,'Nothing to plot !');
-                        return
+                if isempty(args.meshdom_obj)
+                    if isempty(args.id_elem)
+                        if isempty(args.id_face)
+                            text(0,0,'Nothing to plot !');
+                            return
+                        else
+                            dom = SurfaceDom3d;
+                            gid_face = args.id_face;
+                        end
                     else
-                        dom = SurfaceDom3d;
-                        gid_face = args.id_face;
+                        dom = VolumeDom3d;
+                        gid_elem = args.id_elem;
                     end
                 else
-                    dom = VolumeDom3d;
-                    gid_elem = args.id_elem;
+                    dom = args.meshdom_obj;
+                    % ---
+                    if isa(dom,'VolumeDom3d')
+                        gid_elem = dom.gid_elem;
+                    end
+                    % ---
+                    if isa(dom,'SurfaceDom3d')
+                        gid_face = dom.gid_face;
+                    end
                 end
             else
-                dom = obj.parent_model.parent_mesh.dom.(args.id_mesh_dom);
+                dom = obj.parent_model.parent_mesh.dom.(args.id_meshdom);
                 % ---
                 if isa(dom,'VolumeDom3d')
                     gid_elem = dom.gid_elem;

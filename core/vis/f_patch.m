@@ -28,16 +28,19 @@ if isreal(scalar_field)
 else
     fs{1} = real(scalar_field);
     fs{2} = imag(scalar_field);
+    fs{3} = sqrt(fs{1}.^2 + fs{2}.^2);
 end
 %--------------------------------------------------------------------------
 for i = 1:length(fs)
     % ---
-    if length(fs) == 2
-        subplot(120 + i);
+    if length(fs) >= 2
+        subplot(130 + i);
         if i == 1
             title('Real part');
-        else
+        elseif i == 2
             title('Imag part');
+        elseif i == 3
+            title('Magnitude');
         end
     end
     % ---
@@ -49,11 +52,13 @@ for i = 1:length(fs)
         msh.FaceColor = face_color;
         msh.EdgeColor = edge_color;
         %------------------------------------------------------------------
-        id_node = f_uniquenode(elem);
-        maxfs = max(fs{i}(id_node));
-        minfs = min(fs{i}(id_node));
+        
         %------------------------------------------------------------------
         if numel(fs{i}) == size(elem,2)
+            % ---
+            maxfs = max(fs{i});
+            minfs = min(fs{i});
+            % ---
             id_tria = find(elem(4,:) == 0);
             id_quad = setdiff(1:size(elem,2),id_tria);
             % ---
@@ -71,6 +76,11 @@ for i = 1:length(fs)
                 patch(msh); hold on
             end
         elseif numel(fs{i}) == size(node,2)
+            % ---
+            id_node = f_uniquenode(elem);
+            maxfs = max(fs{i}(id_node));
+            minfs = min(fs{i}(id_node));
+            % ---
             msh.Faces = elem.';
             msh.FaceVertexCData = full(fs{i});
             msh.FaceColor = 'interp';

@@ -177,7 +177,10 @@ classdef PhysicalDom < Xhandle
                 args.show_dom = 0
             end
             % ---
-            obj.plotscalarfield('show_dom',args.show_dom,'field_name','T')
+            it = obj.parent_model.ltime.it;
+            obj.parent_model.field{it}.T.node.plot('meshdom_obj',obj.dom,...
+                'show_dom',args.show_dom);
+            % ---
         end
         % -----------------------------------------------------------------
         function plotps(obj,args)
