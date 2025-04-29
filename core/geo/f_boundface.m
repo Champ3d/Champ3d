@@ -51,7 +51,7 @@ for i = 1:nbFa_inEl
 end
 %-----
 dom_left_of_face = zeros(1,nb_face);
-dom_left_of_face(elem_left_of_face > 0) = 1 ;%elem_code(elem_left_of_face(elem_left_of_face > 0));
+dom_left_of_face(elem_left_of_face > 0) = 1; %elem_code(elem_left_of_face(elem_left_of_face > 0));
 %-----
 elem_right_of_face = zeros(1,nb_face);
 for i = 1:nbFa_inEl
@@ -59,7 +59,7 @@ for i = 1:nbFa_inEl
 end
 %-----
 dom_right_of_face = zeros(1,nb_face);
-dom_right_of_face(elem_right_of_face > 0) = 1 ;%elem_code(elem_right_of_face(elem_right_of_face > 0));
+dom_right_of_face(elem_right_of_face > 0) = 1; %elem_code(elem_right_of_face(elem_right_of_face > 0));
 %--------------------------------------------------------------------------
 % --- id bound
 ibO = find(dom_left_of_face  == 1 & dom_right_of_face == 0);
