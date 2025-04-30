@@ -1,4 +1,4 @@
-function elem_type = f_elemtype(meshorelem,args)
+function elem_type = f_elemtype(elem,args)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
@@ -10,27 +10,17 @@ function elem_type = f_elemtype(meshorelem,args)
 %--------------------------------------------------------------------------
 
 arguments
-    meshorelem
+    elem
     args.defined_on {mustBeMember(args.defined_on,{'elem','face'})} = 'elem'
+    args.dim = 3
 end
 
 % --- default
 defined_on = args.defined_on;
 elem_type  = [];
-
 %--------------------------------------------------------------------------
-if isstruct(meshorelem)
-    nbnoinel = size(meshorelem.elem, 1);
-    dim = 3;
-    if isfield(meshorelem,'node')
-        if ~isempty(meshorelem.node)
-            dim = size(meshorelem.node,1);
-        end
-    end
-else
-    nbnoinel = size(meshorelem, 1);
-    dim = 3;
-end
+nbnoinel = size(elem, 1);
+dim = args.dim;
 %--------------------------------------------------------------------------
 if any(f_strcmpi(defined_on,{'elem'}))
     if dim == 3

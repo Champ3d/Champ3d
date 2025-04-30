@@ -8,19 +8,22 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef TnodeField < Xhandle
+% XTODO - whole class
+classdef TfaceField < Xhandle
     properties
         parent_model
         dof
         reference_potential = 0
     end
     properties (Dependent)
-        value
+        cvalue
+        ivalue
+        gvalue
         node
     end
     % --- Contructor
     methods
-        function obj = TnodeField(args)
+        function obj = TfaceField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
                 args.dof {mustBeA(args.dof,'NodeDof')}
@@ -33,21 +36,21 @@ classdef TnodeField < Xhandle
                 error('#parent_model and #dof must be given !');
             end
             obj <= args;
-            % ---
         end
     end
-    % --- Get
+    % --- Methods/public
     methods
         % -----------------------------------------------------------------
-        function val = get.value(obj)
-            val = obj.dof.value + obj.reference_potential;
+        function val = get.cvalue(obj)
+            val = obj.parent_model.parent_mesh.field_wn('dof',obj.dof.value,'on','center') ...
+                  + obj.reference_potential;
         end
         % -----------------------------------------------------------------
         function val = get.node(obj)
-            val = obj.parent_model.parent_mesh.node;
+            val = obj.parent_model.parent_mesh.celem;
         end
     end
-    % --- Plot
+    % --- Plot - XTODO
     methods
         % -----------------------------------------------------------------
         function plot(obj,args)
@@ -106,15 +109,14 @@ classdef TnodeField < Xhandle
             if isa(dom,'VolumeDom3d')
                 node_ = obj.parent_model.parent_mesh.node;
                 elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
-                % ---
-                f_patch('node',node_,'elem',elem,'node_field',obj.value);
+                f_patch('node',node_,'elem',elem,'elem_field',obj.cvalue(gid_elem(id_elem_of_face)));
             end
             % ---
             if isa(dom,'SurfaceDom3d')
                 node_ = obj.parent_model.parent_mesh.node;
                 face = obj.parent_model.parent_mesh.face(:,gid_face);
                 % ---
-                f_patch('node',node_,'face',face,'node_field',obj.value);
+                f_patch(node_,face,'defined_on','face','scalar_field',obj.cvalue);
             end
         end
         % -----------------------------------------------------------------

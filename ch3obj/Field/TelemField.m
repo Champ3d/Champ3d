@@ -58,7 +58,6 @@ classdef TelemField < Xhandle
                 args.meshdom_obj = []
                 args.id_meshdom = []
                 args.id_elem = []
-                args.id_face = []
                 args.show_dom = 1
             end
             % ---
@@ -67,37 +66,24 @@ classdef TelemField < Xhandle
                 % ---
                 if isempty(args.meshdom_obj)
                     if isempty(args.id_elem)
-                        if isempty(args.id_face)
-                            text(0,0,'Nothing to plot !');
-                            return
-                        else
-                            dom = SurfaceDom3d;
-                            gid_face = args.id_face;
-                        end
+                        text(0,0,'Nothing to plot !');
                     else
-                        dom = VolumeDom3d;
                         gid_elem = args.id_elem;
                     end
                 else
                     dom = args.meshdom_obj;
-                    % ---
                     if isa(dom,'VolumeDom3d')
                         gid_elem = dom.gid_elem;
-                    end
-                    % ---
-                    if isa(dom,'SurfaceDom3d')
-                        gid_face = dom.gid_face;
+                    else
+                        text(0,0,'Nothing to plot, dom must be a VolumeDom3d !');
                     end
                 end
             else
                 dom = obj.parent_model.parent_mesh.dom.(args.id_meshdom);
-                % ---
                 if isa(dom,'VolumeDom3d')
                     gid_elem = dom.gid_elem;
-                end
-                % ---
-                if isa(dom,'SurfaceDom3d')
-                    gid_face = dom.gid_face;
+                else
+                    text(0,0,'Nothing to plot, dom must be a VolumeDom3d !');
                 end
             end
             % ---
@@ -105,21 +91,9 @@ classdef TelemField < Xhandle
                 dom.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
             end
             % ---
-            if isa(dom,'VolumeDom3d')
-                node = obj.parent_model.parent_mesh.node;
-                elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
-                elem_type = f_elemtype(elem);
-                [face, id_elem_of_face] = f_boundface(elem,node,'elem_type',elem_type);
-                % ---
-                f_patch(node,face,'defined_on','face','scalar_field',obj.cvalue(gid_elem(id_elem_of_face)));
-            end
-            % ---
-            if isa(dom,'SurfaceDom3d')
-                node = obj.parent_model.parent_mesh.node;
-                face = obj.parent_model.parent_mesh.face(:,gid_face);
-                % ---
-                f_patch(node,face,'defined_on','face','scalar_field',obj.cvalue);
-            end
+            node_ = obj.parent_model.parent_mesh.node;
+            elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
+            f_patch('node',node_,'elem',elem,'elem_field',obj.cvalue(gid_elem));
         end
         % -----------------------------------------------------------------
     end

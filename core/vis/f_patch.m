@@ -8,20 +8,107 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-function f_patch(node,elem,args)
+function f_patch(args)
 arguments
-    node
-    elem
-    args.defined_on {mustBeMember(args.defined_on,{'face','elem'})} = 'face'
-    args.scalar_field = []
+    args.node = []
+    args.face = []
+    args.elem = []
+    args.node_field = []
+    args.face_field = []
+    args.elem_field = []
     args.face_color = 'c'
     args.edge_color = 'none'
 end
 %--------------------------------------------------------------------------
-defined_on = args.defined_on;
+if isempty(args.node)
+    error('#node must be given !');
+else
+    node = args.node;
+end
+% ---
+dim = size(node,1);
+%--------------------------------------------------------------------------
+mesh_defined_on_face = 0;
+mesh_defined_on_elem = 0;
+if isempty(args.face) && isempty(args.elem)
+    error('#face or #elem must be given !');
+elseif ~isempty(args.face)
+    mesh_defined_on_face = 1;
+    face = args.face;
+elseif ~isempty(args.elem)
+    mesh_defined_on_elem = 1;
+    elem = args.elem;
+end
+%--------------------------------------------------------------------------
 edge_color = args.edge_color;
 face_color = args.face_color;
-scalar_field = f_tocolv(args.scalar_field);
+%--------------------------------------------------------------------------
+field_defined_on_node = 0;
+field_defined_on_face = 0;
+field_defined_on_elem = 0;
+if ~isempty(args.node_field)
+    field_defined_on_node = 1;
+    scalar_field = f_tocolv(args.node_field);
+elseif ~isempty(args.face_field)
+    field_defined_on_face = 1;
+    scalar_field = f_tocolv(args.face_field);
+elseif ~isempty(args.elem_field)
+    field_defined_on_elem = 1;
+    scalar_field = f_tocolv(args.elem_field);
+end
+%--------------------------------------------------------------------------
+switch dim
+    case 2
+        % ---
+        if mesh_defined_on_elem && field_defined_on_elem
+            elem_type = f_elemtype(elem);
+            [face,id_elem_of_face] = f_boundface(elem,node,'elem_type',elem_type);
+            f_patch('node',node,'face',face,...
+                'face_field',scalar_field(id_elem_of_face),...
+                'edge_color',edge_color,'face_color',face_color);
+            % ---
+            view(2);
+            % ---
+        elseif mesh_defined_on_elem && field_defined_on_node
+            f_patch('node',node,'face',face,...
+                'node_field',scalar_field,...
+                'edge_color',edge_color,'face_color',face_color);
+            % ---
+            view(2);
+            % ---
+        elseif mesh_defined_on_elem && field_defined_on_face
+            text(0,0,0,'cannot plot !');
+        elseif mesh_defined_on_face
+            text(0,0,0,'cannot plot !');
+        end
+        % ---
+    case 3
+        % ---
+        if mesh_defined_on_elem && field_defined_on_elem
+            elem_type = f_elemtype(elem);
+            [face,id_elem_of_face] = f_boundface(elem,node,'elem_type',elem_type);
+            f_patch('node',node,'face',face,...
+                'face_field',scalar_field(id_elem_of_face),...
+                'edge_color',edge_color,'face_color',face_color);
+            % ---
+            view(3);
+            % ---
+        elseif mesh_defined_on_elem && field_defined_on_node
+            elem_type = f_elemtype(elem);
+            face = f_boundface(elem,node,'elem_type',elem_type);
+            f_patch('node',node,'face',face,...
+                'node_field',scalar_field,...
+                'edge_color',edge_color,'face_color',face_color);
+            % ---
+            view(3);
+            % ---
+        elseif mesh_defined_on_elem && field_defined_on_face
+            text(0,0,0,'cannot plot !');
+        elseif mesh_defined_on_face && field_defined_on_elem
+            text(0,0,0,'cannot plot !');
+        end
+        % ---
+end
 %--------------------------------------------------------------------------
 if isreal(scalar_field)
     fs{1} = scalar_field;
@@ -31,6 +118,8 @@ else
     fs{3} = sqrt(fs{1}.^2 + fs{2}.^2);
 end
 %--------------------------------------------------------------------------
+maxfs = 0;
+minfs = 0;
 for i = 1:length(fs)
     % ---
     if length(fs) >= 2
@@ -43,47 +132,32 @@ for i = 1:length(fs)
             title('Magnitude');
         end
     end
-    % ---
-    if any(f_strcmpi(defined_on,{'face'}))
-        %------------------------------------------------------------------
-        clear msh;
-        %------------------------------------------------------------------
-        msh.Vertices  = node.';
-        msh.FaceColor = face_color;
-        msh.EdgeColor = edge_color;
-        %------------------------------------------------------------------
-        
-        %------------------------------------------------------------------
-        if numel(fs{i}) == size(elem,2)
-            % ---
-            maxfs = max(fs{i});
-            minfs = min(fs{i});
-            % ---
-            id_tria = find(elem(4,:) == 0);
-            id_quad = setdiff(1:size(elem,2),id_tria);
-            % ---
-            if ~isempty(id_tria)
-                msh.Faces = (elem(1:3,id_tria)).';
-                msh.FaceVertexCData = full(fs{i}(id_tria));
-                msh.FaceColor = 'flat';
-                patch(msh); hold on
-            end
-            % ---
-            if ~isempty(id_quad)
-                msh.Faces = (elem(1:4,id_quad)).';
-                msh.FaceVertexCData = full(fs{i}(id_quad));
-                msh.FaceColor = 'flat';
-                patch(msh); hold on
-            end
-        elseif numel(fs{i}) == size(node,2)
-            % ---
-            id_node = f_uniquenode(elem);
-            maxfs = max(fs{i}(id_node));
-            minfs = min(fs{i}(id_node));
-            % ---
-            msh.Faces = elem.';
-            msh.FaceVertexCData = full(fs{i});
-            msh.FaceColor = 'interp';
+    %------------------------------------------------------------------
+    clear msh;
+    %------------------------------------------------------------------
+    msh.Vertices  = node.';
+    msh.FaceColor = face_color;
+    msh.EdgeColor = edge_color;
+    %------------------------------------------------------------------
+    if field_defined_on_face
+        % ---
+        maxfs = max(fs{i});
+        minfs = min(fs{i});
+        % ---
+        id_tria = find(face(4,:) == 0);
+        id_quad = setdiff(1:size(face,2),id_tria);
+        % ---
+        if ~isempty(id_tria)
+            msh.Faces = (face(1:3,id_tria)).';
+            msh.FaceVertexCData = full(fs{i}(id_tria));
+            msh.FaceColor = 'flat'; % !!! the difference
+            patch(msh); hold on
+        end
+        % ---
+        if ~isempty(id_quad)
+            msh.Faces = (face(1:4,id_quad)).';
+            msh.FaceVertexCData = full(fs{i}(id_quad));
+            msh.FaceColor = 'flat'; % !!! the difference
             patch(msh); hold on
         end
         % ---
@@ -91,16 +165,26 @@ for i = 1:length(fs)
             caxis([minfs maxfs]);
         end
         axis equal; axis tight; f_colormap;
-        %------------------------------------------------------------------
+        % ---
         f_chlogo;
-    else
-        %------------------------------------------------------------------
-        face = f_boundface(elem,node,'elem_type',elem_type);
-        f_patch(node,face,'defined_on','face','edge_color',edge_color,...
-            'face_color',face_color,'scalar_field',scalar_field);
+        % ---
+    elseif field_defined_on_node
+        % ---
+        id_node = f_uniquenode(face);
+        maxfs = max(fs{i}(id_node));
+        minfs = min(fs{i}(id_node));
+        % ---
+        msh.Faces = face.';
+        msh.FaceVertexCData = full(fs{i});
+        msh.FaceColor = 'interp'; % !!! the difference
+        patch(msh); hold on
+        % ---
+        if maxfs > minfs
+            caxis([minfs maxfs]);
+        end
+        axis equal; axis tight; f_colormap;
+        % ---
+        f_chlogo;
+        % ---
     end
 end
-%--------------------------------------------------------------------------
-
-%--------------------------------------------------------------------------
-
