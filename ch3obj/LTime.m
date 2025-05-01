@@ -105,7 +105,7 @@ classdef LTime < Xhandle
             i = find(t <= obj.t_array,1);
         end
         function i = back_it(obj,t)
-            i = length(obj.t_array) - find(t >= obj.t_array,1) + 1;
+            i = length(obj.t_array) - find(t >= obj.t_array(end:-1:1),1) + 1;
         end
     end
 end

@@ -21,7 +21,7 @@ classdef VectorFaceField < Xhandle
         function val = cnode(obj,id_face)
             % ---
             if nargin <= 1
-                id_face = obj.parent_model.parent_mesh.nb_face;
+                id_face = 1:obj.parent_model.parent_mesh.nb_face;
             end
             % ---
             val = obj.parent_model.parent_mesh.cface(:,id_face);

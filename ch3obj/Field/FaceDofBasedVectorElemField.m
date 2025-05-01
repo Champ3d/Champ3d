@@ -47,7 +47,7 @@ classdef FaceDofBasedVectorElemField < VectorElemField
         function val = cvalue(obj,id_elem)
             % ---
             if nargin <= 1
-                id_elem = obj.parent_model.parent_mesh.nb_elem;
+                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
             end
             % ---
             val = obj.parent_model.parent_mesh.field_wf('dof',obj.dof.value,...
@@ -58,7 +58,7 @@ classdef FaceDofBasedVectorElemField < VectorElemField
         function val = ivalue(obj,id_elem)
             % ---
             if nargin <= 1
-                id_elem = obj.parent_model.parent_mesh.nb_elem;
+                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
             end
             % ---
             val = obj.parent_model.parent_mesh.field_wf('dof',obj.dof.value,...
@@ -76,7 +76,7 @@ classdef FaceDofBasedVectorElemField < VectorElemField
         function val = gvalue(obj,id_elem)
             % ---
             if nargin <= 1
-                id_elem = obj.parent_model.parent_mesh.nb_elem;
+                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
             end
             % ---
             val = obj.parent_model.parent_mesh.field_wf('dof',obj.dof.value,...

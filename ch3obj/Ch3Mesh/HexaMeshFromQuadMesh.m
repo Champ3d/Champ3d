@@ -177,6 +177,7 @@ classdef HexaMeshFromQuadMesh < HexMesh
             % ---
             obj.velem = f_volume(node_,elem_,'elem_type',obj.elem_type);
             obj.sface = f_area(node_,face_);
+            obj.ledge = f_ledge(node_,edge_);
             % ---
             obj.setup_done = 1;
             obj.build_done = 0;

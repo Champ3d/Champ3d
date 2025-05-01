@@ -47,7 +47,7 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
         function val = cvalue(obj,id_face)
             % ---
             if nargin <= 1
-                id_face = obj.parent_model.parent_mesh.nb_face;
+                id_face = 1:obj.parent_model.parent_mesh.nb_face;
             end
             % ---
             dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gid_face',id_face);

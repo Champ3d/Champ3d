@@ -8,10 +8,9 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef VectorElemField < ElemField
-    % --- Contructor
+classdef ScalarElemField < ElemField
     methods
-        function obj = VectorElemField()
+        function obj = ScalarElemField()
             obj = obj@ElemField;
         end
     end
@@ -57,29 +56,9 @@ classdef VectorElemField < ElemField
                 dom.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
             end
             % ---
-            celem = obj.parent_model.parent_mesh.celem;
-            if isreal(obj.cvalue(gid_elem(1)))
-                f_quiver(celem,obj.cvalue(gid_elem));
-            else
-                for i = 1:3
-                    % ---
-                    subplot(130 + i);
-                    if i == 1
-                        title('Real part');
-                        f_quiver(celem,real(obj.cvalue(gid_elem)));
-                    elseif i == 2
-                        title('Imag part');
-                        f_quiver(celem,imag(obj.cvalue(gid_elem)));
-                    elseif i == 3
-                        title('Magnitude');
-                        % ---
-                        node_ = obj.parent_model.parent_mesh.node;
-                        elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
-                        f_patch('node',node_,'elem',elem,'elem_field',f_magnitude(obj.cvalue(gid_elem)));
-                    end
-                    % ---
-                end
-            end
+            node_ = obj.parent_model.parent_mesh.node;
+            elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
+            f_patch('node',node_,'elem',elem,'elem_field',obj.cvalue(gid_elem));
         end
         % -----------------------------------------------------------------
     end
