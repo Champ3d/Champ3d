@@ -47,7 +47,7 @@ classdef LTime < Xhandle
             % ---
             if isfield(args,'t_array')
                 if ~isempty(args.t_array)
-                    obj.t_array = round(args.t_array,obj.nbdigit); % !!!
+                    obj.t_array = round(args.t_array, obj.nbdigit); % !!!
                 end
             end
             % ---
@@ -77,7 +77,7 @@ classdef LTime < Xhandle
         end
     end
 
-    % --- Methods
+    % --- get
     methods
         function val = get.t_now(obj)
             if obj.it > 0
@@ -97,6 +97,15 @@ classdef LTime < Xhandle
         % ---
         function val = get.it_max(obj)
             val = length(obj.t_array);
+        end
+    end
+    % --- methods
+    methods
+        function i = next_it(obj,t)
+            i = find(t <= obj.t_array,1);
+        end
+        function i = back_it(obj,t)
+            i = length(obj.t_array) - find(t >= obj.t_array,1) + 1;
         end
     end
 end

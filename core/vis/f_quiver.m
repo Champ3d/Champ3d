@@ -128,7 +128,7 @@ if strcmpi(vtype,'equal')
     patchinfo.FaceColor = 'flat';
     patchinfo.FaceVertexCData = pylvec.';
     % patchinfo.FaceLighting = 'gouraud';
-    patchinfo.EdgeColor = 'non';
+    patchinfo.EdgeColor = 'k';%[0.9 0.9 0.9];
     patchinfo.LineWidth = 0.1;
     patch(patchinfo); hold on; axis equal; alpha(1);
     h = colorbar;
@@ -190,7 +190,7 @@ else
     patchinfo.FaceColor = 'flat';
     patchinfo.FaceVertexCData = pylvec.';
     % patchinfo.FaceLighting = 'gouraud';
-    patchinfo.EdgeColor = 'non';
+    patchinfo.EdgeColor = 'k'; %[0.9 0.9 0.9];
     patchinfo.LineWidth = 0.1;
     patch(patchinfo); hold on; axis equal;
     h = colorbar;

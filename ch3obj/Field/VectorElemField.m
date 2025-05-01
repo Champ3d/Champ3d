@@ -103,7 +103,7 @@ classdef VectorElemField < Xhandle
             end
             % ---
             celem = obj.parent_model.parent_mesh.celem;
-            if isreal(celem,obj.cvalue(gid_elem(1)))
+            if isreal(obj.cvalue(gid_elem(1)))
                 f_quiver(celem,obj.cvalue(gid_elem));
             else
                 for i = 1:3

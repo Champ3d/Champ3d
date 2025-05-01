@@ -32,8 +32,8 @@ classdef Parameter < Xhandle
                 args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
                 args.f = []
                 args.depend_on {mustBeMember(args.depend_on,...
-                    {'celem','cface', ...
-                     'T',...
+                    {'celem','cface','velem','sface','ledge',...
+                     'J','V','T','B','E','H','A','P','Phi',...
                      'ltime'})}
                 args.from = []
                 args.varargin_list = []
@@ -392,11 +392,11 @@ classdef Parameter < Xhandle
                     % take from paramater parent_model
                     fargs{i} = parent_model_.parent_mesh.(depon_)(:,id_elem);
                 elseif any(f_strcmpi(depon_,{...
-                        'T','B',}))
+                        'J','V','T','B','E','H','A','P','Phi'}))
                     % physical quantities
                     % must be able to take from other model with different ltime, mesh/dom
                     % ---
-                    if from_ == parent_model_
+                    if isequal(from_, parent_model_)
                         % no interpolation
                         try
                             fargs{i} = from_.field{parent_model_.ltime.it}.(depon_).elem.cvalue(:,id_elem);
@@ -404,8 +404,8 @@ classdef Parameter < Xhandle
                             fargs{i} = from_.field{parent_model_.ltime.it}.(depon_).elem.cvalue(id_elem);
                         end
                     else
-                        if from_.parent_mesh == parent_model_.parent_mesh
-                            if all(from_.ltime.t_array == parent_model_.ltime.t_array)
+                        if isequal(from_.parent_mesh, parent_model_.parent_mesh)
+                            if isequal(from_.ltime.t_array, parent_model_.ltime.t_array)
                                 % no interpolation
                                 try
                                     fargs{i} = from_.field{parent_model_.ltime.it}.(depon_).elem.cvalue(:,id_elem);
@@ -442,10 +442,37 @@ classdef Parameter < Xhandle
                             end
                         else
                             % get by time/mesh interpolation
+                            % --- data
+                            next_it = from_.ltime.next_it(parent_model_.ltime.t_now);
+                            back_it = from_.ltime.back_it(parent_model_.ltime.t_now);
+                            if next_it == back_it
+                                try
+                                    val = from_.field{back_it}.(depon_).elem.cvalue(:,id_elem);
+                                catch
+                                    val = from_.field{back_it}.(depon_).elem.cvalue(id_elem);
+                                end
+                            else
+                                % ---
+                                try
+                                    val01 = from_.field{back_it}.(depon_).elem.cvalue(:,id_elem);
+                                    val02 = from_.field{next_it}.(depon_).elem.cvalue(:,id_elem);
+                                catch
+                                    val01 = from_.field{back_it}.(depon_).elem.cvalue(id_elem);
+                                    val02 = from_.field{next_it}.(depon_).elem.cvalue(id_elem);
+                                end
+                                % ---
+                                delta_v = val02 - val01;
+                                % ---
+                                delta_t = from_.ltime.t_array(next_it) - from_.ltime.t_array(back_it);
+                                % ---
+                                dt = parent_model_.ltime.t_now - from_.ltime.t_array(back_it);
+                                val = val01 + delta_v./delta_t .* dt;
+                            end
+                            % ---
                         end
                     end
                 elseif any(f_strcmpi(depon_,{'ltime','time'}))
-                    % take from paramater parent_model
+                    % take from parent_model of paramater object
                     fargs{i} = parent_model_.ltime.t_now;
                 end
             end
