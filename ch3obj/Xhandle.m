@@ -16,7 +16,7 @@ classdef Xhandle < matlab.mixin.Copyable
     %----------------------------------------------------------------------
     methods
         function obj = Xhandle()
-            obj.id = char(java.util.UUID.randomUUID.toString);
+            % obj.id = char(java.util.UUID.randomUUID.toString);
         end
     end
     %----------------------------------------------------------------------

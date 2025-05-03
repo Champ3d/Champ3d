@@ -34,7 +34,7 @@ classdef VolumeDom2d < VolumeDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_mesh','id_xline','id_yline','elem_code', ...
+            argslist = {'id','parent_mesh','id_xline','id_yline','elem_code', ...
                         'gid_elem','condition'};
         end
     end
@@ -43,6 +43,7 @@ classdef VolumeDom2d < VolumeDom
         function obj = VolumeDom2d(args)
             arguments
                 % ---
+                args.id = []
                 args.parent_mesh = []
                 args.id_xline = []
                 args.id_yline = []

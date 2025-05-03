@@ -76,7 +76,7 @@ classdef Mesh2d < Mesh
             arguments
                 obj
                 % ---
-                args.id char
+                args.id char = []
                 % ---
                 args.id_xline = []
                 args.id_yline = []
@@ -84,16 +84,29 @@ classdef Mesh2d < Mesh
                 args.elem_code = []
                 args.gid_elem = []
                 args.condition char = []
+                % ---
+                args.dom_obj {mustBeA(args.dom_obj,{'VolumeDom2d'})}
             end
             % ---
-            args.parent_mesh = obj;
+            if isempty(args.id)
+                error('#id must be given !');
+            end
             % ---
-            argu = f_to_namedarg(args,'for','VolumeDom2d');
-            dom = VolumeDom2d(argu{:});
-            obj.dom.(args.id) = dom;
-            % ---
-            obj.is_defining_obj_of(dom);
-            % ---
+            if ~isfield(args,'dom_obj')
+                args.parent_mesh = obj;
+                % ---
+                argu = f_to_namedarg(args,'for','VolumeDom2d');
+                dom = VolumeDom2d(argu{:});
+                obj.dom.(args.id) = dom;
+                % ---
+                obj.is_defining_obj_of(dom);
+                % ---
+            else
+                dom = args.dom_obj;
+                dom.id = args.id;
+                obj.dom.(args.id) = dom;
+                % obj.is_defining_obj_of(dom);
+            end
         end
         % --- XTODO
         function add_sdom(obj,args)

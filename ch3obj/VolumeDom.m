@@ -41,13 +41,14 @@ classdef VolumeDom < GeoDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_mesh','elem_code','gid_elem','condition'};
+            argslist = {'id','parent_mesh','elem_code','gid_elem','condition'};
         end
     end
     % --- Constructors
     methods
         function obj = VolumeDom(args)
             arguments
+                args.id = []
                 args.parent_mesh = []
                 args.elem_code = []
                 args.gid_elem = []

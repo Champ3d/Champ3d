@@ -33,7 +33,7 @@ classdef SurfaceDom3d < SurfaceDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_mesh','gid_face','condition', ...
+            argslist = {'id','parent_mesh','gid_face','condition', ...
                         'defined_on','id_dom3d'};
         end
     end
@@ -42,6 +42,7 @@ classdef SurfaceDom3d < SurfaceDom
         function obj = SurfaceDom3d(args)
             arguments
                 % ---
+                args.id = []
                 args.parent_mesh = []
                 args.gid_face = []
                 args.condition = []
