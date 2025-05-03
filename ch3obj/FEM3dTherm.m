@@ -91,11 +91,20 @@ classdef FEM3dTherm < ThModel
             %--------------------------------------------------------------
         end
         % -----------------------------------------------------------------
-        function solve(obj)
+        function solve(obj,args)
+            arguments
+                obj
+                args.tol_out = 1e-3; % tolerance of outer loop
+                args.tol_in  = 1e-6; % tolerance of inner loop
+                args.maxniter_out = 3; % maximum iteration of outer loop
+                args.maxniter_in = 1e3; % maximum iteration of inner loop
+            end
+            % ---
             obj.ltime.it = 0;
             while obj.ltime.t_now < obj.ltime.t_end
                 obj.ltime.it = obj.ltime.it + 1;
-                obj.solveone;
+                obj.solveone('tol_out',args.tol_out,'tol_in',args.tol_in,...
+                    'maxniter_out',args.maxniter_out,'maxniter_in',args.maxniter_in);
             end
         end
         %------------------------------------------------------------------
