@@ -82,10 +82,6 @@ classdef Thcapacitor < PhysicalDom
     methods
         function build(obj)
             % ---
-            if obj.build_done
-                return
-            end
-            % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
             gid_elem = dom.gid_elem;
@@ -98,7 +94,11 @@ classdef Thcapacitor < PhysicalDom
             cp_array  = obj.cp.getvalue('in_dom',dom);
             rho_cp_array = rho_array .* cp_array;
             % --- check changes
-
+            is_changed = 1;
+            %--------------------------------------------------------------
+            if ~is_changed
+                return
+            end
             %--------------------------------------------------------------
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.gid_node_t = gid_node_t;
@@ -142,7 +142,6 @@ classdef Thcapacitor < PhysicalDom
             %--------------------------------------------------------------
             obj.matrix.rhocpwnwn = rhocpwnwn;
             % ---
-            obj.build_done = 1;
         end
     end
 

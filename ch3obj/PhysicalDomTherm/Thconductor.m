@@ -79,10 +79,6 @@ classdef Thconductor < PhysicalDom
     methods
         function build(obj)
             % ---
-            if obj.build_done
-                return
-            end
-            % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
             gid_elem = dom.gid_elem;
@@ -93,7 +89,11 @@ classdef Thconductor < PhysicalDom
             % ---
             lambda_array = obj.lambda.getvalue('in_dom',dom);
             % --- check changes
-
+            is_changed = 1;
+            %--------------------------------------------------------------
+            if ~is_changed
+                return
+            end
             %--------------------------------------------------------------
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.gid_node_t = gid_node_t;
@@ -134,7 +134,6 @@ classdef Thconductor < PhysicalDom
             %--------------------------------------------------------------
             obj.matrix.lambdawewe = lambdawewe;
             % ---
-            obj.build_done = 1;
         end
     end
 

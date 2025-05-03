@@ -389,7 +389,7 @@ classdef Parameter < Xhandle
                 depon_ = depon__{i};
                 from_  = from__{i};
                 if any(f_strcmpi(depon_,{'celem','cface','cedge','velem','sface','ledge'}))
-                    % take from paramater parent_model
+                    % take from paramater parent_model's mesh
                     fargs{i} = parent_model_.parent_mesh.(depon_)(:,id_elem);
                 elseif any(f_strcmpi(depon_,{...
                         'J','V','T','B','E','H','A','P','Phi'}))
@@ -548,7 +548,7 @@ classdef Parameter < Xhandle
                     end
                 elseif any(f_strcmpi(depon_,{'ltime','time'}))
                     % take from parent_model of paramater object
-                    fargs{k} = parent_model_.ltime.t_now;
+                    fargs{i} = parent_model_.ltime.t_now;
                 end
             end
         end

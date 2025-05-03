@@ -80,10 +80,6 @@ classdef ThPv < PhysicalDom
     methods
         function build(obj)
             % ---
-            if obj.build_done
-                return
-            end
-            % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
             gid_elem = dom.gid_elem;
@@ -99,7 +95,11 @@ classdef ThPv < PhysicalDom
             %    'reference_potential',obj.T0);
             %pv_array;
             % --- check changes
-            
+            is_changed = 1;
+            %--------------------------------------------------------------
+            if ~is_changed
+                return
+            end
             %--------------------------------------------------------------
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.gid_node_t = gid_node_t;
@@ -130,7 +130,6 @@ classdef ThPv < PhysicalDom
             %--------------------------------------------------------------
             obj.matrix.pvwn = pvwn;
             % ---
-            obj.build_done = 1;
         end
     end
 

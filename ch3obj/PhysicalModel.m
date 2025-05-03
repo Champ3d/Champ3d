@@ -39,6 +39,10 @@ classdef PhysicalModel < Xhandle
             obj.parent_mesh.build;
         end
         % ---
+    end
+    % --- ltime + visualization
+    methods
+        % ---
         function add_ltime(obj,ltime_obj)
             arguments
                 obj
@@ -49,9 +53,7 @@ classdef PhysicalModel < Xhandle
             obj.ltime = ltime_obj;
             % ---
         end
-    end
-    % --- visualization
-    methods
+        % ---
         function add_visualdom(obj,args)
             arguments
                 obj

@@ -81,10 +81,6 @@ classdef Thconvection < PhysicalDom
     methods
         function build(obj)
             % ---
-            if obj.build_done
-                return
-            end
-            % ---
             dom = obj.dom;
             % ---
             gid_face = dom.gid_face;
@@ -105,7 +101,11 @@ classdef Thconvection < PhysicalDom
                 gid_face_{k} = sm.gid_face;
             end
             % --- check changes
-
+            is_changed = 1;
+            %--------------------------------------------------------------
+            if ~is_changed
+                return
+            end
             %--------------------------------------------------------------
             obj.matrix.gid_face = gid_face_;
             obj.matrix.gid_node_t = gid_node_t;
@@ -156,7 +156,6 @@ classdef Thconvection < PhysicalDom
             %--------------------------------------------------------------
             obj.matrix.hwnwn = hwnwn;
             % ---
-            obj.build_done = 1;
         end
     end
 
