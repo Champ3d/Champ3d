@@ -89,7 +89,6 @@ classdef SibcAphijw < Sibc
                 (1 + (1-1j)/4 .* skindepth .* cparam_array);
             z_sibc = f_column_array(z_sibc,'nb_elem',lnb_face);
             % ---
-            dom.build_submesh;
             submesh = dom.submesh;
             for k = 1:length(submesh)
                 sm = submesh{k};
@@ -181,7 +180,6 @@ classdef SibcAphijw < Sibc
             es = sparse(2,lnb_face);
             js = sparse(2,lnb_face);
             %--------------------------------------------------------------
-            obj.dom.build_submesh;
             submesh = obj.dom.submesh;
             for k = 1:length(submesh)
                 sm = submesh{k};

@@ -15,7 +15,6 @@ classdef SurfaceDom < GeoDom
         gid_face
         defined_on
         condition
-        submesh
     end
 
     % --- subfields to build
@@ -127,15 +126,7 @@ classdef SurfaceDom < GeoDom
 
     % --- Methods
     methods
-        function allmeshes = build_submesh(obj)
-            % ---
-            % if ~isempty(obj.submesh)
-            %     allmeshes = obj.submesh;
-            %     for i = 1:length(allmeshes)
-            %         allmeshes{i}.node = obj.parent_mesh.node;
-            %     end
-            %     return
-            % end
+        function sm = submesh(obj)
             % --- need parent_mesh
             node = obj.parent_mesh.node;
             face = obj.parent_mesh.face(:,obj.gid_face);
@@ -148,24 +139,23 @@ classdef SurfaceDom < GeoDom
             nb_sm = 0;
             if ~isempty(id_tria)
                 nb_sm = nb_sm + 1;
-                allmeshes{nb_sm} = TriMesh('node',node,'elem',face(1:3,id_tria));
-                allmeshes{nb_sm}.gid_face = obj.gid_face(id_tria);
-                allmeshes{nb_sm}.lid_face = id_tria;
-                allmeshes{nb_sm}.parent_mesh = obj.parent_mesh;
+                sm{nb_sm} = TriMesh('node',node,'elem',face(1:3,id_tria));
+                sm{nb_sm}.gid_face = obj.gid_face(id_tria);
+                sm{nb_sm}.lid_face = id_tria;
+                sm{nb_sm}.parent_mesh = obj.parent_mesh;
             end
             if ~isempty(id_quad)
                 nb_sm = nb_sm + 1;
-                allmeshes{nb_sm} = QuadMesh('node',node,'elem',face(1:4,id_quad));
-                allmeshes{nb_sm}.gid_face = obj.gid_face(id_quad);
-                allmeshes{nb_sm}.lid_face = id_quad;
-                allmeshes{nb_sm}.parent_mesh = obj.parent_mesh;
+                sm{nb_sm} = QuadMesh('node',node,'elem',face(1:4,id_quad));
+                sm{nb_sm}.gid_face = obj.gid_face(id_quad);
+                sm{nb_sm}.lid_face = id_quad;
+                sm{nb_sm}.parent_mesh = obj.parent_mesh;
             end
             % ---
             if nb_sm == 0
-                allmeshes{1} = Mesh;
+                sm{1} = Mesh;
             end
             % ---
-            obj.submesh = allmeshes;
         end
     end
 
@@ -239,7 +229,6 @@ classdef SurfaceDom < GeoDom
                 args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
             end
             % ---
-            obj.build_submesh;
             submesh_ = obj.submesh;
             argu = f_to_namedarg(args);
             for i = 1:length(submesh_)

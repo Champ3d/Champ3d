@@ -15,7 +15,6 @@ classdef VolumeDom < GeoDom
         elem_code
         gid_elem
         condition
-        submesh
         gid
     end
 
@@ -118,22 +117,15 @@ classdef VolumeDom < GeoDom
     % --- Methods
     methods
         % -----------------------------------------------------------------
-        function allmeshes = build_submesh(obj)
-            % ---
-            % if ~isempty(obj.submesh)
-            %     allmeshes = obj.submesh;
-            %     allmeshes{1}.node = obj.parent_mesh.node;
-            %     return
-            % end
+        function sm = submesh(obj)
             % --- need parent_mesh
             node = obj.parent_mesh.node;
             elem = obj.parent_mesh.elem(:,obj.gid_elem);
             % -------------------------------------------------------------
-            allmeshes{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
-            allmeshes{1}.gid_elem = obj.gid_elem;
-            allmeshes{1}.parent_mesh = obj.parent_mesh;
+            sm{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
+            sm{1}.gid_elem = obj.gid_elem;
+            sm{1}.parent_mesh = obj.parent_mesh;
             % ---
-            obj.submesh = allmeshes;
         end
         % -----------------------------------------------------------------
         function gid = get_gid(obj)
@@ -400,7 +392,6 @@ classdef VolumeDom < GeoDom
                 elcode = [args.id ':' elcode];
             end
             % ---
-            obj.build_submesh;
             submesh_ = obj.submesh;
             argu = f_to_namedarg(args,'with_out','id');
             for i = 1:length(submesh_)

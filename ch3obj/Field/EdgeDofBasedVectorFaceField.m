@@ -57,7 +57,6 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
             % ---
             val = zeros(2,lnb_face);
             %--------------------------------------------------------------
-            dom.build_submesh;
             submesh = dom.submesh;
             for k = 1:length(submesh)
                 sm = submesh{k};

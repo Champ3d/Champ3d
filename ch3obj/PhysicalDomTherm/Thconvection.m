@@ -92,7 +92,6 @@ classdef Thconvection < PhysicalDom
             h_array = f_column_array(h_array,'nb_elem',nb_face);
             %--------------------------------------------------------------
             % local surface mesh
-            dom.build_submesh;
             submesh = dom.submesh;
             %--------------------------------------------------------------
             for k = 1:length(submesh)
