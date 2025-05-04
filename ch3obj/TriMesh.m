@@ -118,20 +118,27 @@ classdef TriMesh < Mesh2d
             refelem.nbEd_inEl = size(refelem.EdNo_inEl,1);
             refelem.nbFa_inEl = size(refelem.FaNo_inEl,1);
             %----- Gauss points
-            refelem.U   =       [1/6  2/3  1/6];
-            refelem.V   =       [1/6  1/6  2/3];
-            refelem.Weigh =     [1/6  1/6  1/6];
+            % --- 3 pt
+            % refelem.U     = [1/6  2/3  1/6];
+            % refelem.V     = [1/6  1/6  2/3];
+            % refelem.Weigh = [1/6  1/6  1/6];
+            % --- 4 pt
+            refelem.U     =   [1/3     0.2    0.6    0.2];
+            refelem.V     =   [1/3     0.2    0.2    0.6];
+            refelem.Weigh =   [-27/96  25/96  25/96  25/96];
+            % --- 1 pt
             refelem.cU  = 1/3;
             refelem.cV  = 1/3;
             refelem.cWeigh  = 1/2;
+            % ---
             refelem.nbG = length(refelem.U);
             % ---
-            refelem.nbI = 4;
+            refelem.nbI = 5;
             e = 1e-6;
             refelem.nU = [0 1 0];
             refelem.nV = [0 0 1];
-            refelem.iU = [(1-e) * refelem.nU    1/3];
-            refelem.iV = [(1-e) * refelem.nV    1/3];
+            refelem.iU = [(1-e) * refelem.nU    1/3  2/3];
+            refelem.iV = [(1-e) * refelem.nV    1/3  2/3];
             %-----
             refelem.N{1} = @(u,v) (1-u-v);
             refelem.N{2} = @(u,v) (    u);

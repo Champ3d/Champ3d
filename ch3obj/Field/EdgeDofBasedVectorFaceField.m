@@ -55,7 +55,7 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
             id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face;
             lnb_face = length(dom.gid_face);
             % ---
-            val = zeros(2,lnb_face);
+            val = zeros(3,lnb_face);
             %--------------------------------------------------------------
             submesh = dom.submesh;
             for k = 1:length(submesh)
@@ -104,7 +104,6 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
                     for iG = 1:nbG
                         Wx{iG} = obj.prokit.We{iG}(id_elem,:,:);
                     end
-            end
             %--------------------------------------------------------------
             
 

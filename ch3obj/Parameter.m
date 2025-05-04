@@ -390,6 +390,7 @@ classdef Parameter < Xhandle
             % ---
             fargs = cell(1,length(obj.depend_on));
             % ---
+            target_dom   = dom;
             target_model = obj.parent_model;
             % ---
             depon__ = obj.depend_on;
@@ -464,10 +465,10 @@ classdef Parameter < Xhandle
                                 elseif f_strcmpi(obj.dom_search,'by_id')
                                     id_dom_source = fieldnames(source_model.parent_mesh.dom);
                                     for ids = 1:length(id_dom_source)
-                                        if f_strcmpi(id_dom_source{ids},dom.id)
+                                        if f_strcmpi(id_dom_source{ids},target_dom.id)
                                             id_elem_source = source_model.parent_mesh.dom.gid_elem;
                                         else
-                                            f_fprintf(0,'dom',1,dom.id,0,'not found !',0,'champ3d performs #dom_search by_coordinates \n');
+                                            f_fprintf(0,'dom',1,target_dom.id,0,'not found !',0,'champ3d performs #dom_search by_coordinates \n');
                                             id_elem_source = f_findelem(source_model.parent_mesh.node,source_model.parent_mesh.elem,...
                                                 'in_box',target_model.parent_mesh.localbox(id_elem_target));
                                         end
@@ -576,19 +577,14 @@ classdef Parameter < Xhandle
                                 % ---
                                 id_face_target = id_place_target;
                                 % --- take just what needed
-                                if f_strcmpi(obj.dom_search,'by_coordinates')
-                                    id_face_source = f_findelem(source_model.parent_mesh.node,source_model.parent_mesh.face,...
-                                                'in_box',target_model.parent_mesh.localbox(id_face_target));
-                                elseif f_strcmpi(obj.dom_search,'by_id')
-                                    id_dom_source = fieldnames(source_model.parent_mesh.dom);
-                                    for ids = 1:length(id_dom_source)
-                                        if f_strcmpi(id_dom_source{ids},dom.id)
-                                            id_face_source = source_model.parent_mesh.dom.gid_elem;
-                                        else
-                                            f_fprintf(0,'dom',1,dom.id,0,'not found !',0,'champ3d performs #dom_search by_coordinates \n');
-                                            id_face_source = f_findelem(source_model.parent_mesh.node,source_model.parent_mesh.face,...
-                                                'in_box',target_model.parent_mesh.localbox(id_face_target));
-                                        end
+                                % --- XTODO dom_search = 'by_coordinates'
+                                id_dom_source = fieldnames(source_model.parent_mesh.dom);
+                                for ids = 1:length(id_dom_source)
+                                    if f_strcmpi(id_dom_source{ids},target_dom.id)
+                                        id_face_source = source_model.parent_mesh.dom.gid_face;
+                                    else
+                                        % f_fprintf(0,'dom',1,c,0,'not found !\n');
+                                        error(['dom ' target_dom ' not found on source model !\n']);
                                     end
                                 end
                                 % --- time interpolated data

@@ -164,7 +164,7 @@ for i = 1:length(fs)
         if maxfs > minfs
             caxis([minfs maxfs]);
         end
-        axis equal; axis tight; f_colormap;
+        axis equal; axis tight; f_colormap; view(3);
         % ---
         f_chlogo;
         % ---
@@ -182,7 +182,7 @@ for i = 1:length(fs)
         if maxfs > minfs
             caxis([minfs maxfs]);
         end
-        axis equal; axis tight; f_colormap;
+        axis equal; axis tight; f_colormap; view(3);
         % ---
         f_chlogo;
         % ---

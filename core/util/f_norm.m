@@ -25,5 +25,4 @@ switch ntype
         VM = sqrt(sum(V.^2));
 end
 
-
 end

@@ -841,7 +841,11 @@ classdef Mesh < Xhandle
             refelem_ = obj.refelem;
             U = refelem_.U;
             V = refelem_.V;
-            W = refelem_.W;
+            if isfield(refelem_,'W')
+                W = refelem_.W;
+            else
+                W = [];
+            end
             %--------------------------------------------------------------
             obj.build_meshds;
             %--------------------------------------------------------------
@@ -891,7 +895,11 @@ classdef Mesh < Xhandle
             refelem_ = obj.refelem;
             U = refelem_.iU;
             V = refelem_.iV;
-            W = refelem_.iW;
+            if isfield(refelem_,'iW')
+                W = refelem_.iW;
+            else
+                W = [];
+            end
             %--------------------------------------------------------------
             fnmeshds = fieldnames(obj.meshds);
             for i = 1:length(fnmeshds)
@@ -957,7 +965,11 @@ classdef Mesh < Xhandle
             refelem_ = obj.refelem;
             U = refelem_.iU;
             V = refelem_.iV;
-            W = refelem_.iW;
+            if isfield(refelem_,'iW')
+                W = refelem_.iW;
+            else
+                W = [];
+            end
             %--------------------------------------------------------------
             obj.build_meshds;
             %--------------------------------------------------------------

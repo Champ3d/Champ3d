@@ -8,36 +8,81 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef VectorFaceField < Xhandle
+classdef VectorFaceField < FaceField
     % --- Contructor
     methods
         function obj = VectorFaceField()
-            obj = obj@Xhandle;
+            obj = obj@FaceField;
         end
-    end
-    % --- get
-    methods
-        % -----------------------------------------------------------------
-        function val = cnode(obj,id_face)
-            % ---
-            if nargin <= 1
-                id_face = 1:obj.parent_model.parent_mesh.nb_face;
-            end
-            % ---
-            val = obj.parent_model.parent_mesh.cface(:,id_face);
-        end
-        % -----------------------------------------------------------------
-        % function val = inode(obj,id_elem)
-        % end
-        % -----------------------------------------------------------------
-        % function val = gnode(obj,id_elem)
-        % end
-        % -----------------------------------------------------------------
     end
     % --- plot - XTODO
     methods
         % -----------------------------------------------------------------
         function plot(obj,args)
+            arguments
+                obj
+                args.meshdom_obj = []
+                args.id_meshdom = []
+                args.id_face = []
+                args.show_dom = 1
+            end
+            % ---
+            if isempty(args.id_meshdom)
+                args.show_dom = 0;
+                % ---
+                if isempty(args.meshdom_obj)
+                    if isempty(args.id_face)
+                        text(0,0,'Nothing to plot !');
+                    else
+                        gid_face = args.id_face;
+                    end
+                else
+                    dom = args.meshdom_obj;
+                    if isa(dom,'SurfaceDom3d')
+                        gid_face = dom.gid_face;
+                    else
+                        text(0,0,'Nothing to plot, dom must be a SurfaceDom3d !');
+                    end
+                end
+            else
+                dom = obj.parent_model.parent_mesh.dom.(args.id_meshdom);
+                if isa(dom,'SurfaceDom3d')
+                    gid_face = dom.gid_face;
+                else
+                    text(0,0,'Nothing to plot, dom must be a SurfaceDom3d !');
+                end
+            end
+            % ---
+            if args.show_dom
+                dom.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
+            end
+            % ---
+            node_ = obj.parent_model.parent_mesh.node;
+            face_ = obj.parent_model.parent_mesh.face(:,gid_face);
+            if isreal(obj.cvalue(gid_face(1:2)))
+                f_patch('node',node_,'face',face_,'face_field',obj.cvalue(gid_face).');
+            else
+                % ---
+                vnorm = f_norm(obj.cvalue(gid_face));
+                % ---
+                for i = 1:3
+                    % ---
+                    subplot(130 + i);
+                    if i == 1
+                        title('Real part');
+                        f_patch('node',node_,'face',face_,'face_field',real(vnorm));
+                    elseif i == 2
+                        title('Imag part');
+                        f_patch('node',node_,'face',face_,'face_field',imag(vnorm));
+                    elseif i == 3
+                        title('Magnitude');
+                        % ---
+                        f_patch('node',node_,'face',face_,'face_field',abs(vnorm));
+                    end
+                    % ---
+                end
+            end
+            
         end
     end
 end
