@@ -63,6 +63,11 @@ classdef Thconductor < PhysicalDom
             obj.set_parameter;
             obj.get_geodom;
             obj.dom.is_defining_obj_of(obj);
+            % --- Initialization
+            obj.matrix.gid_elem = [];
+            obj.matrix.gid_node_t = [];
+            obj.matrix.lambda_array = [];
+            obj.matrix.lambdawewe = [];
             % ---
             obj.setup_done = 1;
             obj.build_done = 0;
@@ -90,6 +95,9 @@ classdef Thconductor < PhysicalDom
             lambda_array = obj.lambda.getvalue('in_dom',dom);
             % --- check changes
             is_changed = 1;
+            if isequal(lambda_array,obj.matrix.lambda_array)
+                is_changed = 0;
+            end
             %--------------------------------------------------------------
             if ~is_changed
                 return

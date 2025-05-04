@@ -64,6 +64,11 @@ classdef Thconvection < PhysicalDom
             obj.set_parameter;
             obj.get_geodom;
             obj.dom.is_defining_obj_of(obj);
+            % --- Initialization
+            obj.matrix.gid_face = [];
+            obj.matrix.gid_node_t = [];
+            obj.matrix.h_array = [];
+            obj.matrix.hwnwn = [];
             % ---
             obj.setup_done = 1;
             obj.build_done = 0;
@@ -101,6 +106,9 @@ classdef Thconvection < PhysicalDom
             end
             % --- check changes
             is_changed = 1;
+            if isequal(h_array,obj.matrix.h_array)
+                is_changed = 0;
+            end
             %--------------------------------------------------------------
             if ~is_changed
                 return

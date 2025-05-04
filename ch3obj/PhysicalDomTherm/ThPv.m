@@ -63,6 +63,11 @@ classdef ThPv < PhysicalDom
             obj.set_parameter;
             obj.get_geodom;
             obj.dom.is_defining_obj_of(obj);
+            % --- Initialization
+            obj.matrix.gid_elem = [];
+            obj.matrix.gid_node_t = [];
+            obj.matrix.pv_array = [];
+            obj.matrix.pvwn = [];
             % ---
             obj.setup_done = 1;
             obj.build_done = 0;
@@ -90,12 +95,15 @@ classdef ThPv < PhysicalDom
             % ---
             pv_array = obj.pv.getvalue('in_dom',dom);
             % --- save
-            it = obj.parent_model.ltime.it;
+            % it = obj.parent_model.ltime.it;
             %obj.field{it}.pv.elem = FreeScalarElemField('parent_model',obj,'dof',obj.dof{it}.T,...
             %    'reference_potential',obj.T0);
             %pv_array;
             % --- check changes
             is_changed = 1;
+            if isequal(pv_array,obj.matrix.pv_array)
+                is_changed = 0;
+            end
             %--------------------------------------------------------------
             if ~is_changed
                 return

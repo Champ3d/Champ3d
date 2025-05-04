@@ -65,6 +65,13 @@ classdef Thcapacitor < PhysicalDom
             obj.set_parameter;
             obj.get_geodom;
             obj.dom.is_defining_obj_of(obj);
+            % --- Initialization
+            obj.matrix.gid_elem = [];
+            obj.matrix.gid_node_t = [];
+            obj.matrix.rho_array = [];
+            obj.matrix.cp_array = [];
+            obj.matrix.rho_cp_array = [];
+            obj.matrix.rhocpwnwn = [];
             % ---
             obj.setup_done = 1;
             obj.build_done = 0;
@@ -95,6 +102,9 @@ classdef Thcapacitor < PhysicalDom
             rho_cp_array = rho_array .* cp_array;
             % --- check changes
             is_changed = 1;
+            if isequal(rho_cp_array,obj.matrix.rho_cp_array)
+                is_changed = 0;
+            end
             %--------------------------------------------------------------
             if ~is_changed
                 return
