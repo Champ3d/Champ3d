@@ -26,7 +26,6 @@ classdef SurfaceDom2d < SurfaceDom
     properties (Access = private)
         setup_done = 0
         build_done = 0
-        assembly_done = 0
     end
 
     % --- Dependent Properties
@@ -53,9 +52,6 @@ classdef SurfaceDom2d < SurfaceDom
             % ---
             SurfaceDom2d.setup(obj);
             % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
     % --- setup/reset/build/assembly
@@ -67,22 +63,22 @@ classdef SurfaceDom2d < SurfaceDom
             end
             % ---
             setup@SurfaceDom(obj);
+            % --- XTODO
             % ---
             obj.setup_done = 1;
+            obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % ---
-            % must reset setup+build+assembly
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
-            % must call super reset
-            % ,,, with obj as argument
+            % reset super
             reset@SurfaceDom(obj);
+            % ---
+            obj.setup_done = 0;
+            SurfaceDom2d.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
         end
     end
     methods
@@ -95,16 +91,10 @@ classdef SurfaceDom2d < SurfaceDom
             if obj.build_done
                 return
             end
+            % --- XTODO
+            % obj.build_defining_obj;
             % ---
             obj.build_done = 1;
-            % ---
-        end
-    end
-    methods
-        function assembly(obj)
-            % ---
-            obj.build;
-            assembly@SurfaceDom(obj);
             % ---
         end
     end

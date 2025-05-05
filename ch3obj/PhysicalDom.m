@@ -15,6 +15,9 @@ classdef PhysicalDom < Xhandle
         parent_model
         id_dom2d
         id_dom3d
+        % ---
+        % 'by_coordinates', 'by_id_dom'[by default]
+        parameter_dependency_search = 'by_id_dom'
     end
 
     % --- computed
@@ -22,64 +25,20 @@ classdef PhysicalDom < Xhandle
         dom
     end
 
-    % ---
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-        assembly_done = 0
-    end
-    % ---
-    
-    % --- Valid args list
-    methods (Static)
-        function argslist = validargs(fname)
-            if nargin < 1
-                argslist = {'parent_model','id_dom2d','id_dom3d'};
-            elseif ischar(fname)
-                if f_strcmpi(fname,'plot')
-                    argslist = {'edge_color','face_color','alpha'};
-                end
-            end
-        end
-    end
     % --- Contructor
     methods
-        function obj = PhysicalDom(args)
-            arguments
-                args.parent_model
-                args.id_dom2d
-                args.id_dom3d
-            end
+        function obj = PhysicalDom()
             % ---
             obj@Xhandle;
             % ---
-            if isempty(fieldnames(args))
-                return
-            end
-            % ---
-            obj <= args;
-            % ---
-            % call setup in constructor
-            % ,,, for direct verification
-            % ,,, setup must be static
-            PhysicalDom.setup(obj);
-            % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
     
-    % --- setup/reset/build/assembly
-    methods (Static)
-        function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            obj.get_geodom;
-            % ---
+    % --- Utility Methods
+    methods
+        function set_parameter(obj)
+            % --- XTODO
+            % should put list in config file ?
             paramlist = {'sigma','mur','bs','br','r_ht','r_et',...
                          'i_coil','v_coil','j_coil',...
                          'rho','cp','lambda','h','ps','pv'};
@@ -89,51 +48,12 @@ classdef PhysicalDom < Xhandle
                 if isprop(obj,param)
                     if isnumeric(obj.(param))
                         if ~isempty(obj.(param))
-                            obj.(param) = Parameter('f',obj.(param));
+                            obj.(param) = Parameter('parent_model',obj.parent_model,'f',obj.(param));
                         end
                     end
                 end
             end
-            % ---
-            obj.setup_done = 1;
-            % ---
         end
-    end
-    methods (Access = public)
-        function reset(obj)
-            % ---
-            % must reset setup+build+assembly
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-        end
-    end
-    methods
-        function build(obj)
-            % ---
-            PhysicalDom.setup(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            obj.callsubfieldbuild('field_name','dom');
-            % ---
-            obj.build_done = 1;
-            % ---
-        end
-    end
-    methods
-        function assembly(obj)
-            % ---
-            % may return to build of subclass obj
-            % ... subclass build must call superclass build
-            obj.build;
-            % ---
-        end
-    end
-    % --- Methods
-    methods
         function get_geodom(obj)
             if isempty(obj.parent_model)
                 return
@@ -153,11 +73,14 @@ classdef PhysicalDom < Xhandle
             if isempty(id_dom_)
                 return
             end
-            % --- can define on multiple geo doms
+            % ---
             obj.dom = obj.parent_model.parent_mesh.dom.(id_dom_{1});
-            for i = 2:length(id_dom_)
-                obj.dom = obj.dom + obj.parent_model.parent_mesh.dom.(id_dom_{i});
-            end
+            % ---
+            % --- can define on multiple geo doms
+            % --- but better if define dom in mesh
+            % for i = 2:length(id_dom_)
+            %     obj.dom = obj.dom + obj.parent_model.parent_mesh.dom.(id_dom_{i});
+            % end
         end
         % -----------------------------------------------------------------
     end
@@ -171,8 +94,6 @@ classdef PhysicalDom < Xhandle
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
             end
-            % ---
-            obj.build;
             % ---
             argu = f_to_namedarg(args);
             obj.dom.plot(argu{:});
@@ -259,7 +180,10 @@ classdef PhysicalDom < Xhandle
                 args.show_dom = 0
             end
             % ---
-            obj.plotscalarfield('show_dom',args.show_dom,'field_name','T')
+            it = obj.parent_model.ltime.it;
+            obj.parent_model.field{it}.T.node.plot('meshdom_obj',obj.dom,...
+                'show_dom',args.show_dom);
+            % ---
         end
         % -----------------------------------------------------------------
         function plotps(obj,args)
@@ -322,7 +246,7 @@ classdef PhysicalDom < Xhandle
             if args.show_dom
                 obj.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
             end
-            % ---
+            % --- for ScalarElemField
             if any(f_strcmpi(args.field_name,{'pv'}))
                 fs = obj.parent_model.field.(args.field_name);
                 % ---
@@ -333,7 +257,7 @@ classdef PhysicalDom < Xhandle
                 f_colormap;
                 return
             end
-            % ---
+            % --- for ScalarNodeField
             if isa(obj.dom,'VolumeDom3d')
                 node = obj.parent_model.parent_mesh.node;
                 elem = obj.parent_model.parent_mesh.elem(:,obj.dom.gid_elem);
@@ -349,8 +273,11 @@ classdef PhysicalDom < Xhandle
             if isa(obj.dom,'SurfaceDom3d')
                 node = obj.parent_model.parent_mesh.node;
                 face = obj.parent_model.parent_mesh.face(:,obj.dom.gid_face);
-                fs = obj.parent_model.field.(args.field_name);
-                fs = fs(obj.dom.gid_face);
+                % ---
+                it = obj.parent_model.ltime.it;
+                fs = obj.parent_model.field{it}.(args.field_name).node.value;
+                %fs = fs(obj.dom.gid_face);
+                % ---
                 f_patch(node,face,'defined_on','face','scalar_field',fs);
             end
         end

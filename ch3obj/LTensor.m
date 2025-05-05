@@ -10,6 +10,7 @@
 
 classdef LTensor < Xhandle
     properties
+        parent_model
         main_value
         main_dir
         ort1_value
@@ -23,7 +24,8 @@ classdef LTensor < Xhandle
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'main_value','main_dir', ...
+            argslist = {'parent_model',...
+                        'main_value','main_dir', ...
                         'ort1_value','ort1_dir', ....
                         'ort2_value','ort2_dir', ...
                         'rot_axis','rot_angle'};
@@ -33,6 +35,7 @@ classdef LTensor < Xhandle
     methods
         function obj = LTensor(args)
             arguments
+                args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
                 args.main_value = []
                 args.main_dir = []
                 args.ort1_value = []
@@ -43,23 +46,41 @@ classdef LTensor < Xhandle
                 args.rot_angle = []
             end
             % ---
+            obj = obj@Xhandle;
+            % ---
+            if ~isfield(args,'parent_model')
+                error('#parent_model must be given !');
+            end
+            % ---
             obj <= args;
+            % ---
         end
     end
 
     % --- Methods
     methods
         % -----------------------------------------------------------------
-        function gtensor = get_on(obj,dom)
+        function gtensor = getvalue(obj,args)
+            arguments
+                obj
+                args.in_dom = [] %{mustBeA(args.in_dom,{'VolumeDom','SurfaceDom'})}
+            end
             % ---
-            if isa(dom,'VolumeDom')
-                id_elem = dom.gid_elem;
-            elseif isa(dom,'SurfaceDom')
-                id_elem = dom.gid_face;
-            elseif isprop(dom,'gid_elem')
-                id_elem = dom.gid_elem;
-            elseif isprop(dom,'gid_face')
-                id_elem = dom.gid_face;
+            dom = args.in_dom;
+            if isa(dom,'PhysicalDom')
+                meshdom = dom.dom;
+            else
+                meshdom = dom;
+            end
+            % ---
+            if isa(meshdom,'VolumeDom')
+                id_elem = meshdom.gid_elem;
+            elseif isa(meshdom,'SurfaceDom')
+                id_elem = meshdom.gid_face;
+            elseif isprop(meshdom,'gid_elem')
+                id_elem = meshdom.gid_elem;
+            elseif isprop(meshdom,'gid_face')
+                id_elem = meshdom.gid_face;
             end
             % ---
             nb_elem = length(id_elem);
@@ -74,11 +95,19 @@ classdef LTensor < Xhandle
                 if ~isempty(ltfield)
                     if isnumeric(ltfield)
                         ltensor.(fn) = repmat(ltfield,nb_elem,1);
-                    elseif isa(ltfield,'Parameter')
-                        ltensor.(fn) = ltfield.get('in_dom',dom);
+                    elseif isa(ltfield,'Parameter') || isa(ltfield,'LVector')
+                        if isequal(obj.parent_model,ltfield.parent_model)
+                            ltensor.(fn) = ltfield.getvalue('in_dom',dom);
+                        else
+                            error('#parent_model of LTensor obj must be the same as its parameters !');
+                        end
                     end
                 end
             end
+            % --- normalize
+            ltensor.main_dir = f_normalize(ltensor.main_dir,2);
+            ltensor.ort1_dir = f_normalize(ltensor.ort1_dir,2);
+            ltensor.ort2_dir = f_normalize(ltensor.ort2_dir,2);
             % ---
             if ~isempty(obj.rot_axis) && ~isempty(obj.rot_angle)
                 for i = 1:nb_elem
@@ -97,9 +126,16 @@ classdef LTensor < Xhandle
             % ---
         end
         % -----------------------------------------------------------------
-        function ginv = get_inverse_on(obj,dom)
+        function ginv = get_inverse(obj,args)
+            arguments
+                obj
+                args.in_dom = [] %{mustBeA(args.in_dom,{'VolumeDom','SurfaceDom'})}
+            end
+            % ---
+            dom = args.in_dom;
+            % ---
             ginv = [];
-            gtensor  = obj.get('in_dom',dom);
+            gtensor  = obj.getvalue('in_dom',dom);
             sizeg = size(gtensor);
             lensg = length(sizeg); 
             if lensg == 3

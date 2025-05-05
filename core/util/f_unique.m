@@ -33,7 +33,9 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if isobject(mat)
+if isempty(mat)
+    return
+elseif isobject(mat)
     return
 elseif iscell(mat)
     % --- work with obj references

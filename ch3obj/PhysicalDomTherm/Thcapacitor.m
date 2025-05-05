@@ -8,10 +8,12 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ThPvTherm < ThPv
+classdef Thcapacitor < PhysicalDom
 
     % --- computed
     properties
+        rho = 0
+        cp  = 0
         matrix
     end
 
@@ -19,27 +21,30 @@ classdef ThPvTherm < ThPv
     properties (Access = private)
         setup_done = 0
         build_done = 0
-        assembly_done = 0
     end
     
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = ThPv.validargs;
+            argslist = {'parent_model','id_dom2d','id_dom3d','rho','cp','parameter_dependency_search'};
         end
     end
     % --- Contructor
     methods
-        function obj = ThPvTherm(args)
+        function obj = Thcapacitor(args)
             arguments
                 args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
-                args.pv
+                args.rho
+                args.cp
+                args.parameter_dependency_search ...
+                    {mustBeMember(args.parameter_dependency_search,{'by_coordinates','by_id_dom'})} ...
+                    = 'by_id_dom'
             end
             % ---
-            obj = obj@ThPv;
+            obj = obj@PhysicalDom;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -47,11 +52,8 @@ classdef ThPvTherm < ThPv
             % ---
             obj <= args;
             % ---
-            ThPvTherm.setup(obj);
+            Thcapacitor.setup(obj);
             % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
 
@@ -62,38 +64,33 @@ classdef ThPvTherm < ThPv
             if obj.setup_done
                 return
             end
-            % ---
-            setup@ThPv(obj);
+            % --- call utility methods
+            obj.set_parameter;
+            obj.get_geodom;
+            obj.dom.is_defining_obj_of(obj);
+            % --- Initialization
+            obj.matrix.gid_elem = [];
+            obj.matrix.gid_node_t = [];
+            obj.matrix.rho_array = [];
+            obj.matrix.cp_array = [];
+            obj.matrix.rho_cp_array = [];
+            obj.matrix.rhocpwnwn = [];
             % ---
             obj.setup_done = 1;
+            obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % ---
-            % must reset setup+build+assembly
             obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
-            % must call super reset
-            % ,,, with obj as argument
-            reset@ThPv(obj);
+            Thcapacitor.setup(obj);
         end
     end
 
     % --- build
     methods
         function build(obj)
-            % ---
-            ThPvTherm.setup(obj);
-            % ---
-            build@ThPv(obj);
-            % ---
-            if obj.build_done
-                return
-            end
             % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
@@ -103,16 +100,63 @@ classdef ThPvTherm < ThPv
             % ---
             gid_node_t = f_uniquenode(elem);
             % ---
-            pv_array = obj.pv.get('in_dom',dom);
-            % ---
-            pvwn = parent_mesh.cwn('id_elem',gid_elem,'coefficient',pv_array);
-            % ---
+            rho_array = obj.rho.getvalue('in_dom',obj);
+            cp_array  = obj.cp.getvalue('in_dom',obj);
+            rho_cp_array = rho_array .* cp_array;
+            % --- check changes
+            is_changed = 1;
+            if isequal(rho_cp_array,obj.matrix.rho_cp_array)
+                is_changed = 0;
+            end
+            %--------------------------------------------------------------
+            if ~is_changed && obj.build_done == 1
+                return
+            end
+            %--------------------------------------------------------------
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.gid_node_t = gid_node_t;
-            obj.matrix.pvwn = pvwn;
-            obj.matrix.pv_array = pv_array;
+            % ---
+            obj.matrix.rho_array = rho_array;
+            obj.matrix.cp_array = cp_array;
+            obj.matrix.rho_cp_array = rho_cp_array;
+            %--------------------------------------------------------------
+            % local rhocpwnwn matrix
+            lmatrix = parent_mesh.cwnwn('id_elem',gid_elem,'coefficient',rho_cp_array);
+            %--------------------------------------------------------------
+            id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
+            elem = obj.parent_model.parent_mesh.elem;
+            nb_node = obj.parent_model.parent_mesh.nb_node;
+            nbNo_inEl = obj.parent_model.parent_mesh.refelem.nbNo_inEl;
+            %--------------------------------------------------------------
+            gid_elem = obj.matrix.gid_elem;
+            %--------------------------------------------------------------
+            [~,id_] = intersect(gid_elem,id_elem_nomesh);
+            gid_elem(id_) = [];
+            lmatrix(id_,:,:) = [];
+            %--------------------------------------------------------------
+            % global elementary rhocpwnwn matrix
+            rhocpwnwn = sparse(nb_node,nb_node);
+            %--------------------------------------------------------------
+            for i = 1:nbNo_inEl
+                for j = i+1 : nbNo_inEl
+                    rhocpwnwn = rhocpwnwn + ...
+                        sparse(elem(i,gid_elem),elem(j,gid_elem),...
+                        lmatrix(:,i,j),nb_node,nb_node);
+                end
+            end
+            % ---
+            rhocpwnwn = rhocpwnwn + rhocpwnwn.';
+            % ---
+            for i = 1:nbNo_inEl
+                rhocpwnwn = rhocpwnwn + ...
+                    sparse(elem(i,gid_elem),elem(i,gid_elem),...
+                    lmatrix(:,i,i),nb_node,nb_node);
+            end
+            %--------------------------------------------------------------
+            obj.matrix.rhocpwnwn = rhocpwnwn;
             % ---
             obj.build_done = 1;
+            % ---
         end
     end
 
@@ -121,29 +165,9 @@ classdef ThPvTherm < ThPv
         function assembly(obj)
             % ---
             obj.build;
-            assembly@ThPv(obj);
             %--------------------------------------------------------------
-            id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
-            elem = obj.parent_model.parent_mesh.elem;
-            nb_node = obj.parent_model.parent_mesh.nb_node;
-            nbNo_inEl = obj.parent_model.parent_mesh.refelem.nbNo_inEl;
-            %--------------------------------------------------------------
-            gid_elem = obj.matrix.gid_elem;
-            lmatrix = obj.matrix.pvwn;
-            %--------------------------------------------------------------
-            [~,id_] = intersect(gid_elem,id_elem_nomesh);
-            gid_elem(id_) = [];
-            lmatrix(id_,:,:) = [];
-            %--------------------------------------------------------------
-            pvwn = sparse(nb_node,1);
-            %--------------------------------------------------------------
-            for i = 1:nbNo_inEl
-                pvwn = pvwn + ...
-                    sparse(elem(i,gid_elem),1,lmatrix(:,i),nb_node,1);
-            end
-            %--------------------------------------------------------------
-            obj.parent_model.matrix.pvwn = ...
-                obj.parent_model.matrix.pvwn + pvwn;
+            obj.parent_model.matrix.rhocpwnwn = ...
+                obj.parent_model.matrix.rhocpwnwn + obj.matrix.rhocpwnwn;
             %--------------------------------------------------------------
             obj.parent_model.matrix.id_node_t = ...
                 [obj.parent_model.matrix.id_node_t obj.matrix.gid_node_t];

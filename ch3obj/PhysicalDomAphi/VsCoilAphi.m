@@ -38,7 +38,7 @@ classdef VsCoilAphi < Xhandle
             end
             % ---
             dom = obj.dom;
-            obj.matrix.v_coil = obj.v_coil.get('in_dom',dom);
+            obj.matrix.v_coil = obj.v_coil.getvalue('in_dom',dom);
             % ---
             obj.build_done = 1;
             obj.assembly_done = 0;

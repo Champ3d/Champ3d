@@ -13,20 +13,22 @@ arguments
     node
     face
     args.cdetJ = []
-    args.elem_type {mustBeMember(args.elem_type,{'','tri','triangle','quad','tet','tetra','prism','hex','hexa'})} = ''
+    args.elem_type {mustBeMember(args.elem_type,{'tri','triangle','quad','tet','tetra','prism','hex','hexa'})}
 end
 
 % --- 
 cdetJ = args.cdetJ;
-elem_type = args.elem_type;
 % --- default ouput value
 area = zeros(1,size(face,2));
 %--------------------------------------------------------------------------
-if isempty(elem_type)
-    elem_type = f_elemtype(face,'defined_on','face');
-end
-%--------------------------------------------------------------------------
 if ~isempty(cdetJ)
+    % ---
+    if isfield(args,'elem_type')
+        elem_type = args.elem_type;
+    end
+    if isempty(elem_type)
+        elem_type = f_elemtype(face,'defined_on','face');
+    end
     % ---
     refelem = f_connexion(elem_type);
     cWeigh = refelem.cWeigh;
@@ -55,7 +57,7 @@ for i = 1:length(grface)
         cV  = refelem.cV;
         cWeigh = refelem.cWeigh;
         %------------------------------------------------------------------
-        [S, ~] = f_jacobien(node,elem,'elem_type',elem_type,...
+        [S, ~] = f_jacobien(node,face,'elem_type',elem_type,...
                             'u',cU,'v',cV,'flat_node',flat_node);
         %------------------------------------------------------------------
         S = S{1} .* cWeigh;

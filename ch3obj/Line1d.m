@@ -20,6 +20,15 @@ classdef Line1d < Xhandle
         elem_code
     end
 
+    properties (Access = private)
+        setup_done = 0
+    end
+
+    properties
+        dependent_obj = []
+        defining_obj = []
+    end
+
     % --- Dependent Properties
     properties (Dependent = true)
 
@@ -50,13 +59,17 @@ classdef Line1d < Xhandle
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            Line1d.setup(obj);
         end
     end
 
     % --- Methods
-    methods
+    methods (Static)
         function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
             % ---
             if any(f_strcmpi(obj.dtype,{'log+-','log-+','log='}))
                 if mod(obj.dnum,2) ~= 0
@@ -97,6 +110,18 @@ classdef Line1d < Xhandle
             %--------------------------------------------------------------
             obj.node = node_;
             obj.elem_code = f_str2code(obj.id);
+            % ---
+            obj.setup_done = 1;
+            % ---
+        end
+    end
+    % ---
+    methods (Access = public)
+        function reset(obj)
+            obj.setup_done = 0;
+            Line1d.setup(obj);
+            % --- reset dependent objs
+            obj.reset_dependent_obj;
         end
     end
 end

@@ -1,5 +1,5 @@
 %--------------------------------------------------------------------------
-% This code is written by: H-K. Bui, 2024
+% This code is written by: H-K. Bui, 2025
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
@@ -8,9 +8,8 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ProcessingSurface3d < VolumeDom3d
+classdef VisualSurface3d < Xhandle
 
-    % --- Properties
     properties
         parent_model
         id_dom3d
@@ -31,6 +30,11 @@ classdef ProcessingSurface3d < VolumeDom3d
         %gid_side_node_2
     end
 
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+    end
+
     % --- Dependent Properties
     properties (Dependent = true)
         
@@ -46,7 +50,7 @@ classdef ProcessingSurface3d < VolumeDom3d
     end
     % --- Constructors
     methods
-        function obj = ProcessingSurface3d(args)
+        function obj = VisualSurface3d(args)
             arguments
                 % ---
                 args.parent_model = []
@@ -60,46 +64,103 @@ classdef ProcessingSurface3d < VolumeDom3d
                 args.id_dom3d = []
             end
             % ---
+            obj = obj@Xhandle;
+            % ---
             obj <= args;
             % ---
-            if isempty(obj.id_dom3d)
-                obj.id_dom3d = 'default_domain';
-            end
+            VisualSurface3d.setup(obj);
             % ---
-            if f_is_available(args,{'parent_model'})
-                obj.parent_mesh = obj.parent_model.parent_mesh;
-            end
-            % ---
-            if f_is_available(args,{'parallel_line_1','parallel_line_2'})
-                % ---
-                if size(obj.parallel_line_1,1) == 3
-                    obj.parallel_line_1 = obj.parallel_line_1.';
-                end
-                if size(obj.parallel_line_2,1) == 3
-                    obj.parallel_line_2 = obj.parallel_line_2.';
-                end
-                % ---
-                if any(f_strcmpi(obj.dtype_parallel,{'log+-','log-+','log='}))
-                    if mod(obj.dnum_parallel,2) ~= 0
-                        obj.dnum_parallel = obj.dnum_parallel + 1;
-                    end
-                end
-                % ---
-                if any(f_strcmpi(obj.dtype_orthogonal,{'log+-','log-+','log='}))
-                    if mod(obj.dnum_orthogonal,2) ~= 0
-                        obj.dnum_orthogonal = obj.dnum_orthogonal + 1;
-                    end
-                end
-                % ---
-                obj.build;
-            end
         end
     end
 
-    % --- Methods
-    methods (Access = private, Hidden)
+    % ---
+    methods (Static)
         % -----------------------------------------------------------------
-        function build(obj)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            if size(obj.parallel_line_1,1) == 3
+                obj.parallel_line_1 = obj.parallel_line_1.';
+            end
+            if size(obj.parallel_line_2,1) == 3
+                obj.parallel_line_2 = obj.parallel_line_2.';
+            end
+            % ---
+            if any(f_strcmpi(obj.dtype_parallel,{'log+-','log-+','log='}))
+                if mod(obj.dnum_parallel,2) ~= 0
+                    obj.dnum_parallel = obj.dnum_parallel + 1;
+                end
+            end
+            % ---
+            if any(f_strcmpi(obj.dtype_orthogonal,{'log+-','log-+','log='}))
+                if mod(obj.dnum_orthogonal,2) ~= 0
+                    obj.dnum_orthogonal = obj.dnum_orthogonal + 1;
+                end
+            end
+            % -------------------------------------------------------------
+            obj.mesh = QuadMeshFrom3d('parallel_line_1',obj.parallel_line_1, ...
+                                  'parallel_line_2',obj.parallel_line_2, ...
+                                  'dnum_orthogonal',obj.dnum_orthogonal, ...
+                                  'dnum_parallel',obj.dnum_parallel, ...
+                                  'dtype_orthogonal',obj.dtype_orthogonal, ...
+                                  'dtype_parallel',obj.dtype_parallel, ...
+                                  'flog',obj.flog);
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
+        end
+        % -----------------------------------------------------------------
+    end
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            obj.setup_done = 0;
+            VisualSurface3d.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
+        end
+    end
+    % methods
+    %     function build(obj)
+    %         % ---
+    %         VisualSurface3d.setup(obj);
+    %         % ---
+    %         if obj.build_done
+    %             return
+    %         end
+    %         % ---
+    %         obj.build_defining_obj;
+    %         % ---
+    %         obj.build_done = 1;
+    %         % ---
+    %     end
+    % end
+
+    % ---------------------------------------------------------------------
+    methods
+        function add_field(obj,args)
+            arguments
+                obj
+                args.id = 'field01'
+                args.field {mustBeA(args.field,{'ScalarNodeField'})}
+            end
+            % ---
+            if isa(args.field,'ScalarNodeField')
+                visfield = VisualScalarNodeField;
+            end
+            % ---
+            obj.field.(args.id) = visfield;
+            % ---
+        end
+    end
+
+    % ---------------------------------------------------------------------
+    methods
+        % --- XTODO
+        function get_cutelem(obj)
             % ---
             bl = obj.parallel_line_1(1,:);
             br = obj.parallel_line_1(2,:);
@@ -147,19 +208,12 @@ classdef ProcessingSurface3d < VolumeDom3d
             gid_elem_ = gid_elem_(cx > 0 | cy > 0 | cz > 0);
             % ---
             obj.gid_elem = gid_elem_;
-            % -------------------------------------------------------------
-            obj.mesh = QuadMeshFrom3d('parallel_line_1',obj.parallel_line_1, ...
-                                  'parallel_line_2',obj.parallel_line_2, ...
-                                  'dnum_orthogonal',obj.dnum_orthogonal, ...
-                                  'dnum_parallel',obj.dnum_parallel, ...
-                                  'dtype_orthogonal',obj.dtype_orthogonal, ...
-                                  'dtype_parallel',obj.dtype_parallel, ...
-                                  'flog',obj.flog);
+            % ---
         end
-        % -----------------------------------------------------------------
     end
     % ---------------------------------------------------------------------
     methods
+        % --- XTODO
         function plot(obj,args)
             arguments
                 obj
@@ -308,32 +362,6 @@ classdef ProcessingSurface3d < VolumeDom3d
                     alpha(alpha_); hold on
                 end
             end
-        end
-        % ---
-        function add_field(obj,args)
-            arguments
-                obj
-                args.id_field = 'field01'
-                args.field_name {mustBeMember(args.field_name,...
-                    {'b','j','h','p','a','phi','t','ome',''})} = ''
-                args.field_value = []
-                %args.field_name {mustBeMember(args.field_name,{'bv','jv','hv','pv','av','phiv','tv','omev',...
-                %     'bs','js','hs','ps','as','phis','ts','omes'})}
-            end
-            % ---
-            id_field = args.id_field;
-            fn = args.field_name;
-            % ---
-            if ~isempty(fn)
-                if isa(obj.parent_model,'FEM3dAphi')
-                    fi = obj.getfieldAphi(fn);
-                end
-                % ---
-                obj.field.(id_field) = fi;
-            else
-                obj.field.(id_field) = args.field_value;
-            end
-            % ---
         end
     end
     % ---------------------------------------------------------------------

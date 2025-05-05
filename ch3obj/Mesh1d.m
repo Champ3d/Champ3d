@@ -15,6 +15,15 @@ classdef Mesh1d < Xhandle
         dom = []
     end
 
+    properties (Access = private)
+        setup_done = 0
+    end
+
+    properties
+        dependent_obj = []
+        defining_obj = []
+    end
+
     % --- Dependent Properties
     properties (Dependent = true)
         
@@ -24,6 +33,25 @@ classdef Mesh1d < Xhandle
     methods
         function obj = Mesh1d()
             obj@Xhandle;
+            Mesh1d.setup(obj);
+        end
+    end
+
+    methods (Static)
+        function setup(obj)
+            if obj.setup_done
+                return
+            end
+        end
+    end
+
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            obj.setup_done = 0;
+            Mesh1d.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
         end
     end
 
@@ -45,9 +73,11 @@ classdef Mesh1d < Xhandle
             line = Line1d(argu{:});
             % ---
             obj.dom.(args.id) = line;
+            % ---
+            line.is_defining_obj_of(obj);
+            % ---
         end
         % ---
-
     end
 end
 

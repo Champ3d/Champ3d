@@ -8,14 +8,13 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef SurfaceDom < Xhandle
+classdef SurfaceDom < MeshDom
 
     % --- Properties
     properties
         gid_face
         defined_on
         condition
-        submesh
     end
 
     % --- subfields to build
@@ -23,10 +22,19 @@ classdef SurfaceDom < Xhandle
         parent_mesh
     end
 
+    % --- subfields to build
+    properties
+        building_formular
+    end
+
     properties (Access = private)
         setup_done = 0
         build_done = 0
-        assembly_done = 0
+    end
+
+    properties
+        dependent_obj = []
+        defining_obj = []
     end
 
     % --- Dependent Properties
@@ -51,19 +59,16 @@ classdef SurfaceDom < Xhandle
                 args.condition = []
             end
             % ---
+            obj = obj@MeshDom;
+            % ---
             if isempty(fieldnames(args))
                 return
             end
             % ---
             obj <= args;
-            % call setup in constructor
-            % ,,, for direct verification
-            % ,,, setup must be static
+            % ---
             SurfaceDom.setup(obj);
             % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
     % --- setup/reset/build/assembly
@@ -73,22 +78,34 @@ classdef SurfaceDom < Xhandle
             if obj.setup_done
                 return
             end
+            % --- XTODO : which come first
+            % build_from_boundface
+            % build_from_interface
+            % build_from_gid_face
+            % if ~isempty(obj.gid_face)
+            %     obj.build_from_gid_face;
+            % end
             % ---
-            if ~isempty(obj.gid_face)
-                obj.build_from_gid_face;
+            if ~isempty(obj.building_formular)
+                if ~isempty(obj.building_formular.arg1) && ...
+                   ~isempty(obj.building_formular.arg2) && ...
+                   ~isempty(obj.building_formular.operation)
+                    obj.build_from_formular;
+                end
             end
             % ---
             obj.setup_done = 1;
+            obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
             % ---
-            % must reset setup+build+assembly
             obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
+            SurfaceDom.setup(obj);
+            % --- reset dependent obj
+            % obj.reset_dependent_obj;
         end
     end
     methods
@@ -100,34 +117,17 @@ classdef SurfaceDom < Xhandle
                 return
             end
             % ---
-            %obj.callsubfieldbuild('field_name','parent_mesh');
+            obj.build_defining_obj;
             % ---
             obj.build_done = 1;
             % ---
         end
     end
-    methods
-        function assembly(obj)
-            % ---
-            % may return to build of subclass obj
-            % ... subclass build must call superclass build
-            obj.build;
-            % ---
-        end
-    end
+
     % --- Methods
     methods
-        function allmeshes = build_submesh(obj)
-            % ---
-            if ~isempty(obj.submesh)
-                allmeshes = obj.submesh;
-                for i = 1:length(allmeshes)
-                    allmeshes{i}.node = obj.parent_mesh.node;
-                end
-                return
-            end
+        function sm = submesh(obj)
             % --- need parent_mesh
-            obj.parent_mesh.build;
             node = obj.parent_mesh.node;
             face = obj.parent_mesh.face(:,obj.gid_face);
             % ---
@@ -139,29 +139,28 @@ classdef SurfaceDom < Xhandle
             nb_sm = 0;
             if ~isempty(id_tria)
                 nb_sm = nb_sm + 1;
-                allmeshes{nb_sm} = TriMesh('node',node,'elem',face(1:3,id_tria));
-                allmeshes{nb_sm}.gid_face = obj.gid_face(id_tria);
-                allmeshes{nb_sm}.lid_face = id_tria;
-                allmeshes{nb_sm}.parent_mesh = obj.parent_mesh;
+                sm{nb_sm} = TriMesh('node',node,'elem',face(1:3,id_tria));
+                sm{nb_sm}.gid_face = obj.gid_face(id_tria);
+                sm{nb_sm}.lid_face = id_tria;
+                sm{nb_sm}.parent_mesh = obj.parent_mesh;
             end
             if ~isempty(id_quad)
                 nb_sm = nb_sm + 1;
-                allmeshes{nb_sm} = QuadMesh('node',node,'elem',face(1:4,id_quad));
-                allmeshes{nb_sm}.gid_face = obj.gid_face(id_quad);
-                allmeshes{nb_sm}.lid_face = id_quad;
-                allmeshes{nb_sm}.parent_mesh = obj.parent_mesh;
+                sm{nb_sm} = QuadMesh('node',node,'elem',face(1:4,id_quad));
+                sm{nb_sm}.gid_face = obj.gid_face(id_quad);
+                sm{nb_sm}.lid_face = id_quad;
+                sm{nb_sm}.parent_mesh = obj.parent_mesh;
             end
             % ---
             if nb_sm == 0
-                allmeshes{1} = Mesh;
+                sm{1} = Mesh;
             end
             % ---
-            obj.submesh = allmeshes;
         end
     end
 
     % --- Methods
-    methods (Access = protected, Hidden)
+    methods (Access = protected)
         % -----------------------------------------------------------------
         function build_from_gid_face(obj)
             % ---
@@ -185,6 +184,38 @@ classdef SurfaceDom < Xhandle
             % -------------------------------------------------------------
         end
         % -----------------------------------------------------------------
+        function build_from_formular(obj)
+            % ---
+            gid_face_ = [];
+            for i = 1:length(obj.building_formular.operation)
+                dom1 = obj.building_formular.arg1{i};
+                dom2 = obj.building_formular.arg2{i};
+                oper = obj.building_formular.operation{i};
+                if i == 1
+                    switch oper
+                        case '+'
+                            gid_face_ = f_unique([f_torowv(dom1.gid_face), f_torowv(dom2.gid_face)].');
+                        case '-'
+                            gid_face_ = f_unique(setdiff(f_torowv(dom1.gid_face),f_torowv(dom2.gid_face)).');
+                        case '^'
+                            gid_face_ = f_unique(intersect(f_torowv(dom1.gid_face),f_torowv(dom2.gid_face)).');
+                    end
+                elseif i > 1
+                    switch oper
+                        case '+'
+                            
+                        case '-'
+                            
+                        case '^'
+                            
+                    end
+                end
+            end
+            % ---
+            obj.gid_face = gid_face_;
+            obj.build_from_gid_face;
+        end
+        % -----------------------------------------------------------------
     end
 
     % --- Methods
@@ -198,7 +229,6 @@ classdef SurfaceDom < Xhandle
                 args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
             end
             % ---
-            obj.build_submesh;
             submesh_ = obj.submesh;
             argu = f_to_namedarg(args);
             for i = 1:length(submesh_)
@@ -212,18 +242,72 @@ classdef SurfaceDom < Xhandle
     methods
         function objy = plus(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
-            objy.gid_face = [f_torowv(obj.gid_face) f_torowv(objx.gid_face)];
+            objy.gid_face = f_unique([f_torowv(obj.gid_face), f_torowv(objx.gid_face)].');
             objy.build_from_gid_face;
+            % ---
+            %obj.transfer_dep_def(objx,objy);
+            % ---
+            obj.is_defining_obj_of(objy);
+            objx.is_defining_obj_of(objy);
+            % ---
+            if isfield(objy.building_formular,'operation')
+                len = length(objy.building_formular.operation);
+            else
+                objy.building_formular.arg1 = [];
+                objy.building_formular.arg2 = [];
+                objy.building_formular.operation = [];
+                len = 0;
+            end
+            objy.building_formular.arg1{len+1} = obj;
+            objy.building_formular.arg2{len+1} = objx;
+            objy.building_formular.operation{len+1} = '+';
+            % ---
         end
         function objy = minus(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
-            objy.gid_face = setdiff(f_torowv(obj.gid_face),f_torowv(objx.gid_face));
+            objy.gid_face = f_unique(setdiff(f_torowv(obj.gid_face),f_torowv(objx.gid_face)).');
             objy.build_from_gid_face;
+            % ---
+            %obj.transfer_dep_def(objx,objy);
+            % ---
+            obj.is_defining_obj_of(objy);
+            objx.is_defining_obj_of(objy);
+            % ---
+            if isfield(objy.building_formular,'operation')
+                len = length(objy.building_formular.operation);
+            else
+                objy.building_formular.arg1 = [];
+                objy.building_formular.arg2 = [];
+                objy.building_formular.operation = [];
+                len = 0;
+            end
+            objy.building_formular.arg1{len+1} = obj;
+            objy.building_formular.arg2{len+1} = objx;
+            objy.building_formular.operation{len+1} = '-';
+            % ---
         end
         function objy = mpower(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
-            objy.gid_face = intersect(f_torowv(obj.gid_face),f_torowv(objx.gid_face));
+            objy.gid_face = f_unique(intersect(f_torowv(obj.gid_face),f_torowv(objx.gid_face)).');
             objy.build_from_gid_face;
+            % ---
+            %obj.transfer_dep_def(objx,objy);
+            % ---
+            obj.is_defining_obj_of(objy);
+            objx.is_defining_obj_of(objy);
+            % ---
+            if isfield(objy.building_formular,'operation')
+                len = length(objy.building_formular.operation);
+            else
+                objy.building_formular.arg1 = [];
+                objy.building_formular.arg2 = [];
+                objy.building_formular.operation = [];
+                len = 0;
+            end
+            objy.building_formular.arg1{len+1} = obj;
+            objy.building_formular.arg2{len+1} = objx;
+            objy.building_formular.operation{len+1} = '^';
+            % ---
         end
     end
 

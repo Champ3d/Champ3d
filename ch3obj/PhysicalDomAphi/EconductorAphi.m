@@ -101,7 +101,7 @@ classdef EconductorAphi < Econductor
             % ---
             gid_node_phi = f_uniquenode(elem);
             % ---
-            sigma_array = obj.sigma.get('in_dom',dom);
+            sigma_array = obj.sigma.getvalue('in_dom',dom);
             % ---
             sigmawewe = parent_mesh.cwewe('id_elem',gid_elem,'coefficient',sigma_array);
             % ---

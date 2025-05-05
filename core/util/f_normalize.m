@@ -12,23 +12,14 @@ function Vnormalized = f_normalize(V,varargin)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-% --- valid argument list (to be updated each time modifying function)
-arglist = {'position'};
-
-% --- default input value
-position = 1; % index of the dimension
-
-%--------------------------------------------------------------------------
-% --- check and update input
-for i = 1:length(varargin)/2
-    if any(strcmpi(arglist,varargin{2*i-1}))
-        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
-    else
-        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
-    end
+if nargin == 1
+    dim = 1; % by default for column vector row array
+else
+    dim = varargin{1}; % put 2 for row vector column array
 end
+
 %--------------------------------------------------------------------------
-VM = sqrt(sum(V.^2, position));
+VM = sqrt(sum(V.^2, dim));
 Vnormalized = V ./ VM;
 Vnormalized(:,VM <= eps) = 0;
 

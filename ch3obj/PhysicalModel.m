@@ -9,94 +9,67 @@
 %--------------------------------------------------------------------------
 
 classdef PhysicalModel < Xhandle
-    % --- computed
-    properties
-        matrix
-        field
-        dof
-    end
-    % --- subfields to build
+
     properties
         parent_mesh
         ltime
         moving_frame
+        % ---
+        visualdom
+        % ---
+        matrix
+        field
+        dof
     end
-    % ---
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-        assembly_done = 0
-    end
-    
-    % --- Valid args list
-    methods (Static)
-        function argslist = validargs()
-            argslist = {};
-        end
-    end
+
     % --- Constructor
     methods
         function obj = PhysicalModel()
             % ---
             obj@Xhandle;
-            % ---
-            % call setup in constructor
-            % ,,, for direct verification
-            % ,,, setup must be static
-            PhysicalModel.setup(obj);
-            % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-        end
-    end
-    % --- setup/reset/build/assembly
-    methods (Static)
-        function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
+            % --- initialization
             obj.ltime = LTime;
-            % ---
-            obj.setup_done = 1;
-            % ---
         end
     end
-    methods (Access = public)
-        function reset(obj)
-            % ---
-            % must reset setup+build+assembly
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-        end
-    end
+    % --- Utility Methods
+    % --- build
     methods
+        % ---
         function build(obj)
-            % ---
-            PhysicalModel.setup(obj);
-            % ---
-            if obj.build_done
-                return
+            obj.parent_mesh.build;
+        end
+        % ---
+    end
+    % --- ltime + visualization
+    methods
+        % ---
+        function add_ltime(obj,ltime_obj)
+            arguments
+                obj
+                % ---
+                ltime_obj {mustBeA(ltime_obj,'LTime')}
             end
             % ---
-            obj.parent_mesh.build_meshds;
-            obj.parent_mesh.build_discrete;
-            obj.parent_mesh.build_intkit;
-            % ---
-            obj.build_done = 1;
+            obj.ltime = ltime_obj;
             % ---
         end
-    end
-    methods
-        function assembly(obj)
+        % ---
+        function add_visualdom(obj,args)
+            arguments
+                obj
+                % ---
+                args.id = 'no_id'
+                args.id_dom2d = []
+                args.id_dom3d = []
+            end
             % ---
-            % may return to build of subclass obj
-            % ... subclass build must call superclass build
-            obj.build;
+            dom = PhysicalDom;
+            dom.id_dom2d = args.id_dom2d;
+            dom.id_dom3d = args.id_dom3d;
+            dom.parent_model = obj;
+            dom.get_geodom;
             % ---
+            obj.visualdom.(args.id) = dom;
         end
     end
 end

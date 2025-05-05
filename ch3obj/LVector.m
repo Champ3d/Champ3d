@@ -10,6 +10,7 @@
 
 classdef LVector < Xhandle
     properties
+        parent_model
         main_value
         main_dir
         rot_axis
@@ -19,35 +20,55 @@ classdef LVector < Xhandle
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'main_value','main_dir','rot_axis','rot_angle'};
+            argslist = {'parent_model','main_value','main_dir','rot_axis','rot_angle'};
         end
     end
     % --- Contructor
     methods
         function obj = LVector(args)
             arguments
+                args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
                 args.main_value = []
                 args.main_dir = []
                 args.rot_axis = []
                 args.rot_angle = []
             end
             % ---
+            obj = obj@Xhandle;
+            % ---
+            if ~isfield(args,'parent_model')
+                error('#parent_model must be given !');
+            end
+            % ---
             obj <= args;
+            % ---
         end
     end
 
     % --- Methods
     methods
-        function gvector = get_on(obj,dom)
+        function gvector = getvalue(obj,args)
+            arguments
+                obj
+                args.in_dom = [] %{mustBeA(args.in_dom,{'VolumeDom','SurfaceDom'})}
+            end
             % ---
-            if isa(dom,'VolumeDom')
-                id_elem = dom.gid_elem;
-            elseif isa(dom,'SurfaceDom')
-                id_elem = dom.gid_face;
-            elseif isprop(dom,'gid_elem')
-                id_elem = dom.gid_elem;
-            elseif isprop(dom,'gid_face')
-                id_elem = dom.gid_face;
+            dom = args.in_dom;
+            % ---
+            if isa(dom,'PhysicalDom')
+                meshdom = dom.dom;
+            else
+                meshdom = dom;
+            end
+            % ---
+            if isa(meshdom,'VolumeDom')
+                id_elem = meshdom.gid_elem;
+            elseif isa(meshdom,'SurfaceDom')
+                id_elem = meshdom.gid_face;
+            elseif isprop(meshdom,'gid_elem')
+                id_elem = meshdom.gid_elem;
+            elseif isprop(meshdom,'gid_face')
+                id_elem = meshdom.gid_face;
             end
             % ---
             nb_elem = length(id_elem);
@@ -62,10 +83,16 @@ classdef LVector < Xhandle
                     if isnumeric(lvfield)
                         lvector.(fn) = repmat(lvfield,nb_elem,1);
                     elseif isa(lvfield,'Parameter')
-                        lvector.(fn) = lvfield.get('in_dom',dom);
+                        if isequal(obj.parent_model,lvfield.parent_model)
+                            lvector.(fn) = lvfield.getvalue('in_dom',dom);
+                        else
+                            error(['#parent_model of LVector must be the same as ' fn ' Parameter !']);
+                        end
                     end
                 end
             end
+            % --- normalize
+            lvector.main_dir = f_normalize(lvector.main_dir,2);
             % ---
             if ~isempty(obj.rot_axis) && ~isempty(obj.rot_angle)
                 for i = 1:nb_elem
@@ -82,8 +109,15 @@ classdef LVector < Xhandle
             % ---
         end
         % -----------------------------------------------------------------
-        function ginv = get_inverse_on(obj,dom)
-            gvector = obj.get('in_dom',dom);
+        function ginv = get_inverse(obj,args)
+            arguments
+                obj
+                args.in_dom = [] %{mustBeA(args.in_dom,{'VolumeDom','SurfaceDom'})}
+            end
+            % ---
+            dom = args.in_dom;
+            % ---
+            gvector = obj.getvalue('in_dom',dom);
             ginv = - gvector;
         end
         % -----------------------------------------------------------------

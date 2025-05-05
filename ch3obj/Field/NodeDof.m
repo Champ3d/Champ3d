@@ -8,42 +8,45 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef NodeDof < MeshDof
+classdef NodeDof < Xhandle
     properties
-        
+        parent_model
+        % ---
+        value
     end
     % --- Contructor
     methods
         function obj = NodeDof(args)
             arguments
-                args.parent_mesh {mustBeA(args.parent_mesh,'Mesh')}
+                args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
                 args.value = []
             end
             % ---
-            obj = obj@MeshDof;
+            obj = obj@Xhandle;
             % ---
-            obj <= args;
-            % ---
-            if isfield(args,'parent_mesh') && isfield(args,'value')
-                if ~isempty(args.value)
-                    obj.setup;
-                end
+            if ~isfield(args,'parent_model')
+                error('#parent_model must be given');
             end
+            % ---
+            obj.parent_model = args.parent_model;
+            obj.value = args.value;
             % ---
         end
     end
-    % --- Methods/public
+    % --- set/check
     methods
         % -----------------------------------------------------------------
-        function setup(obj)
-            nb_node = obj.parent_mesh.nb_node;
-            if numel(obj.value) == 1
-                obj.value = obj.value .* ones(nb_node,1);
+        function set.value(obj,value)
+            nb_node = obj.parent_model.parent_mesh.nb_node;
+            if isempty(value)
+                obj.value = zeros(nb_node,1);
+            elseif numel(value) == 1
+                obj.value = value .* ones(nb_node,1);
             else
-                if numel(obj.value) ~= nb_node
+                if numel(value) ~= nb_node
                     error('#value must correspond to mesh node, check size !');
                 else
-                    obj.value = f_tocolv(obj.value);
+                    obj.value = f_tocolv(value);
                 end
             end
         end

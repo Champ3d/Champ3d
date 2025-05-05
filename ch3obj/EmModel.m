@@ -13,8 +13,6 @@ classdef EmModel < PhysicalModel
         frequency = 0
         jome
         % ---
-        parent_mesh
-        % ---
         econductor
         mconductor
         pmagnet

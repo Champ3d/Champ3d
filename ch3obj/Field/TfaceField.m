@@ -8,18 +8,22 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef MeshDof < Xhandle
-    properties
-        parent_mesh
-        % ---
-        value
-    end
+classdef TfaceField < NodeDofBasedScalarFaceField
     % --- Contructor
     methods
-        function obj = MeshDof()
+        function obj = TfaceField(args)
+            arguments
+                args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
+                args.dof {mustBeA(args.dof,'NodeDof')}
+                args.reference_potential = 0
+            end
             % ---
-            obj = obj@Xhandle;
+            obj = obj@NodeDofBasedScalarFaceField;
             % ---
+            if ~isfield(args,'parent_model') || ~isfield(args,'dof')
+                error('#parent_model and #dof must be given !');
+            end
+            obj <= args;
         end
     end
 end

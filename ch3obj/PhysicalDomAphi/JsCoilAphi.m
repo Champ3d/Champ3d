@@ -38,7 +38,7 @@ classdef JsCoilAphi < Xhandle
             % --- current turn density vector field
             current_turn_density  = obj.matrix.unit_current_field .* obj.nb_turn ./ obj.cs_area;
             % ---
-            js_array = obj.j_coil.get('in_dom',obj.dom);
+            js_array = obj.j_coil.getvalue('in_dom',obj.dom);
             js_array = js_array .* obj.matrix.unit_current_field;
             % ---
             gid_elem = obj.dom.gid_elem;

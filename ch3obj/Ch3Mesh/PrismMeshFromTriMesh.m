@@ -10,11 +10,15 @@
 
 classdef PrismMeshFromTriMesh < PrismMesh
 
-    % --- Properties
     properties
         parent_mesh1d
         parent_mesh2d
         id_zline
+    end
+
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
     end
 
     % --- Dependent Properties
@@ -50,14 +54,19 @@ classdef PrismMeshFromTriMesh < PrismMesh
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            PrismMeshFromTriMesh.setup(obj);
+            % ---
         end
     end
 
-    % --- Methods
-    methods
+    % --- setup/reset/build/assembly
+    methods (Static)
         % -----------------------------------------------------------------
         function obj = setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
             % ---
             setup@PrismMesh(obj);
             % ---
@@ -154,6 +163,41 @@ classdef PrismMeshFromTriMesh < PrismMesh
             obj.celem = celem_;
             obj.cedge = cedge_;
             obj.cface = cface_;
+            % ---
+            obj.velem = f_volume(node_,elem_,'elem_type',obj.elem_type);
+            obj.sface = f_area(node_,face_);
+            obj.ledge = f_ledge(node_,edge_);
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % reset super
+            reset@PrismMesh(obj);
+            % ---
+            obj.setup_done = 0;
+            PrismMeshFromTriMesh.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            PrismMeshFromTriMesh.setup(obj);
+            % ---
+            build@PrismMesh(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            %--------------------------------------------------------------
+            % obj.build_defining_obj;
+            %--------------------------------------------------------------
+            obj.build_done = 1;
             % ---
         end
     end

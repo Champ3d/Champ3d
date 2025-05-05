@@ -71,7 +71,7 @@ classdef BsfieldAphi < Bsfield
             gid_elem = dom.gid_elem;
             % ---
             if isa(obj.bs,'Parameter')
-                bs = obj.bs.get('in_dom',dom);
+                bs = obj.bs.getvalue('in_dom',dom);
             elseif iscell(obj.bs)
                 bs = obj.bs;
             end

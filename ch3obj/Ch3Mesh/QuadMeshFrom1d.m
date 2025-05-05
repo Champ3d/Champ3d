@@ -10,10 +10,14 @@
 
 classdef QuadMeshFrom1d < QuadMesh
 
-    % --- Properties
     properties
         id_xline
         id_yline
+    end
+
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
     end
 
     % --- Dependent Properties
@@ -41,7 +45,7 @@ classdef QuadMeshFrom1d < QuadMesh
                 args.id_yline
             end
             % ---
-            obj@QuadMesh;
+            obj = obj@QuadMesh;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -49,20 +53,28 @@ classdef QuadMeshFrom1d < QuadMesh
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            QuadMeshFrom1d.setup(obj);
             % ---
         end
     end
 
     % --- Methods
-    methods
+    methods (Static)
         % -----------------------------------------------------------------
         function obj = setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            setup@QuadMesh(obj);
             % ---
             if isempty(obj.parent_mesh) || isempty(obj.id_xline) || ...
                     isempty(obj.id_yline)
                 return
             end
+            % ---
+            obj.parent_mesh.is_defining_obj_of(obj);
             % ---
             obj.id_xline = f_to_scellargin(obj.id_xline);
             obj.id_yline = f_to_scellargin(obj.id_yline);
@@ -92,7 +104,6 @@ classdef QuadMeshFrom1d < QuadMesh
                 % ---
                 xl = xline(i);
                 % ---
-                xl.setup;
                 x     = xl.node;
                 xdom  = [xdom x];
                 % ---
@@ -107,7 +118,6 @@ classdef QuadMeshFrom1d < QuadMesh
                 % ---
                 yl = yline(i);
                 % ---
-                yl.setup;
                 y  = yl.node;
                 ydom = [ydom y];
                 % ---
@@ -151,12 +161,43 @@ classdef QuadMeshFrom1d < QuadMesh
             obj.node = node_;
             obj.elem = elem_;
             obj.elem_code = elem_code_;
+            % --- 2d elem surface
+            obj.velem = f_volume(node_,elem_,'elem_type',obj.elem_type);
+            % --- edge length
+            % obj.sface = f_area(node_,face_);
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
         end
-        % -----------------------------------------------------------------
+    end
+
+    methods (Access = public)
         function reset(obj)
-            obj.setup;
+            % reset super class
+            reset@QuadMesh(obj);
+            % ---
+            obj.setup_done = 0;
+            QuadMeshFrom1d.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
         end
-        % -----------------------------------------------------------------
+    end
+
+    methods
+        function build(obj)
+            % ---
+            QuadMeshFrom1d.setup(obj);
+            % ---
+            build@QuadMesh(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            
+            % ---
+            obj.build_done = 1;
+        end
     end
     
 end

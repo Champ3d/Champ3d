@@ -23,7 +23,6 @@ classdef SurfaceDom3d < SurfaceDom
     properties (Access = private)
         setup_done = 0
         build_done = 0
-        assembly_done = 0
     end
 
     % --- Dependent Properties
@@ -34,7 +33,7 @@ classdef SurfaceDom3d < SurfaceDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_mesh','gid_face','condition', ...
+            argslist = {'id','parent_mesh','gid_face','condition', ...
                         'defined_on','id_dom3d'};
         end
     end
@@ -43,6 +42,7 @@ classdef SurfaceDom3d < SurfaceDom
         function obj = SurfaceDom3d(args)
             arguments
                 % ---
+                args.id = []
                 args.parent_mesh = []
                 args.gid_face = []
                 args.condition = []
@@ -61,9 +61,6 @@ classdef SurfaceDom3d < SurfaceDom
             % ---
             SurfaceDom3d.setup(obj);
             % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
     % --- setup/reset/build/assembly
@@ -76,32 +73,30 @@ classdef SurfaceDom3d < SurfaceDom
             % ---
             setup@SurfaceDom(obj);
             % ---
-            if ~isempty(obj.gid_face)
-                obj.build_from_gid_face
-            else
-                switch lower(obj.defined_on)
-                    case {'bound_face','bound'}
-                        obj.build_from_boundface;
-                    case {'interface'}
-                        obj.build_from_interface;
-                end
+            % if ~isempty(obj.gid_face)
+            %     obj.build_from_gid_face
+            % else
+            switch lower(obj.defined_on)
+                case {'bound_face','bound'}
+                    obj.build_from_boundface;
+                case {'interface'}
+                    obj.build_from_interface;
             end
             % ---
             obj.setup_done = 1;
+            obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % ---
-            % must reset setup+build+assembly
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
-            % must call super reset
-            % ,,, with obj as argument
+            % reset super
             reset@SurfaceDom(obj);
+            % ---
+            obj.setup_done = 0;
+            SurfaceDom3d.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
         end
     end
     methods
@@ -115,18 +110,13 @@ classdef SurfaceDom3d < SurfaceDom
                 return
             end
             % ---
+            obj.build_defining_obj;
+            % ---
             obj.build_done = 1;
             % ---
         end
     end
-    methods
-        function assembly(obj)
-            % ---
-            obj.build;
-            assembly@SurfaceDom(obj);
-            % ---
-        end
-    end
+
     % --- Methods
     methods (Access = protected, Hidden)
         % -----------------------------------------------------------------
@@ -142,7 +132,11 @@ classdef SurfaceDom3d < SurfaceDom
                 valid3 = f_validid(id3,all_id3);
                 % ---
                 for j = 1:length(valid3)
-                    elem = [elem  obj.parent_mesh.elem(:,obj.parent_mesh.dom.(valid3{j}).gid_elem)];
+                    % ---
+                    dom3d = obj.parent_mesh.dom.(valid3{j});
+                    dom3d.is_defining_obj_of(obj);
+                    % ---
+                    elem = [elem  obj.parent_mesh.elem(:,dom3d.gid_elem)];
                 end
             end
             %--------------------------------------------------------------
@@ -178,6 +172,10 @@ classdef SurfaceDom3d < SurfaceDom
                     id3 = id_dom3d_{i}{j};
                     valid3 = f_validid(id3,all_id3);
                     for j = 1:length(valid3)
+                        % ---
+                        dom3d = obj.parent_mesh.dom.(valid3{j});
+                        dom3d.is_defining_obj_of(obj);
+                        % ---
                         elem = [elem  obj.parent_mesh.elem(:,obj.parent_mesh.dom.(valid3{j}).gid_elem)];
                     end
                 end

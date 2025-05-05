@@ -10,10 +10,62 @@
 
 classdef Mesh2d < Mesh
 
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+    end
+
     % --- Constructors
     methods
         function obj = Mesh2d()
             obj = obj@Mesh;
+            Mesh2d.setup(obj);
+        end
+    end
+
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            setup@Mesh(obj);
+            % ---
+            
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
+            % ---
+        end
+    end
+
+    methods (Access = public)
+        function reset(obj)
+            % reset super class
+            reset@Mesh(obj);
+            % ---
+            obj.setup_done = 0;
+            Mesh2d.setup(obj);
+            % --- reset dependent objs
+            % obj.reset_dependent_obj;
+        end
+    end
+    
+    methods
+        function build(obj)
+            % ---
+            Mesh2d.setup(obj);
+            % ---
+            build@Mesh(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            
+            % ---
+            obj.build_done = 1;
         end
     end
 
@@ -24,7 +76,7 @@ classdef Mesh2d < Mesh
             arguments
                 obj
                 % ---
-                args.id char
+                args.id char = []
                 % ---
                 args.id_xline = []
                 args.id_yline = []
@@ -32,14 +84,29 @@ classdef Mesh2d < Mesh
                 args.elem_code = []
                 args.gid_elem = []
                 args.condition char = []
+                % ---
+                args.dom_obj {mustBeA(args.dom_obj,{'VolumeDom2d'})}
             end
             % ---
-            args.parent_mesh = obj;
+            if isempty(args.id)
+                error('#id must be given !');
+            end
             % ---
-            argu = f_to_namedarg(args,'for','VolumeDom2d');
-            vdom = VolumeDom2d(argu{:});
-            obj.dom.(args.id) = vdom;
-            % ---
+            if ~isfield(args,'dom_obj')
+                args.parent_mesh = obj;
+                % ---
+                argu = f_to_namedarg(args,'for','VolumeDom2d');
+                dom = VolumeDom2d(argu{:});
+                obj.dom.(args.id) = dom;
+                % ---
+                obj.is_defining_obj_of(dom);
+                % ---
+            else
+                dom = args.dom_obj;
+                dom.id = args.id;
+                obj.dom.(args.id) = dom;
+                % obj.is_defining_obj_of(dom);
+            end
         end
         % --- XTODO
         function add_sdom(obj,args)
@@ -61,8 +128,10 @@ classdef Mesh2d < Mesh
             args.parent_mesh = obj;
             % ---
             argu = f_to_namedarg(args,'for','SurfaceDom2d');
-            vdom = SurfaceDom2d(argu{:});
-            obj.dom.(args.id) = vdom;
+            dom = SurfaceDom2d(argu{:});
+            obj.dom.(args.id) = dom;
+            % ---
+            obj.is_defining_obj_of(dom);
             % ---
         end
     end
