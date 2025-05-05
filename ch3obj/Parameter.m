@@ -411,39 +411,22 @@ classdef Parameter < Xhandle
                     % ---
                     if isequal(source_model, target_model)
                         % no interpolation
-                        try
-                            fargs{i} = source_model.field{target_model.ltime.it}.(depon_).(place).cvalue(:,id_place_target);
-                        catch
-                            fargs{i} = source_model.field{target_model.ltime.it}.(depon_).(place).cvalue(id_place_target);
-                        end
+                        fargs{i} = source_model.field{target_model.ltime.it}.(depon_).(place).cvalue(id_place_target);
                     else
                         if isequal(source_model.parent_mesh, target_model.parent_mesh)
                             if isequal(source_model.ltime.t_array, target_model.ltime.t_array)
                                 % no interpolation
-                                try
-                                    fargs{i} = source_model.field{target_model.ltime.it}.(depon_).(place).cvalue(:,id_place_target);
-                                catch
-                                    fargs{i} = source_model.field{target_model.ltime.it}.(depon_).(place).cvalue(id_place_target);
-                                end
+                                fargs{i} = source_model.field{target_model.ltime.it}.(depon_).(place).cvalue(id_place_target);
                             else
                                 % get by time interpolation
                                 next_it = source_model.ltime.next_it(target_model.ltime.t_now);
                                 back_it = source_model.ltime.back_it(target_model.ltime.t_now);
                                 if next_it == back_it
-                                    try
-                                        fargs{i} = source_model.field{back_it}.(depon_).(place).cvalue(:,id_place_target);
-                                    catch
-                                        fargs{i} = source_model.field{back_it}.(depon_).(place).cvalue(id_place_target);
-                                    end
+                                    fargs{i} = source_model.field{back_it}.(depon_).(place).cvalue(id_place_target);
                                 else
                                     % ---
-                                    try
-                                        val01 = source_model.field{back_it}.(depon_).(place).cvalue(:,id_place_target);
-                                        val02 = source_model.field{next_it}.(depon_).(place).cvalue(:,id_place_target);
-                                    catch
-                                        val01 = source_model.field{back_it}.(depon_).(place).cvalue(id_place_target);
-                                        val02 = source_model.field{next_it}.(depon_).(place).cvalue(id_place_target);
-                                    end
+                                    val01 = source_model.field{back_it}.(depon_).(place).cvalue(id_place_target);
+                                    val02 = source_model.field{next_it}.(depon_).(place).cvalue(id_place_target);
                                     % ---
                                     delta_v = val02 - val01;
                                     % ---
