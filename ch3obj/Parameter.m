@@ -516,7 +516,7 @@ classdef Parameter < Xhandle
                                         valx(idn) = valcell{k}(1,:);
                                     end
                                     % ---
-                                    fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                    fxi = scatteredInterpolant(node_i,valx,'linear','linear');
                                     % ---
                                     cnode_ = target_model.parent_mesh.celem(:,id_elem_target);
                                     fargs{i} = fxi(cnode_.');
@@ -532,7 +532,7 @@ classdef Parameter < Xhandle
                                         valy(idn) = valcell{k}(2,:);
                                     end
                                     % ---
-                                    fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                    fxi = scatteredInterpolant(node_i,valx,'linear','linear');
                                     fyi = fxi;
                                     fyi.Values = valy;
                                     % ---
@@ -554,7 +554,7 @@ classdef Parameter < Xhandle
                                         valz(idn) = valcell{k}(3,:);
                                     end
                                     % ---
-                                    fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                    fxi = scatteredInterpolant(node_i,valx,'linear','linear');
                                     fyi = fxi;
                                     fyi.Values = valy;
                                     fzi = fxi;
@@ -640,7 +640,7 @@ classdef Parameter < Xhandle
                                             valx(idn) = valcell{k}(1,:);
                                         end
                                         % ---
-                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','linear');
                                         % ---
                                         cnode_ = target_model.parent_mesh.cface(:,id_face_target);
                                         fargs{i} = fxi(cnode_.');
@@ -656,7 +656,7 @@ classdef Parameter < Xhandle
                                             valy(idn) = valcell{k}(2,:);
                                         end
                                         % ---
-                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','linear');
                                         fyi = fxi;
                                         fyi.Values = valy;
                                         % ---
@@ -678,7 +678,7 @@ classdef Parameter < Xhandle
                                             valz(idn) = valcell{k}(3,:);
                                         end
                                         % ---
-                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','linear');
                                         fyi = fxi;
                                         fyi.Values = valy;
                                         fzi = fxi;
@@ -742,7 +742,7 @@ classdef Parameter < Xhandle
                                             valx(idn) = valcell{k}(1,:);
                                         end
                                         % ---
-                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','linear');
                                         % ---
                                         cnode_ = target_model.parent_mesh.cface(:,id_face_target);
                                         fargs{i} = fxi(cnode_.');
@@ -758,7 +758,7 @@ classdef Parameter < Xhandle
                                             valy(idn) = valcell{k}(2,:);
                                         end
                                         % ---
-                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','linear');
                                         fyi = fxi;
                                         fyi.Values = valy;
                                         % ---
@@ -780,7 +780,7 @@ classdef Parameter < Xhandle
                                             valz(idn) = valcell{k}(3,:);
                                         end
                                         % ---
-                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','linear');
                                         fyi = fxi;
                                         fyi.Values = valy;
                                         fzi = fxi;
