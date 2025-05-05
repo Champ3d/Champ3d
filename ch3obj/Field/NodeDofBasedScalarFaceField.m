@@ -52,7 +52,7 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
                 id_face = 1:obj.parent_model.parent_mesh.nb_face;
             end
             % ---
-            face_ = obj.parent_model.parent_mesh.face(:,id_face);
+            face_ = obj.parent_model.parent_mesh.face;
             dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gid_face',id_face);
             % ---
             lnb_face = length(dom.gid_face);
