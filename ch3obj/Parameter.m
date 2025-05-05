@@ -678,14 +678,6 @@ classdef Parameter < Xhandle
             end
         end
         %------------------------------------------------------------------
-        function fargs = elem_interpolation(obj)
-
-        end
-        %------------------------------------------------------------------
-        function fargs = face_interpolation(obj)
-            
-        end
-        %------------------------------------------------------------------
         function vout = cal(obj,fhand,args)
             arguments
                 obj
