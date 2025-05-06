@@ -17,22 +17,21 @@
 %--------------------------------------------------------------------------
 
 classdef EconductorAphi < Econductor
-
-    % --- computed
     properties
+        sigma
+        % ---
         matrix = struct('gid_elem',[],'gid_node_phi',[],'sigmawewe',[],'sigma_array',[])
     end
-
+    % ---
     properties (Access = private)
         setup_done = 0
         build_done = 0
         assembly_done = 0
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = Econductor.validargs;
+            argslist = {'parent_model','id_dom3d','sigma'};
         end
     end
     % --- Contructor
@@ -40,7 +39,6 @@ classdef EconductorAphi < Econductor
         function obj = EconductorAphi(args)
             arguments
                 args.parent_model
-                args.id_dom2d
                 args.id_dom3d
                 args.sigma
             end

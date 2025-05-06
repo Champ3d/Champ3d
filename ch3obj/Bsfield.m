@@ -17,52 +17,10 @@
 %--------------------------------------------------------------------------
 
 classdef Bsfield < PhysicalDom
-
-    properties (SetObservable)
-        bs
-    end
-
-    % --- Valid args list
-    methods (Static)
-        function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','bs'};
-        end
-    end
     % --- Contructor
     methods
-        function obj = Bsfield(args)
-            arguments
-                args.parent_model
-                args.id_dom2d
-                args.id_dom3d
-                args.bs
-            end
-            % ---
+        function obj = Bsfield()
             obj = obj@PhysicalDom;
-            % ---
-            if isempty(fieldnames(args))
-                return
-            end
-            % ---
-            obj <= args;
-            % ---
-            obj.setup;
-        end
-    end
-
-    % --- setup
-    methods
-        function setup(obj)
-            % ---
-            if isempty(obj.id_dom3d)
-                if ~isfield(obj.parent_model.parent_mesh.dom,'default_domain')
-                    obj.parent_model.parent_mesh.add_default_domain;
-                end
-                obj.id_dom3d = 'default_domain';
-            end
-            % ---
-            setup@PhysicalDom(obj);
-            % ---
         end
     end
 end

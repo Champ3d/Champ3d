@@ -17,22 +17,20 @@
 %--------------------------------------------------------------------------
 
 classdef BsfieldAphi < Bsfield
-
-    % --- computed
     properties
+        bs
+        % ---
         matrix
     end
-
-    % --- computed
+    % ---
     properties (Access = private)
         build_done = 0
         assembly_done = 0
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = Bsfield.validargs;
+            argslist = {'parent_model','id_dom3d','bs','parameter_dependency_search'};
         end
     end
     % --- Contructor
@@ -40,9 +38,11 @@ classdef BsfieldAphi < Bsfield
         function obj = BsfieldAphi(args)
             arguments
                 args.parent_model
-                args.id_dom2d
                 args.id_dom3d
                 args.bs
+                args.parameter_dependency_search ...
+                    {mustBeMember(args.parameter_dependency_search,{'by_coordinates','by_id_dom'})} ...
+                    = 'by_id_dom'
             end
             % ---
             obj = obj@Bsfield;
@@ -60,7 +60,12 @@ classdef BsfieldAphi < Bsfield
     % --- setup
     methods
         function setup(obj)
-            setup@Bsfield(obj);
+            if isempty(obj.id_dom3d)
+                if ~isfield(obj.parent_model.parent_mesh.dom,'default_domain')
+                    obj.parent_model.parent_mesh.add_default_domain;
+                end
+                obj.id_dom3d = 'default_domain';
+            end
         end
     end
 

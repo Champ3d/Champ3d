@@ -17,22 +17,19 @@
 %--------------------------------------------------------------------------
 
 classdef PMagnetAphi < PMagnet
-
-    % --- computed
     properties
+        br
+        % ---
         matrix
     end
-
-    % --- computed
     properties (Access = private)
         build_done = 0
         assembly_done = 0
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = PMagnet.validargs;
+            argslist = {'parent_model','id_dom3d','br'};
         end
     end
     % --- Contructor
@@ -40,7 +37,6 @@ classdef PMagnetAphi < PMagnet
         function obj = PMagnetAphi(args)
             arguments
                 args.parent_model
-                args.id_dom2d
                 args.id_dom3d
                 args.br
             end
@@ -78,12 +74,12 @@ classdef PMagnetAphi < PMagnet
             parent_mesh = dom.parent_mesh;
             gid_elem = dom.gid_elem;
             % ---
-            br = obj.br.getvalue('in_dom',dom);
-            wfbr = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',br);
+            br_array = obj.br.getvalue('in_dom',dom);
+            wfbr = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',br_array);
             % ---
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.wfbr = wfbr;
-            obj.matrix.br = br;
+            obj.matrix.br = br_array;
             % ---
             obj.build_done = 1;
             obj.assembly_done = 0;

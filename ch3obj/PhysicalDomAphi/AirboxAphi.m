@@ -17,22 +17,18 @@
 %--------------------------------------------------------------------------
 
 classdef AirboxAphi < Airbox
-
-    % --- computed
     properties
         matrix
     end
-
-    % --- computed
+    % ---
     properties (Access = private)
         build_done = 0
         assembly_done = 0
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = Airbox.validargs;
+            argslist = {'parent_model','id_dom3d'};
         end
     end
     % --- Contructor
@@ -40,7 +36,6 @@ classdef AirboxAphi < Airbox
         function obj = AirboxAphi(args)
             arguments
                 args.parent_model
-                args.id_dom2d
                 args.id_dom3d
             end
             % ---

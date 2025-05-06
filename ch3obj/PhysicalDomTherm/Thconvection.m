@@ -34,7 +34,7 @@ classdef Thconvection < PhysicalDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','h','parameter_dependency_search'};
+            argslist = {'parent_model','id_dom3d','h','parameter_dependency_search'};
         end
     end
     % --- Contructor
@@ -43,7 +43,6 @@ classdef Thconvection < PhysicalDom
             arguments
                 args.id
                 args.parent_model
-                args.id_dom2d
                 args.id_dom3d
                 args.h
                 args.parameter_dependency_search ...

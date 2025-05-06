@@ -17,22 +17,25 @@
 %--------------------------------------------------------------------------
 
 classdef SibcAphijw < Sibc
-
-    % --- computed
     properties
+        sigma = 0
+        mur = 1
+        r_ht = 0
+        r_et = 0
+        cparam = 0
+        % ---
         matrix
     end
-
-    % --- computed
+    % --- 
     properties (Access = private)
         build_done = 0
         assembly_done = 0
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = Sibc.validargs;
+            argslist = {'parent_model','id_dom3d','sigma','mur', ...
+                        'r_ht','r_et','cparam'};
         end
     end
     % --- Contructor
@@ -40,7 +43,6 @@ classdef SibcAphijw < Sibc
         function obj = SibcAphijw(args)
             arguments
                 args.parent_model
-                args.id_dom2d
                 args.id_dom3d
                 args.sigma
                 args.mur
@@ -64,7 +66,18 @@ classdef SibcAphijw < Sibc
     % --- setup
     methods
         function setup(obj)
-            setup@Sibc(obj);
+            % ---
+            cparam_ = 0;
+            if ~isempty(obj.r_ht) && ~isempty(obj.r_et)
+                cparam_ = 1/obj.r_ht - 1/obj.r_et;
+            elseif ~isempty(obj.r_ht)
+                cparam_ = 1/obj.r_ht;
+            elseif ~isempty(obj.r_et)
+                cparam_ = - 1/obj.r_et;
+            end
+            % ---
+            obj.cparam = Parameter('f',cparam_);
+            % ---
         end
     end
 

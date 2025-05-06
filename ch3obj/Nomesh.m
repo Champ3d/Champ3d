@@ -17,38 +17,10 @@
 %--------------------------------------------------------------------------
 
 classdef Nomesh < PhysicalDom
-    
-    % --- Valid args list
-    methods (Static)
-        function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d'};
-        end
-    end
     % --- Contructor
     methods
-        function obj = Nomesh(args)
-            arguments
-                args.parent_model
-                args.id_dom2d
-                args.id_dom3d
-            end
-            % ---
+        function obj = Nomesh()
             obj = obj@PhysicalDom;
-            % ---
-            if isempty(fieldnames(args))
-                return
-            end
-            % ---
-            obj <= args;
-            % ---
-            obj.setup;
-        end
-    end
-
-    % --- setup
-    methods
-        function setup(obj)
-            setup@PhysicalDom(obj);
         end
     end
 end

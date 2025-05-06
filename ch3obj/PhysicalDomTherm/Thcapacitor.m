@@ -34,7 +34,7 @@ classdef Thcapacitor < PhysicalDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','rho','cp','parameter_dependency_search'};
+            argslist = {'parent_model','id_dom3d','rho','cp','parameter_dependency_search'};
         end
     end
     % --- Contructor
@@ -43,7 +43,6 @@ classdef Thcapacitor < PhysicalDom
             arguments
                 args.id
                 args.parent_model
-                args.id_dom2d
                 args.id_dom3d
                 args.rho
                 args.cp

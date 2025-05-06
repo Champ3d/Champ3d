@@ -33,7 +33,7 @@ classdef ThPv < PhysicalDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','pv','parameter_dependency_search'};
+            argslist = {'parent_model','id_dom3d','pv','parameter_dependency_search'};
         end
     end
     % --- Contructor
@@ -42,7 +42,6 @@ classdef ThPv < PhysicalDom
             arguments
                 args.id
                 args.parent_model
-                args.id_dom2d
                 args.id_dom3d
                 args.pv
                 args.parameter_dependency_search ...

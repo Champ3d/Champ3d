@@ -17,43 +17,10 @@
 %--------------------------------------------------------------------------
 
 classdef PMagnet < PhysicalDom
-
-    properties (SetObservable)
-        br
-    end
-    
-    % --- Valid args list
-    methods (Static)
-        function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','br'};
-        end
-    end
     % --- Contructor
     methods
-        function obj = PMagnet(args)
-            arguments
-                args.parent_model
-                args.id_dom2d
-                args.id_dom3d
-                args.br
-            end
-            % ---
+        function obj = PMagnet()
             obj = obj@PhysicalDom;
-            % ---
-            if isempty(fieldnames(args))
-                return
-            end
-            % ---
-            obj <= args;
-            % ---
-            obj.setup;
-        end
-    end
-
-    % --- setup
-    methods
-        function setup(obj)
-            setup@PhysicalDom(obj);
         end
     end
 end
