@@ -24,7 +24,6 @@ classdef ThPs < PhysicalDom
     end
     % --- 
     properties (Access = private)
-        setup_done = 0
         build_done = 0
     end
     % --- Valid args list
@@ -62,10 +61,6 @@ classdef ThPs < PhysicalDom
     % --- setup/reset/build/assembly
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % --- call utility methods
             obj.set_parameter;
             obj.get_geodom;
@@ -76,14 +71,12 @@ classdef ThPs < PhysicalDom
             obj.matrix.ps_array = [];
             obj.matrix.pswn = [];
             % ---
-            obj.setup_done = 1;
             obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            obj.setup_done = 0;
             ThPs.setup(obj);
         end
     end

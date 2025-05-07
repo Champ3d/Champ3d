@@ -43,7 +43,7 @@ classdef FEM3dTherm < ThModel
         %------------------------------------------------------------------
         function assembly(obj)
             %--------------------------------------------------------------
-            obj.build;
+            obj.parent_mesh.build;
             %--------------------------------------------------------------
             % Preparation
             % /!\ init all matrix since always re-assembly

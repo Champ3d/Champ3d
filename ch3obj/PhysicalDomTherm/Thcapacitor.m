@@ -25,7 +25,6 @@ classdef Thcapacitor < PhysicalDom
     end
     % --- 
     properties (Access = private)
-        setup_done = 0
         build_done = 0
     end
     % --- Valid args list
@@ -64,10 +63,6 @@ classdef Thcapacitor < PhysicalDom
     % --- setup/reset/build/assembly
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % --- call utility methods
             obj.set_parameter;
             obj.get_geodom;
@@ -80,14 +75,12 @@ classdef Thcapacitor < PhysicalDom
             obj.matrix.rho_cp_array = [];
             obj.matrix.rhocpwnwn = [];
             % ---
-            obj.setup_done = 1;
             obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            obj.setup_done = 0;
             Thcapacitor.setup(obj);
         end
     end

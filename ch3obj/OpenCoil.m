@@ -17,24 +17,20 @@
 %--------------------------------------------------------------------------
 
 classdef OpenCoil < Coil
-
     % --- entry
     properties
         etrode_equation
     end
-
     % --- computed
     properties
         gid_node_petrode
         gid_node_netrode
     end
-
     properties (Access = private)
         setup_done = 0
         build_done = 0
         assembly_done = 0
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()

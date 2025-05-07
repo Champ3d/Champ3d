@@ -17,18 +17,15 @@
 %--------------------------------------------------------------------------
 
 classdef CloseCoil < Coil
-
     % --- entry
     properties (SetObservable)
         etrode_equation
     end
-
     % --- computed
     properties
         electrode_dom
         shape_dom
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs(fname)
