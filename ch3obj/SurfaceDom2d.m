@@ -17,30 +17,12 @@
 %--------------------------------------------------------------------------
 
 classdef SurfaceDom2d < SurfaceDom
-
-    % --- Properties
     properties
         parent_mesh
         gid_face
         defined_on
         condition
     end
-
-    % --- subfields to build
-    properties
-        
-    end
-
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-    end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-        
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -65,45 +47,14 @@ classdef SurfaceDom2d < SurfaceDom
     % --- setup/reset/build/assembly
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@SurfaceDom(obj);
             % --- XTODO
-            % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
-            % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % reset super
-            reset@SurfaceDom(obj);
-            % ---
-            obj.setup_done = 0;
             SurfaceDom2d.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
-        end
-    end
-    methods
-        function build(obj)
-            % ---
-            SurfaceDom2d.setup(obj);
-            % ---
-            build@SurfaceDom(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % --- XTODO
-            % obj.build_defining_obj;
-            % ---
-            obj.build_done = 1;
-            % ---
         end
     end
 end

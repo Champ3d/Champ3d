@@ -17,22 +17,17 @@
 %--------------------------------------------------------------------------
 
 classdef QuadMesh < Mesh2d
-
-    % --- Properties
     properties
         lid_face
     end
-    
     properties (Access = private)
-        setup_done = 0
         build_done = 0
+        % ---
+        build_meshds_done = 0;
+        build_discrete_done = 0;
+        build_intkit_done = 0;
+        build_prokit_done = 0;
     end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -48,6 +43,7 @@ classdef QuadMesh < Mesh2d
             end
             % ---
             obj = obj@Mesh2d;
+            obj.elem_type = 'quad';
             % ---
             if isempty(fieldnames(args))
                 return
@@ -62,26 +58,20 @@ classdef QuadMesh < Mesh2d
     % --- setup
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            obj.elem_type = 'quad';
-            obj.cal_flatnode;
-            % ---
-            obj.setup_done = 1;
             obj.build_done = 0;
+            % ---
+            obj.build_meshds_done = 0;
+            obj.build_discrete_done = 0;
+            obj.build_intkit_done = 0;
+            obj.build_prokit_done = 0;
+            % ---
+            obj.cal_flatnode;
             % ---
         end
     end
 
     methods (Access = public)
         function reset(obj)
-            % reset super class
-            reset@Mesh2d(obj);
-            % ---
-            obj.setup_done = 0;
             QuadMesh.setup(obj);
             % --- reset dependent objs
             obj.reset_dependent_obj;
@@ -91,17 +81,22 @@ classdef QuadMesh < Mesh2d
     methods
         function build(obj)
             % ---
-            Mesh2d.setup(obj);
-            % ---
-            build@Mesh2d(obj);
-            % ---
             if obj.build_done
                 return
             end
             % ---
-            
+            if ~obj.build_meshds_done
+                obj.build_meshds;
+            end
+            if ~obj.build_discrete_done
+                obj.build_discrete;
+            end
+            if ~obj.build_intkit_done
+                obj.build_intkit;
+            end
             % ---
             obj.build_done = 1;
+            % ---
         end
     end
 

@@ -17,63 +17,12 @@
 %--------------------------------------------------------------------------
 
 classdef Mesh3d < Mesh
-
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-    end
-
     % --- Constructors
     methods
         function obj = Mesh3d()
             obj = obj@Mesh;
-            % ---
-            Mesh3d.setup(obj);
-            % ---
         end
     end
-    % --- setup/reset/build/assembly
-    methods (Static)
-        function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@Mesh(obj);
-            % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
-            % ---
-        end
-    end
-    methods (Access = public)
-        function reset(obj)
-            % reset super
-            reset@Mesh(obj);
-            % ---
-            obj.setup_done = 0;
-            Mesh3d.setup(obj);
-            % --- reset dependent obj
-            % obj.reset_dependent_obj;
-        end
-    end
-    methods
-        function build(obj)
-            % ---
-            Mesh3d.setup(obj);
-            % --- call super
-            build@Mesh(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            obj.build_done = 1;
-            % ---
-        end
-    end
-
     % --- Methods - Add dom
     methods
         % ---

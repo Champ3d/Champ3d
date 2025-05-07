@@ -17,28 +17,10 @@
 %--------------------------------------------------------------------------
 
 classdef VolumeDom2d < VolumeDom
-
-    % --- Properties
     properties
         id_xline
         id_yline
     end
-
-    % --- subfields to build
-    properties
-        
-    end
-
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-    end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-        
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -72,31 +54,22 @@ classdef VolumeDom2d < VolumeDom
             % ---
         end
     end
-    % --- setup/reset/build/assembly
+    % --- setup
     methods (Static)
         function setup(obj)
             % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@VolumeDom(obj);
-            % ---
             if ~isempty(obj.id_xline) && ~isempty(obj.id_yline)
                 obj.build_from_idmesh1d;
+            elseif ~isempty(obj.elem_code)
+                obj.build_from_elem_code;
+            elseif ~isempty(obj.gid_elem)
+                obj.build_from_gid_elem;
             end
-            % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % reset super class
-            reset@VolumeDom(obj);
-            % ---
-            obj.setup_done = 0;
             VolumeDom2d.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;

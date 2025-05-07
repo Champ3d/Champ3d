@@ -17,19 +17,20 @@
 %--------------------------------------------------------------------------
 
 classdef MeshDom < Xhandle
-
+    properties
+        dependent_obj = []
+        defining_obj = []
+    end
     % --- Dependent Properties
     properties (Dependent = true)
         geoextension
     end
-    
     % --- Constructors
     methods
         function obj = MeshDom()
             obj = obj@Xhandle;
         end
     end
-
     % --- Utility Methods
     methods
         function val = get.geoextension(obj)

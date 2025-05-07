@@ -46,30 +46,12 @@ classdef Mesh < Xhandle
         gid_face
         flat_node
         % ---
-    end
-    % --- subfields to build
-    properties
         dom
     end
-
-    % ---
-    properties (Access = private)
-        build_meshds_done = 0
-        build_discrete_done = 0
-        build_intkit_done = 0
-        build_prokit_done = 0
-    end
-    
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-    end
-
     properties
         dependent_obj = []
         defining_obj = []
     end
-
     % --- Dependent Properties
     properties (Dependent = true)
         nb_node
@@ -87,21 +69,6 @@ classdef Mesh < Xhandle
         function obj = Mesh()
             % ---
             obj = obj@Xhandle;
-            % ---
-            % call setup in constructor
-            % ,,, for direct verification
-            % ,,, setup must be static
-            Mesh.setup(obj);
-            % ---
-        end
-    end
-    % --- setup/reset/build/assembly
-    methods (Static)
-        function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % ---
             obj.meshds.id_edge_in_elem = [];
             obj.meshds.ori_edge_in_elem = [];
@@ -142,42 +109,8 @@ classdef Mesh < Xhandle
             obj.prokit.Wn = {};
             obj.prokit.node = {};
             % ---
-            obj.setup_done = 1;
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.build_meshds_done = 0;
-            obj.build_discrete_done = 0;
-            obj.build_intkit_done = 0;
-            obj.build_prokit_done = 0;
         end
     end
-    methods (Access = public)
-        function reset(obj)
-            % ---
-            obj.setup_done = 0;
-            Mesh.setup(obj);
-            % --- reset dependent obj
-            % obj.reset_dependent_obj;
-        end
-    end
-    methods
-        function build(obj)
-            % ---
-            Mesh.setup(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            obj.build_meshds;
-            obj.build_discrete;
-            obj.build_intkit;
-            % ---
-            obj.build_done = 1;
-            % ---
-        end
-    end
-
     % --- Methods - Get
     methods
         % ---
@@ -434,10 +367,6 @@ classdef Mesh < Xhandle
                     'ori_edge_in_face','sign_edge_in_face'})} = 'all'
             end
             %--------------------------------------------------------------
-            if obj.build_meshds_done
-                return
-            end
-            %--------------------------------------------------------------
             %tic
             %f_fprintf(0,'Make #meshds \n');
             %fprintf('   ');
@@ -554,11 +483,6 @@ classdef Mesh < Xhandle
                 % ---
             end
             %--------------------------------------------------------------
-            all_get = {'all'};
-            if any(f_strcmpi(get,all_get))
-                obj.build_meshds_done = 1;
-            end
-            %--------------------------------------------------------------
             %--- Log message
             %f_fprintf(0,'--- in',...
             %    1,toc, ...
@@ -570,10 +494,6 @@ classdef Mesh < Xhandle
                 % ---
                 args.get {mustBeMember(args.get,...
                     {'all','div','grad','curl'})} = 'all'
-            end
-            %--------------------------------------------------------------
-            if obj.build_discrete_done
-                return
             end
             %--------------------------------------------------------------
             %tic
@@ -717,11 +637,6 @@ classdef Mesh < Xhandle
                 end
             end
             %--------------------------------------------------------------
-            all_get = {'all'};
-            if any(f_strcmpi(get,all_get))
-                obj.build_discrete_done = 1;
-            end
-            %--------------------------------------------------------------
             %--- Log message
             %f_fprintf(0,'--- in',...
             %    1,toc, ...
@@ -733,10 +648,6 @@ classdef Mesh < Xhandle
     methods
         % -----------------------------------------------------------------
         function obj = build_intkit(obj)
-            %--------------------------------------------------------------
-            if obj.build_intkit_done
-                return
-            end
             %--------------------------------------------------------------
             %tic
             %f_fprintf(0,'Make #intkit \n');
@@ -832,8 +743,6 @@ classdef Mesh < Xhandle
             obj.intkit.Wf = Wf;
             obj.intkit.node = node_g;
             %--------------------------------------------------------------
-            obj.build_intkit_done = 1;
-            %--------------------------------------------------------------
             %--- Log message
             %f_fprintf(0,'--- in',...
             %    1,toc, ...
@@ -891,10 +800,6 @@ classdef Mesh < Xhandle
     methods
         % -----------------------------------------------------------------
         function obj = build_prokit(obj)
-            %--------------------------------------------------------------
-            if obj.build_prokit_done
-                return
-            end
             %--------------------------------------------------------------
             %tic
             %f_fprintf(0,'Make #prokit \n');
@@ -955,8 +860,6 @@ classdef Mesh < Xhandle
             obj.prokit.We = We;
             obj.prokit.Wf = Wf;
             obj.prokit.node = node_i;
-            %--------------------------------------------------------------
-            obj.build_prokit_done = 1;
             %--------------------------------------------------------------
             %--- Log message
             %f_fprintf(0,'--- in',...

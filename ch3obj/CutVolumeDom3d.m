@@ -17,20 +17,12 @@
 %--------------------------------------------------------------------------
 
 classdef CutVolumeDom3d < VolumeDom3d
-
-    % --- Properties
     properties
         id_dom3d
         cut_equation
         gid_side_node_1
         gid_side_node_2
     end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-        
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -51,13 +43,23 @@ classdef CutVolumeDom3d < VolumeDom3d
             % ---
             obj <= args;
             % ---
-            if ~isempty(obj.id_dom3d) && ~isempty(obj.cut_equation)
-                obj.build;
-            end
+            CutVolumeDom3d.setup(obj);
             % ---
         end
     end
-
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            obj.build;
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            CutVolumeDom3d.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
+        end
+    end
     % --- Methods
     methods (Access = private, Hidden)
         % -----------------------------------------------------------------
@@ -82,7 +84,6 @@ classdef CutVolumeDom3d < VolumeDom3d
         end
         % -----------------------------------------------------------------
     end
-
     % ---
     methods
         function plot(obj,args)
@@ -108,7 +109,6 @@ classdef CutVolumeDom3d < VolumeDom3d
             % -------------------------------------------------------------
         end
     end
-
 end
 
 

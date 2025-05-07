@@ -17,22 +17,18 @@
 %--------------------------------------------------------------------------
 
 classdef QuadMeshFrom1d < QuadMesh
-
     properties
         id_xline
         id_yline
     end
-
     properties (Access = private)
-        setup_done = 0
         build_done = 0
+        % ---
+        build_meshds_done = 0;
+        build_discrete_done = 0;
+        build_intkit_done = 0;
+        build_prokit_done = 0;
     end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -70,12 +66,14 @@ classdef QuadMeshFrom1d < QuadMesh
     methods (Static)
         % -----------------------------------------------------------------
         function obj = setup(obj)
+            obj.build_done = 0;
             % ---
-            if obj.setup_done
-                return
-            end
+            obj.build_meshds_done = 0;
+            obj.build_discrete_done = 0;
+            obj.build_intkit_done = 0;
+            obj.build_prokit_done = 0;
             % ---
-            setup@QuadMesh(obj);
+            obj.cal_flatnode;
             % ---
             if isempty(obj.parent_mesh) || isempty(obj.id_xline) || ...
                     isempty(obj.id_yline)
@@ -174,17 +172,11 @@ classdef QuadMeshFrom1d < QuadMesh
             % --- edge length
             % obj.sface = f_area(node_,face_);
             % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
         end
     end
 
     methods (Access = public)
         function reset(obj)
-            % reset super class
-            reset@QuadMesh(obj);
-            % ---
-            obj.setup_done = 0;
             QuadMeshFrom1d.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
@@ -194,17 +186,22 @@ classdef QuadMeshFrom1d < QuadMesh
     methods
         function build(obj)
             % ---
-            QuadMeshFrom1d.setup(obj);
-            % ---
-            build@QuadMesh(obj);
-            % ---
             if obj.build_done
                 return
             end
             % ---
-            
+            if ~obj.build_meshds_done
+                obj.build_meshds;
+            end
+            if ~obj.build_discrete_done
+                obj.build_discrete;
+            end
+            if ~obj.build_intkit_done
+                obj.build_intkit;
+            end
             % ---
             obj.build_done = 1;
+            % ---
         end
     end
     

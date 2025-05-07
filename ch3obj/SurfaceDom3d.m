@@ -71,60 +71,41 @@ classdef SurfaceDom3d < SurfaceDom
             % ---
         end
     end
-    % --- setup/reset/build/assembly
+    % --- setup
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@SurfaceDom(obj);
-            % ---
+            % --- XTODO : which come first
+            % build_from_boundface
+            % build_from_interface
+            % build_from_gid_face
             % if ~isempty(obj.gid_face)
-            %     obj.build_from_gid_face
-            % else
-            switch lower(obj.defined_on)
-                case {'bound_face','bound'}
-                    obj.build_from_boundface;
-                case {'interface'}
-                    obj.build_from_interface;
-            end
+            %     obj.build_from_gid_face;
+            % end
             % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
+            if ~isempty(obj.building_formular)
+                if ~isempty(obj.building_formular.arg1) && ...
+                   ~isempty(obj.building_formular.arg2) && ...
+                   ~isempty(obj.building_formular.operation)
+                    obj.build_from_formular;
+                end
+            else
+                switch lower(obj.defined_on)
+                    case {'bound_face','bound'}
+                        obj.build_from_boundface;
+                    case {'interface'}
+                        obj.build_from_interface;
+                end
+            end
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % reset super
-            reset@SurfaceDom(obj);
-            % ---
-            obj.setup_done = 0;
             SurfaceDom3d.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
     end
-    methods
-        function build(obj)
-            % ---
-            SurfaceDom3d.setup(obj);
-            % ---
-            build@SurfaceDom(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            obj.build_defining_obj;
-            % ---
-            obj.build_done = 1;
-            % ---
-        end
-    end
-
     % --- Methods
     methods (Access = protected, Hidden)
         % -----------------------------------------------------------------

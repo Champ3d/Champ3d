@@ -17,23 +17,19 @@
 %--------------------------------------------------------------------------
 
 classdef HexaMeshFromQuadMesh < HexMesh
-
     properties
         parent_mesh1d
         parent_mesh2d
         id_zline
     end
-
     properties (Access = private)
-        setup_done = 0
         build_done = 0
+        % ---
+        build_meshds_done = 0;
+        build_discrete_done = 0;
+        build_intkit_done = 0;
+        build_prokit_done = 0;
     end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -67,15 +63,16 @@ classdef HexaMeshFromQuadMesh < HexMesh
         end
     end
 
-    % --- setup/reset/build/assembly
+    % --- setup
     methods (Static)
         function setup(obj)
             % ---
-            if obj.setup_done
-                return
-            end
+            obj.build_done = 0;
             % ---
-            setup@HexMesh(obj);
+            obj.build_meshds_done = 0;
+            obj.build_discrete_done = 0;
+            obj.build_intkit_done = 0;
+            obj.build_prokit_done = 0;
             % ---
             if isempty(obj.parent_mesh2d) || isempty(obj.id_zline)
                 return
@@ -187,17 +184,10 @@ classdef HexaMeshFromQuadMesh < HexMesh
             obj.sface = f_area(node_,face_);
             obj.ledge = f_ledge(node_,edge_);
             % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
-            % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % reset super
-            reset@HexMesh(obj);
-            % ---
-            obj.setup_done = 0;
             HexaMeshFromQuadMesh.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
@@ -206,16 +196,20 @@ classdef HexaMeshFromQuadMesh < HexMesh
     methods
         function build(obj)
             % ---
-            HexaMeshFromQuadMesh.setup(obj);
-            % ---
-            build@HexMesh(obj);
-            % ---
             if obj.build_done
                 return
             end
-            %--------------------------------------------------------------
-            % obj.build_defining_obj;
-            %--------------------------------------------------------------
+            % ---
+            if ~obj.build_meshds_done
+                obj.build_meshds;
+            end
+            if ~obj.build_discrete_done
+                obj.build_discrete;
+            end
+            if ~obj.build_intkit_done
+                obj.build_intkit;
+            end
+            % ---
             obj.build_done = 1;
             % ---
         end

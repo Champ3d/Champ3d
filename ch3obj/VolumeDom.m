@@ -17,35 +17,13 @@
 %--------------------------------------------------------------------------
 
 classdef VolumeDom < MeshDom
-
-    % --- Properties
     properties
+        parent_mesh
         elem_code
         gid_elem
         condition
         gid
     end
-
-    % --- subfields to build
-    properties
-        parent_mesh
-    end
-
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-    end
-
-    properties
-        dependent_obj = []
-        defining_obj = []
-    end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-        
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -56,11 +34,11 @@ classdef VolumeDom < MeshDom
     methods
         function obj = VolumeDom(args)
             arguments
-                args.id = []
-                args.parent_mesh = []
-                args.elem_code = []
-                args.gid_elem = []
-                args.condition = []
+                args.id
+                args.parent_mesh
+                args.elem_code
+                args.gid_elem
+                args.condition
             end
             % ---
             obj = obj@MeshDom;
@@ -71,20 +49,13 @@ classdef VolumeDom < MeshDom
             % ---
             obj <= args;
             % ---
-            % call setup in constructor
-            % ,,, for direct verification
-            % ,,, setup must be static
             VolumeDom.setup(obj);
             % ---
         end
     end
-    % --- setup/reset/build/assembly
+    % --- setup
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % ---
             % must try elem_code first
             if ~isempty(obj.elem_code)
@@ -92,35 +63,13 @@ classdef VolumeDom < MeshDom
             elseif ~isempty(obj.gid_elem)
                 obj.build_from_gid_elem;
             end
-            % ---
-            % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
-            % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % ---
-            obj.setup_done = 0;
             VolumeDom.setup(obj);
             % --- reset dependent obj
-            % obj.reset_dependent_obj;
-        end
-    end
-    methods
-        function build(obj)
-            % ---
-            VolumeDom.setup(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % --- 
-            % obj.build_defining_obj;
-            % ---
-            obj.build_done = 1;
-            % ---
+            obj.reset_dependent_obj;
         end
     end
     % --- Methods
