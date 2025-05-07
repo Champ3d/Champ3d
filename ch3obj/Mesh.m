@@ -135,12 +135,12 @@ classdef Mesh < Xhandle
     % --- Methode - Add
     methods
         % -----------------------------------------------------------------
-        function add_default_domain(obj,varargin)
+        function add_whole_mesh_dom(obj,varargin)
             gid_elem_ = 1:obj.nb_elem;
             if isa(obj,'Mesh2d')
-                obj.dom.default_domain = VolumeDom2d('parent_mesh',obj,'gid_elem',gid_elem_);
+                obj.dom.whole_mesh_dom = VolumeDom2d('parent_mesh',obj,'gid_elem',gid_elem_);
             elseif isa(obj,'Mesh3d')
-                obj.dom.default_domain = VolumeDom3d('parent_mesh',obj,'gid_elem',gid_elem_);
+                obj.dom.whole_mesh_dom = VolumeDom3d('parent_mesh',obj,'gid_elem',gid_elem_);
             end
         end
         % -----------------------------------------------------------------

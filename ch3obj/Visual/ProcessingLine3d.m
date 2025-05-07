@@ -53,7 +53,7 @@ classdef ProcessingLine3d < ProcessingSurface3d
             obj <= args;
             % ---
             if isempty(obj.id_dom3d)
-                obj.id_dom3d = 'default_domain';
+                obj.id_dom3d = 'whole_mesh_dom';
             end
             % ---
             obj.parent_mesh = obj.parent_model.parent_mesh;

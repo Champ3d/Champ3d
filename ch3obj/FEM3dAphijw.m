@@ -66,34 +66,17 @@ classdef FEM3dAphijw < FEM3dAphi
                 obj.build_base_matrix;
                 obj.base_matrix_done = 1;
             end
-            % ---
-            %--------------------------------------------------------------
-            if isempty(obj.airbox)
-                if ~isfield(obj.parent_mesh.dom,'default_domain')
-                    obj.parent_mesh.add_default_domain;
-                end
-                obj.airbox.default_airbox = AirboxAphi('parent_model',obj,'id_dom3d','default_domain');
-            end
-            %--------------------------------------------------------------
-            allowed_physical_dom = {'econductor','mconductor','airbox','sibc',...
-                'bsfield','coil','nomesh','pmagnet','embc'};
-            %--------------------------------------------------------------
-            obj.callsubfieldbuild('field_name',allowed_physical_dom);
-            %--------------------------------------------------------------
+            %---
             obj.build_done = 1;
             % ---
         end
         %------------------------------------------------------------------
         function assembly(obj)
-            % ---
-            obj.build;
-            assembly@FEM3dAphi(obj);
-            % ---
-            if obj.assembly_done
-                return
-            end
             %--------------------------------------------------------------
-            f_fprintf(0,'Assembly',1,class(obj),0,'\n');
+            obj.build;
+            %--------------------------------------------------------------
+            % Preparation
+            % /!\ init all matrix since always re-assembly
             %--------------------------------------------------------------
             parent_mesh = obj.parent_mesh;
             nb_elem = parent_mesh.nb_elem;
@@ -111,6 +94,14 @@ classdef FEM3dAphijw < FEM3dAphi
             obj.dof.t_js = sparse(nb_edge,1);
             obj.dof.a_bs = sparse(nb_edge,1);
             obj.dof.a_pm = sparse(nb_edge,1);
+            %--------------------------------------------------------------
+            if isempty(obj.airbox)
+                if ~isfield(obj.parent_mesh.dom,'whole_mesh_dom')
+                    obj.parent_mesh.add_whole_mesh_dom;
+                end
+                obj.airbox.by_default_airbox = ...
+                    AirboxAphi('parent_model',obj,'id_dom3d','whole_mesh_dom');
+            end
             %--------------------------------------------------------------
             allowed_physical_dom = {'econductor','mconductor','airbox','sibc',...
                 'bsfield','coil','nomesh','pmagnet','embc'};
@@ -231,8 +222,6 @@ classdef FEM3dAphijw < FEM3dAphi
             obj.matrix.LHS = LHS; clear LHS;
             obj.matrix.RHS = RHS; clear RHS;
             %--------------------------------------------------------------
-            obj.assembly_done = 1;
-            % ---
         end
     end
     % --- Methods/public

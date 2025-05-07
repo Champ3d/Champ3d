@@ -198,10 +198,10 @@ classdef EmModel < PhysicalModel
             args.parent_model = obj;
             % ---
             if isempty(args.id_dom3d)
-                if ~isfield(obj.parent_mesh.dom,'default_domain')
-                    obj.parent_mesh.add_default_domain;
+                if ~isfield(obj.parent_mesh.dom,'whole_mesh_dom')
+                    obj.parent_mesh.add_whole_mesh_dom;
                 end
-                args.id_dom3d = 'default_domain';
+                args.id_dom3d = 'whole_mesh_dom';
             end
             % ---
             argu = f_to_namedarg(args,'for','Bsfield');

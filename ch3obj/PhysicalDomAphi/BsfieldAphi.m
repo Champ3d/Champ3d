@@ -67,10 +67,10 @@ classdef BsfieldAphi < Bsfield
             end
             % --- special case
             if isempty(obj.id_dom3d)
-                if ~isfield(obj.parent_model.parent_mesh.dom,'default_domain')
-                    obj.parent_model.parent_mesh.add_default_domain;
+                if ~isfield(obj.parent_model.parent_mesh.dom,'whole_mesh_dom')
+                    obj.parent_model.parent_mesh.add_whole_mesh_dom;
                 end
-                obj.id_dom3d = 'default_domain';
+                obj.id_dom3d = 'whole_mesh_dom';
             end
             % --- call utility methods
             obj.set_parameter;
