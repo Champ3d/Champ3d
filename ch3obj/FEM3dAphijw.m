@@ -271,6 +271,90 @@ classdef FEM3dAphijw < FEM3dAphi
                 % ---
                 f_fprintf(0,'e',1,erro0,0,'\n');
                 f_fprintf(0,'--- iter-in',1,niter,0,'relres',1,relres,0,'\n');
+                
+            end
+        end
+        %------------------------------------------------------------------
+        function solveone(obj,args)
+            arguments
+                obj
+                args.it = []
+                args.tol_out = 1e-3; % tolerance of outer loop
+                args.tol_in  = 1e-6; % tolerance of inner loop
+                args.maxniter_out = 3; % maximum iteration of outer loop
+                args.maxniter_in = 1e3; % maximum iteration of inner loop
+            end
+            % --- which it
+            if isempty(args.it)
+                it = obj.ltime.it; % it = obj.gtime.it ??
+            else
+                it = args.it;
+                obj.ltime.it = it;
+            end
+            %--------------------------------------------------------------
+            % ---
+            obj.dof{it}.A = ...
+                EdgeDof('parent_model',obj);
+            obj.dof{it}.Phi = ...
+                NodeDof('parent_model',obj);
+            % ---
+            if it == 1
+                x0 = [obj.dof{it}.A.value, obj.dof{it}.Phi.value].';
+            else
+                x0 = [obj.dof{it-1}.A.value, obj.dof{it-1}.Phi.value].';
+            end
+            %--------------------------------------------------------------
+            obj.field{it}.A.elem = ...
+                AelemField('parent_model',obj,'dof',obj.dof{it}.A);
+            obj.field{it}.A.face = ...
+                AfaceField('parent_model',obj,'dof',obj.dof{it}.A);
+            %--------------------------------------------------------------
+            f_fprintf(0,'Solveone',1,class(obj),0,'it ---',1,num2str(it),0,'\n');
+            %----------------------------------------------------------
+            tol_out = args.tol_out;
+            maxniter_out = args.maxniter_out;
+            tol_in = args.tol_in;
+            maxniter_in = args.maxniter_in;
+            %----------------------------------------------------------
+            erro = 1;
+            niter_out = 0;
+            % ---
+            while erro > tol_out && niter_out < maxniter_out
+                % ---
+                obj.assembly;
+                % ---
+                niter_out = niter_out + 1;
+                f_fprintf(0,'--- iter-out',1,niter_out);
+                % ---
+                if niter_out == 1
+                    x0 = [];
+                end
+                % --- qmr + jacobi
+                M = sqrt(diag(diag(obj.matrix.LHS)));
+                [x,flag,relres,niter,resvec] = ...
+                    qmr(obj.matrix.LHS, obj.matrix.RHS, ...
+                        tol_in, maxniter_in, M.', M, x0);
+                % ---
+                if niter_out == 1
+                    % out-loop one more time
+                    erro = 1;
+                    x0 = x;
+                elseif niter > 1
+                    % for linear prob, niter = 0 for 2nd out-loop
+                    erro = norm(x0 - x)/norm(x0);
+                    x0 = x;
+                else
+                    erro = 0;
+                end
+                % ---
+                f_fprintf(0,'e',1,erro,0,'\n');
+                f_fprintf(0,'--- iter-in',1,niter,0,'relres',1,relres,0,'\n');
+                %------------------------------------------------------
+                % --- update now, for assembly
+                %------------------------------------------------------
+                % ---
+                obj.dof{it}.T.value = zeros(obj.parent_mesh.nb_node,1);
+                obj.dof{it}.T.value(obj.matrix.id_node_t) = x;
                 %----------------------------------------------------------------------
                 % --- postpro
                 id_edge_a_unknown = obj.matrix.id_edge_a_unknown;
@@ -299,15 +383,11 @@ classdef FEM3dAphijw < FEM3dAphi
                 obj.dof.b = obj.parent_mesh.discrete.rot * obj.dof.a;
                 obj.dof.e = -jome .* (obj.dof.a + obj.parent_mesh.discrete.grad * obj.dof.phi);
                 %----------------------------------------------------------------------
-                obj.postpro;
-                %----------------------------------------------------------------------
+                %------------------------------------------------------
             end
         end
         % -----------------------------------------------------------------------------
         function postpro(obj)
-            %--------------------------------------------------------------------------
-            f_fprintf(0,'Postprocessing',1,class(obj),0,'\n');
-            f_fprintf(0,'   ');
             %--------------------------------------------------------------------------
             parent_mesh = obj.parent_mesh;
             nb_elem = parent_mesh.nb_elem;
@@ -350,8 +430,6 @@ classdef FEM3dAphijw < FEM3dAphi
                     phydom.postpro;
                 end
             end
-            %--------------------------------------------------------------------------
-            f_fprintf(0,'\n');
             %--------------------------------------------------------------------------
         end
     end
