@@ -281,7 +281,7 @@ classdef FEM3dAphijw < FEM3dAphi
                 args.it = []
                 args.tol_out = 1e-3; % tolerance of outer loop
                 args.tol_in  = 1e-6; % tolerance of inner loop
-                args.maxniter_out = 3; % maximum iteration of outer loop
+                args.maxniter_out = 5; % maximum iteration of outer loop
                 args.maxniter_in = 1e3; % maximum iteration of inner loop
             end
             % --- which it
@@ -350,7 +350,11 @@ classdef FEM3dAphijw < FEM3dAphi
                 % ---
                 if niter_out == 1
                     % out-loop one more time
-                    improvement = 1;
+                    if any(x0)
+                        improvement = norm(x0 - x)/norm(x0);
+                    else
+                        improvement = 1;
+                    end
                     x0 = x;
                 elseif niter > 1
                     % for linear prob, niter = 0 for 2nd out-loop
