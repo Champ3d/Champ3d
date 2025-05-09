@@ -420,6 +420,25 @@ classdef Parameter < Xhandle
                 elseif any(f_strcmpi(depon_,{'ltime','time'}))
                     % take from parent_model of paramater object
                     fargs{i} = target_model.ltime.t_now;
+                elseif any(f_strcmpi(depon_,{'fr'}))
+                    % take from parent_model of paramater object
+                    fargs{i} = target_model.fr;
+                elseif contains(depon_,{'V.','I.','Z.'})
+                    % --- id_coil
+                    depon_ = split(depon_,'.');
+                    quantity = depon_{1};
+                    id_coil = depon_{2};
+                    % ---
+                    if ~isprop(source_model,'coil')
+                        error('no coil in source model !');
+                    else
+                        if ~isfield(source_model.coil,id_coil)
+                            error(['no #coil ' id_coil ' in source model !'])
+                        end
+                    end
+                    % ---
+                    fargs{i} = source_model.coil.(id_coil).(['get' quantity]);
+                    % ---
                 elseif any(f_strcmpi(depon_,{...
                         'J','V','T','B','E','H','A','P','Phi'}))
                     % physical quantities

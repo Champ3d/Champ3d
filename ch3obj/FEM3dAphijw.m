@@ -91,9 +91,9 @@ classdef FEM3dAphijw < FEM3dAphi
             obj.matrix.id_node_netrode = [];
             obj.matrix.sigmawewe = sparse(nb_edge,nb_edge);
             obj.matrix.nu0nurwfwf = sparse(nb_face,nb_face);
-            obj.dof.t_js = sparse(nb_edge,1);
-            obj.dof.a_bs = sparse(nb_edge,1);
-            obj.dof.a_pm = sparse(nb_edge,1);
+            obj.matrix.t_js = zeros(nb_edge,1);
+            obj.matrix.a_bs = zeros(nb_edge,1);
+            obj.matrix.a_pm = zeros(nb_edge,1);
             %--------------------------------------------------------------
             if isempty(obj.airbox)
                 if ~isfield(obj.parent_mesh.dom,'whole_mesh_dom')
@@ -162,11 +162,11 @@ classdef FEM3dAphijw < FEM3dAphi
             % --- RHS
             bsfieldRHS = - obj.parent_mesh.discrete.rot.' * ...
                 obj.matrix.nu0nurwfwf * ...
-                obj.parent_mesh.discrete.rot * obj.dof.a_bs;
+                obj.parent_mesh.discrete.rot * obj.matrix.a_bs;
             pmagnetRHS =   obj.parent_mesh.discrete.rot.' * ...
                 ((1/mu0).* obj.matrix.wfwf) * ...
-                obj.parent_mesh.discrete.rot * obj.dof.a_pm;
-            jscoilRHS  =   obj.parent_mesh.discrete.rot.' * obj.matrix.wewf.' * obj.dof.t_js;
+                obj.parent_mesh.discrete.rot * obj.matrix.a_pm;
+            jscoilRHS  =   obj.parent_mesh.discrete.rot.' * obj.matrix.wewf.' * obj.matrix.t_js;
             %--------------------------------------------------------------
             RHS = bsfieldRHS + pmagnetRHS + jscoilRHS;
             RHS = RHS(id_edge_a_unknown,1);
@@ -175,6 +175,30 @@ classdef FEM3dAphijw < FEM3dAphi
             id_coil__ = {};
             if ~isempty(obj.coil)
                 id_coil__ = fieldnames(obj.coil);
+            end
+            % ---
+            for iec = 1:length(id_coil__)
+                %----------------------------------------------------------
+                id_phydom = id_coil__{iec};
+                coil = obj.coil.(id_phydom);
+                %----------------------------------------------------------
+                if isa(coil,'VsCoilAphi')
+                    %------------------------------------------------------
+                    f_fprintf(0,'--- #coil/vscoil',1,id_phydom,0,'\n');
+                    %------------------------------------------------------
+                    Voltage  = coil.matrix.v_coil;
+                    alpha    = coil.matrix.alpha;
+                    %------------------------------------------------------
+                    vRHSed = - obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * (alpha .* Voltage);
+                    vRHSed = vRHSed(id_edge_a_unknown);
+                    %------------------------------------------------------
+                    vRHSno = - obj.parent_mesh.discrete.grad.'  * obj.matrix.sigmawewe * ...
+                        obj.parent_mesh.discrete.grad * (alpha .* Voltage);
+                    vRHSno = vRHSno(id_node_phi_unknown);
+                    %------------------------------------------------------
+                    RHS = RHS + [vRHSed; vRHSno];
+                    %------------------------------------------------------
+                end
             end
             % ---
             for iec = 1:length(id_coil__)
@@ -191,28 +215,16 @@ classdef FEM3dAphijw < FEM3dAphi
                     %------------------------------------------------------
                     S13 = jome * (obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
                     S23 = jome * (obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
-                    S33 = jome * (alpha.' * obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
+                    S33 = alpha.' * obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha;
+                    % S33 = jome * (alpha.' * obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
+                    % ---
                     S13 = S13(id_edge_a_unknown,1);
                     S23 = S23(id_node_phi_unknown,1);
+                    % ---
                     LHS = [LHS [S13;  S23]];
                     LHS = [LHS; S13.' S23.' S33];
                     RHS = [RHS; i_coil];
                     %------------------------------------------------------
-                elseif isa(coil,'VsCoilAphi')
-                    %------------------------------------------------------
-                    f_fprintf(0,'--- #coil/vscoil',1,id_phydom,0,'\n');
-                    %------------------------------------------------------
-                    Voltage  = coil.matrix.v_coil;
-                    alpha    = coil.matrix.alpha;
-                    %------------------------------------------------------
-                    vRHSed = - obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * (alpha .* Voltage);
-                    vRHSed = vRHSed(id_edge_a_unknown);
-                    %------------------------------------------------------
-                    vRHSno = - obj.parent_mesh.discrete.grad.'  * obj.matrix.sigmawewe * ...
-                        obj.parent_mesh.discrete.grad * (alpha .* Voltage);
-                    vRHSno = vRHSno(id_node_phi_unknown);
-                    %------------------------------------------------------
-                    RHS = RHS + [vRHSed; vRHSno];
                 end
             end
             %--------------------------------------------------------------
@@ -227,51 +239,20 @@ classdef FEM3dAphijw < FEM3dAphi
     % --- Methods/public
     methods (Access = public)
         % -----------------------------------------------------------------
-        function solve(obj)
-            %--------------------------------------------------------------
-            f_fprintf(0,'Solve',1,class(obj),0,'\n');
-            f_fprintf(0,'   ');
-            %--------------------------------------------------------------
-            erro0 = 1;
-            tole0 = 1e-3;
-            maxi0 = 10;
-            erro1 = 1;
-            tole1 = 1e-6;
-            maxi1 = 1e3;
-            %--------------------------------------------------------------
-            nite0 = 0;
+        function solve(obj,args)
+            arguments
+                obj
+                args.tol_out = 1e-3; % tolerance of outer loop
+                args.tol_in  = 1e-6; % tolerance of inner loop
+                args.maxniter_out = 5; % maximum iteration of outer loop
+                args.maxniter_in = 1e3; % maximum iteration of inner loop
+            end
             % ---
-            while erro0 > tole0 & nite0 < maxi0
-                % ---
-                obj.build_done = 0;
-                obj.assembly_done = 0;
-                obj.assembly;
-                % ---
-                nite0 = nite0 + 1;
-                f_fprintf(0,'--- iter-out',1,nite0);
-                % ---
-                if nite0 == 1
-                    x0 = [];
-                end
-                % ---
-                M = sqrt(diag(diag(obj.matrix.LHS)));
-                [x,flag,relres,niter,resvec] = ...
-                    qmr(obj.matrix.LHS,obj.matrix.RHS,tole1,maxi1,M.',M,x0);
-                % ---
-                if nite0 == 1
-                    erro0 = 1;
-                    x0 = x;
-                elseif niter > 1
-                    erro0 = norm(x - x0)/norm(x);
-                    x0 = x;
-                else
-                    erro0 = 0;
-                    x = x0;
-                end
-                % ---
-                f_fprintf(0,'e',1,erro0,0,'\n');
-                f_fprintf(0,'--- iter-in',1,niter,0,'relres',1,relres,0,'\n');
-                
+            obj.ltime.it = 0;
+            while obj.ltime.t_now < obj.ltime.t_end
+                obj.ltime.it = obj.ltime.it + 1;
+                obj.solveone('tol_out',args.tol_out,'tol_in',args.tol_in,...
+                    'maxniter_out',args.maxniter_out,'maxniter_in',args.maxniter_in);
             end
         end
         %------------------------------------------------------------------
