@@ -91,6 +91,14 @@ classdef Nomesh < PhysicalDom
     methods
         function assembly(obj)
             obj.build;
+            % ---
+            obj.parent_model.matrix.id_elem_nomesh = ...
+                [obj.parent_model.matrix.id_elem_nomesh obj.matrix.gid_elem];
+            obj.parent_model.matrix.id_inner_edge_nomesh = ...
+                [obj.parent_model.matrix.id_elem_nomesh obj.matrix.gid_inner_edge];
+            obj.parent_model.matrix.id_inner_node_nomesh = ...
+                [obj.parent_model.matrix.id_elem_nomesh obj.matrix.gid_inner_node];
+            % ---
         end
     end
 end

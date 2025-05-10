@@ -112,18 +112,18 @@ classdef FEM3dAphijw < FEM3dAphi
             id_face_in_elem = parent_mesh.meshds.id_face_in_elem;
             %--------------------------------------------------------------
             % --- nomesh
-            id_elem_nomesh = obj.matrix.id_elem_nomesh;
-            id_inner_edge_nomesh = obj.matrix.id_inner_edge_nomesh;
-            id_inner_node_nomesh = obj.matrix.id_inner_node_nomesh;
+            id_elem_nomesh = unique(obj.matrix.id_elem_nomesh);
+            id_inner_edge_nomesh = unique(obj.matrix.id_inner_edge_nomesh);
+            id_inner_node_nomesh = unique(obj.matrix.id_inner_node_nomesh);
             %--------------------------------------------------------------
             % --- airbox
-            id_elem_airbox = obj.matrix.id_elem_airbox;
-            id_inner_edge_airbox = obj.matrix.id_inner_edge_airbox;
+            id_elem_airbox = unique(obj.matrix.id_elem_airbox);
+            id_inner_edge_airbox = unique(obj.matrix.id_inner_edge_airbox);
             %--------------------------------------------------------------
-            id_node_phi = obj.matrix.id_node_phi;
-            id_elem_mcon = obj.matrix.id_elem_mcon;
-            id_node_netrode = obj.matrix.id_node_netrode;
-            id_node_petrode = obj.matrix.id_node_petrode;
+            id_node_phi = unique(obj.matrix.id_node_phi);
+            id_elem_mcon = unique(obj.matrix.id_elem_mcon);
+            id_node_netrode = unique(obj.matrix.id_node_netrode);
+            id_node_petrode = unique(obj.matrix.id_node_petrode);
             %--------------------------------------------------------------
             id_edge_a_unknown   = setdiff(id_inner_edge_airbox,id_inner_edge_nomesh);
             id_node_phi_unknown = setdiff(id_node_phi,...
@@ -160,12 +160,18 @@ classdef FEM3dAphijw < FEM3dAphi
             LHS = [LHS; S12.' S22]; clear S12 S22;
             %--------------------------------------------------------------
             % --- RHS
+            % bsfieldRHS = - obj.parent_mesh.discrete.rot.' * ...
+            %     obj.matrix.nu0nurwfwf * ...
+            %     obj.parent_mesh.discrete.rot * obj.matrix.a_bs;
+            % ---
             bsfieldRHS = - obj.parent_mesh.discrete.rot.' * ...
-                obj.matrix.nu0nurwfwf * ...
+                ((1/mu0).* obj.matrix.wfwf) * ...
                 obj.parent_mesh.discrete.rot * obj.matrix.a_bs;
+            % ---
             pmagnetRHS =   obj.parent_mesh.discrete.rot.' * ...
                 ((1/mu0).* obj.matrix.wfwf) * ...
                 obj.parent_mesh.discrete.rot * obj.matrix.a_pm;
+            % ---
             jscoilRHS  =   obj.parent_mesh.discrete.rot.' * obj.matrix.wewf.' * obj.matrix.t_js;
             %--------------------------------------------------------------
             RHS = bsfieldRHS + pmagnetRHS + jscoilRHS;
@@ -322,11 +328,11 @@ classdef FEM3dAphijw < FEM3dAphi
                     if it == 1
                         x0 = [obj.dof{it}.A.value(id_edge_a_unknown); ...
                               obj.dof{it}.Phi.value(id_node_phi_unknown); ...
-                              zeros(len_dphi_unknown,1)].';
+                              zeros(len_dphi_unknown,1)];
                     else
                         x0 = [obj.dof{it-1}.A.value(id_edge_a_unknown); ...
                               obj.dof{it-1}.Phi.value(id_node_phi_unknown); ...
-                              zeros(len_dphi_unknown,1)].';
+                              zeros(len_dphi_unknown,1)];
                     end
                 end
                 % --- qmr + jacobi

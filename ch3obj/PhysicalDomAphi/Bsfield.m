@@ -144,7 +144,7 @@ classdef Bsfield < PhysicalDom
             %--------------------------------------------------------------
             % --- qmr + jacobi
             M = sqrt(diag(diag(rotrot)));
-            a_bs = qmr(rotrot, rotb, 1e-6, 5e3, M.', M);
+            [a_bs,flag,relres,niter,resvec] = qmr(rotrot, rotb, 1e-6, 5e3, M.', M);
             %--------------------------------------------------------------
             obj.matrix.wfbs = wfbs;
             obj.matrix.a_bs = a_bs;

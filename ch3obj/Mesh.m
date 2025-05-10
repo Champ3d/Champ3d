@@ -142,6 +142,9 @@ classdef Mesh < Xhandle
             elseif isa(obj,'Mesh3d')
                 obj.dom.whole_mesh_dom = VolumeDom3d('parent_mesh',obj,'gid_elem',gid_elem_);
             end
+            % ---
+            obj.dom.whole_mesh_dom.id = 'whole_mesh_dom';
+            % ---
         end
         % -----------------------------------------------------------------
     end
