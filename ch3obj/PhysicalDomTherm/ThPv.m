@@ -101,7 +101,9 @@ classdef ThPv < PhysicalDom
             %pv_array;
             % --- check changes
             is_changed = 1;
-            if isequal(pv_array,obj.matrix.pv_array)
+            if isequal(pv_array,obj.matrix.pv_array) && ...
+               isequal(gid_elem,obj.matrix.gid_elem) && ...
+               isequal(gid_node_t,obj.matrix.gid_node_t)
                 is_changed = 0;
             end
             %--------------------------------------------------------------

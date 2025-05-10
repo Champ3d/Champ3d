@@ -24,7 +24,6 @@ classdef Mconductor < PhysicalDom
     end
     % ---
     properties (Access = private)
-        setup_done = 0
         build_done = 0
     end
     % --- Valid args list
@@ -61,12 +60,6 @@ classdef Mconductor < PhysicalDom
     % --- setup
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % --- special case
-            
             % --- call utility methods
             obj.set_parameter;
             obj.get_geodom;
@@ -77,7 +70,6 @@ classdef Mconductor < PhysicalDom
             obj.matrix.nur_array = [];
             obj.matrix.mur_array = [];
             % ---
-            obj.setup_done = 1;
             obj.build_done = 0;
             % ---
         end
@@ -102,9 +94,11 @@ classdef Mconductor < PhysicalDom
             mur_array = obj.mur.getvalue('in_dom',dom);
             nur_array = obj.mur.get_inverse('in_dom',dom);
             nu0nur = nu0 .* nur_array;
+            %--------------------------------------------------------------
             % --- check changes
             is_changed = 1;
-            if isequal(rho_cp_array,obj.matrix.rho_cp_array)
+            if isequal(mur_array,obj.matrix.mur_array) && ...
+               isequal(gid_elem,obj.matrix.gid_elem)
                 is_changed = 0;
             end
             %--------------------------------------------------------------
@@ -112,23 +106,12 @@ classdef Mconductor < PhysicalDom
                 return
             end
             %--------------------------------------------------------------
-            % local nu0nurwfwf matrix
-            nu0nurwfwf = parent_mesh.cwfwf('id_elem',gid_elem,'coefficient',nu0nur);
-            % ---
             obj.matrix.gid_elem = gid_elem;
-            obj.matrix.nu0nurwfwf = nu0nurwfwf;
             obj.matrix.nur_array = nur_array;
             obj.matrix.mur_array = mur_array;
-            % ---
-            obj.build_done = 1;
-        end
-    end
-
-    % --- assembly
-    methods
-        function assembly(obj)
-            % ---
-            obj.build;
+            %--------------------------------------------------------------
+            % local nu0nurwfwf matrix
+            lmatrix = parent_mesh.cwfwf('id_elem',gid_elem,'coefficient',nu0nur);
             %--------------------------------------------------------------
             id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
             id_face_in_elem = obj.parent_model.parent_mesh.meshds.id_face_in_elem;
@@ -136,7 +119,6 @@ classdef Mconductor < PhysicalDom
             nbFa_inEl = obj.parent_model.parent_mesh.refelem.nbFa_inEl;
             %--------------------------------------------------------------
             gid_elem = obj.matrix.gid_elem;
-            lmatrix = obj.matrix.nu0nurwfwf;
             %--------------------------------------------------------------
             [~,id_] = intersect(gid_elem,id_elem_nomesh);
             gid_elem(id_) = [];
@@ -161,8 +143,20 @@ classdef Mconductor < PhysicalDom
                     lmatrix(:,i,i),nb_face,nb_face);
             end
             %--------------------------------------------------------------
+            obj.matrix.nu0nurwfwf = nu0nurwfwf;
+            % ---
+            obj.build_done = 1;
+        end
+    end
+
+    % --- assembly
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
+            %--------------------------------------------------------------
             obj.parent_model.matrix.nu0nurwfwf = ...
-                obj.parent_model.matrix.nu0nurwfwf + nu0nurwfwf;
+                obj.parent_model.matrix.nu0nurwfwf + obj.matrix.nu0nurwfwf;
             %--------------------------------------------------------------
             obj.parent_model.matrix.id_elem_mcon = ...
                 [obj.parent_model.matrix.id_elem_mcon obj.matrix.gid_elem];

@@ -22,12 +22,6 @@ classdef NodeDofBasedScalarElemField < ScalarElemField
         dof
         reference_potential = 0
     end
-    % properties (Dependent)
-    %     cvalue
-    %     ivalue
-    %     gvalue
-    %     node
-    % end
     % --- Contructor
     methods
         function obj = NodeDofBasedScalarElemField(args)

@@ -20,15 +20,13 @@ classdef Sibcjw < PhysicalDom
     properties
         sigma = 0
         mur = 1
-        r_ht = 0
-        r_et = 0
-        cparam = 0
+        r_ht = 1e9
+        r_et = 1e9
         % ---
         matrix
     end
     % --- 
     properties (Access = private)
-        setup_done = 0
         build_done = 0
     end
     % --- Valid args list
@@ -49,7 +47,6 @@ classdef Sibcjw < PhysicalDom
                 args.mur
                 args.r_ht
                 args.r_et
-                args.cparam
                 args.parameter_dependency_search ...
                     {mustBeMember(args.parameter_dependency_search,{'by_coordinates','by_id_dom'})} ...
                     = 'by_id_dom'
@@ -69,14 +66,8 @@ classdef Sibcjw < PhysicalDom
     end
 
     % --- setup
-    methods
+    methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % --- special case
-            
             % --- call utility methods
             obj.set_parameter;
             obj.get_geodom;
@@ -90,26 +81,12 @@ classdef Sibcjw < PhysicalDom
             obj.matrix.cparam_array = [];
             obj.matrix.skindepth = [];
             % ---
-            obj.setup_done = 1;
             obj.build_done = 0;
-            % ---
-            % ---
-            cparam_ = 0;
-            if ~isempty(obj.r_ht) && ~isempty(obj.r_et)
-                cparam_ = 1/obj.r_ht - 1/obj.r_et;
-            elseif ~isempty(obj.r_ht)
-                cparam_ = 1/obj.r_ht;
-            elseif ~isempty(obj.r_et)
-                cparam_ = - 1/obj.r_et;
-            end
-            % ---
-            obj.cparam = Parameter('f',cparam_);
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            obj.setup_done = 0;
             Sibcjw.setup(obj);
         end
     end
@@ -126,18 +103,34 @@ classdef Sibcjw < PhysicalDom
             % ---
             sigma_array  = obj.sigma.getvalue('in_dom',dom);
             mur_array    = obj.mur.getvalue('in_dom',dom);
-            cparam_array = obj.cparam.getvalue('in_dom',dom);
+            r_ht_array   = obj.r_ht.getvalue('in_dom',dom);
+            r_et_array   = obj.r_et.getvalue('in_dom',dom);
             % ---
             mu0 = 4 * pi * 1e-7;
             fr = obj.parent_model.frequency;
             skindepth = sqrt(2./(2*pi*fr.*(mu0.*mur_array).*sigma_array));
+            cparam_array = 1./r_ht_array - 1./r_et_array;
             % ---
             z_sibc = (1+1j)./(skindepth.*sigma_array) .* ...
                 (1 + (1-1j)/4 .* skindepth .* cparam_array);
             z_sibc = f_column_array(z_sibc,'nb_elem',lnb_face);
+            %--------------------------------------------------------------
+            % local surface mesh
+            submesh = dom.submesh;
+            %--------------------------------------------------------------
+            for k = 1:length(submesh)
+                sm = submesh{k};
+                sm.build_intkit;
+                % ---
+                gid_face_{k} = sm.gid_face;
+            end
+            %--------------------------------------------------------------
             % --- check changes
             is_changed = 1;
-            if isequal(rho_cp_array,obj.matrix.rho_cp_array)
+            if isequal(gid_node_phi,obj.matrix.gid_node_phi) && ...
+               isequal(gid_face_,obj.matrix.gid_face) && ...
+               isequal(sigma_array,obj.matrix.sigma_array) && ...
+               isequal(skindepth,obj.matrix.skindepth)
                 is_changed = 0;
             end
             %--------------------------------------------------------------
@@ -145,37 +138,23 @@ classdef Sibcjw < PhysicalDom
                 return
             end
             %--------------------------------------------------------------
+            obj.matrix.gid_node_phi = gid_node_phi;
+            obj.matrix.gid_face = gid_face_;
+            obj.matrix.sigma_array = sigma_array;
+            obj.matrix.skindepth = skindepth;
+            % obj.matrix.mur_array = mur_array;
+            % obj.matrix.cparam_array = cparam_array;
+            %--------------------------------------------------------------
             % local gsibcwewe matrix
-            submesh = dom.submesh;
             for k = 1:length(submesh)
                 sm = submesh{k};
                 sm.build_intkit;
                 % ---
                 lid_face_  = sm.lid_face;
                 g_sibc = 1./z_sibc(lid_face_);
-                gsibcwewe{k} = sm.cwewe('coefficient',g_sibc);
+                lmatrix{k} = sm.cwewe('coefficient',g_sibc);
                 % ---
-                gid_face_{k} = sm.gid_face;
             end
-            % ---
-            obj.matrix.gid_node_phi = gid_node_phi;
-            % ---
-            obj.matrix.gsibcwewe = gsibcwewe;
-            obj.matrix.gid_face = gid_face_;
-            obj.matrix.sigma_array = sigma_array;
-            obj.matrix.mur_array = mur_array;
-            obj.matrix.cparam_array = cparam_array;
-            obj.matrix.skindepth = skindepth;
-            % ---
-            obj.build_done = 1;
-        end
-    end
-
-    % --- assembly
-    methods
-        function assembly(obj)
-            % ---
-            obj.build;
             %--------------------------------------------------------------
             id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face;
             nb_edge = obj.parent_model.parent_mesh.nb_edge;
@@ -184,7 +163,6 @@ classdef Sibcjw < PhysicalDom
             gsibcwewe = sparse(nb_edge,nb_edge);
             %--------------------------------------------------------------
             gid_face = obj.matrix.gid_face;
-            lmatrix  = obj.matrix.gsibcwewe;
             %--------------------------------------------------------------
             for igr = 1:length(lmatrix)
                 nbEd_inFa = size(lmatrix{igr},2);
@@ -210,8 +188,20 @@ classdef Sibcjw < PhysicalDom
                 end
             end
             %--------------------------------------------------------------
+            obj.matrix.gsibcwewe = gsibcwewe;
+            % ---
+            obj.build_done = 1;
+        end
+    end
+
+    % --- assembly
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
+            %--------------------------------------------------------------
             obj.parent_model.matrix.sigmawewe = ...
-                obj.parent_model.matrix.sigmawewe + gsibcwewe;
+                obj.parent_model.matrix.sigmawewe + obj.matrix.gsibcwewe;
             %--------------------------------------------------------------
             obj.parent_model.matrix.id_node_phi = ...
                 [obj.parent_model.matrix.id_node_phi obj.matrix.gid_node_phi];

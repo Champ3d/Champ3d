@@ -24,7 +24,6 @@ classdef Bsfield < PhysicalDom
     end
     % ---
     properties (Access = private)
-        setup_done = 0
         build_done = 0
     end
     % --- Valid args list
@@ -55,16 +54,13 @@ classdef Bsfield < PhysicalDom
             obj <= args;
             % ---
             Bsfield.setup(obj);
+            % ---
         end
     end
 
     % --- setup/reset/build/assembly
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % --- special case
             if isempty(obj.id_dom3d)
                 if ~isfield(obj.parent_model.parent_mesh.dom,'whole_mesh_dom')
@@ -77,16 +73,17 @@ classdef Bsfield < PhysicalDom
             obj.get_geodom;
             obj.dom.is_defining_obj_of(obj);
             % --- Initialization
-            
+            obj.matrix.gid_elem = [];
+            obj.matrix.bs_array = [];
+            obj.matrix.wfbs = [];
+            obj.matrix.a_bs = [];
             % ---
-            obj.setup_done = 1;
             obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            obj.setup_done = 0;
             Bsfield.setup(obj);
         end
     end
@@ -105,7 +102,8 @@ classdef Bsfield < PhysicalDom
             end
             % --- check changes
             is_changed = 1;
-            if isequal(rho_cp_array,obj.matrix.rho_cp_array)
+            if isequal(bs_array,obj.matrix.bs_array) && ...
+               isequal(gid_elem,obj.matrix.gid_elem)
                 is_changed = 0;
             end
             %--------------------------------------------------------------
@@ -113,20 +111,43 @@ classdef Bsfield < PhysicalDom
                 return
             end
             %--------------------------------------------------------------
-            % local wfbs matrix
-            wfbs = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',bs_array);
-            % ---
             obj.matrix.gid_elem = gid_elem;
-            obj.matrix.wfbs = wfbs;
-            % ---
-            if iscell(obj.bs)
-                bs_array = 0;
-                for i = 1:length(obj.bs)
-                    bs_array = bs_array + obj.bs{i};
-                end
-                bs_array = bs_array ./ length(obj.bs);
+            obj.matrix.bs_array = bs_array;
+            %--------------------------------------------------------------
+            % local wfbs matrix
+            lmatrix = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',bs_array);
+            %--------------------------------------------------------------
+            nb_edge = obj.parent_model.parent_mesh.nb_edge;
+            nb_face = obj.parent_model.parent_mesh.nb_face;
+            id_face_in_elem = obj.parent_model.parent_mesh.meshds.id_face_in_elem;
+            nbFa_inEl = obj.parent_model.parent_mesh.refelem.nbFa_inEl;
+            %--------------------------------------------------------------
+            % global elementary wfbs matrix
+            wfbs = sparse(nb_face,1);
+            %--------------------------------------------------------------
+            gid_elem = obj.matrix.gid_elem;
+            for i = 1:nbFa_inEl
+                wfbs = wfbs + ...
+                    sparse(id_face_in_elem(i,gid_elem),1,lmatrix(:,i),nb_face,1);
             end
-            obj.matrix.bs = bs_array;
+            %--------------------------------------------------------------
+            rotb = obj.parent_model.parent_mesh.discrete.rot.' * wfbs;
+            rotrot = obj.parent_model.parent_mesh.discrete.rot.' * ...
+                     obj.parent_model.matrix.wfwf * ...
+                     obj.parent_model.parent_mesh.discrete.rot;
+            %--------------------------------------------------------------
+            % id_edge_a_unknown = obj.parent_model.matrix.id_edge_a;
+            % rotb = rotb(id_edge_a_unknown,1);
+            % rotrot = rotrot(id_edge_a_unknown,id_edge_a_unknown);
+            % a_bsfield = zeros(nb_edge,1);
+            % a_bsfield(id_edge_a_unknown) = f_solve_axb(rotrot,rotb);
+            %--------------------------------------------------------------
+            % --- qmr + jacobi
+            M = sqrt(diag(diag(rotrot)));
+            a_bs = qmr(rotrot, rotb, 1e-6, 5e3, M.', M);
+            %--------------------------------------------------------------
+            obj.matrix.wfbs = wfbs;
+            obj.matrix.a_bs = a_bs;
             % ---
             obj.build_done = 1;
         end
@@ -138,42 +159,12 @@ classdef Bsfield < PhysicalDom
             % ---
             obj.build;
             %--------------------------------------------------------------
-            nb_edge = obj.parent_model.parent_mesh.nb_edge;
-            nb_face = obj.parent_model.parent_mesh.nb_face;
-            id_face_in_elem = obj.parent_model.parent_mesh.meshds.id_face_in_elem;
-            nbFa_inEl = obj.parent_model.parent_mesh.refelem.nbFa_inEl;
+            obj.parent_model.matrix.a_bs = ...
+                obj.parent_model.matrix.a_bs + obj.matrix.a_bs;
             %--------------------------------------------------------------
-            % global elementary wfbs matrix
-            wfbs = sparse(nb_face,1);
-            %--------------------------------------------------------------
-            gid_elem = obj.matrix.gid_elem;
-            lmatrix  = obj.matrix.wfbs;
-            for i = 1:nbFa_inEl
-                wfbs = wfbs + ...
-                    sparse(id_face_in_elem(i,gid_elem),1,lmatrix(:,i),nb_face,1);
-            end
-            %--------------------------------------------------------------
-            rotb = obj.parent_model.parent_mesh.discrete.rot.' * wfbs;
-            rotrot = obj.parent_model.parent_mesh.discrete.rot.' * ...
-                     obj.parent_model.matrix.wfwf * ...
-                     obj.parent_model.parent_mesh.discrete.rot;
-            %--------------------------------------------------------------
-            id_edge_a_unknown = obj.parent_model.matrix.id_edge_a;
-            %--------------------------------------------------------------
-            rotb = rotb(id_edge_a_unknown,1);
-            rotrot = rotrot(id_edge_a_unknown,id_edge_a_unknown);
-            %--------------------------------------------------------------
-            a_bsfield = zeros(nb_edge,1);
-            a_bsfield(id_edge_a_unknown) = f_solve_axb(rotrot,rotb);
-            %--------------------------------------------------------------
-            clear rotb rotrot wfbs
-            %--------------------------------------------------------------
-            obj.parent_model.dof.a_bs = ...
-                obj.parent_model.dof.a_bs + a_bsfield;
-            %--------------------------------------------------------------
-            %obj.parent_model.dof.bs   = ...
-            %    obj.parent_model.dof.bs + ...
-            %    obj.parent_model.parent_mesh.discrete.rot * a_bsfield;
+            %obj.parent_model.matrix.bs   = ...
+            %    obj.parent_model.matrix.bs + ...
+            %    obj.parent_model.parent_mesh.discrete.rot * obj.matrix.a_bs;
             %--------------------------------------------------------------
         end
     end
@@ -188,14 +179,11 @@ classdef Bsfield < PhysicalDom
                 args.alpha {mustBeNumeric} = 0.5
             end
             % ---
-            argu = f_to_namedarg(args);
-            plot@CloseCoil(obj,argu{:});
-            % ---
-            if ~isempty(obj.matrix.bs)
-                hold on;
-                f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
-                         obj.matrix.bs(:,obj.matrix.gid_elem).','sfactor',0.2);
-            end
+            % if ~isempty(obj.matrix.bs)
+            %     hold on;
+            %     f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
+            %              obj.matrix.bs(:,obj.matrix.gid_elem).','sfactor',0.2);
+            % end
         end
     end
 end

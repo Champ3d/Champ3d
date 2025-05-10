@@ -23,7 +23,6 @@ classdef PMagnet < PhysicalDom
         matrix
     end
     properties (Access = private)
-        setup_done = 0
         build_done = 0
     end
     % --- Valid args list
@@ -50,14 +49,25 @@ classdef PMagnet < PhysicalDom
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            PMagnet.setup(obj);
+            % ---
         end
     end
 
     % --- setup
-    methods
+    methods (Static)
         function setup(obj)
-            setup@PMagnet(obj);
+            % --- call utility methods
+            obj.set_parameter;
+            obj.get_geodom;
+            obj.dom.is_defining_obj_of(obj);
+            % --- Initialization
+            obj.matrix.gid_elem = [];
+            obj.matrix.wfbr = [];
+            obj.matrix.br_array = [];
+            % ---
+            obj.build_done = 0;
+            % ---
         end
     end
 
@@ -65,47 +75,37 @@ classdef PMagnet < PhysicalDom
     methods
         function build(obj)
             % ---
-            obj.setup;
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
             gid_elem = dom.gid_elem;
             % ---
             br_array = obj.br.getvalue('in_dom',dom);
-            wfbr = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',br_array);
-            % ---
-            obj.matrix.gid_elem = gid_elem;
-            obj.matrix.wfbr = wfbr;
-            obj.matrix.br = br_array;
-            % ---
-            obj.build_done = 1;
-            obj.assembly_done = 0;
-        end
-    end
-
-    % --- assembly
-    methods
-        function assembly(obj)
-            % ---
-            obj.build;
-            % ---
-            if obj.assembly_done
+            % --- check changes
+            is_changed = 1;
+            if isequal(br_array,obj.matrix.br_array) && ...
+               isequal(gid_elem,obj.matrix.gid_elem)
+                is_changed = 0;
+            end
+            %--------------------------------------------------------------
+            if ~is_changed && obj.build_done == 1
                 return
             end
+            %--------------------------------------------------------------
+            obj.matrix.gid_elem = gid_elem;
+            obj.matrix.br_array = br_array;
+            %--------------------------------------------------------------
+            % local wfbs matrix
+            lmatrix = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',bs_array);
             %--------------------------------------------------------------
             nb_edge = obj.parent_model.parent_mesh.nb_edge;
             nb_face = obj.parent_model.parent_mesh.nb_face;
             id_face_in_elem = obj.parent_model.parent_mesh.meshds.id_face_in_elem;
             nbFa_inEl = obj.parent_model.parent_mesh.refelem.nbFa_inEl;
             %--------------------------------------------------------------
+            % global elementary wfbs matrix
             wfbr = sparse(nb_face,1);
             %--------------------------------------------------------------
             gid_elem = obj.matrix.gid_elem;
-            lmatrix  = obj.matrix.wfbr;
             for i = 1:nbFa_inEl
                 wfbr = wfbr + ...
                     sparse(id_face_in_elem(i,gid_elem),1,lmatrix(:,i),nb_face,1);
@@ -116,23 +116,36 @@ classdef PMagnet < PhysicalDom
                      obj.parent_model.matrix.wfwf * ...
                      obj.parent_model.parent_mesh.discrete.rot;
             %--------------------------------------------------------------
-            id_edge_a_unknown = obj.parent_model.matrix.id_edge_a;
+            % id_edge_a_unknown = obj.parent_model.matrix.id_edge_a;
+            % rotb = rotb(id_edge_a_unknown,1);
+            % rotrot = rotrot(id_edge_a_unknown,id_edge_a_unknown);
+            % a_pmagnet = zeros(nb_edge,1);
+            % a_pmagnet(id_edge_a_unknown) = f_solve_axb(rotrot,rotb);
             %--------------------------------------------------------------
-            rotb = rotb(id_edge_a_unknown,1);
-            rotrot = rotrot(id_edge_a_unknown,id_edge_a_unknown);
+            % --- qmr + jacobi
+            M = sqrt(diag(diag(rotrot)));
+            a_pm = qmr(rotrot, rotb, 1e-6, 5e3, M.', M);
             %--------------------------------------------------------------
-            a_pmagnet = zeros(nb_edge,1);
-            a_pmagnet(id_edge_a_unknown) = f_solve_axb(rotrot,rotb);
-            clear rotb rotrot wfbr
+            obj.matrix.wfbr = wfbr;
+            obj.matrix.a_pm = a_pm;
+            % ---
+            obj.build_done = 1;
+        end
+    end
+
+    % --- assembly
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
             %--------------------------------------------------------------
-            obj.parent_model.dof.a_pm = ...
-                obj.parent_model.dof.a_pm + a_pmagnet;
+            obj.parent_model.matrix.a_pm = ...
+                obj.parent_model.matrix.a_pm + obj.matrix.a_pm;
             %--------------------------------------------------------------
-            %obj.parent_model.dof.bpm  = ...
-            %    obj.parent_model.dof.bpm + ...
-            %    obj.parent_model.parent_mesh.discrete.rot * a_pmagnet;
+            %obj.parent_model.matrix.bpm  = ...
+            %    obj.parent_model.matrix.bpm + ...
+            %    obj.parent_model.parent_mesh.discrete.rot * obj.matrix.a_pm;
             %--------------------------------------------------------------
-            obj.assembly_done = 1;
         end
     end
 
@@ -146,16 +159,13 @@ classdef PMagnet < PhysicalDom
                 args.alpha {mustBeNumeric} = 0.5
             end
             % ---
-            argu = f_to_namedarg(args);
-            plot@PMagnet(obj,argu{:});
-            % ---
-            if isfield(obj.matrix,'br')
-                if ~isempty(obj.matrix.br)
-                    hold on;
-                    f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
-                             obj.matrix.br(:,obj.matrix.gid_elem).','sfactor',0.2);
-                end
-            end
+            % if isfield(obj.matrix,'br')
+            %     if ~isempty(obj.matrix.br)
+            %         hold on;
+            %         f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
+            %                  obj.matrix.br(:,obj.matrix.gid_elem).','sfactor',0.2);
+            %     end
+            % end
         end
     end
 end

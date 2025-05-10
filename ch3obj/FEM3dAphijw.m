@@ -273,34 +273,12 @@ classdef FEM3dAphijw < FEM3dAphi
                 obj.ltime.it = it;
             end
             %--------------------------------------------------------------
-            % --- size
-            id_edge_a_unknown = obj.matrix.id_edge_a_unknown;
-            id_node_phi_unknown = obj.matrix.id_node_phi_unknown;
-            nb_edge = obj.parent_mesh.nb_edge;
-            nb_node = obj.parent_mesh.nb_node;
             % ---
-            len_sol = length(obj.matrix.RHS);
-            len_a_unknown = length(id_edge_a_unknown);
-            len_phi_unknown = length(id_node_phi_unknown);
-            len_dphi_unknown = len_sol - (len_a_unknown + len_phi_unknown);
-            %--------------------------------------------------------------
-            % ---
-            obj.dof{it}.A = ...
-                EdgeDof('parent_model',obj);
-            obj.dof{it}.Phi = ...
-                NodeDof('parent_model',obj);
-            obj.dof{it}.dPhi = ...
-                GlobalQuantityDof('parent_model',obj);
-            % ---
-            if it == 1
-                x0 = [obj.dof{it}.A.value(id_edge_a_unknown); ...
-                      obj.dof{it}.Phi.value(id_node_phi_unknown); ...
-                      zeros(len_dphi_unknown,1)].';
-            else
-                x0 = [obj.dof{it-1}.A.value(id_edge_a_unknown); ...
-                      obj.dof{it-1}.Phi.value(id_node_phi_unknown); ...
-                      zeros(len_dphi_unknown,1)].';
-            end
+            obj.dof{it}.A = EdgeDof('parent_model',obj);
+            obj.dof{it}.Phi = NodeDof('parent_model',obj);
+            obj.dof{it}.B = FaceDof('parent_model',obj);
+            obj.dof{it}.E = EdgeDof('parent_model',obj);
+            obj.dof{it}.V = GlobalQuantityDof('parent_model',obj);
             %--------------------------------------------------------------
             obj.field{it}.A.elem = ...
                 AelemField('parent_model',obj,'dof',obj.dof{it}.A);
@@ -323,6 +301,30 @@ classdef FEM3dAphijw < FEM3dAphi
                 % ---
                 niter_out = niter_out + 1;
                 f_fprintf(0,'--- iter-out',1,niter_out);
+                %--------------------------------------------------------------
+                % --- size
+                id_edge_a_unknown = obj.matrix.id_edge_a_unknown;
+                id_node_phi_unknown = obj.matrix.id_node_phi_unknown;
+                nb_edge = obj.parent_mesh.nb_edge;
+                nb_node = obj.parent_mesh.nb_node;
+                % ---
+                len_sol = length(obj.matrix.RHS);
+                len_a_unknown = length(id_edge_a_unknown);
+                len_phi_unknown = length(id_node_phi_unknown);
+                len_dphi_unknown = len_sol - (len_a_unknown + len_phi_unknown);
+                %--------------------------------------------------------------
+                % ---
+                if niter_out == 1
+                    if it == 1
+                        x0 = [obj.dof{it}.A.value(id_edge_a_unknown); ...
+                              obj.dof{it}.Phi.value(id_node_phi_unknown); ...
+                              zeros(len_dphi_unknown,1)].';
+                    else
+                        x0 = [obj.dof{it-1}.A.value(id_edge_a_unknown); ...
+                              obj.dof{it-1}.Phi.value(id_node_phi_unknown); ...
+                              zeros(len_dphi_unknown,1)].';
+                    end
+                end
                 % --- qmr + jacobi
                 M = sqrt(diag(diag(obj.matrix.LHS)));
                 [x,flag,relres,niter,resvec] = ...
@@ -337,7 +339,7 @@ classdef FEM3dAphijw < FEM3dAphi
                         improvement = 1;
                     end
                     x0 = x;
-                elseif niter > 1
+                elseif niter >= 1
                     % for linear prob, niter = 0 for 2nd out-loop
                     improvement = norm(x0 - x)/norm(x0);
                     x0 = x;
@@ -350,30 +352,24 @@ classdef FEM3dAphijw < FEM3dAphi
                 %------------------------------------------------------
                 % --- update now, for assembly
                 %------------------------------------------------------
-                % ---
-                obj.dof{it}.T.value = zeros(obj.parent_mesh.nb_node,1);
-                obj.dof{it}.T.value(obj.matrix.id_node_t) = x;
-                %----------------------------------------------------------------------
-                % obj.dof{it}.A   = zeros(nb_edge,1);
-                % obj.dof{it}.Phi = zeros(nb_node,1);
                 obj.dof{it}.A.value(id_edge_a_unknown) ...
                     = x(1:len_a_unknown);
                 obj.dof{it}.Phi.value(id_node_phi_unknown) ...
                     = x(len_a_unknown+1 : len_a_unknown+len_phi_unknown);
                 %----------------------------------------------------------------------
-                obj.dof{it}.dPhi = 0;
+                obj.dof{it}.V = 0;
                 if (len_a_unknown + len_phi_unknown) < len_sol
-                    obj.dof{it}.dPhi = x(len_a_unknown+len_phi_unknown+1 : len_sol);
+                    obj.dof{it}.V = x(len_a_unknown+len_phi_unknown+1 : len_sol);
                 end
                 %----------------------------------------------------------------------
                 freq = obj.frequency;
                 jome = 1j*2*pi*freq;
                 % ---
-                obj.dof{it}.b = obj.parent_mesh.discrete.rot * obj.dof{it}.a;
-                obj.dof{it}.e = -jome .* (obj.dof{it}.a + ...
-                                          obj.parent_mesh.discrete.grad * obj.dof{it}.phi);
+                obj.dof{it}.B.value = obj.parent_mesh.discrete.rot * obj.dof{it}.A.value;
+                obj.dof{it}.E.value = ...
+                    -jome .* (obj.dof{it}.A.value + ...
+                              obj.parent_mesh.discrete.grad * obj.dof{it}.Phi.value);
                 %----------------------------------------------------------------------
-                %------------------------------------------------------
             end
         end
         % -----------------------------------------------------------------------------

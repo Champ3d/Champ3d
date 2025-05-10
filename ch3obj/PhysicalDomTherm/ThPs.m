@@ -105,7 +105,9 @@ classdef ThPs < PhysicalDom
             end
             % --- check changes
             is_changed = 1;
-            if isequal(ps_array,obj.matrix.ps_array)
+            if isequal(ps_array,obj.matrix.ps_array) && ...
+               isequal(gid_face_,obj.matrix.gid_face) && ...
+               isequal(gid_node_t,obj.matrix.gid_node_t)
                 is_changed = 0;
             end
             %--------------------------------------------------------------

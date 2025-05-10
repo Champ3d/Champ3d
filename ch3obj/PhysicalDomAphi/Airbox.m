@@ -22,7 +22,6 @@ classdef Airbox < PhysicalDom
     end
     % ---
     properties (Access = private)
-        setup_done = 0
         build_done = 0
     end
     % --- Valid args list
@@ -49,18 +48,13 @@ classdef Airbox < PhysicalDom
             obj <= args;
             % ---
             Airbox.setup(obj);
+            % ---
         end
     end
 
-    % --- setup
+    % --- setup/reset/build/assembly
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % --- special case
-            
             % --- call utility methods
             obj.get_geodom;
             obj.dom.is_defining_obj_of(obj);
@@ -68,24 +62,18 @@ classdef Airbox < PhysicalDom
             obj.matrix.gid_elem = [];
             obj.matrix.gid_inner_edge = [];
             % ---
-            obj.setup_done = 1;
             obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            obj.setup_done = 0;
             Airbox.setup(obj);
         end
     end
     % --- build
     methods
         function build(obj)
-            % ---
-            if obj.build_done
-                return
-            end
             % ---
             dom = obj.dom;
             obj.dom.get_gid;

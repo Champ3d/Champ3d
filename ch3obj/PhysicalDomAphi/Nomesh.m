@@ -17,18 +17,13 @@
 %--------------------------------------------------------------------------
 
 classdef Nomesh < PhysicalDom
-
-    % --- computed
     properties
         matrix
     end
-
-    % --- computed
+    % ---
     properties (Access = private)
         build_done = 0
-        assembly_done = 0
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -52,26 +47,35 @@ classdef Nomesh < PhysicalDom
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            Nomesh.setup(obj);
+            % ---
         end
     end
 
     % --- setup
-    methods
+    methods (Static)
         function setup(obj)
-            setup@Nomesh(obj);
+            % --- call utility methods
+            obj.set_parameter;
+            obj.get_geodom;
+            obj.dom.is_defining_obj_of(obj);
+            % --- Initialization
+            obj.matrix.gid_elem = [];
+            obj.matrix.gid_inner_edge = [];
+            obj.matrix.gid_inner_node = [];
+            % ---
+            obj.build_done = 0;
+            % ---
         end
     end
-
+    methods (Access = public)
+        function reset(obj)
+            Nomesh.setup(obj);
+        end
+    end
     % --- build
     methods
         function build(obj)
-            % ---
-            obj.setup;
-            % ---
-            if obj.build_done
-                return
-            end
             % ---
             dom = obj.dom;
             obj.dom.get_gid;
@@ -86,22 +90,7 @@ classdef Nomesh < PhysicalDom
     % --- assembly
     methods
         function assembly(obj)
-
-        end
-    end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
+            obj.build;
         end
     end
 end

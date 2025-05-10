@@ -95,7 +95,9 @@ classdef Thconductor < PhysicalDom
             lambda_array = obj.lambda.getvalue('in_dom',obj);
             % --- check changes
             is_changed = 1;
-            if isequal(lambda_array,obj.matrix.lambda_array)
+            if isequal(lambda_array,obj.matrix.lambda_array) && ...
+               isequal(gid_elem,obj.matrix.gid_elem) && ...
+               isequal(gid_node_t,obj.matrix.gid_node_t)
                 is_changed = 0;
             end
             %--------------------------------------------------------------

@@ -24,8 +24,19 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
     end
     % --- Contructor
     methods
-        function obj = NodeDofBasedScalarFaceField()
+        function obj = NodeDofBasedScalarFaceField(args)
+            arguments
+                args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
+                args.dof {mustBeA(args.dof,'NodeDof')}
+                args.reference_potential = 0
+            end
+            % ---
             obj = obj@ScalarFaceField;
+            % ---
+            if ~isfield(args,'parent_model') || ~isfield(args,'dof')
+                error('#parent_model and #dof must be given !');
+            end
+            obj <= args;
         end
     end
     % --- get

@@ -174,15 +174,12 @@ classdef EmModel < PhysicalModel
             % ---
             argu = f_to_namedarg(args,'for','Sibc');
             % ---
-            if isa(obj,'FEM3dAphi')
-                phydom = SibcAphijw(argu{:});
-                %nomsh  = NomeshAphi('parent_model',args.parent_model, ...
-                %                    'id_dom2d',args.id_dom2d,...
-                %                    'id_dom3d',args.id_dom3d);
+            if isa(obj,'FEM3dAphijw')
+                phydom = Sibcjw(argu{:});
+                obj.sibc.(args.id) = phydom;
+            else
+                f_fprintf(1,'Sibc',0,'is only supported with',1,'FEM3dAphijw',0,'(for now) ! \n');
             end
-            % ---
-            obj.sibc.(args.id) = phydom;
-            %obj.nomesh.(['nomesh_for_sibc_' args.id]) = nomsh;
         end
         % -----------------------------------------------------------------
         function add_bsfield(obj,args)

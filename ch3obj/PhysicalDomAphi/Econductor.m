@@ -24,7 +24,6 @@ classdef Econductor < PhysicalDom
     end
     % ---
     properties (Access = private)
-        setup_done = 0
         build_done = 0
     end
     % --- Valid args list
@@ -62,10 +61,6 @@ classdef Econductor < PhysicalDom
     % --- setup/reset/build/assembly
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % --- call utility methods
             obj.set_parameter;
             obj.get_geodom;
@@ -76,14 +71,12 @@ classdef Econductor < PhysicalDom
             obj.matrix.sigmawewe = [];
             obj.matrix.sigma_array = [];
             % ---
-            obj.setup_done = 1;
             obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            obj.setup_done = 0;
             Econductor.setup(obj);
         end
     end
@@ -103,7 +96,9 @@ classdef Econductor < PhysicalDom
             sigma_array = obj.sigma.getvalue('in_dom',dom);
             % --- check changes
             is_changed = 1;
-            if isequal(rho_cp_array,obj.matrix.rho_cp_array)
+            if isequal(sigma_array,obj.matrix.sigma_array) && ...
+               isequal(gid_elem,obj.matrix.gid_elem) && ...
+               isequal(gid_node_phi,obj.matrix.gid_node_phi)
                 is_changed = 0;
             end
             %--------------------------------------------------------------
@@ -111,23 +106,12 @@ classdef Econductor < PhysicalDom
                 return
             end
             %--------------------------------------------------------------
-            % local sigmawewe matrix
-            sigmawewe = parent_mesh.cwewe('id_elem',gid_elem,'coefficient',sigma_array);
-            % ---
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.gid_node_phi = gid_node_phi;
-            obj.matrix.sigmawewe = sigmawewe;
             obj.matrix.sigma_array = sigma_array;
-            % ---
-            obj.build_done = 1;
-        end
-    end
-
-    % --- assembly
-    methods
-        function assembly(obj)
-            % ---
-            obj.build;
+            %--------------------------------------------------------------
+            % local sigmawewe matrix
+            lmatrix = parent_mesh.cwewe('id_elem',gid_elem,'coefficient',sigma_array);
             %--------------------------------------------------------------
             id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
             id_edge_in_elem = obj.parent_model.parent_mesh.meshds.id_edge_in_elem;
@@ -135,7 +119,6 @@ classdef Econductor < PhysicalDom
             nbEd_inEl = obj.parent_model.parent_mesh.refelem.nbEd_inEl;
             %--------------------------------------------------------------
             gid_elem = obj.matrix.gid_elem;
-            lmatrix = obj.matrix.sigmawewe;
             %--------------------------------------------------------------
             [~,id_] = intersect(gid_elem,id_elem_nomesh);
             gid_elem(id_) = [];
@@ -160,8 +143,20 @@ classdef Econductor < PhysicalDom
                     lmatrix(:,i,i),nb_edge,nb_edge);
             end
             %--------------------------------------------------------------
+            obj.matrix.sigmawewe = sigmawewe;
+            % ---
+            obj.build_done = 1;
+        end
+    end
+
+    % --- assembly
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
+            %--------------------------------------------------------------
             obj.parent_model.matrix.sigmawewe = ...
-                obj.parent_model.matrix.sigmawewe + sigmawewe;
+                obj.parent_model.matrix.sigmawewe + obj.matrix.sigmawewe;
             %--------------------------------------------------------------
             obj.parent_model.matrix.id_node_phi = ...
                 [obj.parent_model.matrix.id_node_phi obj.matrix.gid_node_phi];

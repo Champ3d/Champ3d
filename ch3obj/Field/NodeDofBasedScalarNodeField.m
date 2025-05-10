@@ -23,10 +23,6 @@ classdef NodeDofBasedScalarNodeField < Xhandle
         % ---
         reference_potential = 0
     end
-    % properties (Dependent)
-    %     cvalue
-    %     node
-    % end
     % --- Contructor
     methods
         function obj = NodeDofBasedScalarNodeField(args)

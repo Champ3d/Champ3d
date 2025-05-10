@@ -134,28 +134,16 @@ classdef FEM3dTherm < ThModel
                 obj.ltime.it = it;
             end
             %--------------------------------------------------------------
-            if it == 1
-                % ---
-                obj.dof{it}.T = ...
-                    NodeDof('parent_model',obj,'value',0);
-                % ---
-                x0 = obj.dof{it}.T.value;
-            else
-                % ---
-                obj.dof{it}.T = ...
-                    NodeDof('parent_model',obj);
-                % ---
-                x0 = obj.dof{it-1}.T.value;
-            end
+            obj.dof{it}.T = NodeDof('parent_model',obj);
             % ---
             obj.field{it}.T.elem = ...
-                TelemField('parent_model',obj,'dof',obj.dof{it}.T,...
+                NodeDofBasedScalarElemField('parent_model',obj,'dof',obj.dof{it}.T,...
                 'reference_potential',obj.T0);
             obj.field{it}.T.face = ...
-                TfaceField('parent_model',obj,'dof',obj.dof{it}.T,...
+                NodeDofBasedScalarFaceField('parent_model',obj,'dof',obj.dof{it}.T,...
                 'reference_potential',obj.T0);
             obj.field{it}.T.node = ...
-                TnodeField('parent_model',obj,'dof',obj.dof{it}.T,...
+                NodeDofBasedScalarNodeField('parent_model',obj,'dof',obj.dof{it}.T,...
                 'reference_potential',obj.T0);
             %--------------------------------------------------------------
             if it > 1
@@ -177,9 +165,13 @@ classdef FEM3dTherm < ThModel
                     niter_out = niter_out + 1;
                     f_fprintf(0,'--- iter-out',1,niter_out);
                     % ---
-                    % if niter_out == 1
-                    %     x0 = [];
-                    % end
+                    if niter_out == 1
+                        if it == 1
+                            x0 = obj.dof{it}.T.value(obj.matrix.id_node_t);
+                        else
+                            x0 = obj.dof{it-1}.T.value(obj.matrix.id_node_t);
+                        end
+                    end
                     % --- qmr + jacobi
                     M = sqrt(diag(diag(obj.matrix.LHS)));
                     [x,flag,relres,niter,resvec] = ...
@@ -194,7 +186,7 @@ classdef FEM3dTherm < ThModel
                             improvement = 1;
                         end
                         x0 = x;
-                    elseif niter > 1
+                    elseif niter >= 1
                         % for linear prob, niter = 0 for 2nd out-loop
                         improvement = norm(x0 - x)/norm(x0);
                         x0 = x;

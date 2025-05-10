@@ -105,7 +105,9 @@ classdef Thconvection < PhysicalDom
             end
             % --- check changes
             is_changed = 1;
-            if isequal(h_array,obj.matrix.h_array)
+            if isequal(h_array,obj.matrix.h_array) && ...
+               isequal(gid_face_,obj.matrix.gid_face) && ...
+               isequal(gid_node_t,obj.matrix.gid_node_t)
                 is_changed = 0;
             end
             %--------------------------------------------------------------
