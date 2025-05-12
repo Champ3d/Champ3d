@@ -26,6 +26,7 @@ classdef SolidOpenIsCoil < OpenCoil & SolidCoil & IsCoil
     % --- computed
     properties
         V
+        I
         Z
         L0
     end

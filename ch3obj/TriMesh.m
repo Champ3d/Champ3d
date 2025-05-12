@@ -140,7 +140,7 @@ classdef TriMesh < Mesh2d
             refelem.nbNo_inEl = 3;
             refelem.nbNo_inEd = 2;
             refelem.EdNo_inEl = [1 2; 1 3; 2 3];
-            refelem.siNo_inEd = [+1, -1]; % w.r.t edge
+            refelem.siNo_inEd = [-1, +1]; % w.r.t edge
             refelem.FaNo_inEl = refelem.EdNo_inEl; % face as edge
             %-----
             refelem.NoFa_ofEd = [2 3; 1 3; 1 2]; % !!! F(i,~j) - circular

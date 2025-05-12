@@ -153,7 +153,7 @@ classdef TetMesh < Mesh3d
             refelem.nbNo_inEl = 4;
             refelem.nbNo_inEd = 2;
             refelem.EdNo_inEl = [1 2; 1 3; 1 4; 2 3; 2 4; 3 4];
-            refelem.siNo_inEd = [+1, -1]; % w.r.t edge
+            refelem.siNo_inEd = [-1, +1]; % w.r.t edge
             refelem.FaNo_inEl = [1 2 3; 1 2 4; 1 3 4; 2 3 4]; %
             %-----
             refelem.NoFa_ofEd = [3 4; 2 4; 1 4; 2 3; 1 3; 1 2]; % !!! F(i,~j) - circular

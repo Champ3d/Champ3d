@@ -430,7 +430,12 @@ classdef FEM3dAphijw < FEM3dAphi
                 freq = obj.frequency;
                 jome = 1j*2*pi*freq;
                 %----------------------------------------------------------------------
-                obj.dof{it}.Phi.value = obj.dof{it}.Phi.value;% + 1/jome .* alphaV;
+                % obj.dof{it}.Phi.value = obj.dof{it}.Phi.value + 1/jome .* alphaV;
+                if any(alphaV)
+                    obj.dof{it}.Phi.value(id_node_phi_unknown) = x(len_a_unknown+1 : len_a_unknown+len_phi_unknown);% + 1/jome .* alphaV(id_node_phi_unknown);
+                else
+                    obj.dof{it}.Phi.value(id_node_phi_unknown) = x(len_a_unknown+1 : len_a_unknown+len_phi_unknown);
+                end
                 %----------------------------------------------------------------------
                 obj.dof{it}.B.value = obj.parent_mesh.discrete.rot * obj.dof{it}.A.value;
                 obj.dof{it}.E.value = ...
@@ -460,6 +465,11 @@ classdef FEM3dAphijw < FEM3dAphi
                 end
                 %----------------------------------------------------------
                 if isa(coil,'VsCoil')
+                    alpha  = coil.matrix.alpha;
+                    coil.I{it} = - (obj.matrix.sigmawewe * obj.dof{it}.E.value).' ...
+                        * (obj.parent_mesh.discrete.grad * alpha);
+                end
+                if isa(coil,'IsCoil')
                     alpha  = coil.matrix.alpha;
                     coil.I{it} = - (obj.matrix.sigmawewe * obj.dof{it}.E.value).' ...
                         * (obj.parent_mesh.discrete.grad * alpha);

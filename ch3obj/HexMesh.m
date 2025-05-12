@@ -154,7 +154,7 @@ classdef HexMesh < Mesh3d
             refelem.nbNo_inEl = 8;
             refelem.nbNo_inEd = 2;
             refelem.EdNo_inEl = [1 2; 1 4; 1 5; 2 3; 2 6; 3 4; 3 7; 4 8; 5 6; 5 8; 6 7; 7 8];
-            refelem.siNo_inEd = [+1, -1]; % w.r.t edge
+            refelem.siNo_inEd = [-1, +1]; % w.r.t edge
             refelem.FaNo_inEl = [1 2 3 4; 5 6 7 8; 1 2 6 5; 2 3 7 6; 3 4 8 7; 1 4 8 5]; %
             % ---
             refelem.NoFa_ofEd = [6 4; 3 5; 1 2; 3 5; 1 2; 4 6; 1 2; 1 2; 6 4; 3 5; 3 5; 4 6]; % !!! F(i,~j) - circular

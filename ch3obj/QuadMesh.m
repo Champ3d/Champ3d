@@ -152,7 +152,7 @@ classdef QuadMesh < Mesh2d
             refelem.nbNo_inEl = 4;
             refelem.nbNo_inEd = 2;
             refelem.EdNo_inEl = [1 2; 1 4; 2 3; 3 4];
-            refelem.siNo_inEd = [+1, -1]; % w.r.t edge
+            refelem.siNo_inEd = [-1, +1]; % w.r.t edge
             refelem.FaNo_inEl = refelem.EdNo_inEl; % face as edge
             %-----
             refelem.NoFa_ofEd = [2 3; 1 4; 1 4; 3 2]; % !!! F(i,~j) - circular

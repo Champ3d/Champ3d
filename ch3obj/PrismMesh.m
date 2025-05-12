@@ -156,7 +156,7 @@ classdef PrismMesh < Mesh3d
             refelem.nbNo_inEl = 6;
             refelem.nbNo_inEd = 2;
             refelem.EdNo_inEl = [1 2; 1 3; 1 4; 2 3; 2 5; 3 6; 4 5; 4 6; 5 6];
-            refelem.siNo_inEd = [+1, -1]; % w.r.t edge
+            refelem.siNo_inEd = [-1, +1]; % w.r.t edge
             refelem.FaNo_inEl = [1 2 3 0; 4 5 6 0; 1 2 5 4; 1 3 6 4; 2 3 6 5]; % tri first then quad
             %-----
             refelem.NoFa_ofEd = [4 5; 3 5; 1 2; 3 4; 1 2; 1 2; 4 5; 3 5; 3 4]; % !!! F(i,~j) - circular
