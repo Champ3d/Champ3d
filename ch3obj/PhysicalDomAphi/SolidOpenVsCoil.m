@@ -142,9 +142,9 @@ classdef SolidOpenVsCoil < OpenCoil & SolidCoil & VsCoil
             obj.build;
             %--------------------------------------------------------------
             obj.parent_model.matrix.id_node_netrode = ...
-                [obj.parent_model.matrix.id_node_netrode obj.gid_node_netrode];
+                unique([obj.parent_model.matrix.id_node_netrode obj.gid_node_netrode]);
             obj.parent_model.matrix.id_node_petrode = ...
-                [obj.parent_model.matrix.id_node_petrode obj.gid_node_petrode];
+                unique([obj.parent_model.matrix.id_node_petrode obj.gid_node_petrode]);
             %--------------------------------------------------------------
             % obj.parent_model.matrix.alpha = ...
             %     obj.parent_model.matrix.alpha + obj.matrix.alpha;

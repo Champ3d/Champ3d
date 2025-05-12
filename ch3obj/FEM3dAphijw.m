@@ -156,7 +156,6 @@ classdef FEM3dAphijw < FEM3dAphi
             id_face_in_elem_air = f_uniquenode(id_face_in_elem(:,id_elem_air));
             mu0 = 4 * pi * 1e-7;
             nu0wfwf = (1/mu0) .* obj.matrix.wfwfx;
-            nu0nurwfwf0 = obj.matrix.nu0nurwfwf;
             % ---
             obj.matrix.nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) = ...
                 obj.matrix.nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) + ...
