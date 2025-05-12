@@ -39,12 +39,6 @@ classdef CloseCoil < Coil
     methods
         function [unit_current_field,alpha] = get_uj_alpha(obj)
             % ---
-            obj.setup;
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
             parent_mesh = obj.parent_model.parent_mesh;
             % --- current field
             unit_current_field = zeros(3,parent_mesh.nb_elem);
@@ -122,7 +116,8 @@ classdef CloseCoil < Coil
             % ---
             % obj.shape_dom = eval(class(obj.electrode_dom));
             % obj.shape_dom <= coilshape;
-            obj.shape_dom = coilshape;
+            obj.shape_dom = obj.electrode_dom.';
+            obj.shape_dom <= coilshape;
             % ---
             obj.shape_dom.gid_side_node_1 = obj.electrode_dom.gid_side_node_2;
             obj.shape_dom.gid_side_node_2 = obj.electrode_dom.gid_side_node_1;

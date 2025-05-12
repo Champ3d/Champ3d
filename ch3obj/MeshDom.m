@@ -61,5 +61,9 @@ classdef MeshDom < Xhandle
             end
             % ---
         end
+        % ----------
+        function set.geoextension(obj,val)
+            
+        end
     end
 end
