@@ -162,23 +162,23 @@ classdef EmModel < PhysicalModel
                 obj
                 % ---
                 args.id = 'no_id'
-                args.id_dom2d = []
-                args.id_dom3d = []
-                args.sigma = 0
-                args.mur = 1
-                args.r_ht = []
-                args.r_et = []
+                args.id_dom2d 
+                args.id_dom3d
+                args.sigma
+                args.mur
+                args.r_ht
+                args.r_et
             end
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args,'for','Sibc');
+            argu = f_to_namedarg(args,'for','Sibcjw');
             % ---
             if isa(obj,'FEM3dAphijw')
                 phydom = Sibcjw(argu{:});
                 obj.sibc.(args.id) = phydom;
             else
-                f_fprintf(1,'Sibc',0,'is only supported with',1,'FEM3dAphijw',0,'(for now) ! \n');
+                f_fprintf(1,'Sibc',0,'is only supported with',1,'FEM3dAphijw',0,'(<ver.2025.05) ! \n');
             end
         end
         % -----------------------------------------------------------------
