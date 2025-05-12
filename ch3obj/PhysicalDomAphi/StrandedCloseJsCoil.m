@@ -16,9 +16,9 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef StrandedOpenJsCoilAphi < OpenCoil & StrandedCoil & JsCoil
+classdef StrandedCloseJsCoil < CloseCoil & StrandedCoil & JsCoil
     properties
-        connexion {mustBeMember(connexion,{'serial','parallel'})} = 'serial'
+        connexion = 'serial'
         cs_area = 1
         nb_turn = 1
         fill_factor = 1
@@ -34,6 +34,7 @@ classdef StrandedOpenJsCoilAphi < OpenCoil & StrandedCoil & JsCoil
         Z
         L0
     end
+    % --- 
     properties (Access = private)
         build_done = 0
     end
@@ -47,15 +48,14 @@ classdef StrandedOpenJsCoilAphi < OpenCoil & StrandedCoil & JsCoil
     end
     % --- Contructor
     methods
-        function obj = StrandedOpenJsCoilAphi(args)
+        function obj = StrandedCloseJsCoil(args)
             arguments
                 args.id
                 args.parent_model
-                args.id_dom2d
                 args.id_dom3d
                 args.etrode_equation
                 % ---
-                args.connexion
+                args.connexion {mustBeMember(args.connexion,{'serial','parallel'})}
                 args.cs_area
                 args.nb_turn
                 args.fill_factor
@@ -63,7 +63,9 @@ classdef StrandedOpenJsCoilAphi < OpenCoil & StrandedCoil & JsCoil
                 args.coil_mode {mustBeMember(args.coil_mode,{'tx','rx'})}
             end
             % ---
-            obj@OpenCoil;
+            obj@CloseCoil;
+            obj@StrandedCoil;
+            obj@JsCoil;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -71,7 +73,7 @@ classdef StrandedOpenJsCoilAphi < OpenCoil & StrandedCoil & JsCoil
             % ---
             obj <= args;
             % ---
-            StrandedOpenJsCoilAphi.setup(obj);
+            StrandedCloseJsCoil.setup(obj);
         end
     end
 
@@ -88,10 +90,13 @@ classdef StrandedOpenJsCoilAphi < OpenCoil & StrandedCoil & JsCoil
             end
             % ---
             obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
+            obj.etrode_equation = obj.etrode_equation{1};
             % --- call utility methods
             obj.set_parameter;
             obj.get_geodom;
             obj.dom.is_defining_obj_of(obj);
+            % XTODO - vdom
+            % obj.etrode.is_defining_obj_of(obj);
             % --- specific
             obj.get_electrode;
             % --- Initialization
@@ -108,7 +113,7 @@ classdef StrandedOpenJsCoilAphi < OpenCoil & StrandedCoil & JsCoil
     end
     methods (Access = public)
         function reset(obj)
-            StrandedOpenJsCoilAphi.setup(obj);
+            StrandedCloseJsCoil.setup(obj);
         end
     end
     % --- build
@@ -133,7 +138,7 @@ classdef StrandedOpenJsCoilAphi < OpenCoil & StrandedCoil & JsCoil
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.js_array = js_array;
             %--------------------------------------------------------------
-            % OpenCoil first, then JsCoil
+            % CloseCoil first, then JsCoil
             % ---
             [unit_current_field,alpha] = obj.get_uj_alpha;
             obj.matrix.unit_current_field = unit_current_field;
@@ -166,7 +171,7 @@ classdef StrandedOpenJsCoilAphi < OpenCoil & StrandedCoil & JsCoil
             % ---
             obj.dom.plot('face_color','none'); hold on
             % ---
-            plot@OpenCoil(obj);
+            plot@CloseCoil(obj);
             % ---
         end
     end

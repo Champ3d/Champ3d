@@ -23,56 +23,21 @@ classdef CloseCoil < Coil
         electrode_dom
         shape_dom
     end
-
-    % --- computed
-    properties (Access = private)
-        build_done = 0
-        assembly_done = 0
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','etrode_equation'};
+            argslist = {'parent_model','id_dom3d','etrode_equation'};
         end
     end
     % --- Contructor
     methods
-        function obj = CloseCoil(args)
-            arguments
-                args.parent_model
-                args.id_dom2d
-                args.id_dom3d
-                args.etrode_equation
-            end
-            % ---
+        function obj = CloseCoil()
             obj@Coil;
-            % ---
-            if isempty(fieldnames(args))
-                return
-            end
-            % ---
-            obj <= args;
-            % ---
-            obj.setup;
         end
     end
-
-    % --- setup
+    % --- Utility Methods
     methods
-        function setup(obj)
-            % ---
-            obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
-            obj.etrode_equation = obj.etrode_equation{1};
-            % ---
-            obj.get_electrode;
-            % ---
-        end
-    end
-
-    % --- build
-    methods
-        function build(obj)
+        function [unit_current_field,alpha] = get_uj_alpha(obj)
             % ---
             obj.setup;
             % ---
@@ -80,12 +45,9 @@ classdef CloseCoil < Coil
                 return
             end
             % ---
-            parent_mesh = obj.dom.parent_mesh;
-            parent_mesh.build_meshds;
-            parent_mesh.build_discrete;
-            parent_mesh.build_intkit;
+            parent_mesh = obj.parent_model.parent_mesh;
             % --- current field
-            unit_current_field = sparse(3,parent_mesh.nb_elem);
+            unit_current_field = zeros(3,parent_mesh.nb_elem);
             % ---
             nbEd_inEl = parent_mesh.refelem.nbEd_inEl;
             % ---
@@ -138,40 +100,12 @@ classdef CloseCoil < Coil
                 vJs = f_normalize(vJs);
                 % ---
                 unit_current_field = unit_current_field + vJs;
-            end
-            % ---
-            % current turn density vector field
-            % current_turn_density  = current_field .* nb_turn ./ cs_area;
-            % ---
-            obj.matrix.gid_elem = obj.dom.gid_elem;
-            obj.matrix.unit_current_field = unit_current_field;
-            % ---
-            obj.build_done = 1;
-        end
-    end
-
-    % --- Methods
-    methods
-        function plot(obj,args)
-            arguments
-                obj
-                args.edge_color = 'k'
-                args.face_color = 'none'
-                args.alpha {mustBeNumeric} = 0.5
-            end
-            % ---
-            argu = f_to_namedarg(args);
-            plot@CloseCoil(obj,argu{:});
-            % ---
-            if ~isempty(obj.matrix.unit_current_field)
-                hold on;
-                f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
-                         obj.matrix.unit_current_field(:,obj.matrix.gid_elem),'sfactor',0.2);
+                % --- XTODO
+                alpha = [];
             end
         end
     end
-
-    % --- Methods
+    % --- Utility Methods
     methods
         % -----------------------------------------------------------------
         function get_electrode(obj)
@@ -186,26 +120,24 @@ classdef CloseCoil < Coil
             % ---
             coilshape = obj.dom - obj.electrode_dom;
             % ---
-            obj.shape_dom = eval(class(obj.electrode_dom));
-            obj.shape_dom <= coilshape;
+            % obj.shape_dom = eval(class(obj.electrode_dom));
+            % obj.shape_dom <= coilshape;
+            obj.shape_dom = coilshape;
             % ---
             obj.shape_dom.gid_side_node_1 = obj.electrode_dom.gid_side_node_2;
             obj.shape_dom.gid_side_node_2 = obj.electrode_dom.gid_side_node_1;
         end
         % -----------------------------------------------------------------
-        function plot(obj,args)
-            arguments
-                obj
-                args.edge_color = 'none'
-                args.face_color = 'c'
-                args.alpha {mustBeNumeric} = 0.9
+        function plot(obj)
+            % ---
+            obj.electrode_dom.plot('face_color',f_color(100),'alpha',0.5); hold on;
+            % ---
+            if isfield(obj.matrix,'unit_current_field')
+                if ~isempty(obj.matrix.unit_current_field)
+                    f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
+                             obj.matrix.unit_current_field(:,obj.matrix.gid_elem),'sfactor',0.2);
+                end
             end
-            % ---
-            argu = f_to_namedarg(args);
-            plot@Coil(obj,argu{:}); hold on
-            % ---
-            etrode = obj.electrode_dom;
-            etrode.plot('face_color',f_color(100));
         end
         % -----------------------------------------------------------------
     end

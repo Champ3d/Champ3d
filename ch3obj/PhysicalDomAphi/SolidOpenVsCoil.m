@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef SolidOpenVsCoilAphi < OpenCoilAphi & SolidCoilAphi & VsCoilAphi
+classdef SolidOpenVsCoil < OpenCoil & SolidCoil & VsCoil
     
     % --- entry
     properties
@@ -47,7 +47,7 @@ classdef SolidOpenVsCoilAphi < OpenCoilAphi & SolidCoilAphi & VsCoilAphi
     end
     % --- Contructor
     methods
-        function obj = SolidOpenVsCoilAphi(args)
+        function obj = SolidOpenVsCoil(args)
             arguments
                 args.id
                 args.parent_model

@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
+classdef SolidOpenIsCoil < OpenCoil & SolidCoil & IsCoil
     
     % --- entry
     properties
@@ -47,7 +47,7 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
     end
     % --- Contructor
     methods
-        function obj = SolidOpenIsCoilAphi(args)
+        function obj = SolidOpenIsCoil(args)
             arguments
                 args.parent_model
                 args.id_dom2d
@@ -69,7 +69,7 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
             % ---
             obj <= args;
             % ---
-            SolidOpenIsCoilAphi.setup(obj);
+            SolidOpenIsCoil.setup(obj);
             % ---
             % must reset build+assembly
             obj.build_done = 0;
@@ -120,7 +120,7 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
     methods
         function build(obj)
             % ---
-            SolidOpenIsCoilAphi.setup(obj);
+            SolidOpenIsCoil.setup(obj);
             % ---
             build@OpenCoilAphi(obj);
             build@SolidCoilAphi(obj);
