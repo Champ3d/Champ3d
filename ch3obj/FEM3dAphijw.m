@@ -73,11 +73,6 @@ classdef FEM3dAphijw < FEM3dAphi
                     Airbox('parent_model',obj,'id_dom3d','whole_mesh_dom');
             end
             %--------------------------------------------------------------
-            % if ~obj.base_matrix_done
-            %     obj.build_base_matrix;
-            %     obj.base_matrix_done = 1;
-            % end
-            %--------------------------------------------------------------
             obj.build_done = 1;
             % ---
         end
@@ -243,9 +238,6 @@ classdef FEM3dAphijw < FEM3dAphi
                     i_coil = coil.matrix.is_array;
                     alpha  = coil.matrix.alpha;
                     %------------------------------------------------------
-                    % S13 = (obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
-                    % S23 = (obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
-                    % S33 = alpha.' * obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha;
                     S13 = jome * (obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
                     S23 = jome * (obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
                     S33 = jome * (alpha.' * obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
@@ -332,8 +324,6 @@ classdef FEM3dAphijw < FEM3dAphi
             tol_in = args.tol_in;
             maxniter_in = args.maxniter_in;
             %----------------------------------------------------------
-            
-            %----------------------------------------------------------
             improvement = 1;
             niter_out = 0;
             % ---
@@ -396,8 +386,6 @@ classdef FEM3dAphijw < FEM3dAphi
                 %------------------------------------------------------
                 obj.dof{it}.A.value(id_edge_a_unknown) ...
                     = x(1:len_a_unknown);
-                % obj.dof{it}.Phi.value(id_node_phi_unknown) ...
-                %     = x(len_a_unknown+1 : len_a_unknown+len_phi_unknown);
                 %----------------------------------------------------------------------
                 obj.dof{it}.V = 0;
                 if (len_a_unknown + len_phi_unknown) < len_sol
@@ -432,7 +420,6 @@ classdef FEM3dAphijw < FEM3dAphi
                 freq = obj.frequency;
                 jome = 1j*2*pi*freq;
                 %----------------------------------------------------------------------
-                % obj.dof{it}.Phi.value(id_node_phi_unknown) = x(len_a_unknown+1 : len_a_unknown+len_phi_unknown) + 1/jome .* alphaV;
                 if any(alphaV)
                     obj.dof{it}.Phi.value(id_node_phi_unknown) = x(len_a_unknown+1 : len_a_unknown+len_phi_unknown) + 1/jome .* alphaV(id_node_phi_unknown);
                 else
