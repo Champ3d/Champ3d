@@ -156,4 +156,32 @@ classdef SolidOpenIsCoil < OpenCoil & SolidCoil & IsCoil
             % ---
         end
     end
+    % --- Utility Methods
+    methods
+    % -----------------------------------------------------------------
+        function getcircuitquantity(obj)
+            it = obj.parent_model.ltime.it;
+            % ---
+            jome = obj.parent_model.jome;
+            if jome ~= 0
+                % --- XTODO
+                switch obj.coil_mode
+                    case 'rx'
+                        obj.I(it) = 0;
+                        obj.Z(it) = 0;
+                        obj.L(it) = 0;
+                        obj.R(it) = 0;
+                        obj.P(it) = 0;
+                        obj.Q(it) = 0;
+                    case 'tx'
+                        obj.Z(it) = obj.V(it) / obj.I(it);
+                        obj.L(it) = imag(obj.Z(it)) / abs(jome);
+                        obj.R(it) = real(obj.Z(it));
+                        obj.P(it) = 1/2 * real(obj.V(it) * conj(obj.I(it)));
+                        obj.Q(it) = 1/2 * imag(obj.V(it) * conj(obj.I(it)));
+                end
+                % ---
+            end
+        end
+    end
 end
