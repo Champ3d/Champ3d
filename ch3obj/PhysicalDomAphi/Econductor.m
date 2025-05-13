@@ -85,6 +85,8 @@ classdef Econductor < PhysicalDom
     methods
         function build(obj)
             % ---
+            it = obj.parent_model.ltime.it;
+            % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
             gid_elem = dom.gid_elem;
@@ -109,6 +111,10 @@ classdef Econductor < PhysicalDom
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.gid_node_phi = gid_node_phi;
             obj.matrix.sigma_array = sigma_array;
+            % ---
+            obj.matrix.tarray{it}.sigma = ...
+                ElemTensorArray('parent_model',obj.parent_model,'gid_elem',gid_elem);
+            obj.matrix.tarray{it}.sigma.store(sigma_array);
             %--------------------------------------------------------------
             % local sigmawewe matrix
             lmatrix = parent_mesh.cwewe('id_elem',gid_elem,'coefficient',sigma_array);

@@ -16,10 +16,11 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-function [colx,array_type] = f_column_format(x)
+function [colx,array_type] = f_column_format(x,array_type)
 
 arguments
     x {mustBeNumeric}
+    array_type {mustBeMember(array_type,{'scalar','vector','tensor','auto'})} = 'auto'
 end
 
 % ---
@@ -27,6 +28,21 @@ x = squeeze(x);
 % ---
 sx = size(x);
 lensx = length(sx);
+% ---
+if any(f_strcmpi(array_type,{'scalar','vector','tensor'}))
+    switch array_type
+        case 'scalar'
+            colx = f_tocolv(x);
+        case 'vector'
+            colx = f_tocolv(x);
+        case 'tensor'
+            [~,ielem] = max(sx);
+            ix(ielem) = [];
+            ix = [ielem ix];
+            colx = permute(x,ix);
+    end
+    return
+end
 % ---
 if lensx > 3
     colx = x;

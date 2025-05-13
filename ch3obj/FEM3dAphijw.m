@@ -19,7 +19,7 @@
 classdef FEM3dAphijw < FEM3dAphi
     properties (Access = private)
         build_done = 0
-        base_matrix_done = 0
+        basematrix_done = 0
     end
     properties (Access = private)
         idVIsCoil = []
@@ -79,6 +79,8 @@ classdef FEM3dAphijw < FEM3dAphi
         %------------------------------------------------------------------
         function assembly(obj)
             %--------------------------------------------------------------
+            it = obj.ltime.it;
+            %--------------------------------------------------------------
             obj.build;
             %--------------------------------------------------------------
             % Preparation
@@ -112,9 +114,9 @@ classdef FEM3dAphijw < FEM3dAphi
             %--------------------------------------------------------------
             obj.callsubfieldassembly('field_name',allowed_physical_dom);
             %--------------------------------------------------------------
-            if ~obj.base_matrix_done
+            if ~obj.basematrix_done
                 obj.basematrix;
-                obj.base_matrix_done = 1;
+                obj.basematrix_done = 1;
             end
             %--------------------------------------------------------------
             allowed_physical_dom = {'econductor','sibc','bsfield','coil','pmagnet','embc'};
@@ -325,6 +327,15 @@ classdef FEM3dAphijw < FEM3dAphi
                 EdgeDofBasedVectorElemField('parent_model',obj,'dof',obj.dof{it}.E);
             obj.field{it}.E.face = ...
                 EdgeDofBasedVectorFaceField('parent_model',obj,'dof',obj.dof{it}.E);
+            %--------------------------------------------------------------
+            obj.field{it}.J.elem = ...
+                JAphiVectorElemField('parent_model',obj,'Efield',obj.field{it}.E.elem);
+            % obj.field{it}.J.face = ...
+            %     JAphiVectorFaceField('parent_model',obj,'Efield',obj.field{it}.E.elem);
+            % obj.field{it}.P.elem = ...
+            %     PAphiVectorElemField('parent_model',obj,'Efield',obj.field{it}.E.elem);
+            % obj.field{it}.P.face = ...
+            %     PAphiVectorFaceField('parent_model',obj,'Efield',obj.field{it}.E.elem);
             %--------------------------------------------------------------
             f_fprintf(0,'Solveone',1,class(obj),0,'it ---',1,num2str(it),0,'\n');
             %--------------------------------------------------------------

@@ -142,6 +142,7 @@ classdef Sibcjw < PhysicalDom
             obj.matrix.gid_face = gid_face_;
             obj.matrix.sigma_array = sigma_array;
             obj.matrix.skindepth = skindepth;
+            obj.matrix.z_sibc = z_sibc;
             % obj.matrix.mur_array = mur_array;
             % obj.matrix.cparam_array = cparam_array;
             %--------------------------------------------------------------
