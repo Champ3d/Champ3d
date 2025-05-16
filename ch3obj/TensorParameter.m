@@ -17,15 +17,6 @@
 %--------------------------------------------------------------------------
 
 classdef TensorParameter < Parameter
-    properties
-        parent_model
-        f
-        depend_on
-        from
-        varargin_list
-        fvectorized
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()

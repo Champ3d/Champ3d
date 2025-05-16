@@ -85,7 +85,26 @@ classdef Parameter < Xhandle
             end
             % ---
             if isnumeric(args.f)
-                args.f = @()(constant_parameter);
+                const = args.f;
+                % ---
+                sizeconst = size(const);
+                % ---
+                if numel(const) == 1
+                    args.f = @()(const);
+                elseif numel(const) == 2 || numel(const) == 3
+                    const = f_tocolv(const);
+                    args.f = @()(const);
+                elseif isequal(sizeconst,[2 2]) || isequal(sizeconst,[3 3])
+                    args.f = @()(const);
+                else
+                    fprintf(['Constant parameter must be a single scalar, ' ...
+                             'single vector or single tensor !\n' ...
+                             'Consider ScalarParameter, VectorParameter or TensorParameter ' ...
+                             'for general purpose. \n']);
+                    error('constant parameter error');
+                end
+                % ---
+                args.f = @()(const);
             elseif isa(args.f,'function_handle')
                 if isempty(args.from)
                     error('#from must be given ! Give EMModel, THModel, ... ');

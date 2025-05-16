@@ -102,7 +102,12 @@ classdef LTensor < Xhandle
                 ltfield = obj.(fn);
                 if ~isempty(ltfield)
                     if isnumeric(ltfield)
-                        ltensor.(fn) = repmat(ltfield,nb_elem,1);
+                        if any(f_strcmpi(fn,{'main_dir','ort1_dir','ort2_dir','rot_axis'}))
+                            ltfield = TensorArray.vector(ltfield,'nb_elem',nb_elem);
+                        else
+                            ltfield = TensorArray.scalar(ltfield,'nb_elem',nb_elem);
+                        end
+                        ltensor.(fn) = ltfield;
                     elseif isa(ltfield,'Parameter') || isa(ltfield,'LVector')
                         if isequal(obj.parent_model,ltfield.parent_model)
                             ltensor.(fn) = ltfield.getvalue('in_dom',dom);

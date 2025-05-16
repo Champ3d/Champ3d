@@ -53,9 +53,9 @@ classdef TensorArray < Xhandle
             nb_elem = args.nb_elem;
             % ---
             if numel(array) == 1
-                sarray = repmat(array,[1,nb_elem]);
+                sarray = repmat(array,[nb_elem,1]);
             else
-                sarray = f_torowv(array);
+                sarray = f_tocolv(array);
             end
         end
         %-------------------------------------------------------------------
@@ -75,7 +75,7 @@ classdef TensorArray < Xhandle
             if isequal(s,[1 2]) || isequal(s,[2 1]) || ...
                isequal(s,[1 3]) || isequal(s,[3 1])
                 array = f_torowv(array);
-                varray = repmat(array,[1,nb_elem]);
+                varray = repmat(array,[nb_elem,1]);
             elseif isequal(s,[2 2]) || isequal(s,[3 3])
                 f_fprintf(1,'/!\\',0,'vector input array understood as [n x dim] \n');
                 varray = array;

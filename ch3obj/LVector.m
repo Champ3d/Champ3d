@@ -89,7 +89,12 @@ classdef LVector < Xhandle
                 lvfield = obj.(fn);
                 if ~isempty(lvfield)
                     if isnumeric(lvfield)
-                        lvector.(fn) = repmat(lvfield,nb_elem,1);
+                        if any(f_strcmpi(fn,{'main_dir','rot_axis'}))
+                            lvfield = TensorArray.vector(lvfield,'nb_elem',nb_elem);
+                        else
+                            lvfield = TensorArray.scalar(lvfield,'nb_elem',nb_elem);
+                        end
+                        lvector.(fn) = lvfield;
                     elseif isa(lvfield,'Parameter')
                         if isequal(obj.parent_model,lvfield.parent_model)
                             lvector.(fn) = lvfield.getvalue('in_dom',dom);

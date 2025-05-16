@@ -21,9 +21,9 @@ function Vnormalized = f_normalize(V,varargin)
 %--------------------------------------------------------------------------
 
 if nargin == 1
-    dim = 1; % by default for column vector row array
+    dim = 1; % by default for column-vector row-array
 else
-    dim = varargin{1}; % put 2 for row vector column array
+    dim = varargin{1}; % put 2 for row-vector column-array
 end
 
 %--------------------------------------------------------------------------
