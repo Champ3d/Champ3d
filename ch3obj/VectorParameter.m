@@ -1,5 +1,5 @@
 %--------------------------------------------------------------------------
-% This code is written by: H-K. Bui, 2024
+% This code is written by: H-K. Bui, 2025
 % as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
 % Champ3d is copyright (c) 2023-2025 H-K. Bui.
@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef VectorParameter < Xhandle
+classdef VectorParameter < Parameter
     properties
         parent_model
         f
@@ -24,8 +24,6 @@ classdef VectorParameter < Xhandle
         from
         varargin_list
         fvectorized
-        % ---
-        constant_parameter_type
     end
     
     % --- Valid args list
@@ -49,65 +47,19 @@ classdef VectorParameter < Xhandle
                 args.fvectorized = 0
             end
             % ---
-            obj = obj@Xhandle;
-            % ---
-            if ~isfield(args,'parent_model')
-                error('#parent_model must be given !');
-            end
-            % ---
-            if isempty(args.f)
-                error('#f must be given ! Give a function handle or numeric value');
-            end
-            % ---
-            if ~isfield(args,'depend_on')
-                args.depend_on = '';
-            end
+            obj = obj@Parameter;
             % ---
             if isnumeric(args.f)
-                constant_parameter = args.f;
-                % ---
-                sizeconst = size(constant_parameter);
-                % ---
-                if numel(constant_parameter) == 1
-                    obj.constant_parameter_type = 'scalar';
-                elseif numel(constant_parameter) == 2 || numel(constant_parameter) == 3
-                    constant_parameter = f_tocolv(constant_parameter);
-                    obj.constant_parameter_type = 'vector';
-                elseif isequal(sizeconst,[2 2]) || isequal(sizeconst,[3 3])
-                    obj.constant_parameter_type = 'tensor';
+                if isequal(s,[1 2]) || isequal(s,[2 1]) || ...
+                   isequal(s,[1 3]) || isequal(s,[3 1])
+                    args.f = f_tocolv(args.f);
                 else
-                    obj.constant_parameter_type = 'standardTensorArray';
+                    error('input is not a vector !');
                 end
-                % ---
-                args.f = @()(constant_parameter);
-                % ---
-            elseif isa(args.f,'function_handle')
-                if isempty(args.from)
-                    error('#from must be given ! Give EMModel, THModel, ... ');
-                else
-                    args.from = f_to_scellargin(args.from);
-                end
-            else
-                error('#f must be function handle or numeric value');
             end
             % ---
-            obj.parent_model = args.parent_model;
-            obj.f = args.f;
-            obj.depend_on = f_to_scellargin(args.depend_on);
-            obj.from = f_to_scellargin(args.from);
-            obj.varargin_list = f_to_scellargin(args.varargin_list);
-            obj.fvectorized = args.fvectorized;
-            % --- check
-            nb_fargin = f_nargin(obj.f);
-            if nb_fargin > 0
-                if nb_fargin ~= length(obj.depend_on)
-                    error('Number of input arguments of #f must corresponds to #depend_on');
-                elseif nb_fargin ~= length(obj.from)
-                    error('Number of input arguments of #f must corresponds to #from');
-                elseif length(obj.depend_on) ~= length(obj.from)
-                    error('Number of elements in #depend_on must corresponds to #from');
-                end
-            end
+            argu = f_to_namedarg(args);
+            obj.setup(argu{:});
             % -------------------------------------------------------------
         end
     end
@@ -120,15 +72,27 @@ classdef VectorParameter < Xhandle
                 obj
                 args.in_dom = []
             end
-
+            vout = getvalue@Parameter(obj,'in_dom',args.in_dom);
+            vout = TensorArray.vector(vout);
+            %--------------------------------------------------------------
+            if any(isinf(vout))
+                f_fprintf(1,'Value has Inf ! \n');
+            end
+            % --- 
+            if any(isnan(vout))
+                f_fprintf(1,'Value has NaN ! \n');
+            end
+            %--------------------------------------------------------------
         end
         %------------------------------------------------------------------
         function vout = get_inverse(obj,args)
             arguments
                 obj
                 args.in_dom = []
-                args.parameter_type {mustBeMember(args.parameter_type,{'auto','vector'})} = 'vector'
             end
+            vout = obj.getvalue('in_dom',args.in_dom);
+            vout = -vout;
         end
+        %------------------------------------------------------------------
     end
 end
