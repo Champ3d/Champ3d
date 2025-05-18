@@ -44,7 +44,7 @@ classdef TensorArray < Xhandle
     % --- Utilily Methods
     methods (Static)
         %-------------------------------------------------------------------
-        function sarray = scalar(array,args)
+        function [sarray, array_type] = scalar(array,args)
             arguments
                 array
                 args.nb_elem = 1;
@@ -57,9 +57,11 @@ classdef TensorArray < Xhandle
             else
                 sarray = f_torowv(array);
             end
+            % ---
+            array_type = 'scalar';
         end
         %-------------------------------------------------------------------
-        function varray = vector(array,args)
+        function [varray, array_type] = vector(array,args)
             arguments
                 array
                 args.nb_elem = 1
@@ -87,9 +89,11 @@ classdef TensorArray < Xhandle
             else
                 error('#array is not a vector array !');
             end
+            % ---
+            array_type = 'vector';
         end
         %-------------------------------------------------------------------
-        function tarray = tensor(array,args)
+        function [tarray, array_type] = tensor(array,args)
             arguments
                 array
                 args.nb_elem = 1
@@ -117,6 +121,34 @@ classdef TensorArray < Xhandle
                 tarray = array;
             else
                 error('#array is not a tensor array !');
+            end
+            % ---
+            array_type = 'tensor';
+        end
+        %-------------------------------------------------------------------
+        function [autoarray, array_type] = autoformat(array,nb_elem)
+            arguments
+                array
+                nb_elem = []
+            end
+            % ---
+            if isempty(nb_elem)
+                
+            else
+                
+            end
+        end
+        %-------------------------------------------------------------------
+        function array_type = get_arraytype(array,nb_elem)
+            arguments
+                array
+                nb_elem = []
+            end
+            % ---
+            if isempty(nb_elem)
+                
+            else
+                
             end
         end
         %-------------------------------------------------------------------
