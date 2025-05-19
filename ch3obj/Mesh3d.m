@@ -680,9 +680,9 @@ classdef Mesh3d < Mesh
             %--------------------------------------------------------------
             coefwevf = zeros(nb_elem,nbEd_inEl);
             %--------------------------------------------------------------
-            vfx = cell(3,1);
-            vfy = cell(3,1);
-            vfz = cell(3,1);
+            vfx = cell(nbG,1);
+            vfy = cell(nbG,1);
+            vfz = cell(nbG,1);
             if ~iscell(vector_field)
                 for iG = 1:nbG
                     if numel(vector_field) == 3
@@ -826,9 +826,9 @@ classdef Mesh3d < Mesh
             %--------------------------------------------------------------
             coefwfvf = zeros(nb_elem,nbFa_inEl);
             %--------------------------------------------------------------
-            vfx = cell(3,1);
-            vfy = cell(3,1);
-            vfz = cell(3,1);
+            vfx = cell(nbG,1);
+            vfy = cell(nbG,1);
+            vfz = cell(nbG,1);
             if ~iscell(vector_field)
                 for iG = 1:nbG
                     if numel(vector_field) == 3
@@ -1116,22 +1116,22 @@ classdef Mesh3d < Mesh
             elseif any(f_strcmpi(coef_array_type,{'tensor'}))
                 %----------------------------------------------------------
                 for iG = 1:nbG
-                    fi = zeros(3,length(id_elem));
+                    fi = zeros(length(id_elem),3);
                     %------------------------------------------------------
                     for i = 1:nbEd_inEl
                         wix = Wx{iG}(:,1,i);
                         wiy = Wx{iG}(:,2,i);
                         wiz = Wx{iG}(:,3,i);
                         id_edge = id_edge_in_elem(i,id_elem);
-                        fi(1,:) = fi(1,:) + (coefficient(:,1,1) .* wix + ...
-                            coefficient(:,1,2) .* wiy + ...
-                            coefficient(:,1,3) .* wiz) .* dof(id_edge) ;
-                        fi(2,:) = fi(2,:) + (coefficient(:,2,1) .* wix + ...
-                            coefficient(:,2,2) .* wiy + ...
-                            coefficient(:,2,3) .* wiz) .* dof(id_edge) ;
-                        fi(3,:) = fi(3,:) + (coefficient(:,3,1) .* wix + ...
-                            coefficient(:,3,2) .* wiy + ...
-                            coefficient(:,3,3) .* wiz) .* dof(id_edge) ;
+                        fi(:,1) = fi(:,1) + (coefficient(:,1,1) .* wix + ...
+                                             coefficient(:,1,2) .* wiy + ...
+                                             coefficient(:,1,3) .* wiz) .* dof(id_edge) ;
+                        fi(:,2) = fi(:,2) + (coefficient(:,2,1) .* wix + ...
+                                             coefficient(:,2,2) .* wiy + ...
+                                             coefficient(:,2,3) .* wiz) .* dof(id_edge) ;
+                        fi(:,3) = fi(:,3) + (coefficient(:,3,1) .* wix + ...
+                                             coefficient(:,3,2) .* wiy + ...
+                                             coefficient(:,3,3) .* wiz) .* dof(id_edge) ;
                     end
                     % ---
                     vector_field{iG}(1:3,id_elem) = fi.';
@@ -1247,22 +1247,22 @@ classdef Mesh3d < Mesh
             elseif any(f_strcmpi(coef_array_type,{'tensor'}))
                 %----------------------------------------------------------
                 for iG = 1:nbG
-                    fi = zeros(3,length(id_elem));
+                    fi = zeros(length(id_elem),3);
                     %------------------------------------------------------
                     for i = 1:nbFa_inEl
-                        wix = Wx(:,1,i);
-                        wiy = Wx(:,2,i);
-                        wiz = Wx(:,3,i);
+                        wix = Wx{iG}(:,1,i);
+                        wiy = Wx{iG}(:,2,i);
+                        wiz = Wx{iG}(:,3,i);
                         id_face = id_face_in_elem(i,id_elem);
-                        fi(1,:) = fi(1,:) + (coefficient(:,1,1) .* wix + ...
-                            coefficient(:,1,2) .* wiy + ...
-                            coefficient(:,1,3) .* wiz) .* dof(id_face) ;
-                        fi(2,:) = fi(2,:) + (coefficient(:,2,1) .* wix + ...
-                            coefficient(:,2,2) .* wiy + ...
-                            coefficient(:,2,3) .* wiz) .* dof(id_face) ;
-                        fi(3,:) = fi(3,:) + (coefficient(:,3,1) .* wix + ...
-                            coefficient(:,3,2) .* wiy + ...
-                            coefficient(:,3,3) .* wiz) .* dof(id_face) ;
+                        fi(:,1) = fi(:,1) + (coefficient(:,1,1) .* wix + ...
+                                             coefficient(:,1,2) .* wiy + ...
+                                             coefficient(:,1,3) .* wiz) .* dof(id_face) ;
+                        fi(:,2) = fi(:,2) + (coefficient(:,2,1) .* wix + ...
+                                             coefficient(:,2,2) .* wiy + ...
+                                             coefficient(:,2,3) .* wiz) .* dof(id_face) ;
+                        fi(:,3) = fi(:,3) + (coefficient(:,3,1) .* wix + ...
+                                             coefficient(:,3,2) .* wiy + ...
+                                             coefficient(:,3,3) .* wiz) .* dof(id_face) ;
                     end
                     % ---
                     vector_field{iG}(1:3,id_elem) = fi.';
