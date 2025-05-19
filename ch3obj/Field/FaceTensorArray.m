@@ -16,76 +16,77 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef EdgeDofBasedVectorElemField < VectorElemField
+classdef FaceTensorArray < TensorArray
     properties
-        parent_model
-        dof
+        gid_face = []
     end
     % --- Contructor
     methods
-        function obj = EdgeDofBasedVectorElemField(args)
+        function obj = FaceTensorArray(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
-                args.dof {mustBeA(args.dof,'EdgeDof')}
+                args.gid_face
             end
             % ---
-            obj = obj@VectorElemField;
+            obj = obj@TensorArray;
             % ---
             if nargin >1
-                if ~isfield(args,'parent_model') || ~isfield(args,'dof')
-                    error('#parent_model and #dof must be given !');
+                if ~isfield(args,'parent_model')
+                    error('#parent_model must be given !');
                 end
             end
             % ---
-            obj <= args;
+            obj.parent_model = args.parent_model;
+            if isfield(args,'gid_face')
+                obj.gid_face = args.gid_face;
+            end
             % ---
         end
     end
-    % --- get
+    % ---
     methods
         % -----------------------------------------------------------------
-        function val = cvalue(obj,id_elem)
-            % ---
-            if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
-            end
-            % ---
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,...
-                  'on','center','id_elem',id_elem);
-            val = val(:,id_elem);
+        function set.gid_face(obj,val)
+            obj.gid_face = val;
+            len = length(val);
+            obj.tarray = zeros(len,2,2);
+            obj.array_type = zeros(1,len);
         end
         % -----------------------------------------------------------------
-        function val = ivalue(obj,id_elem)
-            % ---
-            if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+        function store(obj,array)
+            arguments
+                obj
+                array
             end
             % ---
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,...
-                  'on','interpolation_points','id_elem',id_elem);
+            [array, array_type_] = f_column_format(array);
             % ---
-            if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
-                for i = 1:length(val)
-                    val{i} = val{i}(:,id_elem);
-                end
+            switch array_type_
+                case 'scalar'
+                    obj.tarray(:,1,1) = array;
+                    obj.array_type(:) = 1;
+                case 'vector'
+                    obj.tarray(:,:,1) = array;
+                    obj.array_type(:) = 2;
+                case 'tensor'
+                    obj.tarray = array;
+                    obj.array_type(:) = 3;
             end
             % ---
         end
         % -----------------------------------------------------------------
-        function val = gvalue(obj,id_elem)
-            % ---
-            if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+    end
+    % ---
+    methods
+        % -----------------------------------------------------------------
+        function txVf = cmultiply(obj,field_obj,id_face)
+            arguments
+                obj
+                field_obj {mustBeA(field_obj,{'VectorFaceField'})}
+                id_face
             end
             % ---
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,...
-                  'on','gauss_points','id_elem',id_elem);
-            % ---
-            if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
-                for i = 1:length(val)
-                    val{i} = val{i}(:,id_elem);
-                end
-            end
+            txVf = cmultiply@TensorArray(obj,field_obj,id_face);
             % ---
         end
         % -----------------------------------------------------------------

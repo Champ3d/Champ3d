@@ -39,6 +39,7 @@ if ~isempty(cdetJ)
     cWeigh = refelem.cWeigh;
     % ---
     vol = cdetJ{1} .* cWeigh;
+    vol = vol.';
     % ---
     return
 end
@@ -57,6 +58,7 @@ cWeigh = refelem.cWeigh;
                       'u',cU,'v',cV,'w',cW);
 %--------------------------------------------------------------------------
 vol = vol{1} .* cWeigh;
+vol = vol.';
 %--------------------------------------------------------------------------
 
 

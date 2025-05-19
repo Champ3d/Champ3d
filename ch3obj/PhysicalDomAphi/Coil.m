@@ -17,6 +17,17 @@
 %--------------------------------------------------------------------------
 
 classdef Coil < PhysicalDom
+    % --- computed
+    properties
+        Flux
+        I
+        V
+        Z
+        L
+        R
+        P
+        Q
+    end
     % --- Contructor
     methods
         function obj = Coil()

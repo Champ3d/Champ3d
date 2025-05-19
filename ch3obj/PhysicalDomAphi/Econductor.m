@@ -21,6 +21,7 @@ classdef Econductor < PhysicalDom
         sigma
         % ---
         matrix
+        tarray
     end
     % ---
     properties (Access = private)
@@ -70,6 +71,7 @@ classdef Econductor < PhysicalDom
             obj.matrix.gid_node_phi = [];
             obj.matrix.sigmawewe = [];
             obj.matrix.sigma_array = [];
+            obj.tarray = [];
             % ---
             obj.build_done = 0;
             % ---
@@ -85,6 +87,8 @@ classdef Econductor < PhysicalDom
     methods
         function build(obj)
             % ---
+            it = obj.parent_model.ltime.it;
+            % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
             gid_elem = dom.gid_elem;
@@ -96,11 +100,11 @@ classdef Econductor < PhysicalDom
             sigma_array = obj.sigma.getvalue('in_dom',dom);
             % --- check changes
             is_changed = 1;
-            if isequal(sigma_array,obj.matrix.sigma_array) && ...
-               isequal(gid_elem,obj.matrix.gid_elem) && ...
-               isequal(gid_node_phi,obj.matrix.gid_node_phi)
-                is_changed = 0;
-            end
+            % if isequal(sigma_array,obj.matrix.sigma_array{it}) && ...
+            %    isequal(gid_elem,obj.matrix.gid_elem) && ...
+            %    isequal(gid_node_phi,obj.matrix.gid_node_phi)
+            %     is_changed = 0;
+            % end
             %--------------------------------------------------------------
             if ~is_changed && obj.build_done == 1
                 return
@@ -108,7 +112,8 @@ classdef Econductor < PhysicalDom
             %--------------------------------------------------------------
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.gid_node_phi = gid_node_phi;
-            obj.matrix.sigma_array = sigma_array;
+            obj.matrix.sigma_array{it} = sigma_array;
+            % obj.tarray{it}.sigma = TensorArray('');
             %--------------------------------------------------------------
             % local sigmawewe matrix
             lmatrix = parent_mesh.cwewe('id_elem',gid_elem,'coefficient',sigma_array);

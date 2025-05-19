@@ -19,7 +19,7 @@
 classdef FEM3dAphijw < FEM3dAphi
     properties (Access = private)
         build_done = 0
-        base_matrix_done = 0
+        basematrix_done = 0
     end
     properties (Access = private)
         idVIsCoil = []
@@ -79,6 +79,8 @@ classdef FEM3dAphijw < FEM3dAphi
         %------------------------------------------------------------------
         function assembly(obj)
             %--------------------------------------------------------------
+            it = obj.ltime.it;
+            %--------------------------------------------------------------
             obj.build;
             %--------------------------------------------------------------
             % Preparation
@@ -112,9 +114,9 @@ classdef FEM3dAphijw < FEM3dAphi
             %--------------------------------------------------------------
             obj.callsubfieldassembly('field_name',allowed_physical_dom);
             %--------------------------------------------------------------
-            if ~obj.base_matrix_done
-                obj.build_base_matrix;
-                obj.base_matrix_done = 1;
+            if ~obj.basematrix_done
+                obj.basematrix;
+                obj.basematrix_done = 1;
             end
             %--------------------------------------------------------------
             allowed_physical_dom = {'econductor','sibc','bsfield','coil','pmagnet','embc'};
@@ -205,8 +207,9 @@ classdef FEM3dAphijw < FEM3dAphi
                     %------------------------------------------------------
                     f_fprintf(0,'--- #coil/vscoil',1,id_phydom,0,'\n');
                     %------------------------------------------------------
-                    v_coil = coil.matrix.vs_array;
+                    v_coil = coil.matrix.vs_array(1);
                     alpha  = coil.matrix.alpha;
+                    coil.V(it) = v_coil;
                     %------------------------------------------------------
                     vRHSed = - obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * (alpha .* v_coil);
                     vRHSed = vRHSed(id_edge_a_unknown);
@@ -222,6 +225,10 @@ classdef FEM3dAphijw < FEM3dAphi
             % --- then IsCoil
             o_ = 0;
             obj.idVIsCoil = [];
+            % ---
+            Saphix = [];
+            Svx = [];
+            iRhS = [];
             for iec = 1:length(id_coil__)
                 % ---
                 if strcmpi(coil.coil_mode,'rx')
@@ -235,7 +242,7 @@ classdef FEM3dAphijw < FEM3dAphi
                     %------------------------------------------------------
                     f_fprintf(0,'--- #coil/iscoil',1,id_phydom,0,'\n');
                     %------------------------------------------------------
-                    i_coil = coil.matrix.is_array;
+                    i_coil = coil.matrix.is_array(1);
                     alpha  = coil.matrix.alpha;
                     %------------------------------------------------------
                     S13 = jome * (obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
@@ -245,14 +252,18 @@ classdef FEM3dAphijw < FEM3dAphi
                     S13 = S13(id_edge_a_unknown,1);
                     S23 = S23(id_node_phi_unknown,1);
                     % ---
-                    LHS = [LHS [S13;  S23]];
-                    LHS = [LHS; S13.' S23.' S33];
-                    RHS = [RHS; i_coil];
+                    Saphix = [Saphix, [S13;  S23]];
+                    Svx = [Svx, S33];
+                    iRhS = [iRhS; i_coil];
                     %------------------------------------------------------
                     o_ = o_ + 1;
                     obj.idVIsCoil{o_} = coil;
                 end
             end
+            % ---
+            LHS = [LHS, Saphix];
+            LHS = [LHS; [Saphix.' diag(Svx)]];
+            RHS = [RHS; iRhS];
             %--------------------------------------------------------------
             obj.matrix.id_edge_a_unknown = id_edge_a_unknown;
             obj.matrix.id_node_phi_unknown = id_node_phi_unknown;
@@ -317,13 +328,22 @@ classdef FEM3dAphijw < FEM3dAphi
             obj.field{it}.E.face = ...
                 EdgeDofBasedVectorFaceField('parent_model',obj,'dof',obj.dof{it}.E);
             %--------------------------------------------------------------
+            obj.field{it}.J.elem = ...
+                JAphiVectorElemField('parent_model',obj,'Efield',obj.field{it}.E.elem);
+            % obj.field{it}.J.face = ...
+            %     JAphiVectorFaceField('parent_model',obj,'Efield',obj.field{it}.E.elem);
+            % obj.field{it}.P.elem = ...
+            %     PAphiVectorElemField('parent_model',obj,'Efield',obj.field{it}.E.elem);
+            % obj.field{it}.P.face = ...
+            %     PAphiVectorFaceField('parent_model',obj,'Efield',obj.field{it}.E.elem);
+            %--------------------------------------------------------------
             f_fprintf(0,'Solveone',1,class(obj),0,'it ---',1,num2str(it),0,'\n');
-            %----------------------------------------------------------
+            %--------------------------------------------------------------
             tol_out = args.tol_out;
             maxniter_out = args.maxniter_out;
             tol_in = args.tol_in;
             maxniter_in = args.maxniter_in;
-            %----------------------------------------------------------
+            %--------------------------------------------------------------
             improvement = 1;
             niter_out = 0;
             % ---
@@ -333,7 +353,7 @@ classdef FEM3dAphijw < FEM3dAphi
                 % ---
                 niter_out = niter_out + 1;
                 f_fprintf(0,'--- iter-out',1,niter_out);
-                %--------------------------------------------------------------
+                %----------------------------------------------------------
                 % --- size
                 id_edge_a_unknown = obj.matrix.id_edge_a_unknown;
                 id_node_phi_unknown = obj.matrix.id_node_phi_unknown;
@@ -344,7 +364,7 @@ classdef FEM3dAphijw < FEM3dAphi
                 len_a_unknown = length(id_edge_a_unknown);
                 len_phi_unknown = length(id_node_phi_unknown);
                 len_dphi_unknown = len_sol - (len_a_unknown + len_phi_unknown);
-                %--------------------------------------------------------------
+                %----------------------------------------------------------
                 % ---
                 if niter_out == 1
                     if it == 1
@@ -386,16 +406,16 @@ classdef FEM3dAphijw < FEM3dAphi
                 %------------------------------------------------------
                 obj.dof{it}.A.value(id_edge_a_unknown) ...
                     = x(1:len_a_unknown);
-                %----------------------------------------------------------------------
+                %------------------------------------------------------
                 obj.dof{it}.V = 0;
                 if (len_a_unknown + len_phi_unknown) < len_sol
-                    obj.dof{it}.V = x(len_a_unknown+len_phi_unknown+1 : len_sol).*obj.jome;
+                    obj.dof{it}.V = obj.jome .* x(len_a_unknown+len_phi_unknown+1 : len_sol);
                 end
                 % --- get Vcoil
                 for iisc = 1:length(obj.dof{it}.V)
-                    obj.idVIsCoil{iisc}.V{it} = obj.dof{it}.V(iisc);
+                    obj.idVIsCoil{iisc}.V(it) = obj.dof{it}.V(iisc);
                 end
-                %----------------------------------------------------------------------
+                %------------------------------------------------------
                 id_coil__ = {};
                 if ~isempty(obj.coil)
                     id_coil__ = fieldnames(obj.coil);
@@ -413,19 +433,13 @@ classdef FEM3dAphijw < FEM3dAphi
                     if isa(coil,'VsCoil')
                         alphaV  = alphaV + coil.matrix.alpha .* coil.matrix.vs_array;
                     elseif isa(coil,'IsCoil')
-                        alphaV  = alphaV + coil.matrix.alpha .* coil.V{it};
+                        alphaV  = alphaV + coil.matrix.alpha .* coil.V(it);
                     end
                 end
                 %----------------------------------------------------------------------
                 freq = obj.frequency;
                 jome = 1j*2*pi*freq;
                 %----------------------------------------------------------------------
-                if any(alphaV)
-                    obj.dof{it}.Phi.value(id_node_phi_unknown) = x(len_a_unknown+1 : len_a_unknown+len_phi_unknown) + 1/jome .* alphaV(id_node_phi_unknown);
-                else
-                    obj.dof{it}.Phi.value(id_node_phi_unknown) = x(len_a_unknown+1 : len_a_unknown+len_phi_unknown);
-                end
-                % ---
                 phivalue = zeros(obj.parent_mesh.nb_node,1);
                 phivalue(id_node_phi_unknown) = x(len_a_unknown+1 : len_a_unknown+len_phi_unknown);
                 %----------------------------------------------------------------------
@@ -439,7 +453,7 @@ classdef FEM3dAphijw < FEM3dAphi
                 obj.postpro;
             end
         end
-        % -----------------------------------------------------------------------------
+        % -------------------------------------------------------------------------
         function postpro(obj)
             %----------------------------------------------------------------------
             it = obj.ltime.it;
@@ -450,24 +464,23 @@ classdef FEM3dAphijw < FEM3dAphi
             end
             % --- VsCoil
             for iec = 1:length(id_coil__)
-                %----------------------------------------------------------
+                %------------------------------------------------------------------
                 id_phydom = id_coil__{iec};
                 coil = obj.coil.(id_phydom);
-                % ---
-                if strcmpi(coil.coil_mode,'rx')
-                    continue
-                end
-                %----------------------------------------------------------
+                %------------------------------------------------------------------
                 if isa(coil,'VsCoil')
                     alpha  = coil.matrix.alpha;
-                    coil.I{it} = - (obj.matrix.sigmawewe * obj.dof{it}.E.value).' ...
-                        * (obj.parent_mesh.discrete.grad * alpha);
+                    coil.I(it) = - (obj.matrix.sigmawewe * obj.dof{it}.E.value).' ...
+                                 * (obj.parent_mesh.discrete.grad * alpha);
                 end
                 if isa(coil,'IsCoil')
                     alpha  = coil.matrix.alpha;
-                    coil.I{it} = - (obj.matrix.sigmawewe * obj.dof{it}.E.value).' ...
-                        * (obj.parent_mesh.discrete.grad * alpha);
+                    coil.I(it) = - (obj.matrix.sigmawewe * obj.dof{it}.E.value).' ...
+                                 * (obj.parent_mesh.discrete.grad * alpha);
                 end
+                %------------------------------------------------------------------
+                coil.getcircuitquantity;
+                %------------------------------------------------------------------
             end
             %----------------------------------------------------------------------
         end

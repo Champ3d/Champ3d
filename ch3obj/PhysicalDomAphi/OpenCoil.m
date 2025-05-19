@@ -22,6 +22,7 @@ classdef OpenCoil < Coil
         % ---
         gid_node_petrode
         gid_node_netrode
+        % ---
     end
     % --- Valid args list
     methods (Static)
@@ -37,7 +38,7 @@ classdef OpenCoil < Coil
     end
     % --- Utility Methods
     methods
-        function [unit_current_field,alpha] = get_uj_alpha(obj)
+        function [unit_current_field,alpha,dofuJ] = get_uj_alpha(obj)
             % ---
             parent_mesh = obj.parent_model.parent_mesh;
             % --- current field
@@ -84,8 +85,8 @@ classdef OpenCoil < Coil
                 V(id_node_v_unknown) = gradgrad \ RHS;
             end
             % ---
-            dofJs = - parent_mesh.discrete.grad * V;
-            vJs = parent_mesh.field_we('dof',dofJs,'id_elem',gid_elem);
+            dofuJ = - parent_mesh.discrete.grad * V;
+            vJs = parent_mesh.field_we('dof',dofuJ,'id_elem',gid_elem);
             vJs = f_normalize(vJs);
             % ---
             unit_current_field = unit_current_field + vJs;

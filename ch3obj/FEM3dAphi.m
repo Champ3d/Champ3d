@@ -44,7 +44,7 @@ classdef FEM3dAphi < EmModel
     % --- Methods
     methods (Access = protected)
         % -------------------------------------------------------------------
-        function build_base_matrix(obj)
+        function basematrix(obj)
             %--------------------------------------------------------------
             f_fprintf(0,'Base',1,class(obj),0,'\n');
             %--------------------------------------------------------------
@@ -172,30 +172,32 @@ classdef FEM3dAphi < EmModel
                             lmatrix(:,i,i),nb_edge,nb_edge);
                     end
                 end
-                if no_wewex
-                    lmatrix(id_elem_nomesh,:,:) = 0;
-                    % ---
-                    wewex = sparse(nb_edge,nb_edge);
-                    for i = 1:nbEd_inEl
-                        for j = i+1:nbEd_inEl
-                            wewex = wewex + ...
-                                sparse(id_edge_in_elem(i,:),id_edge_in_elem(j,:),...
-                                lmatrix(:,i,j),nb_edge,nb_edge);
-                        end
-                    end
-                    % ---
-                    wewex = wewex + wewex.';
-                    % ---
-                    for i = 1:nbEd_inEl
-                        wewex = wewex + ...
-                            sparse(id_edge_in_elem(i,:),id_edge_in_elem(i,:),...
-                            lmatrix(:,i,i),nb_edge,nb_edge);
-                    end
-                end
+                % --- XTODO : future use
+                % if no_wewex
+                %     lmatrix(id_elem_nomesh,:,:) = 0;
+                %     % ---
+                %     wewex = sparse(nb_edge,nb_edge);
+                %     for i = 1:nbEd_inEl
+                %         for j = i+1:nbEd_inEl
+                %             wewex = wewex + ...
+                %                 sparse(id_edge_in_elem(i,:),id_edge_in_elem(j,:),...
+                %                 lmatrix(:,i,j),nb_edge,nb_edge);
+                %         end
+                %     end
+                %     % ---
+                %     wewex = wewex + wewex.';
+                %     % ---
+                %     for i = 1:nbEd_inEl
+                %         wewex = wewex + ...
+                %             sparse(id_edge_in_elem(i,:),id_edge_in_elem(i,:),...
+                %             lmatrix(:,i,i),nb_edge,nb_edge);
+                %     end
+                % end
+                % ---------------------------------------------------------
             end
             % ---
             obj.matrix.wewe  = wewe;  clear wewe
-            obj.matrix.wewex = wewex; clear wewex
+            % obj.matrix.wewex = wewex; clear wewex
             %--------------------------------------------------------------
             % --- wewf / wewfx
             no_wewf = 0;
@@ -230,22 +232,25 @@ classdef FEM3dAphi < EmModel
                         end
                     end
                 end
-                if no_wewfx
-                    lmatrix(id_elem_nomesh,:,:) = 0;
-                    % ---
-                    wewfx = sparse(nb_edge,nb_face);
-                    for i = 1:nbEd_inEl
-                        for j = 1:nbFa_inEl
-                            wewfx = wewfx + ...
-                                sparse(id_edge_in_elem(i,:),id_face_in_elem(j,:),...
-                                lmatrix(:,i,j),nb_edge,nb_face);
-                        end
-                    end
-                end
+                % --- XTODO : future use
+                % if no_wewfx
+                %     lmatrix(id_elem_nomesh,:,:) = 0;
+                %     % ---
+                %     wewfx = sparse(nb_edge,nb_face);
+                %     for i = 1:nbEd_inEl
+                %         for j = 1:nbFa_inEl
+                %             wewfx = wewfx + ...
+                %                 sparse(id_edge_in_elem(i,:),id_face_in_elem(j,:),...
+                %                 lmatrix(:,i,j),nb_edge,nb_face);
+                %         end
+                %     end
+                %     % ---
+                % end
+                % -----------------------
             end
             % ---
             obj.matrix.wewf  = wewf;  clear wewf
-            obj.matrix.wewfx = wewfx; clear wewfx
+            % obj.matrix.wewfx = wewfx; clear wewfx
             %----------------------------------------------------------------
         end
     end

@@ -102,7 +102,12 @@ classdef LTensor < Xhandle
                 ltfield = obj.(fn);
                 if ~isempty(ltfield)
                     if isnumeric(ltfield)
-                        ltensor.(fn) = repmat(ltfield,nb_elem,1);
+                        if any(f_strcmpi(fn,{'main_dir','ort1_dir','ort2_dir','rot_axis'}))
+                            ltfield = TensorArray.vector(ltfield,'nb_elem',nb_elem);
+                        else
+                            ltfield = TensorArray.scalar(ltfield,'nb_elem',nb_elem);
+                        end
+                        ltensor.(fn) = ltfield;
                     elseif isa(ltfield,'Parameter') || isa(ltfield,'LVector')
                         if isequal(obj.parent_model,ltfield.parent_model)
                             ltensor.(fn) = ltfield.getvalue('in_dom',dom);
@@ -113,24 +118,24 @@ classdef LTensor < Xhandle
                 end
             end
             % --- normalize
-            ltensor.main_dir = f_normalize(ltensor.main_dir,2);
-            ltensor.ort1_dir = f_normalize(ltensor.ort1_dir,2);
-            ltensor.ort2_dir = f_normalize(ltensor.ort2_dir,2);
+            ltensor.main_dir = f_normalize(ltensor.main_dir);
+            ltensor.ort1_dir = f_normalize(ltensor.ort1_dir);
+            ltensor.ort2_dir = f_normalize(ltensor.ort2_dir);
             % ---
             if ~isempty(obj.rot_axis) && ~isempty(obj.rot_angle)
                 for i = 1:nb_elem
                     % ---
-                    raxis = ltensor.rot_axis(i,:) ./ norm(ltensor.rot_axis(i,:));
-                    a = ltensor.rot_angle(i,:);
+                    raxis = ltensor.rot_axis(:,i) ./ norm(ltensor.rot_axis(:,i));
+                    a = ltensor.rot_angle(i);
                     %------------------------------------------------------
-                    ltensor.main_dir(i,:) = obj.rotaroundaxis(ltensor.main_dir(i,:),raxis,a);
-                    ltensor.ort1_dir(i,:) = obj.rotaroundaxis(ltensor.ort1_dir(i,:),raxis,a);
-                    ltensor.ort2_dir(i,:) = obj.rotaroundaxis(ltensor.ort2_dir(i,:),raxis,a);
+                    ltensor.main_dir(:,i) = obj.rotaroundaxis(ltensor.main_dir(:,i),raxis,a);
+                    ltensor.ort1_dir(:,i) = obj.rotaroundaxis(ltensor.ort1_dir(:,i),raxis,a);
+                    ltensor.ort2_dir(:,i) = obj.rotaroundaxis(ltensor.ort2_dir(:,i),raxis,a);
                     %------------------------------------------------------
                 end
             end
             % ---
-            gtensor = f_gtensor(ltensor);
+            gtensor = obj.gtensor(ltensor);
             % ---
         end
         % -----------------------------------------------------------------
@@ -222,30 +227,30 @@ classdef LTensor < Xhandle
                     ort1_value_ = ltensor.ort1_value(iten);
                     ort2_value_ = ltensor.ort2_value(iten);
                     %----------------------------------------------------------------------
-                    main_dir_ = ltensor.main_dir(iten,:);
-                    ort1_dir_ = ltensor.ort1_dir(iten,:);
-                    ort2_dir_ = ltensor.ort2_dir(iten,:);
+                    main_dir_ = ltensor.main_dir(:,iten);
+                    ort1_dir_ = ltensor.ort1_dir(:,iten);
+                    ort2_dir_ = ltensor.ort2_dir(:,iten);
                     %----------------------------------------------------------------------
                     % local coordinates system
                     tensor = [main_value_ 0           0; ...
                               0          ort1_value_  0; ...
                               0          0           ort2_value_];
-                    lix = [1 0 0];
-                    liy = [0 1 0];
-                    liz = [0 0 1];
-                    lcoor = [lix; liy; liz];
+                    lix = [1 0 0].';
+                    liy = [0 1 0].';
+                    liz = [0 0 1].';
+                    lcoor = [lix liy liz];
                     %----------------------------------------------------------------------
                     % global coordinates system
                     gix = main_dir_./norm(main_dir_);
                     giy = ort1_dir_./norm(ort1_dir_);
                     giz = ort2_dir_./norm(ort2_dir_);
-                    gcoor = [gix; giy; giz];
+                    gcoor = [gix giy giz];
                     %----------------------------------------------------------------------
                     % transformation matrix local --> global
                     TM = zeros(3,3);
                     for i = 1:3
                         for j = 1:3
-                            TM(i,j) = dot(gcoor(i,:),lcoor(j,:));
+                            TM(i,j) = dot(gcoor(:,i),lcoor(:,j));
                         end
                     end
                     %----------------------------------------------------------------------
@@ -258,26 +263,26 @@ classdef LTensor < Xhandle
                     main_value_ = ltensor.main_value(iten);
                     ort1_value_ = ltensor.ort1_value(iten);
                     %----------------------------------------------------------------------
-                    main_dir_ = ltensor.main_dir(iten,:);
-                    ort1_dir_ = ltensor.ort1_dir(iten,:);
+                    main_dir_ = ltensor.main_dir(:,iten);
+                    ort1_dir_ = ltensor.ort1_dir(:,iten);
                     %----------------------------------------------------------------------
                     % local coordinates system
                     tensor = [main_value_ 0 ; ...
                               0         ort1_value_ ];
-                    lix = [1 0];
-                    liy = [0 1];
-                    lcoor = [lix; liy];
+                    lix = [1 0].';
+                    liy = [0 1].';
+                    lcoor = [lix liy];
                     %----------------------------------------------------------------------
                     % global coordinates system
                     gix = main_dir_./norm(main_dir_);
                     giy = ort1_dir_./norm(ort1_dir_);
-                    gcoor = [gix; giy];
+                    gcoor = [gix giy];
                     %----------------------------------------------------------------------
                     % transformation matrix local --> global
                     TM = zeros(2,2);
                     for i = 1:2
                         for j = 1:2
-                            TM(i,j) = dot(gcoor(i,:),lcoor(j,:));
+                            TM(i,j) = dot(gcoor(:,i),lcoor(:,j));
                         end
                     end
                     %----------------------------------------------------------------------
@@ -307,8 +312,7 @@ classdef LTensor < Xhandle
                       uy*ux*(1-cos(a))              cos(a) + uy^2 * (1-cos(a))];
             end
             % ---
-            vrot = R * v.';
-            vrot = vrot.';
+            vrot = R * v;
         end
     end
 end

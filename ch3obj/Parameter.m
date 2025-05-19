@@ -37,6 +37,31 @@ classdef Parameter < Xhandle
         function obj = Parameter(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
+                args.f
+                args.depend_on {mustBeMember(args.depend_on,...
+                    {'celem','cface','velem','sface','ledge',...
+                     'J','V','I','Z','T','B','E','H','A','P','Phi',...
+                     'ltime'})}
+                args.from
+                args.varargin_list
+                args.fvectorized
+            end
+            % ---
+            obj = obj@Xhandle;
+            % ---
+            if ~isempty(fieldnames(args))
+                argu = f_to_namedarg(args);
+                obj.setup(argu{:});
+            end
+            % ---
+        end
+    end
+    % --- setup
+    methods (Access = protected)
+        function setup(obj,args)
+            arguments
+                obj
+                args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
                 args.f = []
                 args.depend_on {mustBeMember(args.depend_on,...
                     {'celem','cface','velem','sface','ledge',...
@@ -46,8 +71,6 @@ classdef Parameter < Xhandle
                 args.varargin_list = []
                 args.fvectorized = 0
             end
-            % ---
-            obj = obj@Xhandle;
             % ---
             if ~isfield(args,'parent_model')
                 error('#parent_model must be given !');
@@ -62,8 +85,26 @@ classdef Parameter < Xhandle
             end
             % ---
             if isnumeric(args.f)
-                constant_parameter = args.f;
-                args.f = @()(constant_parameter);
+                const = args.f;
+                % ---
+                sizeconst = size(const);
+                % ---
+                if numel(const) == 1
+                    args.f = @()(const);
+                elseif numel(const) == 2 || numel(const) == 3
+                    const = f_tocolv(const);
+                    args.f = @()(const);
+                elseif isequal(sizeconst,[2 2]) || isequal(sizeconst,[3 3])
+                    args.f = @()(const);
+                else
+                    fprintf(['Constant parameter must be a single scalar, ' ...
+                             'single vector or single tensor !\n' ...
+                             'Consider ScalarParameter, VectorParameter or TensorParameter ' ...
+                             'for general purpose. \n']);
+                    error('constant parameter error');
+                end
+                % ---
+                args.f = @()(const);
             elseif isa(args.f,'function_handle')
                 if isempty(args.from)
                     error('#from must be given ! Give EMModel, THModel, ... ');
@@ -91,11 +132,9 @@ classdef Parameter < Xhandle
                     error('Number of elements in #depend_on must corresponds to #from');
                 end
             end
-            % -------------------------------------------------------------
         end
     end
-
-    % --- Methods
+    % --- get
     methods
         %------------------------------------------------------------------
         function vout = getvalue(obj,args)
@@ -108,110 +147,22 @@ classdef Parameter < Xhandle
             % ---
             if obj.fvectorized
                 vout = obj.eval_fvectorized(dom);
-                vout = f_column_format(vout);
             else
                 vout = obj.eval_fserial(dom);
-                vout = f_column_format(vout);
             end
+            % ---
+            if length(size(vout)) < 3
+                if any(size(vout) == 1)
+                    vout = f_torowv(vout);
+                else
+                    vout = f_tocolv(vout);
+                end
+            end
+            % ---
         end
         %------------------------------------------------------------------
-        function vout = get_inverse(obj,args)
-            arguments
-                obj
-                args.in_dom = []
-                args.parameter_type {mustBeMember(args.parameter_type,{'auto','vector'})} = 'vector'
-            end
-            % ---
-            dom = args.in_dom;
-            parameter_type = args.parameter_type;
-            % ---
-            vout = [];
-            vin  = obj.getvalue('in_dom',dom);
-            sizev = size(vin);
-            lensv = length(sizev);
-            % ---
-            if lensv == 2
-                if sizev(2) == 1
-                    if any(sizev(1) == [2 3])
-                        if f_strcmpi(parameter_type,'vector')
-                            vout = - vin;
-                        else
-                            vout = 1./vin;
-                        end
-                    else
-                        vout = 1./vin;
-                    end
-                else
-                    vout = - vin;
-                end
-            elseif lensv == 3
-                if sizev(2) == sizev(3)
-                    if sizev(2) == 2
-                        % --- 
-                        vout = zeros(sizev(1),2,2);
-                        % ---
-                        a11(1,:) = vin(:,1,1);
-                        a12(1,:) = vin(:,1,2);
-                        a21(1,:) = vin(:,2,1);
-                        a22(1,:) = vin(:,2,2);
-                        d = a11.*a22 - a21.*a12;
-                        ix = find(d);
-                        vout(ix,1,1) = +1./d(ix).*a22(ix);
-                        vout(ix,1,2) = -1./d(ix).*a12(ix);
-                        vout(ix,2,1) = -1./d(ix).*a21(ix);
-                        vout(ix,2,2) = +1./d(ix).*a11(ix);
-                    elseif sizev(2) == 3
-                        % --- 
-                        vout = zeros(sizev(1),3,3);
-                        % ---
-                        a11(1,:) = vin(:,1,1);
-                        a12(1,:) = vin(:,1,2);
-                        a13(1,:) = vin(:,1,3);
-                        a21(1,:) = vin(:,2,1);
-                        a22(1,:) = vin(:,2,2);
-                        a23(1,:) = vin(:,2,3);
-                        a31(1,:) = vin(:,3,1);
-                        a32(1,:) = vin(:,3,2);
-                        a33(1,:) = vin(:,3,3);
-                        A11 = a22.*a33 - a23.*a32;
-                        A12 = a32.*a13 - a12.*a33;
-                        A13 = a12.*a23 - a13.*a22;
-                        A21 = a23.*a31 - a21.*a33;
-                        A22 = a33.*a11 - a31.*a13;
-                        A23 = a13.*a21 - a23.*a11;
-                        A31 = a21.*a32 - a31.*a22;
-                        A32 = a31.*a12 - a32.*a11;
-                        A33 = a11.*a22 - a12.*a21;
-                        d = a11.*a22.*a33 + a21.*a32.*a13 + a31.*a12.*a23 - ...
-                            a11.*a32.*a23 - a31.*a22.*a13 - a21.*a12.*a33;
-                        ix = find(d);
-                        vout(ix,1,1) = 1./d(ix).*A11(ix);
-                        vout(ix,1,2) = 1./d(ix).*A12(ix);
-                        vout(ix,1,3) = 1./d(ix).*A13(ix);
-                        vout(ix,2,1) = 1./d(ix).*A21(ix);
-                        vout(ix,2,2) = 1./d(ix).*A22(ix);
-                        vout(ix,2,3) = 1./d(ix).*A23(ix);
-                        vout(ix,3,1) = 1./d(ix).*A31(ix);
-                        vout(ix,3,2) = 1./d(ix).*A32(ix);
-                        vout(ix,3,3) = 1./d(ix).*A33(ix);
-                    else
-                        f_fprintf(1,'Cannot inverse !',0,'\n');
-                    end
-                end
-            else
-                f_fprintf(1,'Cannot inverse !',0,'\n');
-            end
-            % --- 
-            if any(isinf(vout))
-                f_fprintf(1,'Inverse has Inf ! \n');
-            end
-            % --- 
-            if any(isnan(vout))
-                f_fprintf(1,'Inverse has NaN ! \n');
-            end
-            % ---
-        end
     end
+    %----------------------------------------------------------------------
     methods (Access = private)
         %------------------------------------------------------------------
         function vout = eval_fvectorized(obj,dom)
@@ -436,9 +387,23 @@ classdef Parameter < Xhandle
                             error(['no #coil ' id_coil ' in source model !'])
                         end
                     end
-                    % ---
-                    fargs{i} = source_model.coil.(id_coil).(quantity);
-                    % ---
+                    % get by time interpolation
+                    next_it = source_model.ltime.next_it(target_model.ltime.t_now);
+                    back_it = source_model.ltime.back_it(target_model.ltime.t_now);
+                    if next_it == back_it
+                        fargs{i} = source_model.coil.(id_coil).(quantity){back_it};
+                    else
+                        % ---
+                        val01 = source_model.coil.(id_coil).(quantity){back_it};
+                        val02 = source_model.coil.(id_coil).(quantity){next_it};
+                        % ---
+                        delta_v = val02 - val01;
+                        delta_t = source_model.ltime.t_array(next_it) - source_model.ltime.t_array(back_it);
+                        % ---
+                        dt = target_model.ltime.t_now - source_model.ltime.t_array(back_it);
+                        fargs{i} = val01 + delta_v./delta_t .* dt;
+                    end
+                    % --------------------------------------
                 elseif any(f_strcmpi(depon_,{...
                         'J','T','B','E','H','A','P','Phi'}))
                     % physical quantities

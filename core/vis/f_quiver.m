@@ -145,7 +145,6 @@ if strcmpi(vtype,'equal')
     box on;
     xlabel('x (m)'); ylabel('y (m)'); zlabel('z (m)');
 else
-
     %----- try to scale
     dmax = max(node(1,:)) - min(node(1,:));
     for i = 2:dim

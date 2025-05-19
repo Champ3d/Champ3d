@@ -93,7 +93,7 @@ classdef Thconvection < PhysicalDom
             gid_node_t = f_uniquenode(dom.parent_mesh.face(:,gid_face));
             % ---
             h_array = obj.h.getvalue('in_dom',obj);
-            h_array = f_column_array(h_array,'nb_elem',nb_face);
+            h_array = TensorArray.scalar(h_array,'nb_elem',nb_face);
             %--------------------------------------------------------------
             % local surface mesh
             submesh = dom.submesh;

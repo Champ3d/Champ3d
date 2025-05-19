@@ -37,7 +37,7 @@ classdef CloseCoil < Coil
     end
     % --- Utility Methods
     methods
-        function [unit_current_field,alpha] = get_uj_alpha(obj)
+        function [unit_current_field,alpha,dofuJ] = get_uj_alpha(obj)
             % ---
             parent_mesh = obj.parent_model.parent_mesh;
             % --- current field
@@ -89,12 +89,15 @@ classdef CloseCoil < Coil
                     V(id_node_v_unknown) = gradgrad \ RHS;
                 end
                 % ---
-                dofJs = parent_mesh.discrete.grad * V;
+                dofJs = - parent_mesh.discrete.grad * V;
                 vJs = parent_mesh.field_we('dof',dofJs,'id_elem',gid_elem);
                 vJs = f_normalize(vJs);
                 % ---
                 unit_current_field = unit_current_field + vJs;
                 % --- XTODO
+                if ipart == 2
+                    dofuJ = dofJs;
+                end
                 alpha = [];
             end
             unit_current_field = f_normalize(unit_current_field);

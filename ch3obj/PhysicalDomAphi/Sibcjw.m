@@ -94,6 +94,8 @@ classdef Sibcjw < PhysicalDom
     methods
         function build(obj)
             % ---
+            it = obj.parent_model.ltime.it;
+            % ---
             dom = obj.dom;
             % ---
             gid_face = dom.gid_face;
@@ -113,7 +115,7 @@ classdef Sibcjw < PhysicalDom
             % ---
             z_sibc = (1+1j)./(skindepth.*sigma_array) .* ...
                 (1 + (1-1j)/4 .* skindepth .* cparam_array);
-            z_sibc = f_column_array(z_sibc,'nb_elem',lnb_face);
+            z_sibc = TensorArray.scalar(z_sibc,'nb_elem',lnb_face);
             %--------------------------------------------------------------
             % local surface mesh
             submesh = dom.submesh;
@@ -129,8 +131,8 @@ classdef Sibcjw < PhysicalDom
             is_changed = 1;
             if isequal(gid_node_phi,obj.matrix.gid_node_phi) && ...
                isequal(gid_face_,obj.matrix.gid_face) && ...
-               isequal(sigma_array,obj.matrix.sigma_array) && ...
-               isequal(skindepth,obj.matrix.skindepth)
+               isequal(sigma_array,obj.matrix.sigma_array{it}) && ...
+               isequal(skindepth,obj.matrix.skindepth{it})
                 is_changed = 0;
             end
             %--------------------------------------------------------------
@@ -140,8 +142,9 @@ classdef Sibcjw < PhysicalDom
             %--------------------------------------------------------------
             obj.matrix.gid_node_phi = gid_node_phi;
             obj.matrix.gid_face = gid_face_;
-            obj.matrix.sigma_array = sigma_array;
-            obj.matrix.skindepth = skindepth;
+            obj.matrix.sigma_array{it} = sigma_array;
+            obj.matrix.skindepth{it} = skindepth;
+            obj.matrix.z_sibc{it} = z_sibc;
             % obj.matrix.mur_array = mur_array;
             % obj.matrix.cparam_array = cparam_array;
             %--------------------------------------------------------------
@@ -216,8 +219,8 @@ classdef Sibcjw < PhysicalDom
             id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face;
             lnb_face = length(obj.dom.gid_face);
             % ---
-            sigma_array = f_column_array(obj.matrix.sigma_array,'nb_elem',lnb_face);
-            skindepth   = f_column_array(obj.matrix.skindepth,'nb_elem',lnb_face);
+            sigma_array = TensorArray.scalar(obj.matrix.sigma_array,'nb_elem',lnb_face);
+            skindepth   = TensorArray.scalar(obj.matrix.skindepth,'nb_elem',lnb_face);
             % ---
             es = sparse(2,lnb_face);
             js = sparse(2,lnb_face);

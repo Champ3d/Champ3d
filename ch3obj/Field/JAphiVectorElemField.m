@@ -16,24 +16,24 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef EdgeDofBasedVectorElemField < VectorElemField
+classdef JAphiVectorElemField < VectorElemField
     properties
         parent_model
-        dof
+        Efield
     end
     % --- Contructor
     methods
-        function obj = EdgeDofBasedVectorElemField(args)
+        function obj = JAphiVectorElemField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
-                args.dof {mustBeA(args.dof,'EdgeDof')}
+                args.Efield {mustBeA(args.Efield,'EdgeDofBasedVectorElemField')}
             end
             % ---
             obj = obj@VectorElemField;
             % ---
             if nargin >1
-                if ~isfield(args,'parent_model') || ~isfield(args,'dof')
-                    error('#parent_model and #dof must be given !');
+                if ~isfield(args,'parent_model') || ~isfield(args,'Efield')
+                    error('#parent_model and #Efield must be given !');
                 end
             end
             % ---
@@ -50,9 +50,31 @@ classdef EdgeDofBasedVectorElemField < VectorElemField
                 id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
             end
             % ---
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,...
+            val = zeros(3,length(id_elem));
+            % ---
+            id_phydom__ = {};
+            if ~isempty(obj.parent_model.econductor)
+                id_phydom__ = fieldnames(obj.parent_model.econductor);
+            end
+            % ---
+            for iec = 1:length(id_phydom__)
+                id_phydom = id_phydom__{iec};
+                % ---
+                phydom = obj.parent_model.econductor.(id_phydom);
+                % ---
+                gid_elem = intersect(id_elem,phydom.gid_elem);
+                gid_elem = unique(gid_elem);
+                % ---
+                % sigma_array = phydom.matrix.sigma_array
+                % % ---
+                % E = obj.Efield.cvalue(gid_elem);
+                % val = 
+            end
+            % ---
+            val = obj.parent_model.parent_mesh.field_we('dof',obj.Efield.value,...
                   'on','center','id_elem',id_elem);
             val = val(:,id_elem);
+            % ---
         end
         % -----------------------------------------------------------------
         function val = ivalue(obj,id_elem)
@@ -61,7 +83,7 @@ classdef EdgeDofBasedVectorElemField < VectorElemField
                 id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
             end
             % ---
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,...
+            val = obj.parent_model.parent_mesh.field_we('dof',obj.Efield.value,...
                   'on','interpolation_points','id_elem',id_elem);
             % ---
             if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
@@ -78,7 +100,7 @@ classdef EdgeDofBasedVectorElemField < VectorElemField
                 id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
             end
             % ---
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,...
+            val = obj.parent_model.parent_mesh.field_we('dof',obj.Efield.value,...
                   'on','gauss_points','id_elem',id_elem);
             % ---
             if length(id_elem) < obj.parent_model.parent_mesh.nb_elem

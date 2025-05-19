@@ -17,10 +17,36 @@
 %--------------------------------------------------------------------------
 
 classdef StrandedCoil < Coil
+    properties
+        dofuJ
+        uJfield
+    end
     % --- Contructor
     methods
         function obj = StrandedCoil()
             obj@Coil;
+        end
+    end
+    % --- Utility Methods
+    methods
+    % -----------------------------------------------------------------
+        function getFlux(obj)
+            it = obj.parent_model.ltime.it;
+            gid_elem = obj.matrix.gid_elem;
+            A = obj.parent_model.field{it}.A.elem.gvalue(gid_elem);
+            N = obj.uJfield.gvalue(gid_elem);
+            % ---
+            AN = zeros(8,length(gid_elem));
+            detJ = zeros(8,length(gid_elem));
+            for i = 1:length(A)
+                AN(i,:) = dot(A{i},N{i});
+                detJ(i,:) = obj.parent_model.parent_mesh.intkit.detJ{i}(gid_elem);
+            end
+            % ---
+            refelem = obj.parent_model.parent_mesh.refelem;
+            wei = refelem.Weigh.';
+            obj.Flux(it) = sum(sum(wei.*detJ.*AN)) .* obj.nb_turn ./ obj.cs_area;
+            % ---
         end
     end
 end

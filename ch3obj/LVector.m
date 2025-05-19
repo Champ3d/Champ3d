@@ -89,7 +89,12 @@ classdef LVector < Xhandle
                 lvfield = obj.(fn);
                 if ~isempty(lvfield)
                     if isnumeric(lvfield)
-                        lvector.(fn) = repmat(lvfield,nb_elem,1);
+                        if any(f_strcmpi(fn,{'main_dir','rot_axis'}))
+                            lvfield = TensorArray.vector(lvfield,'nb_elem',nb_elem);
+                        else
+                            lvfield = TensorArray.scalar(lvfield,'nb_elem',nb_elem);
+                        end
+                        lvector.(fn) = lvfield;
                     elseif isa(lvfield,'Parameter')
                         if isequal(obj.parent_model,lvfield.parent_model)
                             lvector.(fn) = lvfield.getvalue('in_dom',dom);
@@ -100,15 +105,15 @@ classdef LVector < Xhandle
                 end
             end
             % --- normalize
-            lvector.main_dir = f_normalize(lvector.main_dir,2);
+            lvector.main_dir = f_normalize(lvector.main_dir);
             % ---
             if ~isempty(obj.rot_axis) && ~isempty(obj.rot_angle)
                 for i = 1:nb_elem
                     % ---
-                    raxis = lvector.rot_axis(i,:) ./ norm(lvector.rot_axis(i,:));
-                    a = lvector.rot_angle(i,:);
+                    raxis = lvector.rot_axis(:,i) ./ norm(lvector.rot_axis(:,i));
+                    a = lvector.rot_angle(i);
                     %------------------------------------------------------
-                    lvector.main_dir(i,:) = obj.rotaroundaxis(lvector.main_dir(i,:),raxis,a);
+                    lvector.main_dir(:,i) = obj.rotaroundaxis(lvector.main_dir(:,i),raxis,a);
                     %------------------------------------------------------
                 end
             end
@@ -150,8 +155,7 @@ classdef LVector < Xhandle
                       uy*ux*(1-cos(a))              cos(a) + uy^2 * (1-cos(a))];
             end
             % ---
-            vrot = R * v.';
-            vrot = vrot.';
+            vrot = R * v;
         end
         % -----------------------------------------------------------------
     end
