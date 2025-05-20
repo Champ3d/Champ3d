@@ -37,6 +37,7 @@ classdef PhysicalDom < Xhandle
     end
     % --- Utility Methods
     methods
+        % -----------------------------------------------------------------
         function set_parameter(obj)
             % --- XTODO
             % should put list in config file ?
@@ -49,12 +50,29 @@ classdef PhysicalDom < Xhandle
                 if isprop(obj,param)
                     if isnumeric(obj.(param))
                         if ~isempty(obj.(param))
-                            obj.(param) = Parameter('parent_model',obj.parent_model,'f',obj.(param));
+                            % ---------------------------------------------
+                            const = obj.(param);
+                            if numel(const) == 1
+                                obj.(param) = ScalarParameter('parent_model',obj.parent_model,'f',obj.(param));
+                            elseif numel(const) == 2 || numel(const) == 3
+                                obj.(param) = VectorParameter('parent_model',obj.parent_model,'f',obj.(param));
+                            elseif isequal(sizeconst,[2 2]) || isequal(sizeconst,[3 3])
+                                obj.(param) = TensorParameter('parent_model',obj.parent_model,'f',obj.(param));
+                            else
+                                fprintf(['Constant parameter must be a single scalar, ' ...
+                                         'single vector or single tensor !\n' ...
+                                         'Consider ScalarParameter, VectorParameter, TensorParameter, ' ...
+                                         'LTensor or LVector ' ...
+                                         'for general purpose. \n']);
+                                error('constant parameter error');
+                            end
+                            % ---------------------------------------------
                         end
                     end
                 end
             end
         end
+        % -----------------------------------------------------------------
         function get_geodom(obj)
             if isempty(obj.parent_model)
                 return

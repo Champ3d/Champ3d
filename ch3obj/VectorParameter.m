@@ -41,6 +41,7 @@ classdef VectorParameter < Parameter
             obj = obj@Parameter;
             % ---
             if isnumeric(args.f)
+                s = size(args.f);
                 if isequal(s,[1 2]) || isequal(s,[2 1]) || ...
                    isequal(s,[1 3]) || isequal(s,[3 1])
                     args.f = f_tocolv(args.f);
