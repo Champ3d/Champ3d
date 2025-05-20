@@ -61,7 +61,7 @@ classdef NodeDofBasedScalarNodeField < Xhandle
                 id_node = 1:obj.parent_model.parent_mesh.nb_node;
             end
             % ---
-            val = obj.parent_model.parent_mesh.node(:,id_node);
+            val = obj.parent_model.parent_mesh.node(:,id_node).';
         end
     end
     % --- plot

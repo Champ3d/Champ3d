@@ -68,7 +68,7 @@ classdef NodeDofBasedScalarElemField < ScalarElemField
             % ---
             if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
                 for i = 1:length(val)
-                    val{i} = val{i}(1,id_elem) + obj.reference_potential;
+                    val{i} = val{i}(id_elem) + obj.reference_potential;
                 end
             else
                 for i = 1:length(val)
@@ -89,7 +89,7 @@ classdef NodeDofBasedScalarElemField < ScalarElemField
             % ---
             if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
                 for i = 1:length(val)
-                    val{i} = val{i}(1,id_elem) + obj.reference_potential;
+                    val{i} = val{i}(id_elem) + obj.reference_potential;
                 end
             else
                 for i = 1:length(val)

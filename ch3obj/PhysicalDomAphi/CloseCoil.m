@@ -41,7 +41,7 @@ classdef CloseCoil < Coil
             % ---
             parent_mesh = obj.parent_model.parent_mesh;
             % --- current field
-            unit_current_field = zeros(3,parent_mesh.nb_elem);
+            unit_current_field = zeros(parent_mesh.nb_elem,3);
             % ---
             nbEd_inEl = parent_mesh.refelem.nbEd_inEl;
             % ---
@@ -91,7 +91,7 @@ classdef CloseCoil < Coil
                 % ---
                 dofJs = - parent_mesh.discrete.grad * V;
                 vJs = parent_mesh.field_we('dof',dofJs,'id_elem',gid_elem);
-                vJs = f_normalize(vJs);
+                vJs = TensorArray.normalize(vJs);
                 % ---
                 unit_current_field = unit_current_field + vJs;
                 % --- XTODO
@@ -100,7 +100,7 @@ classdef CloseCoil < Coil
                 end
                 alpha = [];
             end
-            unit_current_field = f_normalize(unit_current_field);
+            unit_current_field = TensorArray.normalize(unit_current_field);
         end
     end
     % --- Utility Methods

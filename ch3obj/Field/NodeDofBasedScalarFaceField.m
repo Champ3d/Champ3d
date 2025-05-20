@@ -48,16 +48,16 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
                 id_face = 1:obj.parent_model.parent_mesh.nb_face;
             end
             % ---
-            val = zeros(1,length(id_face));
+            val = zeros(length(id_face),1);
             [grface,lid_face,face_elem_type] = f_filterface(obj.parent_model.parent_mesh.face(:,id_face));
             % ---
             for i = 1:length(grface)
                 face_ = grface{i};
                 elem_type = face_elem_type{i};
                 if any(f_strcmpi(elem_type,{'tri','triangle'}))
-                    val(1,lid_face{i}) = mean(obj.dof.value(face_(1:3,:)));
+                    val(lid_face{i}) = mean(obj.dof.value(face_(1:3,:))).';
                 elseif any(f_strcmpi(elem_type,{'quad'}))
-                    val(1,lid_face{i}) = mean(obj.dof.value(face_(1:4,:)));
+                    val(lid_face{i}) = mean(obj.dof.value(face_(1:4,:))).';
                 end
             end
             % ---
@@ -80,7 +80,7 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
             % ---
             nbNodeI = submesh{1}.refelem.nbI;
             for i = 1:nbNodeI
-                val{i} = zeros(1,lnb_face);
+                val{i} = zeros(lnb_face,1);
             end
             % ---
             for k = 1:length(submesh)
@@ -104,7 +104,7 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
                         vi = vi + wi .* dof_(:,l);
                     end
                     % ---
-                    val{m}(1,lid_face) = vi.';
+                    val{m}(lid_face) = vi;
                 end
             end
             % ---
@@ -129,7 +129,7 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
             % ---
             nbNodeG = submesh{1}.refelem.nbG;
             for i = 1:nbNodeG
-                val{i} = zeros(1,lnb_face);
+                val{i} = zeros(lnb_face,1);
             end
             % ---
             for k = 1:length(submesh)
@@ -153,7 +153,7 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
                         vi = vi + wi .* dof_(:,l);
                     end
                     % ---
-                    val{m}(1,lid_face) = vi.';
+                    val{m}(lid_face) = vi;
                 end
             end
             % ---

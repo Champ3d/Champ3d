@@ -66,31 +66,42 @@ classdef VectorElemField < ElemField
             end
             % ---
             celem = obj.parent_model.parent_mesh.celem(:,gid_elem);
-            if isreal(obj.cvalue(gid_elem(1)))
+            v_ = obj.cvalue(gid_elem);
+            if isreal(v_)
                 % ---
                 subplot(121)
+                title('Vector');
                 f_quiver(celem,obj.cvalue(gid_elem));
                 % ---
                 subplot(122)
+                title('Norm');
                 node_ = obj.parent_model.parent_mesh.node;
                 elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
-                f_patch('node',node_,'elem',elem,'elem_field',f_magnitude(obj.cvalue(gid_elem)));
+                v__ = TensorArray.norm(v_);
+                f_patch('node',node_,'elem',elem,'elem_field',v__);
             else
-                for i = 1:3
+                for i = 1:4
                     % ---
-                    subplot(130 + i);
+                    subplot(220 + i);
                     if i == 1
                         title('Real part');
-                        f_quiver(celem,real(obj.cvalue(gid_elem)));
+                        v__ = real(v_);
+                        f_quiver(celem,v__);
                     elseif i == 2
                         title('Imag part');
-                        f_quiver(celem,imag(obj.cvalue(gid_elem)));
+                        v__ = imag(v_);
+                        f_quiver(celem,v__);
                     elseif i == 3
-                        title('Magnitude');
+                        title('Max');
+                        v__ = TensorArray.maxvector(v_);
+                        f_quiver(celem,v__);
+                    elseif i == 4
+                        title('Max');
                         % ---
                         node_ = obj.parent_model.parent_mesh.node;
                         elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
-                        f_patch('node',node_,'elem',elem,'elem_field',f_magnitude(obj.cvalue(gid_elem)));
+                        v__ = TensorArray.norm(TensorArray.maxvector(v_));
+                        f_patch('node',node_,'elem',elem,'elem_field',v__);
                     end
                     % ---
                 end

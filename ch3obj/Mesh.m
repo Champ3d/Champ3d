@@ -104,7 +104,7 @@ classdef Mesh < Xhandle
             % ---
         end
     end
-    % --- Methods - Get
+    % --- Get
     methods
         % ---
         function val = get.nb_node(obj)
@@ -132,7 +132,7 @@ classdef Mesh < Xhandle
         end
         % ---
     end
-    % --- Methode - Add
+    % --- Add
     methods
         % -----------------------------------------------------------------
         function add_whole_mesh_dom(obj,varargin)
@@ -148,7 +148,7 @@ classdef Mesh < Xhandle
         end
         % -----------------------------------------------------------------
     end
-    % --- Methods - Geo
+    % --- Geo
     methods
         % -----------------------------------------------------------------
         function lbox = localbox(obj,id_elem)
@@ -349,7 +349,7 @@ classdef Mesh < Xhandle
         end
         % -----------------------------------------------------------------
     end
-    % --- Methods - Meshds/Discrete
+    % --- Meshds/Discrete
     methods
         % -----------------------------------------------------------------
         function obj = build_meshds(obj,args)
@@ -640,7 +640,7 @@ classdef Mesh < Xhandle
         end
         % -----------------------------------------------------------------
     end
-    % --- Methods - Intkit
+    % --- Intkit
     methods
         % -----------------------------------------------------------------
         function obj = build_intkit(obj)
@@ -792,7 +792,7 @@ classdef Mesh < Xhandle
         end
         % -----------------------------------------------------------------
     end
-    % --- Methods - Prokit
+    % --- Prokit
     methods
         % -----------------------------------------------------------------
         function obj = build_prokit(obj)
@@ -910,7 +910,7 @@ classdef Mesh < Xhandle
         end
         % -----------------------------------------------------------------
     end
-    % --- Methods - Check
+    % --- Check
     methods
         % -----------------------------------------------------------------
         function check_meshds(obj)
@@ -992,7 +992,7 @@ classdef Mesh < Xhandle
         end
         % -----------------------------------------------------------------
     end
-    % --- Methods - Shape fun
+    % --- Shape fun
     methods
         % -----------------------------------------------------------------
         function Wn = wn(obj,args)
@@ -1464,7 +1464,19 @@ classdef Mesh < Xhandle
         end
         % -----------------------------------------------------------------
     end
-    % --- Methods - Plot
+    % --- Arrayformat
+    methods
+        % -----------------------------------------------------------------
+        function coefformat(obj,coef_array)
+            
+        end
+        % -----------------------------------------------------------------
+        function vectorformat(obj,vector_array)
+            
+        end
+        % -----------------------------------------------------------------
+    end
+    % --- Plot
     methods
         % -----------------------------------------------------------------
         function plot(obj,varargin)
@@ -1476,7 +1488,7 @@ classdef Mesh < Xhandle
         end
         % -----------------------------------------------------------------
     end
-    % --- Methods - Obj
+    % --- Obj
     methods (Access = protected)
         function newmesh = copyElement(obj)
             newmesh = copyElement@matlab.mixin.Copyable(obj);

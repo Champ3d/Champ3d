@@ -17,11 +17,18 @@ function f_chlogo()
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-%c3name = '$\overrightarrow{champ}{3d}$';
+% ---
+tobj_ = findall(gca,'Type','text');
+for i = 1:length(tobj_)
+    if strcmpi(tobj_(i).String,'Champ3d')
+        return
+    end
+end
+% ---
 c3name = 'Champ3d';
 texpos = get(gca, 'OuterPosition');
 hold on;
-t = text(texpos(1),texpos(2)+1.00, c3name, ...
+t = text(0.01,texpos(2)+1.01, c3name, ...
      'FontSize',12, ...
      'FontWeight','bold',...
      'Interpreter','tex',...

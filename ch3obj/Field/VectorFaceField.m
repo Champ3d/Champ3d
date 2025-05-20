@@ -67,27 +67,25 @@ classdef VectorFaceField < FaceField
             % ---
             node_ = obj.parent_model.parent_mesh.node;
             face_ = obj.parent_model.parent_mesh.face(:,gid_face);
-            if isreal(obj.cvalue(gid_face(1:2)))
+            v_ = obj.cvalue(gid_face);
+            if isreal(v_)
                 f_patch('node',node_,'face',face_,'face_field',obj.cvalue(gid_face).');
             else
-                % ---
-                vnorm = f_norm(obj.cvalue(gid_face));
-                % ---
                 for i = 1:3
-                    % ---
                     subplot(130 + i);
                     if i == 1
                         title('Real part');
-                        f_patch('node',node_,'face',face_,'face_field',real(vnorm));
+                        v__ = TensorArray.norm(real(v_));
+                        f_patch('node',node_,'face',face_,'face_field',v__);
                     elseif i == 2
                         title('Imag part');
-                        f_patch('node',node_,'face',face_,'face_field',imag(vnorm));
+                        v__ = TensorArray.norm(imag(v_));
+                        f_patch('node',node_,'face',face_,'face_field',v__);
                     elseif i == 3
-                        title('Magnitude');
-                        % ---
-                        f_patch('node',node_,'face',face_,'face_field',abs(vnorm));
+                        title('Max');
+                        v__ = TensorArray.norm(TensorArray.maxvector(v_));
+                        f_patch('node',node_,'face',face_,'face_field',v__);
                     end
-                    % ---
                 end
             end
             

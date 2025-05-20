@@ -115,7 +115,7 @@ classdef Sibcjw < PhysicalDom
             % ---
             z_sibc = (1+1j)./(skindepth.*sigma_array) .* ...
                 (1 + (1-1j)/4 .* skindepth .* cparam_array);
-            z_sibc = TensorArray.scalar(z_sibc,'nb_elem',lnb_face);
+            z_sibc = TensorArray.tensor(z_sibc,'nb_elem',lnb_face);
             %--------------------------------------------------------------
             % local surface mesh
             submesh = dom.submesh;
@@ -219,8 +219,8 @@ classdef Sibcjw < PhysicalDom
             id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face;
             lnb_face = length(obj.dom.gid_face);
             % ---
-            sigma_array = TensorArray.scalar(obj.matrix.sigma_array,'nb_elem',lnb_face);
-            skindepth   = TensorArray.scalar(obj.matrix.skindepth,'nb_elem',lnb_face);
+            sigma_array = TensorArray.tensor(obj.matrix.sigma_array,'nb_elem',lnb_face);
+            skindepth   = TensorArray.tensor(obj.matrix.skindepth,'nb_elem',lnb_face);
             % ---
             es = sparse(2,lnb_face);
             js = sparse(2,lnb_face);

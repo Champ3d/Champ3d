@@ -137,7 +137,7 @@ classdef Mesh3d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbNo_inEl = refelem.nbNo_inEl;
@@ -213,7 +213,7 @@ classdef Mesh3d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbNo_inEl = refelem.nbNo_inEl;
@@ -292,7 +292,7 @@ classdef Mesh3d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbEd_inEl = refelem.nbEd_inEl;
@@ -406,7 +406,7 @@ classdef Mesh3d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbEd_inEl = refelem.nbEd_inEl;
@@ -526,7 +526,7 @@ classdef Mesh3d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbFa_inEl = refelem.nbFa_inEl;
@@ -642,10 +642,10 @@ classdef Mesh3d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
             %--------------------------------------------------------------
             if ~iscell(vector_field)
-                vector_field = f_column_format(vector_field);
+                vector_field = TensorArray.vector(vector_field);
             end
             %--------------------------------------------------------------
             refelem = obj.refelem;
@@ -680,9 +680,9 @@ classdef Mesh3d < Mesh
             %--------------------------------------------------------------
             coefwevf = zeros(nb_elem,nbEd_inEl);
             %--------------------------------------------------------------
-            vfx = cell(3,1);
-            vfy = cell(3,1);
-            vfz = cell(3,1);
+            vfx = cell(nbG,1);
+            vfy = cell(nbG,1);
+            vfz = cell(nbG,1);
             if ~iscell(vector_field)
                 for iG = 1:nbG
                     if numel(vector_field) == 3
@@ -788,10 +788,10 @@ classdef Mesh3d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
             %--------------------------------------------------------------
             if ~iscell(vector_field)
-                vector_field = f_column_format(vector_field);
+                vector_field = TensorArray.vector(vector_field);
             end
             %--------------------------------------------------------------
             refelem = obj.refelem;
@@ -826,9 +826,9 @@ classdef Mesh3d < Mesh
             %--------------------------------------------------------------
             coefwfvf = zeros(nb_elem,nbFa_inEl);
             %--------------------------------------------------------------
-            vfx = cell(3,1);
-            vfy = cell(3,1);
-            vfz = cell(3,1);
+            vfx = cell(nbG,1);
+            vfy = cell(nbG,1);
+            vfz = cell(nbG,1);
             if ~iscell(vector_field)
                 for iG = 1:nbG
                     if numel(vector_field) == 3
@@ -938,8 +938,8 @@ classdef Mesh3d < Mesh
                 error('dof must be defined in whole mesh !');
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
-            dof = f_column_format(dof);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
+            dof = TensorArray.tensor(dof);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbNo_inEl = refelem.nbNo_inEl;
@@ -990,7 +990,7 @@ classdef Mesh3d < Mesh
             %--------------------------------------------------------------
             scalar_field = cell(nbG,1);
             for i = 1:nbG
-                scalar_field{i} = sparse(1,nb_elem);
+                scalar_field{i} = sparse(nb_elem,1);
             end
             %--------------------------------------------------------------
             if any(f_strcmpi(coef_array_type,{'scalar'}))
@@ -1003,7 +1003,7 @@ classdef Mesh3d < Mesh
                         fi(:,1) = fi(:,1) + coefficient .* wi .* dof(id_node);
                     end
                     % ---
-                    scalar_field{iG}(1,id_elem) = fi.';
+                    scalar_field{iG}(id_elem,1) = fi;
                 end
                 % ---
                 if nbG == 1
@@ -1037,8 +1037,8 @@ classdef Mesh3d < Mesh
                 error('dof must be defined in whole mesh !');
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
-            dof = f_column_format(dof);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
+            dof = TensorArray.tensor(dof);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbEd_inEl = refelem.nbEd_inEl;
@@ -1089,7 +1089,7 @@ classdef Mesh3d < Mesh
             %--------------------------------------------------------------
             vector_field = cell(nbG,1);
             for i = 1:nbG
-                vector_field{i} = sparse(3,nb_elem);
+                vector_field{i} = sparse(nb_elem,3);
             end
             %--------------------------------------------------------------
             if any(f_strcmpi(coef_array_type,{'scalar'}))
@@ -1106,7 +1106,7 @@ classdef Mesh3d < Mesh
                         fi(:,3) = fi(:,3) + coefficient .* wiz .* dof(id_edge);
                     end
                     % ---
-                    vector_field{iG}(1:3,id_elem) = fi.';
+                    vector_field{iG}(id_elem,1:3) = fi;
                 end
                 % ---
                 if nbG == 1
@@ -1116,25 +1116,25 @@ classdef Mesh3d < Mesh
             elseif any(f_strcmpi(coef_array_type,{'tensor'}))
                 %----------------------------------------------------------
                 for iG = 1:nbG
-                    fi = zeros(3,length(id_elem));
+                    fi = zeros(length(id_elem),3);
                     %------------------------------------------------------
                     for i = 1:nbEd_inEl
                         wix = Wx{iG}(:,1,i);
                         wiy = Wx{iG}(:,2,i);
                         wiz = Wx{iG}(:,3,i);
                         id_edge = id_edge_in_elem(i,id_elem);
-                        fi(1,:) = fi(1,:) + (coefficient(:,1,1) .* wix + ...
-                            coefficient(:,1,2) .* wiy + ...
-                            coefficient(:,1,3) .* wiz) .* dof(id_edge) ;
-                        fi(2,:) = fi(2,:) + (coefficient(:,2,1) .* wix + ...
-                            coefficient(:,2,2) .* wiy + ...
-                            coefficient(:,2,3) .* wiz) .* dof(id_edge) ;
-                        fi(3,:) = fi(3,:) + (coefficient(:,3,1) .* wix + ...
-                            coefficient(:,3,2) .* wiy + ...
-                            coefficient(:,3,3) .* wiz) .* dof(id_edge) ;
+                        fi(:,1) = fi(:,1) + (coefficient(:,1,1) .* wix + ...
+                                             coefficient(:,1,2) .* wiy + ...
+                                             coefficient(:,1,3) .* wiz) .* dof(id_edge) ;
+                        fi(:,2) = fi(:,2) + (coefficient(:,2,1) .* wix + ...
+                                             coefficient(:,2,2) .* wiy + ...
+                                             coefficient(:,2,3) .* wiz) .* dof(id_edge) ;
+                        fi(:,3) = fi(:,3) + (coefficient(:,3,1) .* wix + ...
+                                             coefficient(:,3,2) .* wiy + ...
+                                             coefficient(:,3,3) .* wiz) .* dof(id_edge) ;
                     end
                     % ---
-                    vector_field{iG}(1:3,id_elem) = fi.';
+                    vector_field{iG}(id_elem,1:3) = fi;
                 end
                 % ---
                 if nbG == 1
@@ -1168,8 +1168,8 @@ classdef Mesh3d < Mesh
                 error('dof must be defined in whole mesh !');
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
-            dof = f_column_format(dof);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
+            dof = TensorArray.tensor(dof);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbFa_inEl = refelem.nbFa_inEl;
@@ -1220,7 +1220,7 @@ classdef Mesh3d < Mesh
             %--------------------------------------------------------------
             vector_field = cell(nbG,1);
             for i = 1:nbG
-                vector_field{i} = sparse(3,nb_elem);
+                vector_field{i} = sparse(nb_elem,3);
             end
             %--------------------------------------------------------------
             if any(f_strcmpi(coef_array_type,{'scalar'}))
@@ -1237,7 +1237,7 @@ classdef Mesh3d < Mesh
                         fi(:,3) = fi(:,3) + coefficient .* wiz .* dof(id_face);
                     end
                     % ---
-                    vector_field{iG}(1:3,id_elem) = fi.';
+                    vector_field{iG}(id_elem,1:3) = fi;
                 end
                 % ---
                 if nbG == 1
@@ -1247,25 +1247,25 @@ classdef Mesh3d < Mesh
             elseif any(f_strcmpi(coef_array_type,{'tensor'}))
                 %----------------------------------------------------------
                 for iG = 1:nbG
-                    fi = zeros(3,length(id_elem));
+                    fi = zeros(length(id_elem),3);
                     %------------------------------------------------------
                     for i = 1:nbFa_inEl
-                        wix = Wx(:,1,i);
-                        wiy = Wx(:,2,i);
-                        wiz = Wx(:,3,i);
+                        wix = Wx{iG}(:,1,i);
+                        wiy = Wx{iG}(:,2,i);
+                        wiz = Wx{iG}(:,3,i);
                         id_face = id_face_in_elem(i,id_elem);
-                        fi(1,:) = fi(1,:) + (coefficient(:,1,1) .* wix + ...
-                            coefficient(:,1,2) .* wiy + ...
-                            coefficient(:,1,3) .* wiz) .* dof(id_face) ;
-                        fi(2,:) = fi(2,:) + (coefficient(:,2,1) .* wix + ...
-                            coefficient(:,2,2) .* wiy + ...
-                            coefficient(:,2,3) .* wiz) .* dof(id_face) ;
-                        fi(3,:) = fi(3,:) + (coefficient(:,3,1) .* wix + ...
-                            coefficient(:,3,2) .* wiy + ...
-                            coefficient(:,3,3) .* wiz) .* dof(id_face) ;
+                        fi(:,1) = fi(:,1) + (coefficient(:,1,1) .* wix + ...
+                                             coefficient(:,1,2) .* wiy + ...
+                                             coefficient(:,1,3) .* wiz) .* dof(id_face) ;
+                        fi(:,2) = fi(:,2) + (coefficient(:,2,1) .* wix + ...
+                                             coefficient(:,2,2) .* wiy + ...
+                                             coefficient(:,2,3) .* wiz) .* dof(id_face) ;
+                        fi(:,3) = fi(:,3) + (coefficient(:,3,1) .* wix + ...
+                                             coefficient(:,3,2) .* wiy + ...
+                                             coefficient(:,3,3) .* wiz) .* dof(id_face) ;
                     end
                     % ---
-                    vector_field{iG}(1:3,id_elem) = fi.';
+                    vector_field{iG}(id_elem,1:3) = fi;
                 end
                 % ---
                 if nbG == 1

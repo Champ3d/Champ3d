@@ -41,6 +41,7 @@ classdef TensorParameter < Parameter
             obj = obj@Parameter;
             % ---
             if isnumeric(args.f)
+                s = size(args.f);
                 if ~isequal(s,[2 2]) && ~isequal(s,[3 3])
                     error('input is not a tensor !');
                 end

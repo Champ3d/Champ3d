@@ -55,7 +55,7 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
             id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face;
             lnb_face = length(dom.gid_face);
             % ---
-            val = zeros(3,lnb_face);
+            val = zeros(lnb_face,3);
             %--------------------------------------------------------------
             submesh = dom.submesh;
             for k = 1:length(submesh)
@@ -72,8 +72,8 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
                     dofe = obj.dof.value(id_edge_in_face(1:4,gid_face)).';
                 end
                 %----------------------------------------------------------
-                val(1,lid_face) = val(1,lid_face) + sum(squeeze(cWes(:,1,:)) .* dofe,2).';
-                val(2,lid_face) = val(2,lid_face) + sum(squeeze(cWes(:,2,:)) .* dofe,2).';
+                val(lid_face,1) = val(lid_face,2) + sum(squeeze(cWes(:,1,:)) .* dofe,2);
+                val(lid_face,2) = val(lid_face,2) + sum(squeeze(cWes(:,2,:)) .* dofe,2);
                 %----------------------------------------------------------
             end
             %--------------------------------------------------------------
@@ -95,7 +95,7 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
             % ---
             nbNodeI = submesh{1}.refelem.nbI;
             for i = 1:nbNodeI
-                val{i} = zeros(3,lnb_face);
+                val{i} = zeros(lnb_face,2);
             end
             % ---
             for k = 1:length(submesh)
@@ -116,17 +116,15 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
                 end
                 % ---
                 for m = 1:nbNodeI
-                    vi = zeros(length(lid_face),3);
+                    vi = zeros(length(lid_face),2);
                     for l = 1:sm.refelem.nbEd_inEl
                         wix = Wx{m}(:,1,l);
                         wiy = Wx{m}(:,2,l);
-                        % wiz = Wx{m}(:,3,l);
                         vi(:,1) = vi(:,1) + wix .* dof_(:,l);
                         vi(:,2) = vi(:,2) + wiy .* dof_(:,l);
-                        % vi(:,3) = vi(:,3) + coefficient .* wiz .* dof_(id_edge);
                     end
                     % ---
-                    val{m}(:,lid_face) = vi.';
+                    val{m}(lid_face,:) = vi;
                 end
             end
             %--------------------------------------------------------------
