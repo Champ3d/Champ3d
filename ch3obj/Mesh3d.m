@@ -137,7 +137,7 @@ classdef Mesh3d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbNo_inEl = refelem.nbNo_inEl;
@@ -213,7 +213,7 @@ classdef Mesh3d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbNo_inEl = refelem.nbNo_inEl;
@@ -292,7 +292,7 @@ classdef Mesh3d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbEd_inEl = refelem.nbEd_inEl;
@@ -406,7 +406,7 @@ classdef Mesh3d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbEd_inEl = refelem.nbEd_inEl;
@@ -526,7 +526,7 @@ classdef Mesh3d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbFa_inEl = refelem.nbFa_inEl;
@@ -642,10 +642,10 @@ classdef Mesh3d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
             %--------------------------------------------------------------
             if ~iscell(vector_field)
-                vector_field = f_column_format(vector_field);
+                vector_field = TensorArray.vector(vector_field);
             end
             %--------------------------------------------------------------
             refelem = obj.refelem;
@@ -788,10 +788,10 @@ classdef Mesh3d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
             %--------------------------------------------------------------
             if ~iscell(vector_field)
-                vector_field = f_column_format(vector_field);
+                vector_field = TensorArray.vector(vector_field);
             end
             %--------------------------------------------------------------
             refelem = obj.refelem;
@@ -938,8 +938,8 @@ classdef Mesh3d < Mesh
                 error('dof must be defined in whole mesh !');
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
-            dof = f_column_format(dof);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
+            dof = TensorArray.tensor(dof);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbNo_inEl = refelem.nbNo_inEl;
@@ -1037,8 +1037,8 @@ classdef Mesh3d < Mesh
                 error('dof must be defined in whole mesh !');
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
-            dof = f_column_format(dof);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
+            dof = TensorArray.tensor(dof);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbEd_inEl = refelem.nbEd_inEl;
@@ -1168,8 +1168,8 @@ classdef Mesh3d < Mesh
                 error('dof must be defined in whole mesh !');
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = f_column_format(coefficient);
-            dof = f_column_format(dof);
+            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
+            dof = TensorArray.tensor(dof);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbFa_inEl = refelem.nbFa_inEl;

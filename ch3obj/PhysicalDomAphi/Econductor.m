@@ -176,7 +176,7 @@ classdef Econductor < PhysicalDom
             gid_elem = obj.matrix.gid_elem;
             sigma_array = obj.matrix.sigma_array;
             %--------------------------------------------------------------
-            [coef, coef_array_type] = f_column_format(sigma_array);
+            [coef, coef_array_type] = TensorArray.tensor(sigma_array);
             %--------------------------------------------------------------
             ev = obj.parent_model.field.ev(:,gid_elem);
             jv = zeros(3,length(gid_elem));

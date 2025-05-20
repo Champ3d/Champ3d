@@ -92,7 +92,7 @@ classdef LVector < Xhandle
                         if any(f_strcmpi(fn,{'main_dir','rot_axis'}))
                             lvfield = TensorArray.vector(lvfield,'nb_elem',nb_elem);
                         else
-                            lvfield = TensorArray.scalar(lvfield,'nb_elem',nb_elem);
+                            lvfield = TensorArray.tensor(lvfield,'nb_elem',nb_elem);
                         end
                         lvector.(fn) = lvfield;
                     elseif isa(lvfield,'Parameter')
@@ -105,15 +105,15 @@ classdef LVector < Xhandle
                 end
             end
             % --- normalize
-            lvector.main_dir = f_normalize(lvector.main_dir);
+            lvector.main_dir = TensorArray.normalize(lvector.main_dir);
             % ---
             if ~isempty(obj.rot_axis) && ~isempty(obj.rot_angle)
                 for i = 1:nb_elem
                     % ---
-                    raxis = lvector.rot_axis(:,i) ./ norm(lvector.rot_axis(:,i));
+                    raxis = lvector.rot_axis(i,:)./norm(lvector.rot_axis(i,:));
                     a = lvector.rot_angle(i);
                     %------------------------------------------------------
-                    lvector.main_dir(:,i) = obj.rotaroundaxis(lvector.main_dir(:,i),raxis,a);
+                    lvector.main_dir(i,:) = obj.rotaroundaxis(lvector.main_dir(i,:),raxis,a);
                     %------------------------------------------------------
                 end
             end
@@ -150,12 +150,13 @@ classdef LVector < Xhandle
                       uy*ux*(1-cos(a)) + uz*sin(a)  cos(a) + uy^2 * (1-cos(a))     uy*uz*(1-cos(a)) - ux*sin(a) ;...
                       uz*ux*(1-cos(a)) - uy*sin(a)  uz*uy*(1-cos(a)) + ux*sin(a)   cos(a) + uz^2 * (1-cos(a))];
             elseif dim == 2
-                ux = rot_axis_(1); uy = rot_axis_(2);
+                ux = rot_axis(1); uy = rot_axis(2);
                 R  = [cos(a) + ux^2 * (1-cos(a))    ux*uy*(1-cos(a)) ; ...
                       uy*ux*(1-cos(a))              cos(a) + uy^2 * (1-cos(a))];
             end
             % ---
-            vrot = R * v;
+            vrot = R * v.';
+            vrot = vrot.';
         end
         % -----------------------------------------------------------------
     end

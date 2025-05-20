@@ -44,23 +44,6 @@ classdef TensorArray < Xhandle
     % --- Utilily Methods
     methods (Static)
         %-------------------------------------------------------------------
-        function [sarray, array_type] = scalar(array,args)
-            arguments
-                array
-                args.nb_elem = 1;
-            end
-            % ---
-            nb_elem = args.nb_elem;
-            % ---
-            if numel(array) == 1
-                sarray = repmat(array,[1,nb_elem]);
-            else
-                sarray = f_torowv(array);
-            end
-            % ---
-            array_type = 'scalar';
-        end
-        %-------------------------------------------------------------------
         function [varray, array_type] = vector(array,args)
             arguments
                 array
@@ -68,6 +51,7 @@ classdef TensorArray < Xhandle
             end
             % ---
             nb_elem = args.nb_elem;
+            array = squeeze(array); % !!!
             % ---
             s = size(array);
             if length(s) >= 3
@@ -76,16 +60,16 @@ classdef TensorArray < Xhandle
             % ---
             if isequal(s,[1 2]) || isequal(s,[2 1]) || ...
                isequal(s,[1 3]) || isequal(s,[3 1])
-                array = f_tocolv(array);
-                varray = repmat(array,[1,nb_elem]);
+                array = f_torowv(array);
+                varray = repmat(array,[nb_elem,1]);
             elseif isequal(s,[2 2]) || isequal(s,[3 3])
-                f_fprintf(1,'/!\\',0,'vector-array input understood as [dim x n] \n');
+                f_fprintf(1,'/!\\',0,'vector-array input understood as [n x dim] \n');
                 varray = array;
             elseif s(1) < s(2) && s(1) <= 3
-                varray = array;
-            elseif s(2) < s(1) && s(2) <= 3
-                f_fprintf(1,'/!\\',0,'vector-array input understood as [n x dim] --> output [dim x n] \n');
+                f_fprintf(1,'/!\\',0,'vector-array input understood as [dim x n] --> output [n x dim] \n');
                 varray = permute(array,[2 1]);
+            elseif s(2) < s(1) && s(2) <= 3
+                varray = array;
             else
                 error('#array is not a vector array !');
             end
@@ -100,56 +84,91 @@ classdef TensorArray < Xhandle
             end
             % ---
             nb_elem = args.nb_elem;
+            array = squeeze(array); % !!!
             % ---
             s = size(array);
             if length(s) >= 4
-                error('#array is not a tensor array !');
+                error('#array is not a scalar/tensor array !');
             end
             % ---
-            if isequal(s,[2 2]) || isequal(s,[3 3])
-                tarray = permute(reshape(repmat(array,[1,nb_elem]),[s nb_elem]),[3 1 2]);
-            elseif isequal(s,[2 2 2]) || isequal(s,[3 3 3])
-                f_fprintf(1,'/!\\',0,'tensor input array understood as [n x dim x dim] \n');
-                tarray = array;
-            elseif s(1) == s(2)
-                f_fprintf(1,'/!\\',0,'tensor input array understood as [dim x dim x n] --> output [n x dim x dim] \n');
-                tarray = permute(array,[3 1 2]);
-            elseif s(1) == s(3)
-                f_fprintf(1,'/!\\',0,'tensor input array understood as [dim x n x dim] --> output [n x dim x dim] \n');
-                tarray = permute(array,[2 1 3]);
-            elseif s(2) == s(3)
-                tarray = array;
+            if length(s) == 2 && min(s) == 1
+                if numel(array) == 1
+                    tarray = repmat(array,[nb_elem,1]);
+                    array_type = 'scalar';
+                else
+                    tarray = f_tocolv(array);
+                    array_type = 'scalar';
+                end
             else
-                error('#array is not a tensor array !');
+                if isequal(s,[2 2]) || isequal(s,[3 3])
+                    tarray = permute(reshape(repmat(array,[1,nb_elem]),[s nb_elem]),[3 1 2]);
+                    array_type = 'tensor';
+                elseif isequal(s,[2 2 2]) || isequal(s,[3 3 3])
+                    f_fprintf(1,'/!\\',0,'tensor input array understood as [n x dim x dim] \n');
+                    tarray = array;
+                    array_type = 'tensor';
+                elseif s(1) == s(2) && s(1) <= 3
+                    f_fprintf(1,'/!\\',0,'tensor input array understood as [dim x dim x n] --> output [n x dim x dim] \n');
+                    tarray = permute(array,[3 1 2]);
+                    array_type = 'tensor';
+                elseif s(1) == s(3) && s(1) <= 3
+                    f_fprintf(1,'/!\\',0,'tensor input array understood as [dim x n x dim] --> output [n x dim x dim] \n');
+                    tarray = permute(array,[2 1 3]);
+                    array_type = 'tensor';
+                elseif s(2) == s(3) && s(2) <= 3
+                    tarray = array;
+                    array_type = 'tensor';
+                else
+                    error('#array is not a scalar/tensor array !');
+                end
             end
-            % ---
-            array_type = 'tensor';
         end
         %-------------------------------------------------------------------
-        function [autoarray, array_type] = autoformat(array,nb_elem)
-            arguments
-                array
-                nb_elem = []
-            end
+        function varray = normalize(vector_array)
+            varray = TensorArray.vector(vector_array);
             % ---
-            if isempty(nb_elem)
-                
+            VM = sqrt(sum(varray.^2, 2)); % 2-position !!
+            varray = varray ./ VM;
+            varray(:,VM <= eps) = 0;
+        end
+        %-------------------------------------------------------------------
+        function vnorm = norm(vector_array)
+            varray = TensorArray.vector(vector_array);
+            % ---
+            if isreal(varray)
+                vnorm = sqrt(sum(varray.^2, 2)); % 2-position !!
+                vnorm(abs(vnorm) <= eps) = 0;
             else
-                
+                f_fprintf(1,'/!\\',0,'norm undefined for complex vector ! consider max or complex2time \n');
+                error('undefined norm for complex vector !');
             end
         end
         %-------------------------------------------------------------------
-        function array_type = get_arraytype(array,nb_elem)
-            arguments
-                array
-                nb_elem = []
+        function vtime = max(vector_array)
+            varray = TensorArray.vector(vector_array);
+            % ---
+            if isreal(varray)
+                vtime = varray;
             end
             % ---
-            if isempty(nb_elem)
-                
-            else
-                
+        end
+        %-------------------------------------------------------------------
+        function vtime = complex2time(vector_array,frequency,t)
+            arguments
+                vector_array
+                frequency = 1
+                t = 0
             end
+            varray = TensorArray.vector(vector_array);
+            % ---
+            if isreal(varray)
+                vtime = varray;
+            else
+                mag = abs(varray);
+                ang = angle(varray);
+                vtime = mag .* cos(2*pi*frequency*t + ang);
+            end
+            % ---
         end
         %-------------------------------------------------------------------
         function tarray = fullformat(array,nb_elem)
@@ -162,7 +181,7 @@ classdef TensorArray < Xhandle
 
             end
             % ---
-            array_type = f_arraytype(array);
+            array_type = TensorArray.arraytype(array);
             tarray = zeros(lent,3,3);
             switch array_type
                 case 'scalar'
@@ -173,6 +192,19 @@ classdef TensorArray < Xhandle
                     tarray = obj.parameter_array;
             end
             % ---
+        end
+        %-------------------------------------------------------------------
+        function array_type = arraytype(array)
+            arguments
+                array
+                nb_elem = []
+            end
+            % ---
+            if isempty(nb_elem)
+                
+            else
+                
+            end
         end
         %-------------------------------------------------------------------
     end
