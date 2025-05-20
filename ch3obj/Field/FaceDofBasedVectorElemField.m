@@ -52,7 +52,7 @@ classdef FaceDofBasedVectorElemField < VectorElemField
             % ---
             val = obj.parent_model.parent_mesh.field_wf('dof',obj.dof.value,...
                   'on','center','id_elem',id_elem);
-            val = val(:,id_elem);
+            val = val(id_elem,:);
         end
         % -----------------------------------------------------------------
         function val = ivalue(obj,id_elem)
@@ -66,7 +66,7 @@ classdef FaceDofBasedVectorElemField < VectorElemField
             % ---
             if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
                 for i = 1:length(val)
-                    val{i} = val{i}(:,id_elem);
+                    val{i} = val{i}(id_elem,:);
                 end
             end
             % ---
@@ -84,7 +84,7 @@ classdef FaceDofBasedVectorElemField < VectorElemField
             % ---
             if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
                 for i = 1:length(val)
-                    val{i} = val{i}(:,id_elem);
+                    val{i} = val{i}(id_elem,:);
                 end
             end
             % ---

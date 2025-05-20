@@ -32,7 +32,7 @@ classdef ElemField < Xhandle
                 id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
             end
             % ---
-            val = obj.parent_model.parent_mesh.celem(:,id_elem);
+            val = obj.parent_model.parent_mesh.celem(:,id_elem).';
         end
         % -----------------------------------------------------------------
         function val = inode(obj,id_elem)

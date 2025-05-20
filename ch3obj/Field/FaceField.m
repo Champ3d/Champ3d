@@ -32,7 +32,7 @@ classdef FaceField < Xhandle
                 id_face = 1:obj.parent_model.parent_mesh.nb_face;
             end
             % ---
-            val = obj.parent_model.parent_mesh.cface(:,id_face);
+            val = obj.parent_model.parent_mesh.cface(:,id_face).';
         end
         % -----------------------------------------------------------------
         function val = inode(obj,id_face)

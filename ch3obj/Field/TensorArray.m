@@ -129,7 +129,7 @@ classdef TensorArray < Xhandle
             % ---
             VM = sqrt(sum(varray.^2, 2)); % 2-position !!
             varray = varray ./ VM;
-            varray(:,VM <= eps) = 0;
+            varray(VM <= eps,:) = 0;
         end
         %-------------------------------------------------------------------
         function vnorm = norm(vector_array)

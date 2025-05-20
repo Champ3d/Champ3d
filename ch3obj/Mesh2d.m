@@ -807,7 +807,7 @@ classdef Mesh2d < Mesh
             %--------------------------------------------------------------
             scalar_field = cell(nbG,1);
             for i = 1:nbG
-                scalar_field{i} = sparse(1,nb_elem);
+                scalar_field{i} = sparse(nb_elem,1);
             end
             %--------------------------------------------------------------
             if any(f_strcmpi(coef_array_type,{'scalar'}))
@@ -820,7 +820,7 @@ classdef Mesh2d < Mesh
                         fi(:,1) = fi(:,1) + coefficient .* wi .* dof(id_node);
                     end
                     % ---
-                    scalar_field{iG}(1,id_elem) = fi.';
+                    scalar_field{iG}(id_elem,1) = fi;
                 end
                 % ---
                 if nbG == 1
@@ -906,7 +906,7 @@ classdef Mesh2d < Mesh
             %--------------------------------------------------------------
             vector_field = cell(nbG,1);
             for i = 1:nbG
-                vector_field{i} = sparse(2,nb_elem);
+                vector_field{i} = sparse(nb_elem,2);
             end
             %--------------------------------------------------------------
             if any(f_strcmpi(coef_array_type,{'scalar'}))
@@ -921,7 +921,7 @@ classdef Mesh2d < Mesh
                         fi(:,2) = fi(:,2) + coefficient .* wiy .* dof(id_edge);
                     end
                     % ---
-                    vector_field{iG}(1:2,id_elem) = fi.';
+                    vector_field{iG}(id_elem,1:2) = fi;
                 end
                 % ---
                 if nbG == 1
@@ -943,7 +943,7 @@ classdef Mesh2d < Mesh
                                              coefficient(:,2,2) .* wiy) .* dof(id_edge) ;
                     end
                     % ---
-                    vector_field{iG}(1:2,id_elem) = fi.';
+                    vector_field{iG}(id_elem,1:2) = fi;
                 end
                 % ---
                 if nbG == 1
@@ -1029,7 +1029,7 @@ classdef Mesh2d < Mesh
             %--------------------------------------------------------------
             vector_field = cell(nbG,1);
             for i = 1:nbG
-                vector_field{i} = sparse(2,nb_elem);
+                vector_field{i} = sparse(nb_elem,2);
             end
             %--------------------------------------------------------------
             if any(f_strcmpi(coef_array_type,{'scalar'}))
@@ -1044,7 +1044,7 @@ classdef Mesh2d < Mesh
                         fi(:,2) = fi(:,2) + coefficient .* wiy .* dof(id_face);
                     end
                     % ---
-                    vector_field{iG}(1:2,id_elem) = fi.';
+                    vector_field{iG}(id_elem,1:2) = fi;
                 end
                 % ---
                 if nbG == 1
@@ -1066,7 +1066,7 @@ classdef Mesh2d < Mesh
                                              coefficient(:,2,2) .* wiy) .* dof(id_face) ;
                     end
                     % ---
-                    vector_field{iG}(1:2,id_elem) = fi.';
+                    vector_field{iG}(id_elem,1:2) = fi;
                 end
                 % ---
                 if nbG == 1
