@@ -50,6 +50,11 @@ classdef EdgeDofBasedVectorElemField < VectorElemField
                 id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
             end
             % ---
+            if isempty(id_elem)
+                val = [];
+                return
+            end
+            % ---
             val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,...
                   'on','center','id_elem',id_elem);
             val = val(id_elem,:);
@@ -59,6 +64,11 @@ classdef EdgeDofBasedVectorElemField < VectorElemField
             % ---
             if nargin <= 1
                 id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+            end
+            % ---
+            if isempty(id_elem)
+                val = [];
+                return
             end
             % ---
             val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,...
@@ -76,6 +86,11 @@ classdef EdgeDofBasedVectorElemField < VectorElemField
             % ---
             if nargin <= 1
                 id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+            end
+            % ---
+            if isempty(id_elem)
+                val = [];
+                return
             end
             % ---
             val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,...

@@ -211,7 +211,7 @@ classdef Sibcjw < PhysicalDom
                 unique([obj.parent_model.matrix.id_node_phi, obj.matrix.gid_node_phi]);
             %--------------------------------------------------------------
             it = obj.parent_model.ltime.it;
-            obj.field{it}.J.face.sibc.(obj.id).sigma = obj.tarray{it}.sigma;
+            obj.parent_model.field{it}.J.face.sibc.(obj.id).sigma = obj.tarray{it}.sigma;
             %--------------------------------------------------------------
         end
     end

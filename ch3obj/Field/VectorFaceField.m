@@ -23,7 +23,55 @@ classdef VectorFaceField < FaceField
             obj = obj@FaceField;
         end
     end
-    % --- plot - XTODO
+    % --- Utility Methods
+    methods
+        % -----------------------------------------------------------------
+        function Vout = cmultiply(obj,tensor_array,gid_face)
+            arguments
+                obj
+                tensor_array
+                gid_face = []
+            end
+            % ---
+            if nargin <= 2
+                gid_face = 1:obj.parent_model.parent_mesh.nb_face;
+            end
+            % ---
+            if isa(tensor_array,'TensorArray')
+                % ---
+                [gid_face, ~, lid_face] = intersect(gid_face,tensor_array.parent_dom.gid_face);
+                % ---
+                Vin = obj.cvalue(gid_face);
+                T = tensor_array.getvalue(lid_face);
+                array_type = tensor_array.type;
+            elseif isnumeric(tensor_array)
+                Vin = obj.cvalue(gid_face);
+                [T, array_type] = Array.tensor(tensor_array);
+            end
+            % ---
+            if isempty(T)
+                Vout = [];
+                return
+            end
+            % ---
+            if strcmpi(array_type,'scalar')
+                Vout = T .* Vin;
+            elseif strcmpi(array_type,'tensor')
+                Vout(:,1) = T(:,1,1) .* Vin(:,1) + ...
+                            T(:,1,2) .* Vin(:,2) + ...
+                            T(:,1,3) .* Vin(:,3);
+                Vout(:,2) = T(:,2,1) .* Vin(:,1) + ...
+                            T(:,2,2) .* Vin(:,2) + ...
+                            T(:,2,3) .* Vin(:,3);
+                Vout(:,3) = T(:,3,1) .* Vin(:,1) + ...
+                            T(:,3,2) .* Vin(:,2) + ...
+                            T(:,3,3) .* Vin(:,3);
+            end
+            % ---
+        end
+        % -----------------------------------------------------------------
+    end
+    % --- plot
     methods
         % -----------------------------------------------------------------
         function plot(obj,args)
@@ -88,7 +136,6 @@ classdef VectorFaceField < FaceField
                     end
                 end
             end
-            
         end
     end
 end

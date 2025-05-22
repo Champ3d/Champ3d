@@ -165,7 +165,7 @@ classdef Econductor < PhysicalDom
                 unique([obj.parent_model.matrix.id_node_phi, obj.matrix.gid_node_phi]);
             %--------------------------------------------------------------
             it = obj.parent_model.ltime.it;
-            obj.field{it}.J.elem.econductor.(obj.id).sigma = obj.tarray{it}.sigma;
+            obj.parent_model.field{it}.J.elem.econductor.(obj.id).sigma = obj.tarray{it}.sigma;
             %--------------------------------------------------------------
         end
     end

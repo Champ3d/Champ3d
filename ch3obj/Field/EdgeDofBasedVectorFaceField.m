@@ -50,6 +50,11 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
                 id_face = 1:obj.parent_model.parent_mesh.nb_face;
             end
             % ---
+            if isempty(id_face)
+                val = [];
+                return
+            end
+            % ---
             dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gid_face',id_face);
             % ---
             id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face;
@@ -85,6 +90,11 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
             % ---
             if nargin <= 1
                 id_face = 1:obj.parent_model.parent_mesh.nb_face;
+            end
+            % ---
+            if isempty(id_face)
+                val = [];
+                return
             end
             % ---
             dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gid_face',id_face);

@@ -26,27 +26,41 @@ classdef VectorElemField < ElemField
     % --- Utility Methods
     methods
         % -----------------------------------------------------------------
-        function cmultiply(obj,tensor_array,gid_elem)
+        function Vout = cmultiply(obj,tensor_array,gid_elem)
             arguments
                 obj
                 tensor_array
                 gid_elem = []
             end
             % ---
+            if nargin <= 2
+                gid_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+            end
+            % ---
             if isa(tensor_array,'TensorArray')
                 % ---
-                if isempty(gid_elem)
-                    gid_elem = tensor_array.parent_dom.gid_elem;
-                else
-                    [gid_elem, ~, lid_elem] = intersect(gid_elem,tensor_array.parent_dom.gid_elem);
-                end
+                [gid_elem, ~, lid_elem] = intersect(gid_elem,tensor_array.parent_dom.gid_elem);
                 % ---
-                V = obj.cvalue(gid_elem);
-                T = tensor_array.value;
-                % ---
-                
+                Vin = obj.cvalue(gid_elem);
+                T = tensor_array.getvalue(lid_elem);
+                array_type = tensor_array.type;
             elseif isnumeric(tensor_array)
-                
+                Vin = obj.cvalue(gid_elem);
+                [T, array_type] = Array.tensor(tensor_array);
+            end
+            % ---
+            if strcmpi(array_type,'scalar')
+                Vout = T .* Vin;
+            elseif strcmpi(array_type,'tensor')
+                Vout(:,1) = T(:,1,1) .* Vin(:,1) + ...
+                            T(:,1,2) .* Vin(:,2) + ...
+                            T(:,1,3) .* Vin(:,3);
+                Vout(:,2) = T(:,2,1) .* Vin(:,1) + ...
+                            T(:,2,2) .* Vin(:,2) + ...
+                            T(:,2,3) .* Vin(:,3);
+                Vout(:,3) = T(:,3,1) .* Vin(:,1) + ...
+                            T(:,3,2) .* Vin(:,2) + ...
+                            T(:,3,3) .* Vin(:,3);
             end
             % ---
         end

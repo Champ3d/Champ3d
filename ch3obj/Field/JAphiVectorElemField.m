@@ -51,64 +51,32 @@ classdef JAphiVectorElemField < VectorElemField
                 id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
             end
             % ---
-            val = zeros(3,length(id_elem));
+            if isempty(id_elem)
+                val = [];
+                return
+            end
             % ---
-            id_phydom__ = {};
+            val = zeros(length(id_elem),3);
+            % ---
             if ~isempty(obj.econductor)
-                id_phydom__ = fieldnames(obj.econductor);
+                id_phydom_ = fieldnames(obj.econductor);
+                % ---
+                for iec = 1:length(id_phydom_)
+                    tarray = obj.econductor.(id_phydom_{iec}).sigma;
+                    % ---
+                    [gid_elem,lid_elem] = intersect(id_elem,tarray.parent_dom.gid_elem);
+                    val(lid_elem,:) = obj.Efield.cmultiply(tarray,gid_elem);
+                end
             end
-            % ---
-            for iec = 1:length(id_phydom__)
-                id_phydom = id_phydom__{iec};
-                % ---
-                phydom = obj.econductor.(id_phydom).sigma.parent_dom;
-                % ---
-                [gid_elem, ~, lid_elem] = intersect(id_elem,phydom.gid_elem);
-                lid_elem = phydom.gid_elem(lid_elem);
-                % ---
-                sigma_array = obj.econductor.(id_phydom).sigma.value(lid_elem);
-                E = obj.Efield.cvalue(gid_elem);
-                % val = 
-            end
-            % ---
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.Efield.value,...
-                  'on','center','id_elem',id_elem);
-            val = val(:,id_elem);
             % ---
         end
         % -----------------------------------------------------------------
         function val = ivalue(obj,id_elem)
-            % ---
-            if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
-            end
-            % ---
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.Efield.value,...
-                  'on','interpolation_points','id_elem',id_elem);
-            % ---
-            if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
-                for i = 1:length(val)
-                    val{i} = val{i}(:,id_elem);
-                end
-            end
-            % ---
+            
         end
         % -----------------------------------------------------------------
         function val = gvalue(obj,id_elem)
-            % ---
-            if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
-            end
-            % ---
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.Efield.value,...
-                  'on','gauss_points','id_elem',id_elem);
-            % ---
-            if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
-                for i = 1:length(val)
-                    val{i} = val{i}(:,id_elem);
-                end
-            end
-            % ---
+            
         end
         % -----------------------------------------------------------------
     end

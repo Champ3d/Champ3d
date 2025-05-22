@@ -107,36 +107,4 @@ classdef Array < Xhandle
         end
         %-------------------------------------------------------------------
     end
-
-    % --- obj's methods
-    methods
-        %-------------------------------------------------------------------
-        function type(obj)
-            
-        end
-        %-------------------------------------------------------------------
-        function tarray = fullformat(obj,nb_elem)
-            arguments
-                obj
-                nb_elem
-            end
-            % ---
-            if mod(nb_elem)
-                
-            end
-            % ---
-            array_type = obj.type;
-            tarray = zeros(lent,3,3);
-            switch array_type
-                case 'scalar'
-                    tarray(:,1,1) = repmat(obj.value,[]);
-                case 'vector'
-                    tarray(:,:,1) = obj.value;
-                case 'tensor'
-                    tarray = obj.value;
-            end
-            % ---
-        end
-        %-------------------------------------------------------------------
-    end
 end

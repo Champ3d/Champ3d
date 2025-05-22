@@ -48,6 +48,11 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
                 id_face = 1:obj.parent_model.parent_mesh.nb_face;
             end
             % ---
+            if isempty(id_face)
+                val = [];
+                return
+            end
+            % ---
             val = zeros(length(id_face),1);
             [grface,lid_face,face_elem_type] = f_filterface(obj.parent_model.parent_mesh.face(:,id_face));
             % ---
@@ -69,6 +74,11 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
             % ---
             if nargin <= 1
                 id_face = 1:obj.parent_model.parent_mesh.nb_face;
+            end
+            % ---
+            if isempty(id_face)
+                val = [];
+                return
             end
             % ---
             face_ = obj.parent_model.parent_mesh.face;
@@ -118,6 +128,11 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
             % ---
             if nargin <= 1
                 id_face = 1:obj.parent_model.parent_mesh.nb_face;
+            end
+            % ---
+            if isempty(id_face)
+                val = [];
+                return
             end
             % ---
             face_ = obj.parent_model.parent_mesh.face;

@@ -52,6 +52,11 @@ classdef NodeDofBasedScalarElemField < ScalarElemField
                 id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
             end
             % ---
+            if isempty(id_elem)
+                val = [];
+                return
+            end
+            % ---
             val = obj.parent_model.parent_mesh.field_wn('dof',obj.dof.value,...
                   'on','center','id_elem',id_elem);
             val = val(id_elem) + obj.reference_potential;
@@ -61,6 +66,11 @@ classdef NodeDofBasedScalarElemField < ScalarElemField
             % ---
             if nargin <= 1
                 id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+            end
+            % ---
+            if isempty(id_elem)
+                val = [];
+                return
             end
             % ---
             val = obj.parent_model.parent_mesh.field_wn('dof',obj.dof.value,...
@@ -82,6 +92,11 @@ classdef NodeDofBasedScalarElemField < ScalarElemField
             % ---
             if nargin <= 1
                 id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+            end
+            % ---
+            if isempty(id_elem)
+                val = [];
+                return
             end
             % ---
             val = obj.parent_model.parent_mesh.field_wn('dof',obj.dof.value,...

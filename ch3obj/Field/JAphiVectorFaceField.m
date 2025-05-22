@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef JAphiVectorFaceField < VectorElemField
+classdef JAphiVectorFaceField < VectorFaceField
     properties
         parent_model
         sibc
@@ -27,10 +27,10 @@ classdef JAphiVectorFaceField < VectorElemField
         function obj = JAphiVectorFaceField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
-                args.Efield {mustBeA(args.Efield,'EdgeDofBasedVectorElemField')}
+                args.Efield {mustBeA(args.Efield,'EdgeDofBasedVectorFaceField')}
             end
             % ---
-            obj = obj@VectorElemField;
+            obj = obj@VectorFaceField;
             % ---
             if nargin >1
                 if ~isfield(args,'parent_model') || ~isfield(args,'Efield')
@@ -45,71 +45,38 @@ classdef JAphiVectorFaceField < VectorElemField
     % --- get
     methods
         % -----------------------------------------------------------------
-        function val = cvalue(obj,id_elem)
+        function val = cvalue(obj,id_face)
             % ---
             if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+                id_face = 1:obj.parent_model.parent_mesh.nb_face;
             end
             % ---
-            val = zeros(3,length(id_elem));
-            % ---
-            id_phydom__ = {};
-            if ~isempty(obj.parent_model.econductor)
-                id_phydom__ = fieldnames(obj.parent_model.econductor);
+            if isempty(id_face)
+                val = [];
+                return
             end
             % ---
-            for iec = 1:length(id_phydom__)
-                id_phydom = id_phydom__{iec};
-                % ---
-                phydom = obj.parent_model.econductor.(id_phydom);
-                % ---
-                gid_elem = intersect(id_elem,phydom.gid_elem);
-                gid_elem = unique(gid_elem);
-                % ---
-                % sigma_array = phydom.matrix.sigma_array
-                % % ---
-                % E = obj.Efield.cvalue(gid_elem);
-                % val = 
-            end
+            val = zeros(length(id_face),3);
             % ---
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.Efield.value,...
-                  'on','center','id_elem',id_elem);
-            val = val(:,id_elem);
+            if ~isempty(obj.sibc)
+                id_phydom_ = fieldnames(obj.sibc);
+                % ---
+                for iec = 1:length(id_phydom_)
+                    tarray = obj.sibc.(id_phydom_{iec}).sigma;
+                    % ---
+                    [gid_face,lid_face] = intersect(id_face,tarray.parent_dom.gid_face);
+                    val(lid_face,:) = obj.Efield.cmultiply(tarray,gid_face);
+                end
+            end
             % ---
         end
         % -----------------------------------------------------------------
         function val = ivalue(obj,id_elem)
-            % ---
-            if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
-            end
-            % ---
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.Efield.value,...
-                  'on','interpolation_points','id_elem',id_elem);
-            % ---
-            if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
-                for i = 1:length(val)
-                    val{i} = val{i}(:,id_elem);
-                end
-            end
-            % ---
+
         end
         % -----------------------------------------------------------------
         function val = gvalue(obj,id_elem)
-            % ---
-            if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
-            end
-            % ---
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.Efield.value,...
-                  'on','gauss_points','id_elem',id_elem);
-            % ---
-            if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
-                for i = 1:length(val)
-                    val{i} = val{i}(:,id_elem);
-                end
-            end
-            % ---
+
         end
         % -----------------------------------------------------------------
     end

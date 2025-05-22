@@ -32,6 +32,11 @@ classdef FaceField < Xhandle
                 id_face = 1:obj.parent_model.parent_mesh.nb_face;
             end
             % ---
+            if isempty(id_face)
+                val = [];
+                return
+            end
+            % ---
             val = obj.parent_model.parent_mesh.cface(:,id_face).';
         end
         % -----------------------------------------------------------------
@@ -39,6 +44,11 @@ classdef FaceField < Xhandle
             % ---
             if nargin <= 1
                 id_face = 1:obj.parent_model.parent_mesh.nb_face;
+            end
+            % ---
+            if isempty(id_face)
+                val = [];
+                return
             end
             % ---
             dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gid_face',id_face);
@@ -71,6 +81,11 @@ classdef FaceField < Xhandle
             % ---
             if nargin <= 1
                 id_face = 1:obj.parent_model.parent_mesh.nb_face;
+            end
+            % ---
+            if isempty(id_face)
+                val = [];
+                return
             end
             % ---
             dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gid_face',id_face);

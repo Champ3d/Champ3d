@@ -32,6 +32,11 @@ classdef ElemField < Xhandle
                 id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
             end
             % ---
+            if isempty(id_elem)
+                val = [];
+                return
+            end
+            % ---
             val = obj.parent_model.parent_mesh.celem(:,id_elem).';
         end
         % -----------------------------------------------------------------
@@ -39,6 +44,11 @@ classdef ElemField < Xhandle
             % ---
             if nargin <= 1
                 id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+            end
+            % ---
+            if isempty(id_elem)
+                val = [];
+                return
             end
             % ---
             if length(id_elem) == obj.parent_model.parent_mesh.nb_elem
@@ -55,6 +65,11 @@ classdef ElemField < Xhandle
             % ---
             if nargin <= 1
                 id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+            end
+            % ---
+            if isempty(id_elem)
+                val = [];
+                return
             end
             % ---
             if length(id_elem) == obj.parent_model.parent_mesh.nb_elem

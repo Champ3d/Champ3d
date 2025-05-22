@@ -52,6 +52,11 @@ classdef NodeDofBasedScalarNodeField < Xhandle
                 id_node = 1:obj.parent_model.parent_mesh.nb_node;
             end
             % ---
+            if isempty(id_node)
+                val = [];
+                return
+            end
+            % ---
             val = obj.dof.value(id_node) + obj.reference_potential;
         end
         % -----------------------------------------------------------------
@@ -59,6 +64,11 @@ classdef NodeDofBasedScalarNodeField < Xhandle
             % ---
             if nargin <= 1
                 id_node = 1:obj.parent_model.parent_mesh.nb_node;
+            end
+            % ---
+            if isempty(id_node)
+                val = [];
+                return
             end
             % ---
             val = obj.parent_model.parent_mesh.node(:,id_node).';
