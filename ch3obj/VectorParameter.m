@@ -65,7 +65,7 @@ classdef VectorParameter < Parameter
                 args.in_dom = []
             end
             vout = getvalue@Parameter(obj,'in_dom',args.in_dom);
-            vout = TensorArray.vector(vout);
+            vout = Array.vector(vout);
             %--------------------------------------------------------------
             if any(isinf(vout))
                 f_fprintf(1,'Value has Inf ! \n');

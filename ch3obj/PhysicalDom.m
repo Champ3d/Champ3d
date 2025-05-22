@@ -30,12 +30,35 @@ classdef PhysicalDom < Xhandle
         % 'by_coordinates', 'by_id_dom'[by default]
         parameter_dependency_search = 'by_id_dom'
     end
+    properties (Dependent)
+        gid_elem
+        gid_face
+    end
     % --- Contructor
     methods
         function obj = PhysicalDom()
             % ---
             obj@Xhandle;
             % ---
+        end
+    end
+    % --- get
+    methods
+        % -----------------------------------------------------------------
+        function val = get.gid_elem(obj)
+            if isa(obj.dom,'VolumeDom')
+                val = obj.dom.gid_elem;
+            else
+                error('#gid_elem undefined ! Physical dom is not defined on a volume dom !');
+            end
+        end
+        % -----------------------------------------------------------------
+        function val = get.gid_face(obj)
+            if isa(obj.dom,'SurfaceDom')
+                val = obj.dom.gid_face;
+            else
+                error('#gid_face undefined ! Physical dom is not defined on a surface dom !');
+            end
         end
     end
     % --- Utility Methods

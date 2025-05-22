@@ -61,7 +61,7 @@ classdef JAphiVectorElemField < VectorElemField
             for iec = 1:length(id_phydom__)
                 id_phydom = id_phydom__{iec};
                 % ---
-                phydom = obj.econductor.(id_phydom).sigma.physical_dom;
+                phydom = obj.econductor.(id_phydom).sigma.parent_dom;
                 % ---
                 [gid_elem, ~, lid_elem] = intersect(id_elem,phydom.gid_elem);
                 lid_elem = phydom.gid_elem(lid_elem);

@@ -61,7 +61,7 @@ classdef ScalarParameter < Parameter
                 args.in_dom = []
             end
             vout = getvalue@Parameter(obj,'in_dom',args.in_dom);
-            vout = TensorArray.tensor(vout);
+            vout = Array.tensor(vout);
             %--------------------------------------------------------------
             if any(isinf(vout))
                 f_fprintf(1,'Value has Inf ! \n');

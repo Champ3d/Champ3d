@@ -90,9 +90,9 @@ classdef LVector < Xhandle
                 if ~isempty(lvfield)
                     if isnumeric(lvfield)
                         if any(f_strcmpi(fn,{'main_dir','rot_axis'}))
-                            lvfield = TensorArray.vector(lvfield,'nb_elem',nb_elem);
+                            lvfield = Array.vector(lvfield,'nb_elem',nb_elem);
                         else
-                            lvfield = TensorArray.tensor(lvfield,'nb_elem',nb_elem);
+                            lvfield = Array.tensor(lvfield,'nb_elem',nb_elem);
                         end
                         lvector.(fn) = lvfield;
                     elseif isa(lvfield,'Parameter')
@@ -105,7 +105,7 @@ classdef LVector < Xhandle
                 end
             end
             % --- normalize
-            lvector.main_dir = TensorArray.normalize(lvector.main_dir);
+            lvector.main_dir = VectorArray.normalize(lvector.main_dir);
             % ---
             if ~isempty(obj.rot_axis) && ~isempty(obj.rot_angle)
                 for i = 1:nb_elem

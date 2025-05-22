@@ -23,6 +23,35 @@ classdef VectorElemField < ElemField
             obj = obj@ElemField;
         end
     end
+    % --- Utility Methods
+    methods
+        % -----------------------------------------------------------------
+        function cmultiply(obj,tensor_array,gid_elem)
+            arguments
+                obj
+                tensor_array
+                gid_elem = []
+            end
+            % ---
+            if isa(tensor_array,'TensorArray')
+                % ---
+                if isempty(gid_elem)
+                    gid_elem = tensor_array.parent_dom.gid_elem;
+                else
+                    [gid_elem, ~, lid_elem] = intersect(gid_elem,tensor_array.parent_dom.gid_elem);
+                end
+                % ---
+                V = obj.cvalue(gid_elem);
+                T = tensor_array.value;
+                % ---
+                
+            elseif isnumeric(tensor_array)
+                
+            end
+            % ---
+        end
+        % -----------------------------------------------------------------
+    end
     % --- plot
     methods
         % -----------------------------------------------------------------

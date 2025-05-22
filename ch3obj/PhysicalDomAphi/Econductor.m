@@ -111,7 +111,7 @@ classdef Econductor < PhysicalDom
             obj.matrix.gid_node_phi = gid_node_phi;
             obj.matrix.sigma_array = sigma_array;
             %--------------------------------------------------------------
-            obj.tarray{it}.sigma = TensorArray('physical_dom',obj,'value',sigma_array);
+            obj.tarray{it}.sigma = TensorArray('parent_dom',obj,'value',sigma_array);
             %--------------------------------------------------------------
             % local sigmawewe matrix
             lmatrix = parent_mesh.cwewe('id_elem',gid_elem,'coefficient',sigma_array);
