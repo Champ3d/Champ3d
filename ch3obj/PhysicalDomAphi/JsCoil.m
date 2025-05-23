@@ -28,10 +28,10 @@ classdef JsCoil < Xhandle
         function [t_js,wfjs] = get_t_js(obj)
             % ---
             js_array = obj.matrix.js_array .* obj.matrix.unit_current_field;
-            gid_elem = obj.matrix.gid_elem;
+            gindex = obj.matrix.gindex;
             %--------------------------------------------------------------
             % local wfjs matrix
-            lmatrix = obj.parent_model.parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',js_array);
+            lmatrix = obj.parent_model.parent_mesh.cwfvf('id_elem',gindex,'vector_field',js_array);
             %--------------------------------------------------------------
             nb_edge = obj.parent_model.parent_mesh.nb_edge;
             nb_face = obj.parent_model.parent_mesh.nb_face;
@@ -42,7 +42,7 @@ classdef JsCoil < Xhandle
             %--------------------------------------------------------------
             for i = 1:nbFa_inEl
                 wfjs = wfjs + ...
-                    sparse(id_face_in_elem(i,gid_elem),1,lmatrix(:,i),nb_face,1);
+                    sparse(id_face_in_elem(i,gindex),1,lmatrix(:,i),nb_face,1);
             end
             %--------------------------------------------------------------
             rotj   = obj.parent_model.parent_mesh.discrete.rot.' * wfjs;

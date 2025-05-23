@@ -307,7 +307,7 @@ end
 %         %----------------------------------------------------------
 %         f_fprintf(0,'--- #nomesh',1,id_phydom,0,'\n');
 %         %----------------------------------------------------------
-%         id_elem = obj.nomesh.(id_phydom).matrix.gid_elem;
+%         id_elem = obj.nomesh.(id_phydom).matrix.gindex;
 %         id_inner_edge = obj.nomesh.(id_phydom).matrix.gid_inner_edge;
 %         id_inner_node = obj.nomesh.(id_phydom).matrix.gid_inner_node;
 %         %----------------------------------------------------------
@@ -330,7 +330,7 @@ end
 %         %----------------------------------------------------------
 %         id_phydom = id_mconductor__{iec};
 %         %----------------------------------------------------------------------
-%         id_elem_mcon = [id_elem_mcon obj.mconductor.(id_phydom).matrix.gid_elem];
+%         id_elem_mcon = [id_elem_mcon obj.mconductor.(id_phydom).matrix.gindex];
 %         %----------------------------------------------------------
 %     end
 %     % ---
@@ -340,7 +340,7 @@ end
 %     %--------------------------------------------------------------
 %     % --- airbox
 %     id_phydom = id_airbox__{1};
-%     id_elem_airbox = unique(obj.airbox.(id_phydom).matrix.gid_elem);
+%     id_elem_airbox = unique(obj.airbox.(id_phydom).matrix.gindex);
 %     id_inner_edge_airbox = unique(obj.airbox.(id_phydom).matrix.gid_inner_edge);
 %     %---
 %     obj.matrix.id_elem_airbox = id_elem_airbox;

@@ -51,9 +51,9 @@ classdef FaceField < Field
                 return
             end
             % ---
-            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gid_face',id_face);
+            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gindex',id_face);
             % ---
-            lnb_face = length(dom.gid_face);
+            lnb_face = length(dom.gindex);
             % ---
             submesh = dom.submesh;
             % ---
@@ -66,11 +66,11 @@ classdef FaceField < Field
                 sm = submesh{k};
                 sm.build_prokit;
                 % ---
-                lid_face = sm.lid_face;
+                lindex = sm.lindex;
                 inode = sm.prokit.node;
                 % ---
                 for i = 1:length(inode)
-                    val{i}(lid_face,:) = inode{i};
+                    val{i}(lindex,:) = inode{i};
                 end
                 % ---
             end
@@ -88,9 +88,9 @@ classdef FaceField < Field
                 return
             end
             % ---
-            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gid_face',id_face);
+            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gindex',id_face);
             % ---
-            lnb_face = length(dom.gid_face);
+            lnb_face = length(dom.gindex);
             % ---
             submesh = dom.submesh;
             % ---
@@ -103,11 +103,11 @@ classdef FaceField < Field
                 sm = submesh{k};
                 sm.build_intkit;
                 % ---
-                lid_face = sm.lid_face;
+                lindex = sm.lindex;
                 gnode = sm.intkit.node;
                 % ---
                 for i = 1:length(gnode)
-                    val{i}(lid_face,:) = gnode{i};
+                    val{i}(lindex,:) = gnode{i};
                 end
                 % ---
             end

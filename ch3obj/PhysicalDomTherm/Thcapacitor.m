@@ -66,7 +66,7 @@ classdef Thcapacitor < PhysicalDom
             obj.get_geodom;
             obj.dom.is_defining_obj_of(obj);
             % --- Initialization
-            obj.matrix.gid_elem = [];
+            obj.matrix.gindex = [];
             obj.matrix.gid_node_t = [];
             obj.matrix.rho_array = [];
             obj.matrix.cp_array = [];
@@ -89,9 +89,9 @@ classdef Thcapacitor < PhysicalDom
             % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
-            gid_elem = dom.gid_elem;
+            gindex = dom.gindex;
             % ---
-            elem = parent_mesh.elem(:,gid_elem);
+            elem = parent_mesh.elem(:,gindex);
             % ---
             gid_node_t = f_uniquenode(elem);
             % ---
@@ -101,7 +101,7 @@ classdef Thcapacitor < PhysicalDom
             % --- check changes
             is_changed = 1;
             if isequal(rho_cp_array,obj.matrix.rho_cp_array) && ...
-               isequal(gid_elem,obj.matrix.gid_elem) && ...
+               isequal(gindex,obj.matrix.gindex) && ...
                isequal(gid_node_t,obj.matrix.gid_node_t)
                 is_changed = 0;
             end
@@ -110,7 +110,7 @@ classdef Thcapacitor < PhysicalDom
                 return
             end
             %--------------------------------------------------------------
-            obj.matrix.gid_elem = gid_elem;
+            obj.matrix.gindex = gindex;
             obj.matrix.gid_node_t = gid_node_t;
             % ---
             obj.matrix.rho_array = rho_array;
@@ -118,17 +118,17 @@ classdef Thcapacitor < PhysicalDom
             obj.matrix.rho_cp_array = rho_cp_array;
             %--------------------------------------------------------------
             % local rhocpwnwn matrix
-            lmatrix = parent_mesh.cwnwn('id_elem',gid_elem,'coefficient',rho_cp_array);
+            lmatrix = parent_mesh.cwnwn('id_elem',gindex,'coefficient',rho_cp_array);
             %--------------------------------------------------------------
             id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
             elem = obj.parent_model.parent_mesh.elem;
             nb_node = obj.parent_model.parent_mesh.nb_node;
             nbNo_inEl = obj.parent_model.parent_mesh.refelem.nbNo_inEl;
             %--------------------------------------------------------------
-            gid_elem = obj.matrix.gid_elem;
+            gindex = obj.matrix.gindex;
             %--------------------------------------------------------------
-            [~,id_] = intersect(gid_elem,id_elem_nomesh);
-            gid_elem(id_) = [];
+            [~,id_] = intersect(gindex,id_elem_nomesh);
+            gindex(id_) = [];
             lmatrix(id_,:,:) = [];
             %--------------------------------------------------------------
             % global elementary rhocpwnwn matrix
@@ -137,7 +137,7 @@ classdef Thcapacitor < PhysicalDom
             for i = 1:nbNo_inEl
                 for j = i+1 : nbNo_inEl
                     rhocpwnwn = rhocpwnwn + ...
-                        sparse(elem(i,gid_elem),elem(j,gid_elem),...
+                        sparse(elem(i,gindex),elem(j,gindex),...
                         lmatrix(:,i,j),nb_node,nb_node);
                 end
             end
@@ -146,7 +146,7 @@ classdef Thcapacitor < PhysicalDom
             % ---
             for i = 1:nbNo_inEl
                 rhocpwnwn = rhocpwnwn + ...
-                    sparse(elem(i,gid_elem),elem(i,gid_elem),...
+                    sparse(elem(i,gindex),elem(i,gindex),...
                     lmatrix(:,i,i),nb_node,nb_node);
             end
             %--------------------------------------------------------------

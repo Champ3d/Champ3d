@@ -19,7 +19,7 @@
 classdef SurfaceDom < MeshDom
     properties
         parent_mesh = []
-        gid_face = []
+        gindex = []
         defined_on = []
         condition = []
         % ---
@@ -28,7 +28,7 @@ classdef SurfaceDom < MeshDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'id','parent_mesh','gid_face','defined_on','condition'};
+            argslist = {'id','parent_mesh','gindex','defined_on','condition'};
         end
     end
     % --- Constructors
@@ -37,7 +37,7 @@ classdef SurfaceDom < MeshDom
             arguments
                 args.id
                 args.parent_mesh
-                args.gid_face
+                args.gindex
                 args.defined_on
                 args.condition
             end
@@ -80,7 +80,7 @@ classdef SurfaceDom < MeshDom
         function sm = submesh(obj)
             % --- need parent_mesh
             node = obj.parent_mesh.node;
-            face = obj.parent_mesh.face(:,obj.gid_face);
+            face = obj.parent_mesh.face(:,obj.gindex);
             % ---
             nb_face = size(face,2);
             % ---
@@ -91,15 +91,15 @@ classdef SurfaceDom < MeshDom
             if ~isempty(id_tria)
                 nb_sm = nb_sm + 1;
                 sm{nb_sm} = TriMesh('node',node,'elem',face(1:3,id_tria));
-                sm{nb_sm}.gid_face = obj.gid_face(id_tria);
-                sm{nb_sm}.lid_face = id_tria;
+                sm{nb_sm}.gindex = obj.gindex(id_tria);
+                sm{nb_sm}.lindex = id_tria;
                 sm{nb_sm}.parent_mesh = obj.parent_mesh;
             end
             if ~isempty(id_quad)
                 nb_sm = nb_sm + 1;
                 sm{nb_sm} = QuadMesh('node',node,'elem',face(1:4,id_quad));
-                sm{nb_sm}.gid_face = obj.gid_face(id_quad);
-                sm{nb_sm}.lid_face = id_quad;
+                sm{nb_sm}.gindex = obj.gindex(id_quad);
+                sm{nb_sm}.lindex = id_quad;
                 sm{nb_sm}.parent_mesh = obj.parent_mesh;
             end
             % ---
@@ -112,31 +112,31 @@ classdef SurfaceDom < MeshDom
     % --- Methods
     methods (Access = protected)
         % -----------------------------------------------------------------
-        function build_from_gid_face(obj)
+        function build_from_gindex(obj)
             % ---
-            if any(f_strcmpi(obj.gid_face,{':','all','all_domaine'}))
-                obj.gid_face = 1:obj.parent_mesh.nb_face;
+            if any(f_strcmpi(obj.gindex,{':','all','all_domaine'}))
+                obj.gindex = 1:obj.parent_mesh.nb_face;
             end
             % ---
-            gid_face_ = obj.gid_face;
+            gindex_ = obj.gindex;
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
                 % -------------------------------------------------------------
                 node = obj.parent_mesh.node;
-                face = obj.parent_mesh.face(:,gid_face_);
+                face = obj.parent_mesh.face(:,gindex_);
                 % ---
                 id_ = ...
                     f_findelem(node,face,'condition', obj.condition);
-                gid_face_ = gid_face_(id_);
+                gindex_ = gindex_(id_);
             end
             % -------------------------------------------------------------
-            obj.gid_face = unique(gid_face_);
+            obj.gindex = unique(gindex_);
             % -------------------------------------------------------------
         end
         % -----------------------------------------------------------------
         function build_from_formular(obj)
             % ---
-            gid_face_ = [];
+            gindex_ = [];
             for i = 1:length(obj.building_formular.operation)
                 dom1 = obj.building_formular.arg1{i};
                 dom2 = obj.building_formular.arg2{i};
@@ -144,11 +144,11 @@ classdef SurfaceDom < MeshDom
                 if i == 1
                     switch oper
                         case '+'
-                            gid_face_ = f_unique([f_torowv(dom1.gid_face), f_torowv(dom2.gid_face)].');
+                            gindex_ = f_unique([f_torowv(dom1.gindex), f_torowv(dom2.gindex)].');
                         case '-'
-                            gid_face_ = f_unique(setdiff(f_torowv(dom1.gid_face),f_torowv(dom2.gid_face)).');
+                            gindex_ = f_unique(setdiff(f_torowv(dom1.gindex),f_torowv(dom2.gindex)).');
                         case '^'
-                            gid_face_ = f_unique(intersect(f_torowv(dom1.gid_face),f_torowv(dom2.gid_face)).');
+                            gindex_ = f_unique(intersect(f_torowv(dom1.gindex),f_torowv(dom2.gindex)).');
                     end
                 elseif i > 1
                     switch oper
@@ -162,8 +162,8 @@ classdef SurfaceDom < MeshDom
                 end
             end
             % ---
-            obj.gid_face = gid_face_;
-            obj.build_from_gid_face;
+            obj.gindex = gindex_;
+            obj.build_from_gindex;
         end
         % -----------------------------------------------------------------
     end
@@ -203,8 +203,8 @@ classdef SurfaceDom < MeshDom
     methods
         function objy = plus(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
-            objy.gid_face = f_unique([f_torowv(obj.gid_face), f_torowv(objx.gid_face)].');
-            objy.build_from_gid_face;
+            objy.gindex = f_unique([f_torowv(obj.gindex), f_torowv(objx.gindex)].');
+            objy.build_from_gindex;
             % ---
             %obj.transfer_dep_def(objx,objy);
             % ---
@@ -226,8 +226,8 @@ classdef SurfaceDom < MeshDom
         end
         function objy = minus(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
-            objy.gid_face = f_unique(setdiff(f_torowv(obj.gid_face),f_torowv(objx.gid_face)).');
-            objy.build_from_gid_face;
+            objy.gindex = f_unique(setdiff(f_torowv(obj.gindex),f_torowv(objx.gindex)).');
+            objy.build_from_gindex;
             % ---
             %obj.transfer_dep_def(objx,objy);
             % ---
@@ -249,8 +249,8 @@ classdef SurfaceDom < MeshDom
         end
         function objy = mpower(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
-            objy.gid_face = f_unique(intersect(f_torowv(obj.gid_face),f_torowv(objx.gid_face)).');
-            objy.build_from_gid_face;
+            objy.gindex = f_unique(intersect(f_torowv(obj.gindex),f_torowv(objx.gindex)).');
+            objy.build_from_gindex;
             % ---
             %obj.transfer_dep_def(objx,objy);
             % ---

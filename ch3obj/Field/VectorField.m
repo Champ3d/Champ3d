@@ -26,22 +26,22 @@ classdef VectorField < Field
     % --- Utilily Methods
     methods
         % -----------------------------------------------------------------
-        function val = cmultiply(obj,coefficient,gid_elem)
+        function val = cmultiply(obj,coefficient,gindex)
             arguments
                 obj
                 coefficient
-                gid_elem = []
+                gindex = []
             end
             % ---
             if nargin <= 2
                 if isa(obj,'ElemField')
-                    gid_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+                    gindex = 1:obj.parent_model.parent_mesh.nb_elem;
                 elseif isa(obj,'FaceField')
-                    gid_elem = 1:obj.parent_model.parent_mesh.nb_face;
+                    gindex = 1:obj.parent_model.parent_mesh.nb_face;
                 end
             end
             % ---
-            if isempty(gid_elem)
+            if isempty(gindex)
                 val = [];
                 return
             end
@@ -49,16 +49,16 @@ classdef VectorField < Field
             if isa(coefficient,'TensorArray')
                 % ---
                 if isa(obj,'ElemField')
-                    [gid_elem, ~, lid_elem] = intersect(gid_elem,coefficient.parent_dom.gid_elem);
+                    [gindex, ~, lindex] = intersect(gindex,coefficient.parent_dom.gindex);
                 elseif isa(obj,'FaceField')
-                    [gid_elem, ~, lid_elem] = intersect(gid_elem,coefficient.parent_dom.gid_face);
+                    [gindex, ~, lindex] = intersect(gindex,coefficient.parent_dom.gindex);
                 end
                 % ---
-                Vin = obj.cvalue(gid_elem);
-                T = coefficient.getvalue(lid_elem);
+                Vin = obj.cvalue(gindex);
+                T = coefficient.getvalue(lindex);
                 array_type = coefficient.type;
             elseif isnumeric(coefficient)
-                Vin = obj.cvalue(gid_elem);
+                Vin = obj.cvalue(gindex);
                 [T, array_type] = Array.tensor(coefficient);
             end
             % ---
@@ -93,13 +93,13 @@ classdef VectorField < Field
         %     % ---
         %     if nargin <= 1
         %         if isa(obj,'ElemField')
-        %             gid_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+        %             gindex = 1:obj.parent_model.parent_mesh.nb_elem;
         %         elseif isa(obj,'FaceField')
-        %             gid_elem = 1:obj.parent_model.parent_mesh.nb_face;
+        %             gindex = 1:obj.parent_model.parent_mesh.nb_face;
         %         end
         %     end
         %     % ---
-        %     if isempty(gid_elem)
+        %     if isempty(gindex)
         %         val = [];
         %         return
         %     end
@@ -107,20 +107,20 @@ classdef VectorField < Field
         %     if isa(vector_field,'VectorArray')
         %         % ---
         %         if isa(obj,'ElemField')
-        %             [gid_elem, ~, lid_elem] = intersect(gid_elem,vector_field.parent_dom.gid_elem);
+        %             [gindex, ~, lindex] = intersect(gindex,vector_field.parent_dom.gindex);
         %         elseif isa(obj,'FaceField')
-        %             [gid_elem, ~, lid_elem] = intersect(gid_elem,vector_field.parent_dom.gid_face);
+        %             [gindex, ~, lindex] = intersect(gindex,vector_field.parent_dom.gindex);
         %         end
         %         % ---
-        %         Vin = obj.cvalue(gid_elem);
-        %         Vfi = vector_field.getvalue(lid_elem);
+        %         Vin = obj.cvalue(gindex);
+        %         Vfi = vector_field.getvalue(lindex);
         % 
         %     elseif isa(vector_field,'ElemField') || isa(vector_field,'FaceField')
-        %         Vin = obj.cvalue(gid_elem);
-        %         Vfi = vector_field.cvalue(gid_elem);
+        %         Vin = obj.cvalue(gindex);
+        %         Vfi = vector_field.cvalue(gindex);
         % 
         %     elseif isnumeric(vector_field)
-        %         Vin = obj.cvalue(gid_elem);
+        %         Vin = obj.cvalue(gindex);
         %         Vfi = Array.vector(vector_field);
         %     end
         %     % ---

@@ -66,13 +66,13 @@ classdef PAphiFaceField < ScalarFaceField
                 for iec = 1:length(id_phydom_)
                     tarray = obj.sibc.(id_phydom_{iec}).skindepth;
                     % ---
-                    [gid_face,lid_face] = intersect(id_face,tarray.parent_dom.gid_face);
+                    [gindex,lindex] = intersect(id_face,tarray.parent_dom.gindex);
                     % ---
                     E = obj.Efield.cvalue(id_face);
                     J = obj.Jfield.cvalue(id_face);
                     EJconj = real(VectorArray.dot(E,conj(J)));
                     % ---
-                    val(lid_face,:) = obj.Efield.cmultiply(tarray,gid_face);
+                    val(lindex,:) = obj.Efield.cmultiply(tarray,gindex);
                 end
             end
             % ---

@@ -333,18 +333,18 @@ classdef Parameter < Xhandle
             % ---
             if isa(meshdom,'VolumeDom')
                 place = 'elem';
-                id_place_target = meshdom.gid_elem;
+                id_place_target = meshdom.gindex;
             elseif isa(meshdom,'SurfaceDom')
                 place = 'face';
-                id_place_target = meshdom.gid_face;
-            elseif isprop(meshdom,'gid_elem')
+                id_place_target = meshdom.gindex;
+            elseif isprop(meshdom,'gindex')
                 place = 'elem';
-                id_place_target = meshdom.gid_elem;
-            elseif isprop(meshdom,'gid_face')
+                id_place_target = meshdom.gindex;
+            elseif isprop(meshdom,'gindex')
                 place = 'face';
-                id_place_target = meshdom.gid_face;
+                id_place_target = meshdom.gindex;
             else
-                error('must give #dom with .gid_elem or .gid_face !');
+                error('must give #dom with .gindex or .gindex !');
             end
             % ---
             fargs = cell(1,length(obj.depend_on));
@@ -442,7 +442,7 @@ classdef Parameter < Xhandle
                                     id_dom_source = fieldnames(source_model.parent_mesh.dom);
                                     for ids = 1:length(id_dom_source)
                                         if f_strcmpi(id_dom_source{ids},target_dom.id)
-                                            id_elem_source = source_model.parent_mesh.dom.(id_dom_source{ids}).gid_elem;
+                                            id_elem_source = source_model.parent_mesh.dom.(id_dom_source{ids}).gindex;
                                         end
                                     end
                                     if isempty(id_elem_source)
@@ -563,7 +563,7 @@ classdef Parameter < Xhandle
                                     id_dom_source = fieldnames(source_model.parent_mesh.dom);
                                     for ids = 1:length(id_dom_source)
                                         if f_strcmpi(id_dom_source{ids},target_dom.id)
-                                            id_face_source = source_model.parent_mesh.dom.(id_dom_source{ids}).gid_face;
+                                            id_face_source = source_model.parent_mesh.dom.(id_dom_source{ids}).gindex;
                                         end
                                     end
                                     if isempty(id_face_source)

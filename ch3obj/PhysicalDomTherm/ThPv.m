@@ -64,7 +64,7 @@ classdef ThPv < PhysicalDom
             obj.get_geodom;
             obj.dom.is_defining_obj_of(obj);
             % --- Initialization
-            obj.matrix.gid_elem = [];
+            obj.matrix.gindex = [];
             obj.matrix.gid_node_t = [];
             obj.matrix.pv_array = [];
             obj.matrix.pvwn = [];
@@ -85,9 +85,9 @@ classdef ThPv < PhysicalDom
             % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
-            gid_elem = dom.gid_elem;
+            gindex = dom.gindex;
             % ---
-            elem = parent_mesh.elem(:,gid_elem);
+            elem = parent_mesh.elem(:,gindex);
             % ---
             gid_node_t = f_uniquenode(elem);
             % ---
@@ -100,7 +100,7 @@ classdef ThPv < PhysicalDom
             % --- check changes
             is_changed = 1;
             if isequal(pv_array,obj.matrix.pv_array) && ...
-               isequal(gid_elem,obj.matrix.gid_elem) && ...
+               isequal(gindex,obj.matrix.gindex) && ...
                isequal(gid_node_t,obj.matrix.gid_node_t)
                 is_changed = 0;
             end
@@ -109,23 +109,23 @@ classdef ThPv < PhysicalDom
                 return
             end
             %--------------------------------------------------------------
-            obj.matrix.gid_elem = gid_elem;
+            obj.matrix.gindex = gindex;
             obj.matrix.gid_node_t = gid_node_t;
             obj.matrix.pv_array = pv_array;
             %--------------------------------------------------------------
             % local pvwn matrix
             % ---
-            lmatrix = parent_mesh.cwn('id_elem',gid_elem,'coefficient',pv_array);
+            lmatrix = parent_mesh.cwn('id_elem',gindex,'coefficient',pv_array);
             %--------------------------------------------------------------
             id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
             elem = obj.parent_model.parent_mesh.elem;
             nb_node = obj.parent_model.parent_mesh.nb_node;
             nbNo_inEl = obj.parent_model.parent_mesh.refelem.nbNo_inEl;
             %--------------------------------------------------------------
-            gid_elem = obj.matrix.gid_elem;
+            gindex = obj.matrix.gindex;
             %--------------------------------------------------------------
-            [~,id_] = intersect(gid_elem,id_elem_nomesh);
-            gid_elem(id_) = [];
+            [~,id_] = intersect(gindex,id_elem_nomesh);
+            gindex(id_) = [];
             lmatrix(id_,:,:) = [];
             %--------------------------------------------------------------
             % global elementary pvwn matrix
@@ -133,7 +133,7 @@ classdef ThPv < PhysicalDom
             %--------------------------------------------------------------
             for i = 1:nbNo_inEl
                 pvwn = pvwn + ...
-                    sparse(elem(i,gid_elem),1,lmatrix(:,i),nb_node,1);
+                    sparse(elem(i,gindex),1,lmatrix(:,i),nb_node,1);
             end
             %--------------------------------------------------------------
             obj.matrix.pvwn = pvwn;

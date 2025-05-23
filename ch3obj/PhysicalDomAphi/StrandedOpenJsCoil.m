@@ -93,7 +93,7 @@ classdef StrandedOpenJsCoil < OpenCoil & StrandedCoil & JsCoil
             obj.dofuJ = EdgeDof('parent_model',obj.parent_model);
             obj.uJfield = EdgeDofBasedVectorElemField('parent_model',obj.parent_model,'dof',obj.dofuJ);
             % --- Initialization
-            obj.matrix.gid_elem = [];
+            obj.matrix.gindex = [];
             obj.matrix.js_array = [];
             obj.matrix.unit_current_field = [];
             obj.matrix.alpha = [];
@@ -114,13 +114,13 @@ classdef StrandedOpenJsCoil < OpenCoil & StrandedCoil & JsCoil
         function build(obj)
             % ---
             dom = obj.dom;
-            gid_elem = dom.gid_elem;
+            gindex = dom.gindex;
             % ---
             js_array = obj.Js.getvalue('in_dom',obj.dom);
             % --- check changes
             is_changed = 1;
             if isequal(js_array,obj.matrix.js_array) && ...
-               isequal(gid_elem,obj.matrix.gid_elem)
+               isequal(gindex,obj.matrix.gindex)
                 is_changed = 0;
             end
             %--------------------------------------------------------------
@@ -128,7 +128,7 @@ classdef StrandedOpenJsCoil < OpenCoil & StrandedCoil & JsCoil
                 return
             end
             %--------------------------------------------------------------
-            obj.matrix.gid_elem = gid_elem;
+            obj.matrix.gindex = gindex;
             obj.matrix.js_array = js_array;
             %--------------------------------------------------------------
             % OpenCoil first, then JsCoil

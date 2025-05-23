@@ -63,7 +63,7 @@ classdef Mconductor < PhysicalDom
             obj.get_geodom;
             obj.dom.is_defining_obj_of(obj);
             % --- Initialization
-            obj.matrix.gid_elem = [];
+            obj.matrix.gindex = [];
             obj.matrix.nu0nurwfwf = [];
             obj.matrix.nur_array = [];
             obj.matrix.mur_array = [];
@@ -84,7 +84,7 @@ classdef Mconductor < PhysicalDom
             % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
-            gid_elem = dom.gid_elem;
+            gindex = dom.gindex;
             % ---
             mu0 = 4 * pi * 1e-7;
             nu0 = 1/mu0;
@@ -96,7 +96,7 @@ classdef Mconductor < PhysicalDom
             % --- check changes
             is_changed = 1;
             if isequal(mur_array,obj.matrix.mur_array) && ...
-               isequal(gid_elem,obj.matrix.gid_elem)
+               isequal(gindex,obj.matrix.gindex)
                 is_changed = 0;
             end
             %--------------------------------------------------------------
@@ -104,22 +104,22 @@ classdef Mconductor < PhysicalDom
                 return
             end
             %--------------------------------------------------------------
-            obj.matrix.gid_elem = gid_elem;
+            obj.matrix.gindex = gindex;
             obj.matrix.nur_array = nur_array;
             obj.matrix.mur_array = mur_array;
             %--------------------------------------------------------------
             % local nu0nurwfwf matrix
-            lmatrix = parent_mesh.cwfwf('id_elem',gid_elem,'coefficient',nu0nur);
+            lmatrix = parent_mesh.cwfwf('id_elem',gindex,'coefficient',nu0nur);
             %--------------------------------------------------------------
             id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
             id_face_in_elem = obj.parent_model.parent_mesh.meshds.id_face_in_elem;
             nb_face = obj.parent_model.parent_mesh.nb_face;
             nbFa_inEl = obj.parent_model.parent_mesh.refelem.nbFa_inEl;
             %--------------------------------------------------------------
-            gid_elem = obj.matrix.gid_elem;
+            gindex = obj.matrix.gindex;
             %--------------------------------------------------------------
-            [~,id_] = intersect(gid_elem,id_elem_nomesh);
-            gid_elem(id_) = [];
+            [~,id_] = intersect(gindex,id_elem_nomesh);
+            gindex(id_) = [];
             lmatrix(id_,:,:) = [];
             %--------------------------------------------------------------
             % global elementary nu0nurwfwf matrix
@@ -128,7 +128,7 @@ classdef Mconductor < PhysicalDom
             for i = 1:nbFa_inEl
                 for j = i+1 : nbFa_inEl
                     nu0nurwfwf = nu0nurwfwf + ...
-                        sparse(id_face_in_elem(i,gid_elem),id_face_in_elem(j,gid_elem),...
+                        sparse(id_face_in_elem(i,gindex),id_face_in_elem(j,gindex),...
                         lmatrix(:,i,j),nb_face,nb_face);
                 end
             end
@@ -137,7 +137,7 @@ classdef Mconductor < PhysicalDom
             % ---
             for i = 1:nbFa_inEl
                 nu0nurwfwf = nu0nurwfwf + ...
-                    sparse(id_face_in_elem(i,gid_elem),id_face_in_elem(i,gid_elem),...
+                    sparse(id_face_in_elem(i,gindex),id_face_in_elem(i,gindex),...
                     lmatrix(:,i,i),nb_face,nb_face);
             end
             %--------------------------------------------------------------
@@ -157,7 +157,7 @@ classdef Mconductor < PhysicalDom
                 obj.parent_model.matrix.nu0nurwfwf + obj.matrix.nu0nurwfwf;
             %--------------------------------------------------------------
             obj.parent_model.matrix.id_elem_mcon = ...
-                unique([obj.parent_model.matrix.id_elem_mcon, obj.matrix.gid_elem]);
+                unique([obj.parent_model.matrix.id_elem_mcon, obj.matrix.gindex]);
             %--------------------------------------------------------------
         end
     end

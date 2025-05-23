@@ -46,32 +46,32 @@ classdef ScalarNodeField < NodeField
                             return
                         else
                             dom = SurfaceDom3d;
-                            gid_face = args.id_face;
+                            gindex = args.id_face;
                         end
                     else
                         dom = VolumeDom3d;
-                        gid_elem = args.id_elem;
+                        gindex = args.id_elem;
                     end
                 else
                     dom = args.meshdom_obj;
                     % ---
                     if isa(dom,'VolumeDom3d')
-                        gid_elem = dom.gid_elem;
+                        gindex = dom.gindex;
                     end
                     % ---
                     if isa(dom,'SurfaceDom3d')
-                        gid_face = dom.gid_face;
+                        gindex = dom.gindex;
                     end
                 end
             else
                 dom = obj.parent_model.parent_mesh.dom.(args.id_meshdom);
                 % ---
                 if isa(dom,'VolumeDom3d')
-                    gid_elem = dom.gid_elem;
+                    gindex = dom.gindex;
                 end
                 % ---
                 if isa(dom,'SurfaceDom3d')
-                    gid_face = dom.gid_face;
+                    gindex = dom.gindex;
                 end
             end
             % ---
@@ -81,14 +81,14 @@ classdef ScalarNodeField < NodeField
             % ---
             if isa(dom,'VolumeDom3d')
                 node_ = obj.parent_model.parent_mesh.node;
-                elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
+                elem = obj.parent_model.parent_mesh.elem(:,gindex);
                 % ---
                 f_patch('node',node_,'elem',elem,'node_field',obj.cvalue);
             end
             % ---
             if isa(dom,'SurfaceDom3d')
                 node_ = obj.parent_model.parent_mesh.node;
-                face = obj.parent_model.parent_mesh.face(:,gid_face);
+                face = obj.parent_model.parent_mesh.face(:,gindex);
                 % ---
                 f_patch('node',node_,'face',face,'node_field',obj.cvalue);
             end

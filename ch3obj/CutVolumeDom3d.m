@@ -65,7 +65,7 @@ classdef CutVolumeDom3d < VolumeDom3d
         % -----------------------------------------------------------------
         function build_from_cutequation(obj)
             % ---
-            gid_elem_ = [];
+            gindex_ = [];
             gid_side_node_1_ = [];
             gid_side_node_2_ = [];
             iddom3 = f_to_scellargin(obj.id_dom3d);
@@ -80,12 +80,12 @@ classdef CutVolumeDom3d < VolumeDom3d
                 % ---
                 dom2cut = obj.parent_mesh.dom.(id3);
                 cut_dom = dom2cut.get_cutdom('cut_equation',obj.cut_equation);
-                gid_elem_ = [gid_elem_ cut_dom.gid_elem];
+                gindex_ = [gindex_ cut_dom.gindex];
                 gid_side_node_1_ = [gid_side_node_1_ cut_dom.gid_side_node_1];
                 gid_side_node_2_ = [gid_side_node_2_ cut_dom.gid_side_node_2];
             end
             % ---
-            obj.gid_elem = gid_elem_;
+            obj.gindex = gindex_;
             obj.gid_side_node_1 = gid_side_node_1_;
             obj.gid_side_node_2 = gid_side_node_2_;
             % -------------------------------------------------------------

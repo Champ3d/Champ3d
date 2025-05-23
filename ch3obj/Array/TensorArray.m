@@ -124,24 +124,24 @@ classdef TensorArray < Array
             [obj.value, obj.type] = Array.tensor(val);
         end
         %-------------------------------------------------------------------
-        function gid_elem = gid_elem(obj)
-            gid_elem = obj.parent_dom.gid_elem;
+        function gindex = gindex(obj)
+            gindex = obj.parent_dom.gindex;
         end
         %-------------------------------------------------------------------
-        function val = getvalue(obj,lid_elem)
+        function val = getvalue(obj,lindex)
             % ---
-            % eq. to : obj(lid_elem).value
+            % eq. to : obj(lindex).value
             % ---
             arguments
                 obj
-                lid_elem = []
+                lindex = []
             end
             % ---
             if nargin <= 1
-                lid_elem = 1:size(obj.value,1);
+                lindex = 1:size(obj.value,1);
             end
             % ---
-            if isempty(lid_elem)
+            if isempty(lindex)
                 val = [];
                 return
             end
@@ -149,7 +149,7 @@ classdef TensorArray < Array
             if numel(obj.value) == 1
                 val = obj.value;
             else
-                val = obj.value(lid_elem,:,:);
+                val = obj.value(lindex,:,:);
             end
         end
         %-------------------------------------------------------------------
@@ -162,80 +162,106 @@ classdef TensorArray < Array
             value = obj.value;
         end
         %-------------------------------------------------------------------
-        function TAobj = subsref(obj,lid_elem)
+        function taout = subsref(obj,lidstruct)
             % ---
-            % obj([...])
-            % use obj([...]).value to getvalue
+            % taobj([...])
+            % taobj([])
             % ---
-            TAobj = TensorArray();
-            % ---
-            if nargin <= 1
-                lid_elem = 1:size(obj.value,1);
+            switch lidstruct(1).type
+                case '()'
+                    if isempty(lidstruct(1).subs)
+                        lindex = 1:size(obj.value,1);
+                    else
+                        lindex = lidstruct(1).subs{1};
+                    end
+                    % ---
+                    if isempty(lindex)
+                        val = [];
+                    else
+                        if numel(obj.value) == 1
+                            val = obj.value;
+                        else
+                            val = obj.value(lindex,:,:);
+                        end
+                    end
+                    % ---
+                    taout = obj';
+                    taout.value = val;
+                    % ---
+                otherwise
+                    % builtin behavior for field. and field{}
+                    try
+                        taout = builtin('subsref', obj, lidstruct);
+                    catch
+                        builtin('subsref', obj, lidstruct);
+                    end
             end
-            % ---
-            if isempty(lid_elem)
-                val = [];
-                return
-            end
-            % ---
-            if numel(obj.value) == 1
-                val = obj.value;
-            else
-                val = obj.value(lid_elem,:,:);
-            end
-            % ---
-            TAobj.value = val;
         end
         %-------------------------------------------------------------------
-        function field_obj = mtimes(obj,rhs_obj)
+        function outobj = mtimes(obj,rhs_obj)
             % ---
             % obj([...])
             % use obj([...]).value or =+ obj to getvalue
             % ---
-            X = obj.value;
-            Y = rhs_obj.value;
-            % ---
-            if isa(rhs_obj,'TensorArray')
-                % X -> t, Y -> t
-                field_obj = TensorArray();
-                value_ = TensorArray.multiply(X,Y);
+            if isnumeric(rhs_obj)
+                T = obj.value;
+                % ---
+                outobj = VectorArray();
+                value_ = rhs_obj .* T;
+            elseif isa(rhs_obj,'TensorArray')
+                T1 = obj.value;
+                T2 = rhs_obj.value;
+                % ---
+                outobj = TensorArray();
+                value_ = TensorArray.multiply(T1,T2);
             elseif isa(rhs_obj,'VectorArray')
-                % X -> t, Y -> v
-                field_obj = VectorArray();
-                value_ = VectorArray.multiply(Y,X);
+                T = obj.value;
+                V = rhs_obj.value;
+                % ---
+                outobj = VectorArray();
+                value_ = VectorArray.multiply(V,T);
             elseif isa(rhs_obj,'Field')
-                % X -> t, Y -> v
-                field_obj = Field();
-                value_ = VectorArray.multiply(Y,X);
+                T = obj.value;
+                V = rhs_obj.value;
+                % ---
+                outobj = Field();
+                value_ = VectorArray.multiply(V,T);
             end
             % ---
-            field_obj.value = value_;
+            outobj.value = value_;
             % ---
         end
         %-------------------------------------------------------------------
-        function field_obj = mrdivide(obj,rhs_obj)
+        function outobj = mrdivide(obj,numerator)
             % ---
             % obj([...])
             % use obj([...]).value or =+ obj to getvalue
             % ---
-            X = obj.value;
-            Y = rhs_obj.value;
-            % ---
-            if isa(rhs_obj,'TensorArray')
-                % X -> t, Y -> t
-                field_obj = TensorArray();
-                value_ = TensorArray.multiply(X,Y);
-            elseif isa(rhs_obj,'VectorArray')
-                % X -> t, Y -> v
-                field_obj = VectorArray();
-                value_ = VectorArray.multiply(Y,X);
-            elseif isa(rhs_obj,'Field')
-                % X -> t, Y -> v
-                field_obj = Field();
-                value_ = VectorArray.multiply(Y,X);
+            if isnumeric(numerator)
+                T = obj.value;
+                outobj = TensorArray();
+                value_ = numerator .* TensorArray.inverse(T);
+            elseif isa(numerator,'TensorArray')
+                T1 = obj.value;
+                T2 = numerator.value;
+                % ---
+                outobj = TensorArray();
+                value_ = TensorArray.divide(T1,T2);
+            elseif isa(numerator,'VectorArray')
+                T = obj.value;
+                V = numerator.value;
+                % ---
+                outobj = VectorArray();
+                value_ = VectorArray.multiply(V,TensorArray.inverse(T));
+            elseif isa(numerator,'Field')
+                T = obj.value;
+                V = numerator.value;
+                % ---
+                outobj = Field();
+                value_ = VectorArray.multiply(V,TensorArray.inverse(T));
             end
             % ---
-            field_obj.value = value_;
+            outobj.value = value_;
             % ---
         end
         %-------------------------------------------------------------------

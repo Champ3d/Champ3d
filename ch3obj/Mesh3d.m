@@ -35,7 +35,7 @@ classdef Mesh3d < Mesh
                 args.id_dom2d = []
                 args.id_zline = []
                 args.elem_code = []
-                args.gid_elem = []
+                args.gindex = []
                 args.condition char = []
                 % ---
                 args.id_dom3d = [];
@@ -81,7 +81,7 @@ classdef Mesh3d < Mesh
                 args.id_dom3d = []
                 % ---
                 args.elem_code = []
-                args.gid_face = []
+                args.gindex = []
                 args.condition char = []
                 % ---
                 args.dom_obj {mustBeA(args.dom_obj,{'SurfaceDom3d'})}

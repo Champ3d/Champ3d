@@ -31,8 +31,7 @@ classdef PhysicalDom < Xhandle
         parameter_dependency_search = 'by_id_dom'
     end
     properties (Dependent)
-        gid_elem
-        gid_face
+        gindex
     end
     % --- Contructor
     methods
@@ -45,21 +44,10 @@ classdef PhysicalDom < Xhandle
     % --- get
     methods
         % -----------------------------------------------------------------
-        function val = get.gid_elem(obj)
-            if isa(obj.dom,'VolumeDom')
-                val = obj.dom.gid_elem;
-            else
-                error('#gid_elem undefined ! Physical dom is not defined on a volume dom !');
-            end
+        function val = get.gindex(obj)
+            val = obj.dom.gindex;
         end
         % -----------------------------------------------------------------
-        function val = get.gid_face(obj)
-            if isa(obj.dom,'SurfaceDom')
-                val = obj.dom.gid_face;
-            else
-                error('#gid_face undefined ! Physical dom is not defined on a surface dom !');
-            end
-        end
     end
     % --- Utility Methods
     methods
@@ -183,7 +171,7 @@ classdef PhysicalDom < Xhandle
             % ---
             sdom = obj.dom;
             if isa(sdom,'SurfaceDom3d')
-                id_face = sdom.gid_face;
+                id_face = sdom.gindex;
                 face = obj.parent_model.parent_mesh.face(:,id_face);
                 node = obj.parent_model.parent_mesh.node;
                 js   = obj.parent_model.field.js(:,id_face);
@@ -266,7 +254,7 @@ classdef PhysicalDom < Xhandle
             end
             % ---
             if isa(obj.dom,'VolumeDom3d')
-                id_elem = obj.dom.gid_elem;
+                id_elem = obj.dom.gindex;
                 fv = obj.parent_model.field.(args.field_name)(:,id_elem);
                 no = obj.parent_model.parent_mesh.celem(:,id_elem);
                 if isreal(fv)
@@ -294,17 +282,17 @@ classdef PhysicalDom < Xhandle
             if any(f_strcmpi(args.field_name,{'pv'}))
                 fs = obj.parent_model.field.(args.field_name);
                 % ---
-                gid_elem = obj.dom.gid_elem;
-                celem = obj.parent_model.parent_mesh.celem(:,gid_elem);
+                gindex = obj.dom.gindex;
+                celem = obj.parent_model.parent_mesh.celem(:,gindex);
                 % ---
-                scatter3(celem(1,:),celem(2,:),celem(3,:),[],fs(gid_elem));
+                scatter3(celem(1,:),celem(2,:),celem(3,:),[],fs(gindex));
                 f_colormap;
                 return
             end
             % --- for ScalarNodeField
             if isa(obj.dom,'VolumeDom3d')
                 node = obj.parent_model.parent_mesh.node;
-                elem = obj.parent_model.parent_mesh.elem(:,obj.dom.gid_elem);
+                elem = obj.parent_model.parent_mesh.elem(:,obj.dom.gindex);
                 elem_type = f_elemtype(elem);
                 face = f_boundface(elem,node,'elem_type',elem_type);
                 % ---
@@ -316,11 +304,11 @@ classdef PhysicalDom < Xhandle
             % ---
             if isa(obj.dom,'SurfaceDom3d')
                 node = obj.parent_model.parent_mesh.node;
-                face = obj.parent_model.parent_mesh.face(:,obj.dom.gid_face);
+                face = obj.parent_model.parent_mesh.face(:,obj.dom.gindex);
                 % ---
                 it = obj.parent_model.ltime.it;
                 fs = obj.parent_model.field{it}.(args.field_name).node.value;
-                %fs = fs(obj.dom.gid_face);
+                %fs = fs(obj.dom.gindex);
                 % ---
                 f_patch(node,face,'defined_on','face','scalar_field',fs);
             end

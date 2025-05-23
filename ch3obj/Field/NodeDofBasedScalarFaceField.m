@@ -54,15 +54,15 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
             end
             % ---
             val = zeros(length(id_face),1);
-            [grface,lid_face,face_elem_type] = f_filterface(obj.parent_model.parent_mesh.face(:,id_face));
+            [grface,lindex,face_elem_type] = f_filterface(obj.parent_model.parent_mesh.face(:,id_face));
             % ---
             for i = 1:length(grface)
                 face_ = grface{i};
                 elem_type = face_elem_type{i};
                 if any(f_strcmpi(elem_type,{'tri','triangle'}))
-                    val(lid_face{i}) = mean(obj.dof.value(face_(1:3,:))).';
+                    val(lindex{i}) = mean(obj.dof.value(face_(1:3,:))).';
                 elseif any(f_strcmpi(elem_type,{'quad'}))
-                    val(lid_face{i}) = mean(obj.dof.value(face_(1:4,:))).';
+                    val(lindex{i}) = mean(obj.dof.value(face_(1:4,:))).';
                 end
             end
             % ---
@@ -82,9 +82,9 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
             end
             % ---
             face_ = obj.parent_model.parent_mesh.face;
-            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gid_face',id_face);
+            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gindex',id_face);
             % ---
-            lnb_face = length(dom.gid_face);
+            lnb_face = length(dom.gindex);
             % ---
             submesh = dom.submesh;
             % ---
@@ -97,24 +97,24 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
                 sm = submesh{k};
                 sm.build_prokit;
                 % ---
-                lid_face = sm.lid_face;
-                gid_face = sm.gid_face;
+                lindex = sm.lindex;
+                gindex = sm.gindex;
                 Wx = sm.prokit.Wn;
                 % ---
                 if any(f_strcmpi(sm.elem_type,'tri'))
-                    dof_ = obj.dof.value(face_(1:3,gid_face)).';
+                    dof_ = obj.dof.value(face_(1:3,gindex)).';
                 elseif any(f_strcmpi(sm.elem_type,'quad'))
-                    dof_ = obj.dof.value(face_(1:4,gid_face)).';
+                    dof_ = obj.dof.value(face_(1:4,gindex)).';
                 end
                 % ---
                 for m = 1:nbNodeI
-                    vi = zeros(length(lid_face),1);
+                    vi = zeros(length(lindex),1);
                     for l = 1:sm.refelem.nbNo_inEl
                         wi = Wx{m}(:,l);
                         vi = vi + wi .* dof_(:,l);
                     end
                     % ---
-                    val{m}(lid_face) = vi;
+                    val{m}(lindex) = vi;
                 end
             end
             % ---
@@ -136,9 +136,9 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
             end
             % ---
             face_ = obj.parent_model.parent_mesh.face;
-            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gid_face',id_face);
+            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gindex',id_face);
             % ---
-            lnb_face = length(dom.gid_face);
+            lnb_face = length(dom.gindex);
             % ---
             submesh = dom.submesh;
             % ---
@@ -151,24 +151,24 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
                 sm = submesh{k};
                 sm.build_intkit;
                 % ---
-                lid_face = sm.lid_face;
-                gid_face = sm.gid_face;
+                lindex = sm.lindex;
+                gindex = sm.gindex;
                 Wx = sm.intkit.Wn;
                 % ---
                 if any(f_strcmpi(sm.elem_type,'tri'))
-                    dof_ = obj.dof.value(face_(1:3,gid_face)).';
+                    dof_ = obj.dof.value(face_(1:3,gindex)).';
                 elseif any(f_strcmpi(sm.elem_type,'quad'))
-                    dof_ = obj.dof.value(face_(1:4,gid_face)).';
+                    dof_ = obj.dof.value(face_(1:4,gindex)).';
                 end
                 % ---
                 for m = 1:nbNodeG
-                    vi = zeros(length(lid_face),1);
+                    vi = zeros(length(lindex),1);
                     for l = 1:sm.refelem.nbNo_inEl
                         wi = Wx{m}(:,l);
                         vi = vi + wi .* dof_(:,l);
                     end
                     % ---
-                    val{m}(lid_face) = vi;
+                    val{m}(lindex) = vi;
                 end
             end
             % ---

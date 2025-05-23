@@ -23,7 +23,7 @@ classdef SurfaceDom3d < SurfaceDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'id','parent_mesh','gid_face','condition', ...
+            argslist = {'id','parent_mesh','gindex','condition', ...
                         'defined_on','id_dom3d'};
         end
     end
@@ -34,7 +34,7 @@ classdef SurfaceDom3d < SurfaceDom
                 % ---
                 args.id
                 args.parent_mesh
-                args.gid_face
+                args.gindex
                 args.condition
                 % ---
                 args.defined_on char
@@ -59,9 +59,9 @@ classdef SurfaceDom3d < SurfaceDom
             % --- XTODO : which come first
             % build_from_boundface
             % build_from_interface
-            % build_from_gid_face
-            % if ~isempty(obj.gid_face)
-            %     obj.build_from_gid_face;
+            % build_from_gindex
+            % if ~isempty(obj.gindex)
+            %     obj.build_from_gindex;
             % end
             % ---
             if ~isempty(obj.building_formular)
@@ -113,7 +113,7 @@ classdef SurfaceDom3d < SurfaceDom
                     dom3d = obj.parent_mesh.dom.(valid3{j});
                     dom3d.is_defining_obj_of(obj);
                     % ---
-                    elem = [elem  obj.parent_mesh.elem(:,dom3d.gid_elem)];
+                    elem = [elem  obj.parent_mesh.elem(:,dom3d.gindex)];
                 end
             end
             %--------------------------------------------------------------
@@ -125,15 +125,15 @@ classdef SurfaceDom3d < SurfaceDom
             elem_type = f_elemtype(elem);
             %--------------------------------------------------------------
             face = f_boundface(elem,node,'elem_type',elem_type);
-            gid_face_ = f_findvecnd(face,obj.parent_mesh.face);
+            gindex_ = f_findvecnd(face,obj.parent_mesh.face);
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
                 id_ = ...
                     f_findelem(node,face,'condition', obj.condition);
-                gid_face_ = gid_face_(id_);
+                gindex_ = gindex_(id_);
             end
             %--------------------------------------------------------------
-            obj.gid_face = gid_face_;
+            obj.gindex = gindex_;
             % -------------------------------------------------------------
         end
         % -----------------------------------------------------------------
@@ -158,39 +158,39 @@ classdef SurfaceDom3d < SurfaceDom
                         dom3d = obj.parent_mesh.dom.(valid3{k});
                         dom3d.is_defining_obj_of(obj);
                         % ---
-                        elem = [elem  obj.parent_mesh.elem(:,obj.parent_mesh.dom.(valid3{k}).gid_elem)];
+                        elem = [elem  obj.parent_mesh.elem(:,obj.parent_mesh.dom.(valid3{k}).gindex)];
                     end
                 end
                 %--------------------------------------------------------------
                 if isempty(elem)
-                    xgid_face_{i} = [];
+                    xgindex_{i} = [];
                     break;
                 end
                 %----------------------------------------------------------
                 elem_type = f_elemtype(elem);
                 %----------------------------------------------------------
                 face = f_boundface(elem,node,'elem_type',elem_type);
-                xgid_face_{i} = f_findvecnd(face,obj.parent_mesh.face);
+                xgindex_{i} = f_findvecnd(face,obj.parent_mesh.face);
             end
             % ---
-            gid_face_ = [];
-            for i = 1:length(xgid_face_)
+            gindex_ = [];
+            for i = 1:length(xgindex_)
                 if i == 1
-                    gid_face_ = xgid_face_{i};
+                    gindex_ = xgindex_{i};
                 else
-                    gid_face_ = intersect(gid_face_,xgid_face_{i});
+                    gindex_ = intersect(gindex_,xgindex_{i});
                 end
             end
             % ---
-            face = obj.parent_mesh.face(:,gid_face_);
+            face = obj.parent_mesh.face(:,gindex_);
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
                 id_ = ...
                     f_findelem(node,face,'condition', obj.condition);
-                gid_face_ = gid_face_(id_);
+                gindex_ = gindex_(id_);
             end
             %--------------------------------------------------------------
-            obj.gid_face = gid_face_;
+            obj.gindex = gindex_;
             % -------------------------------------------------------------
         end
     end

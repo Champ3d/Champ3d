@@ -83,7 +83,7 @@ classdef SolidOpenVsCoil < OpenCoil & SolidCoil & VsCoil
             % --- specific
             obj.get_electrode;
             % --- Initialization
-            obj.matrix.gid_elem = [];
+            obj.matrix.gindex = [];
             obj.matrix.vs_array = [];
             obj.matrix.unit_current_field = [];
             obj.matrix.alpha = [];
@@ -102,13 +102,13 @@ classdef SolidOpenVsCoil < OpenCoil & SolidCoil & VsCoil
         function build(obj)
             % ---
             dom = obj.dom;
-            gid_elem = dom.gid_elem;
+            gindex = dom.gindex;
             % ---
             vs_array = obj.Vs.getvalue('in_dom',obj.dom);
             % --- check changes
             is_changed = 1;
             if isequal(vs_array,obj.matrix.vs_array) && ...
-               isequal(gid_elem,obj.matrix.gid_elem)
+               isequal(gindex,obj.matrix.gindex)
                 is_changed = 0;
             end
             %--------------------------------------------------------------
@@ -116,7 +116,7 @@ classdef SolidOpenVsCoil < OpenCoil & SolidCoil & VsCoil
                 return
             end
             %--------------------------------------------------------------
-            obj.matrix.gid_elem = gid_elem;
+            obj.matrix.gindex = gindex;
             obj.matrix.vs_array = vs_array;
             %--------------------------------------------------------------
             % OpenCoil first, then VsCoil

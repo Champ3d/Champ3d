@@ -41,12 +41,12 @@ classdef ScalarElemField < ElemField
                     if isempty(args.id_elem)
                         text(0,0,'Nothing to plot !');
                     else
-                        gid_elem = args.id_elem;
+                        gindex = args.id_elem;
                     end
                 else
                     dom = args.meshdom_obj;
                     if isa(dom,'VolumeDom3d')
-                        gid_elem = dom.gid_elem;
+                        gindex = dom.gindex;
                     else
                         text(0,0,'Nothing to plot, dom must be a VolumeDom3d !');
                     end
@@ -54,7 +54,7 @@ classdef ScalarElemField < ElemField
             else
                 dom = obj.parent_model.parent_mesh.dom.(args.id_meshdom);
                 if isa(dom,'VolumeDom3d')
-                    gid_elem = dom.gid_elem;
+                    gindex = dom.gindex;
                 else
                     text(0,0,'Nothing to plot, dom must be a VolumeDom3d !');
                 end
@@ -65,8 +65,8 @@ classdef ScalarElemField < ElemField
             end
             % ---
             node_ = obj.parent_model.parent_mesh.node;
-            elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
-            f_patch('node',node_,'elem',elem,'elem_field',obj.cvalue(gid_elem));
+            elem = obj.parent_model.parent_mesh.elem(:,gindex);
+            f_patch('node',node_,'elem',elem,'elem_field',obj.cvalue(gindex));
         end
         % -----------------------------------------------------------------
     end

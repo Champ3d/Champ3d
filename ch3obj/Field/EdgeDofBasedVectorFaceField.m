@@ -55,10 +55,10 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
                 return
             end
             % ---
-            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gid_face',id_face);
+            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gindex',id_face);
             % ---
             id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face;
-            lnb_face = length(dom.gid_face);
+            lnb_face = length(dom.gindex);
             % ---
             val = zeros(lnb_face,2);
             %--------------------------------------------------------------
@@ -67,18 +67,18 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
                 sm = submesh{k};
                 sm.build_intkit;
                 % ---
-                lid_face = sm.lid_face;
-                gid_face = sm.gid_face;
+                lindex = sm.lindex;
+                gindex = sm.gindex;
                 cWes = sm.intkit.cWe{1};
                 % ---
                 if any(f_strcmpi(sm.elem_type,'tri'))
-                    dofe = obj.dof.value(id_edge_in_face(1:3,gid_face)).';
+                    dofe = obj.dof.value(id_edge_in_face(1:3,gindex)).';
                 elseif any(f_strcmpi(sm.elem_type,'quad'))
-                    dofe = obj.dof.value(id_edge_in_face(1:4,gid_face)).';
+                    dofe = obj.dof.value(id_edge_in_face(1:4,gindex)).';
                 end
                 %----------------------------------------------------------
-                val(lid_face,1) = val(lid_face,2) + sum(squeeze(cWes(:,1,:)) .* dofe,2);
-                val(lid_face,2) = val(lid_face,2) + sum(squeeze(cWes(:,2,:)) .* dofe,2);
+                val(lindex,1) = val(lindex,2) + sum(squeeze(cWes(:,1,:)) .* dofe,2);
+                val(lindex,2) = val(lindex,2) + sum(squeeze(cWes(:,2,:)) .* dofe,2);
                 %----------------------------------------------------------
             end
             %--------------------------------------------------------------
@@ -97,9 +97,9 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
                 return
             end
             % ---
-            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gid_face',id_face);
+            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gindex',id_face);
             % ---
-            lnb_face = length(dom.gid_face);
+            lnb_face = length(dom.gindex);
             % ---
             submesh = dom.submesh;
             % ---
@@ -112,12 +112,12 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
                 sm = submesh{k};
                 sm.build_prokit;
                 % ---
-                lid_face = sm.lid_face;
-                gid_face = sm.gid_face;
+                lindex = sm.lindex;
+                gindex = sm.gindex;
                 Wx = sm.prokit.We;
                 % --- same id system as submesh
                 % --- same as sm.meshds.id_edge_in_elem
-                id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face(:,gid_face);
+                id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face(:,gindex);
                 % ---
                 if any(f_strcmpi(sm.elem_type,'tri'))
                     dof_ = obj.dof.value(id_edge_in_face(1:3,:)).';
@@ -126,7 +126,7 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
                 end
                 % ---
                 for m = 1:nbNodeI
-                    vi = zeros(length(lid_face),2);
+                    vi = zeros(length(lindex),2);
                     for l = 1:sm.refelem.nbEd_inEl
                         wix = Wx{m}(:,1,l);
                         wiy = Wx{m}(:,2,l);
@@ -134,7 +134,7 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
                         vi(:,2) = vi(:,2) + wiy .* dof_(:,l);
                     end
                     % ---
-                    val{m}(lid_face,:) = vi;
+                    val{m}(lindex,:) = vi;
                 end
             end
             %--------------------------------------------------------------

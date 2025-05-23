@@ -25,7 +25,7 @@ classdef VolumeDom3d < VolumeDom
     methods (Static)
         function argslist = validargs()
             argslist = {'id','parent_mesh','id_dom2d','id_zline','elem_code', ...
-                        'gid_elem','condition'};
+                        'gindex','condition'};
         end
     end
     % --- Constructors
@@ -38,7 +38,7 @@ classdef VolumeDom3d < VolumeDom
                 args.id_dom2d
                 args.id_zline
                 args.elem_code
-                args.gid_elem
+                args.gindex
                 args.condition
             end
             % ---
@@ -62,8 +62,8 @@ classdef VolumeDom3d < VolumeDom
                 obj.build_from_idmesh1d2d;
             elseif ~isempty(obj.elem_code)
                 obj.build_from_elem_code;
-            elseif ~isempty(obj.gid_elem)
-                obj.build_from_gid_elem;
+            elseif ~isempty(obj.gindex)
+                obj.build_from_gindex;
             end
             % ---
         end
@@ -88,7 +88,7 @@ classdef VolumeDom3d < VolumeDom
             all_elem_code = obj.parent_mesh.elem_code;
             id_all_elem   = 1:obj.parent_mesh.nb_elem;
             % ---
-            gid_elem_ = [];
+            gindex_ = [];
             elem_code_ = [];
             % ---
             for i = 1:length(id_dom2d_)
@@ -124,7 +124,7 @@ classdef VolumeDom3d < VolumeDom
                                     codeidz = zline.elem_code;
                                     % ---
                                     given_elem_code = codedom2d(o) .* codeidz;
-                                    gid_elem_ = [gid_elem_ ...
+                                    gindex_ = [gindex_ ...
                                                 id_all_elem(all_elem_code == given_elem_code)];
                                     % ---
                                     elem_code_ = [elem_code_ given_elem_code];
@@ -135,21 +135,21 @@ classdef VolumeDom3d < VolumeDom
                 end
             end
             % ---
-            gid_elem_ = unique(gid_elem_);
+            gindex_ = unique(gindex_);
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
                 % ---------------------------------------------------------
                 node = obj.parent_mesh.node;
-                elem = obj.parent_mesh.elem(:,gid_elem_);
+                elem = obj.parent_mesh.elem(:,gindex_);
                 elem_type = obj.parent_mesh.elem_type;
                 % ---
                 idElem = ...
                     f_findelem(node,elem,'condition', obj.condition);
-                gid_elem_ = gid_elem_(idElem);
+                gindex_ = gindex_(idElem);
             end
             % -------------------------------------------------------------
-            obj.gid_elem  = unique(gid_elem_);
-            obj.elem_code = unique(obj.parent_mesh.elem_code(gid_elem_));
+            obj.gindex  = unique(gindex_);
+            obj.elem_code = unique(obj.parent_mesh.elem_code(gindex_));
             % -------------------------------------------------------------
         end
     end

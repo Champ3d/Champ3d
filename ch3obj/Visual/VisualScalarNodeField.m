@@ -33,7 +33,7 @@ classdef VisualScalarNodeField < Xhandle
         field
         % ---
         cut_equation
-        %gid_elem
+        %gindex
         %gid_side_node_1
         %gid_side_node_2
     end
@@ -157,20 +157,20 @@ classdef VisualScalarNodeField < Xhandle
                                 num2str(ci(2)) '*y+' ...
                                 num2str(ci(3)) '*z =' num2str(d)];
             % ---
-            gid_elem_ = [];
+            gindex_ = [];
             iddom3 = f_to_scellargin(obj.id_dom3d);
             for i = 1:length(iddom3)
                 dom2cut = obj.parent_model.parent_mesh.dom.(iddom3{i});
                 gid_e = dom2cut.get_cutelem('cut_equation',obj.cut_equation);
-                gid_elem_ = [gid_elem_ gid_e];
+                gindex_ = [gindex_ gid_e];
             end
             % ---
             nbNo_inEl = size(obj.parent_mesh.elem,1);
-            cx = reshape(obj.parent_mesh.node(1,obj.parent_mesh.elem(:,gid_elem_)),...
+            cx = reshape(obj.parent_mesh.node(1,obj.parent_mesh.elem(:,gindex_)),...
                          nbNo_inEl,[]);
-            cy = reshape(obj.parent_mesh.node(2,obj.parent_mesh.elem(:,gid_elem_)),...
+            cy = reshape(obj.parent_mesh.node(2,obj.parent_mesh.elem(:,gindex_)),...
                          nbNo_inEl,[]);
-            cz = reshape(obj.parent_mesh.node(3,obj.parent_mesh.elem(:,gid_elem_)),...
+            cz = reshape(obj.parent_mesh.node(3,obj.parent_mesh.elem(:,gindex_)),...
                          nbNo_inEl,[]);
             % ---
             xmin = min([obj.parallel_line_1(:,1);obj.parallel_line_2(:,1)]);
@@ -184,9 +184,9 @@ classdef VisualScalarNodeField < Xhandle
             cy = sum(cy >= ymin - 1e-9 & cy <= ymax + 1e-9, 1);
             cz = sum(cz >= zmin - 1e-9 & cz <= zmax + 1e-9, 1);
             % ---
-            gid_elem_ = gid_elem_(cx > 0 | cy > 0 | cz > 0);
+            gindex_ = gindex_(cx > 0 | cy > 0 | cz > 0);
             % ---
-            obj.gid_elem = gid_elem_;
+            obj.gindex = gindex_;
             % ---
         end
     end
@@ -412,7 +412,7 @@ classdef VisualScalarNodeField < Xhandle
                         [coefficient, coef_array_type] = ...
                             f_column_format(model.econductor.(id_phydom).matrix.sigma_array);
                         %------------------------------------------------------
-                        id_elem = model.econductor.(id_phydom).matrix.gid_elem;
+                        id_elem = model.econductor.(id_phydom).matrix.gindex;
                         %------------------------------------------------------
                         if any(f_strcmpi(coef_array_type,{'scalar'}))
                             %--------------------------------------------------
@@ -434,7 +434,7 @@ classdef VisualScalarNodeField < Xhandle
                 end
             end
             % -------------------------------------------------------------
-            id_elem = obj.gid_elem;
+            id_elem = obj.gindex;
             % -------------------------------------------------------------
             xi  = []; yi  = []; zi  = [];
             vfx = []; vfy = []; vfz = [];

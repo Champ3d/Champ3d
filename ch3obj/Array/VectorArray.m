@@ -265,8 +265,8 @@ classdef VectorArray < Array
             obj.value = Array.vector(val);
         end
         %-------------------------------------------------------------------
-        function gid_elem = gid_elem(obj)
-            gid_elem = obj.parent_dom.gid_elem;
+        function gindex = gindex(obj)
+            gindex = obj.parent_dom.gindex;
         end
         %-------------------------------------------------------------------
     end

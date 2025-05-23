@@ -34,7 +34,7 @@ classdef ScalarFaceField < FaceField
                 args.show_dom = 1
             end
             % ---
-            gid_face = [];
+            gindex = [];
             % ---
             if isempty(args.id_meshdom)
                 args.show_dom = 0;
@@ -43,12 +43,12 @@ classdef ScalarFaceField < FaceField
                     if isempty(args.id_face)
                         text(0,0,'Nothing to plot !');
                     else
-                        gid_face = args.id_face;
+                        gindex = args.id_face;
                     end
                 else
                     dom = args.meshdom_obj;
                     if isa(dom,'SurfaceDom3d')
-                        gid_face = dom.gid_face;
+                        gindex = dom.gindex;
                     else
                         text(0,0,'Nothing to plot, dom must be a SurfaceDom3d !');
                     end
@@ -56,7 +56,7 @@ classdef ScalarFaceField < FaceField
             else
                 dom = obj.parent_model.parent_mesh.dom.(args.id_meshdom);
                 if isa(dom,'SurfaceDom3d')
-                    gid_face = dom.gid_face;
+                    gindex = dom.gindex;
                 else
                     text(0,0,'Nothing to plot, dom must be a SurfaceDom3d !');
                 end
@@ -66,10 +66,10 @@ classdef ScalarFaceField < FaceField
                 dom.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
             end
             % ---
-            if ~isempty(gid_face)
+            if ~isempty(gindex)
                 node_ = obj.parent_model.parent_mesh.node;
-                face_ = obj.parent_model.parent_mesh.face(:,gid_face);
-                f_patch('node',node_,'face',face_,'face_field',obj.cvalue(gid_face));
+                face_ = obj.parent_model.parent_mesh.face(:,gindex);
+                f_patch('node',node_,'face',face_,'face_field',obj.cvalue(gindex));
             end
         end
         % -----------------------------------------------------------------

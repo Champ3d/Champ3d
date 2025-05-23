@@ -38,10 +38,7 @@ classdef Mesh < Xhandle
         prokit
         % --- submesh
         parent_mesh
-        gid_node
-        gid_elem
-        gid_edge
-        gid_face
+        gindex
         flat_node
         % ---
         dom
@@ -136,11 +133,11 @@ classdef Mesh < Xhandle
     methods
         % -----------------------------------------------------------------
         function add_whole_mesh_dom(obj,varargin)
-            gid_elem_ = 1:obj.nb_elem;
+            gindex_ = 1:obj.nb_elem;
             if isa(obj,'Mesh2d')
-                obj.dom.whole_mesh_dom = VolumeDom2d('parent_mesh',obj,'gid_elem',gid_elem_);
+                obj.dom.whole_mesh_dom = VolumeDom2d('parent_mesh',obj,'gindex',gindex_);
             elseif isa(obj,'Mesh3d')
-                obj.dom.whole_mesh_dom = VolumeDom3d('parent_mesh',obj,'gid_elem',gid_elem_);
+                obj.dom.whole_mesh_dom = VolumeDom3d('parent_mesh',obj,'gindex',gindex_);
             end
             % ---
             obj.dom.whole_mesh_dom.id = 'whole_mesh_dom';

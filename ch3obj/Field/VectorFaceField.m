@@ -47,12 +47,12 @@ classdef VectorFaceField < FaceField & VectorField
                     if isempty(args.id_face)
                         text(0,0,'Nothing to plot !');
                     else
-                        gid_face = args.id_face;
+                        gindex = args.id_face;
                     end
                 else
                     dom = args.meshdom_obj;
                     if isa(dom,'SurfaceDom3d')
-                        gid_face = dom.gid_face;
+                        gindex = dom.gindex;
                     else
                         text(0,0,'Nothing to plot, dom must be a SurfaceDom3d !');
                     end
@@ -60,7 +60,7 @@ classdef VectorFaceField < FaceField & VectorField
             else
                 dom = obj.parent_model.parent_mesh.dom.(args.id_meshdom);
                 if isa(dom,'SurfaceDom3d')
-                    gid_face = dom.gid_face;
+                    gindex = dom.gindex;
                 else
                     text(0,0,'Nothing to plot, dom must be a SurfaceDom3d !');
                 end
@@ -71,10 +71,10 @@ classdef VectorFaceField < FaceField & VectorField
             end
             % ---
             node_ = obj.parent_model.parent_mesh.node;
-            face_ = obj.parent_model.parent_mesh.face(:,gid_face);
-            v_ = obj.cvalue(gid_face);
+            face_ = obj.parent_model.parent_mesh.face(:,gindex);
+            v_ = obj.cvalue(gindex);
             if isreal(v_)
-                f_patch('node',node_,'face',face_,'face_field',obj.cvalue(gid_face).');
+                f_patch('node',node_,'face',face_,'face_field',obj.cvalue(gindex).');
             else
                 for i = 1:3
                     subplot(130 + i);

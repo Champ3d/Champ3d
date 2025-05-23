@@ -32,13 +32,13 @@ classdef MeshDom < Xhandle
         function val = get.geoextension(obj)
             % ---
             if isa(obj,'VolumeDom')
-                elem = obj.parent_mesh.elem(:,obj.gid_elem);
-                celem = obj.parent_mesh.celem(:,obj.gid_elem);
-                velem = obj.parent_mesh.velem(obj.gid_elem);
+                elem = obj.parent_mesh.elem(:,obj.gindex);
+                celem = obj.parent_mesh.celem(:,obj.gindex);
+                velem = obj.parent_mesh.velem(obj.gindex);
             else isa(obj,'SurfaceDom')
-                elem = obj.parent_mesh.face(:,obj.gid_face);
-                celem = obj.parent_mesh.cface(:,obj.gid_face);
-                velem = obj.parent_mesh.sface(obj.gid_elem);
+                elem = obj.parent_mesh.face(:,obj.gindex);
+                celem = obj.parent_mesh.cface(:,obj.gindex);
+                velem = obj.parent_mesh.sface(obj.gindex);
             end
             % ---
             id_node = f_uniquenode(elem);

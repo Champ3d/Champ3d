@@ -22,64 +22,85 @@ classdef Field < Xhandle
     end
     % --- Contructor
     methods
-        function obj = Field()
+        function obj = Field(value)
             obj = obj@Xhandle;
+            if nargin > 0
+                obj.value = value;
+            end
         end
     end
     % --- Utilily Methods
     methods
         % -----------------------------------------------------------------
-        function field_obj = subsref(obj,gid)
+        function fout = subsref(obj,gidstruct)
             % ---
             % applied to subclass !
             % ---
             % field([...]), field({[...]}), field({{[...]}})
             % field([]), field({[]}), field({{[]}})
             % ---
-            field_obj = Field();
-            % ---
-            if iscell(gid)
-                gid = gid{1};
-                if iscell(gid)
-                    % --- gvalue
-                    gid = gid{1};
-                    value_ = obj.gvalue(gid);
-                elseif isnumeric(gid)
-                    % --- ivalue
-                    value_ = obj.ivalue(gid);
-                end
-            elseif isnumeric(gid)
-                % --- cvalue
-                value_ = obj.cvalue(gid);
+            value_ = [];
+            switch gidstruct(1).type
+                case '()'
+                    if isempty(gidstruct(1).subs)
+                        value_ = obj.cvalue;
+                    else
+                        gindex = gidstruct(1).subs{1};
+                        if iscell(gindex)
+                            gindex = gindex{1};
+                            if iscell(gindex)
+                                % --- gvalue
+                                gindex = gindex{1};
+                                value_ = obj.gvalue(gindex);
+                            elseif isnumeric(gindex)
+                                % --- ivalue
+                                value_ = obj.ivalue(gindex);
+                            end
+                        elseif isnumeric(gindex)
+                            % --- cvalue
+                            value_ = obj.cvalue(gindex);
+                        end
+                    end
+                    % ---
+                    fout = Field();
+                    fout.value = value_;
+                    % ---
+                otherwise
+                    % builtin behavior for field. and field{}
+                    try
+                        fout = builtin('subsref', obj, gidstruct);
+                    catch
+                        builtin('subsref', obj, gidstruct);
+                    end
             end
-            % ---
-            field_obj.value = value_;
-            % ---
         end
         % -----------------------------------------------------------------
-        function field_obj = mtimes(obj,rhs_obj)
+        function outobj = mtimes(obj,rhs_obj)
             % ---
             % obj must be a Field
             % objx may be a Field, a TensorArray, or a VectorArray
             % ---
-            X = obj.value;
-            Y = rhs_obj.value;
-            % ---
             if isa(rhs_obj,'TensorArray')
-                % X -> v, Y -> t
-                field_obj = Field();
-                value_ = VectorArray.multiply(X,Y);
+                V = obj.value;
+                T = rhs_obj.value;
+                % ---
+                outobj = Field();
+                value_ = VectorArray.multiply(V,T);
             elseif isa(rhs_obj,'VectorArray')
-                % X -> v, Y -> v
-                field_obj = TensorArray();
-                value_ = VectorArray.dot(X,Y);
+                V1 = obj.value;
+                V2 = rhs_obj.value;
+                % ---
+                outobj = TensorArray();
+                value_ = VectorArray.dot(V1,V2);
             elseif isa(rhs_obj,'Field')
-                % X -> v, Y -> v
-                field_obj = TensorArray();
-                value_ = VectorArray.dot(X,Y);
+                V1 = obj.value;
+                V2 = rhs_obj.value;
+                % ---
+                outobj = TensorArray();
+                value_ = VectorArray.dot(V1,V2);
             end
             % ---
-            field_obj.value = value_;
+            outobj.value = value_;
             % ---
         end
         % -----------------------------------------------------------------

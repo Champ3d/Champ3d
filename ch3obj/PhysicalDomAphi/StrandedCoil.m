@@ -32,15 +32,15 @@ classdef StrandedCoil < Coil
     % -----------------------------------------------------------------
         function getFlux(obj)
             it = obj.parent_model.ltime.it;
-            gid_elem = obj.matrix.gid_elem;
-            A = obj.parent_model.field{it}.A.elem.gvalue(gid_elem);
-            N = obj.uJfield.gvalue(gid_elem);
+            gindex = obj.matrix.gindex;
+            A = obj.parent_model.field{it}.A.elem.gvalue(gindex);
+            N = obj.uJfield.gvalue(gindex);
             % ---
-            AN = zeros(8,length(gid_elem));
-            detJ = zeros(8,length(gid_elem));
+            AN = zeros(8,length(gindex));
+            detJ = zeros(8,length(gindex));
             for i = 1:length(A)
                 AN(i,:) = dot(A{i},N{i});
-                detJ(i,:) = obj.parent_model.parent_mesh.intkit.detJ{i}(gid_elem);
+                detJ(i,:) = obj.parent_model.parent_mesh.intkit.detJ{i}(gindex);
             end
             % ---
             refelem = obj.parent_model.parent_mesh.refelem;

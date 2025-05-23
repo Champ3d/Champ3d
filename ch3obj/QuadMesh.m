@@ -18,7 +18,7 @@
 
 classdef QuadMesh < Mesh2d
     properties
-        lid_face
+        lindex
     end
     properties (Access = private)
         build_done = 0

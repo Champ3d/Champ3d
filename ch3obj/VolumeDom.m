@@ -20,14 +20,14 @@ classdef VolumeDom < MeshDom
     properties
         parent_mesh
         elem_code
-        gid_elem
+        gindex
         condition
         gid
     end
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'id','parent_mesh','elem_code','gid_elem','condition'};
+            argslist = {'id','parent_mesh','elem_code','gindex','condition'};
         end
     end
     % --- Constructors
@@ -37,7 +37,7 @@ classdef VolumeDom < MeshDom
                 args.id
                 args.parent_mesh
                 args.elem_code
-                args.gid_elem
+                args.gindex
                 args.condition
             end
             % ---
@@ -60,8 +60,8 @@ classdef VolumeDom < MeshDom
             % must try elem_code first
             if ~isempty(obj.elem_code)
                 obj.build_from_elem_code;
-            elseif ~isempty(obj.gid_elem)
-                obj.build_from_gid_elem;
+            elseif ~isempty(obj.gindex)
+                obj.build_from_gindex;
             end
         end
     end
@@ -78,10 +78,10 @@ classdef VolumeDom < MeshDom
         function sm = submesh(obj)
             % --- need parent_mesh
             node = obj.parent_mesh.node;
-            elem = obj.parent_mesh.elem(:,obj.gid_elem);
+            elem = obj.parent_mesh.elem(:,obj.gindex);
             % -------------------------------------------------------------
             sm{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
-            sm{1}.gid_elem = obj.gid_elem;
+            sm{1}.gindex = obj.gindex;
             sm{1}.parent_mesh = obj.parent_mesh;
             % ---
         end
@@ -89,13 +89,13 @@ classdef VolumeDom < MeshDom
         function gid = get_gid(obj)
             %--------------------------------------------------------------
             node = obj.parent_mesh.node;
-            elem = obj.parent_mesh.elem(:,obj.gid_elem);
+            elem = obj.parent_mesh.elem(:,obj.gindex);
             elem_type = obj.parent_mesh.elem_type;
             %--------------------------------------------------------------
             id_node = f_uniquenode(elem);
-            id_edge = obj.parent_mesh.meshds.id_edge_in_elem(:,obj.gid_elem);
+            id_edge = obj.parent_mesh.meshds.id_edge_in_elem(:,obj.gindex);
             id_edge = unique(id_edge);
-            id_face = obj.parent_mesh.meshds.id_face_in_elem(:,obj.gid_elem);
+            id_face = obj.parent_mesh.meshds.id_face_in_elem(:,obj.gindex);
             id_face = unique(id_face);
             %--------------------------------------------------------------
             bound_face = f_boundface(elem,node,'elem_type',elem_type);
@@ -112,7 +112,7 @@ classdef VolumeDom < MeshDom
             id_inner_edge = setdiff(id_edge,id_bound_edge);
             id_inner_face = setdiff(id_face,id_bound_face);
             %--------------------------------------------------------------
-            gid.gid_elem = obj.gid_elem;
+            gid.gid_elem = obj.gindex;
             gid.gid_node = id_node;
             gid.gid_edge = id_edge;
             gid.gid_face = id_face;
@@ -129,7 +129,7 @@ classdef VolumeDom < MeshDom
             %--------------------------------------------------------------
         end
         % -----------------------------------------------------------------
-        function [gid_elem, lid_elem] = get_cutelem(obj,args)
+        function [gindex, lindex] = get_cutelem(obj,args)
             arguments
                 obj
                 args.cut_equation = []
@@ -137,7 +137,7 @@ classdef VolumeDom < MeshDom
             end
             % ---
             node = obj.parent_mesh.node;
-            elem = obj.parent_mesh.elem(:,obj.gid_elem);
+            elem = obj.parent_mesh.elem(:,obj.gindex);
             cut_equation = f_cut_equation(args.cut_equation);
             tol = args.tolerance;
             %--------------------------------------------------------------
@@ -158,9 +158,9 @@ classdef VolumeDom < MeshDom
                 eval(['iNeqcond = (' neqcond ');']);
                 checksum = sum(iNeqcond);
                 % just need one node touched
-                lid_elem = find(checksum >= 1);
+                lindex = find(checksum >= 1);
             else
-                lid_elem = 1:nbElem;
+                lindex = 1:nbElem;
             end
             % ---
             for i = 1:nbEqcond
@@ -181,11 +181,11 @@ classdef VolumeDom < MeshDom
             end
             % ---
             for i = 1:nbEqcond
-                lid_elem = intersect(lid_elem,iElemEqcond{i});
+                lindex = intersect(lindex,iElemEqcond{i});
             end
             %--------------------------------------------------------------
-            lid_elem = unique(lid_elem);
-            gid_elem = obj.gid_elem(lid_elem);
+            lindex = unique(lindex);
+            gindex = obj.gindex(lindex);
             %--------------------------------------------------------------
         end
         % -----------------------------------------------------------------
@@ -196,7 +196,7 @@ classdef VolumeDom < MeshDom
                 args.tolerance = 1e-9;
             end
             %--------------------------------------------------------------
-            IDNode = f_uniquenode(obj.parent_mesh.elem(:,obj.gid_elem));
+            IDNode = f_uniquenode(obj.parent_mesh.elem(:,obj.gindex));
             lnode  = obj.parent_mesh.node(:,IDNode);
             %--------------------------------------------------------------
             lid_node = f_findnode(lnode,'condition',args.cut_equation,...
@@ -212,9 +212,9 @@ classdef VolumeDom < MeshDom
                 args.cut_equation
             end
             %--------------------------------------------------------------
-            [gid_elem_, lid_elem] = obj.get_cutelem('cut_equation',args.cut_equation);
-            if isempty(gid_elem_)
-                cut_dom.gid_elem = [];
+            [gindex_, lindex] = obj.get_cutelem('cut_equation',args.cut_equation);
+            if isempty(gindex_)
+                cut_dom.gindex = [];
                 cut_dom.gid_side_node_1 = [];
                 cut_dom.gid_side_node_2 = [];
                 return
@@ -226,8 +226,8 @@ classdef VolumeDom < MeshDom
             % ---
             eqcond = cut_equation.eqcond;
             % ---
-            elem1 = obj.parent_mesh.elem(:,gid_elem_);
-            elem2 = obj.parent_mesh.elem(:,setdiff(obj.gid_elem,gid_elem_));
+            elem1 = obj.parent_mesh.elem(:,gindex_);
+            elem2 = obj.parent_mesh.elem(:,setdiff(obj.gindex,gindex_));
             % ---
             side_face = f_interface(elem1,elem2,node,'elem_type',elem_type);
             % ---
@@ -255,7 +255,7 @@ classdef VolumeDom < MeshDom
                 gid_side_node_2 = [gid_side_node_2 lid_side_node_2{i}];
             end
             %--------------------------------------------------------------
-            cut_dom.gid_elem = gid_elem_;
+            cut_dom.gindex = gindex_;
             cut_dom.gid_side_node_1 = gid_side_node_1;
             cut_dom.gid_side_node_2 = gid_side_node_2;
             %--------------------------------------------------------------
@@ -270,53 +270,53 @@ classdef VolumeDom < MeshDom
         function build_from_elem_code(obj)
             % ---
             if any(f_strcmpi(obj.elem_code,{':','all','all_domaine'}))
-                obj.gid_elem = ':';
-                obj.build_from_gid_elem;
+                obj.gindex = ':';
+                obj.build_from_gindex;
                 return
             end
             % ---
-            gid_elem_ = [];
+            gindex_ = [];
             for i = 1:length(obj.elem_code)
-                gid_elem_ = [gid_elem_ f_torowv(find(obj.parent_mesh.elem_code == obj.elem_code(i)))];
+                gindex_ = [gindex_ f_torowv(find(obj.parent_mesh.elem_code == obj.elem_code(i)))];
             end
             % ---
-            gid_elem_ = unique(gid_elem_);
+            gindex_ = unique(gindex_);
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
                 % ---------------------------------------------------------
                 node = obj.parent_mesh.node;
-                elem = obj.parent_mesh.elem(:,gid_elem_);
+                elem = obj.parent_mesh.elem(:,gindex_);
                 % ---
                 idElem = ...
                     f_findelem(node,elem,'condition', obj.condition);
-                gid_elem_ = gid_elem_(idElem);
+                gindex_ = gindex_(idElem);
             end
             % -------------------------------------------------------------
-            obj.gid_elem  = unique(gid_elem_);
-            obj.elem_code = unique(obj.parent_mesh.elem_code(gid_elem_));
+            obj.gindex  = unique(gindex_);
+            obj.elem_code = unique(obj.parent_mesh.elem_code(gindex_));
             % -------------------------------------------------------------
         end
         % -----------------------------------------------------------------
-        function build_from_gid_elem(obj)
+        function build_from_gindex(obj)
             % ---
-            if any(f_strcmpi(obj.gid_elem,{':','all','all_domaine'}))
-                obj.gid_elem = 1:obj.parent_mesh.nb_elem;
+            if any(f_strcmpi(obj.gindex,{':','all','all_domaine'}))
+                obj.gindex = 1:obj.parent_mesh.nb_elem;
             end
             % ---
-            gid_elem_ = obj.gid_elem;
+            gindex_ = obj.gindex;
             % -------------------------------------------------------------
             if ~isempty(obj.condition)
                 % ---------------------------------------------------------
                 node = obj.parent_mesh.node;
-                elem = obj.parent_mesh.elem(:,gid_elem_);
+                elem = obj.parent_mesh.elem(:,gindex_);
                 % ---
                 idElem = ...
                     f_findelem(node,elem,'condition', obj.condition);
-                gid_elem_ = gid_elem_(idElem);
+                gindex_ = gindex_(idElem);
             end
             % -------------------------------------------------------------
-            obj.gid_elem  = unique(gid_elem_);
-            obj.elem_code = unique(obj.parent_mesh.elem_code(gid_elem_));
+            obj.gindex  = unique(gindex_);
+            obj.elem_code = unique(obj.parent_mesh.elem_code(gindex_));
             % -------------------------------------------------------------
         end
         % -----------------------------------------------------------------
@@ -390,8 +390,8 @@ classdef VolumeDom < MeshDom
         % must call reset
         function objy = plus(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
-            objy.gid_elem = [f_torowv(obj.gid_elem) f_torowv(objx.gid_elem)];
-            objy.build_from_gid_elem;
+            objy.gindex = [f_torowv(obj.gindex) f_torowv(objx.gindex)];
+            objy.build_from_gindex;
             % ---
             % obj.transfer_dep_def(objx,objy);
             % ---
@@ -400,8 +400,8 @@ classdef VolumeDom < MeshDom
         end
         function objy = minus(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
-            objy.gid_elem = setdiff(f_torowv(obj.gid_elem),f_torowv(objx.gid_elem));
-            objy.build_from_gid_elem;
+            objy.gindex = setdiff(f_torowv(obj.gindex),f_torowv(objx.gindex));
+            objy.build_from_gindex;
             % ---
             % obj.transfer_dep_def(objx,objy);
             % ---
@@ -410,8 +410,8 @@ classdef VolumeDom < MeshDom
         end
         function objy = mpower(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
-            objy.gid_elem = intersect(f_torowv(obj.gid_elem),f_torowv(objx.gid_elem));
-            objy.build_from_gid_elem;
+            objy.gindex = intersect(f_torowv(obj.gindex),f_torowv(objx.gindex));
+            objy.build_from_gindex;
             % ---
             % obj.transfer_dep_def(objx,objy);
             % ---

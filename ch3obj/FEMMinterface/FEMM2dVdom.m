@@ -209,10 +209,10 @@ classdef FEMM2dVdom < Xhandle
             clear msh;
             %--------------------------------------------------------------
             msh.Vertices = obj.parent_model.mesh.node.';
-            msh.Faces = obj.parent_model.mesh.elem(1:3,obj.meshdom.gid_elem).';
+            msh.Faces = obj.parent_model.mesh.elem(1:3,obj.meshdom.gindex).';
             msh.FaceColor = 'flat';
             msh.EdgeColor = edge_color_; % [0.7 0.7 0.7] --> gray
-            msh.FaceVertexCData = obj.parent_model.field.pv(obj.meshdom.gid_elem).';
+            msh.FaceVertexCData = obj.parent_model.field.pv(obj.meshdom.gindex).';
             %--------------------------------------------------------------
             patch(msh);
             f_colormap; colorbar;

@@ -60,7 +60,7 @@ classdef PMagnet < PhysicalDom
             obj.get_geodom;
             obj.dom.is_defining_obj_of(obj);
             % --- Initialization
-            obj.matrix.gid_elem = [];
+            obj.matrix.gindex = [];
             obj.matrix.wfbr = [];
             obj.matrix.br_array = [];
             % ---
@@ -75,13 +75,13 @@ classdef PMagnet < PhysicalDom
             % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
-            gid_elem = dom.gid_elem;
+            gindex = dom.gindex;
             % ---
             br_array = obj.br.getvalue('in_dom',dom);
             % --- check changes
             is_changed = 1;
             if isequal(br_array,obj.matrix.br_array) && ...
-               isequal(gid_elem,obj.matrix.gid_elem)
+               isequal(gindex,obj.matrix.gindex)
                 is_changed = 0;
             end
             %--------------------------------------------------------------
@@ -89,11 +89,11 @@ classdef PMagnet < PhysicalDom
                 return
             end
             %--------------------------------------------------------------
-            obj.matrix.gid_elem = gid_elem;
+            obj.matrix.gindex = gindex;
             obj.matrix.br_array = br_array;
             %--------------------------------------------------------------
             % local wfbs matrix
-            lmatrix = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',br_array);
+            lmatrix = parent_mesh.cwfvf('id_elem',gindex,'vector_field',br_array);
             %--------------------------------------------------------------
             nb_edge = obj.parent_model.parent_mesh.nb_edge;
             nb_face = obj.parent_model.parent_mesh.nb_face;
@@ -103,10 +103,10 @@ classdef PMagnet < PhysicalDom
             % global elementary wfbs matrix
             wfbr = sparse(nb_face,1);
             %--------------------------------------------------------------
-            gid_elem = obj.matrix.gid_elem;
+            gindex = obj.matrix.gindex;
             for i = 1:nbFa_inEl
                 wfbr = wfbr + ...
-                    sparse(id_face_in_elem(i,gid_elem),1,lmatrix(:,i),nb_face,1);
+                    sparse(id_face_in_elem(i,gindex),1,lmatrix(:,i),nb_face,1);
             end
             %--------------------------------------------------------------
             rotb = obj.parent_model.parent_mesh.discrete.rot.' * wfbr;
@@ -160,8 +160,8 @@ classdef PMagnet < PhysicalDom
             % if isfield(obj.matrix,'br')
             %     if ~isempty(obj.matrix.br)
             %         hold on;
-            %         f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
-            %                  obj.matrix.br(:,obj.matrix.gid_elem).','sfactor',0.2);
+            %         f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gindex), ...
+            %                  obj.matrix.br(:,obj.matrix.gindex).','sfactor',0.2);
             %     end
             % end
         end

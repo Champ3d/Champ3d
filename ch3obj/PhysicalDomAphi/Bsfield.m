@@ -71,7 +71,7 @@ classdef Bsfield < PhysicalDom
             obj.get_geodom;
             obj.dom.is_defining_obj_of(obj);
             % --- Initialization
-            obj.matrix.gid_elem = [];
+            obj.matrix.gindex = [];
             obj.matrix.bs_array = [];
             obj.matrix.wfbs = [];
             obj.matrix.a_bs = [];
@@ -91,7 +91,7 @@ classdef Bsfield < PhysicalDom
             % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
-            gid_elem = dom.gid_elem;
+            gindex = dom.gindex;
             % ---
             if isa(obj.bs,'Parameter')
                 bs_array = obj.bs.getvalue('in_dom',dom);
@@ -101,7 +101,7 @@ classdef Bsfield < PhysicalDom
             % --- check changes
             is_changed = 1;
             if isequal(bs_array,obj.matrix.bs_array) && ...
-               isequal(gid_elem,obj.matrix.gid_elem)
+               isequal(gindex,obj.matrix.gindex)
                 is_changed = 0;
             end
             %--------------------------------------------------------------
@@ -109,11 +109,11 @@ classdef Bsfield < PhysicalDom
                 return
             end
             %--------------------------------------------------------------
-            obj.matrix.gid_elem = gid_elem;
+            obj.matrix.gindex = gindex;
             obj.matrix.bs_array = bs_array;
             %--------------------------------------------------------------
             % local wfbs matrix
-            lmatrix = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',bs_array);
+            lmatrix = parent_mesh.cwfvf('id_elem',gindex,'vector_field',bs_array);
             %--------------------------------------------------------------
             nb_edge = obj.parent_model.parent_mesh.nb_edge;
             nb_face = obj.parent_model.parent_mesh.nb_face;
@@ -123,10 +123,10 @@ classdef Bsfield < PhysicalDom
             % global elementary wfbs matrix
             wfbs = sparse(nb_face,1);
             %--------------------------------------------------------------
-            gid_elem = obj.matrix.gid_elem;
+            gindex = obj.matrix.gindex;
             for i = 1:nbFa_inEl
                 wfbs = wfbs + ...
-                    sparse(id_face_in_elem(i,gid_elem),1,lmatrix(:,i),nb_face,1);
+                    sparse(id_face_in_elem(i,gindex),1,lmatrix(:,i),nb_face,1);
             end
             %--------------------------------------------------------------
             rotb = obj.parent_model.parent_mesh.discrete.rot.' * wfbs;
@@ -179,8 +179,8 @@ classdef Bsfield < PhysicalDom
             % ---
             % if ~isempty(obj.matrix.bs)
             %     hold on;
-            %     f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
-            %              obj.matrix.bs(:,obj.matrix.gid_elem).','sfactor',0.2);
+            %     f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gindex), ...
+            %              obj.matrix.bs(:,obj.matrix.gindex).','sfactor',0.2);
             % end
         end
     end

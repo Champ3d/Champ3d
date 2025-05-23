@@ -64,7 +64,7 @@ classdef ThPs < PhysicalDom
             obj.get_geodom;
             obj.dom.is_defining_obj_of(obj);
             % --- Initialization
-            obj.matrix.gid_face = [];
+            obj.matrix.gindex = [];
             obj.matrix.gid_node_t = [];
             obj.matrix.ps_array = [];
             obj.matrix.pswn = [];
@@ -85,10 +85,10 @@ classdef ThPs < PhysicalDom
             % ---
             dom = obj.dom;
             % ---
-            gid_face = dom.gid_face;
-            nb_face  = length(gid_face);
+            gindex = dom.gindex;
+            nb_face  = length(gindex);
             % ---
-            gid_node_t = f_uniquenode(dom.parent_mesh.face(:,gid_face));
+            gid_node_t = f_uniquenode(dom.parent_mesh.face(:,gindex));
             % ---
             ps_array = obj.ps.getvalue('in_dom',obj);
             ps_array = Array.tensor(ps_array,'nb_elem',nb_face);
@@ -99,12 +99,12 @@ classdef ThPs < PhysicalDom
             for k = 1:length(submesh)
                 sm = submesh{k};
                 % ---
-                gid_face_{k} = sm.gid_face;
+                gindex_{k} = sm.gindex;
             end
             % --- check changes
             is_changed = 1;
             if isequal(ps_array,obj.matrix.ps_array) && ...
-               isequal(gid_face_,obj.matrix.gid_face) && ...
+               isequal(gindex_,obj.matrix.gindex) && ...
                isequal(gid_node_t,obj.matrix.gid_node_t)
                 is_changed = 0;
             end
@@ -113,7 +113,7 @@ classdef ThPs < PhysicalDom
                 return
             end
             %--------------------------------------------------------------
-            obj.matrix.gid_face = gid_face_;
+            obj.matrix.gindex = gindex_;
             obj.matrix.gid_node_t = gid_node_t;
             obj.matrix.ps_array = ps_array;
             %--------------------------------------------------------------
@@ -122,8 +122,8 @@ classdef ThPs < PhysicalDom
                 sm = submesh{k};
                 sm.build_intkit;
                 % ---
-                lid_face_  = sm.lid_face;
-                ps_sm = ps_array(lid_face_);
+                lindex_  = sm.lindex;
+                ps_sm = ps_array(lindex_);
                 lmatrix{k} = sm.cwn('coefficient',ps_sm);
                 % ---
             end
@@ -134,11 +134,11 @@ classdef ThPs < PhysicalDom
             % global elementary pswn matrix
             pswn = sparse(nb_node,1);
             %--------------------------------------------------------------
-            gid_face = obj.matrix.gid_face;
+            gindex = obj.matrix.gindex;
             %--------------------------------------------------------------
             for igr = 1:length(lmatrix)
                 nbNo_inFa = size(lmatrix{igr},2);
-                id_face = gid_face{igr};
+                id_face = gindex{igr};
                 for i = 1:nbNo_inFa
                     pswn = pswn + ...
                         sparse(face(i,id_face),1,lmatrix{igr}(:,i),nb_node,1);

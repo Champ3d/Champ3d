@@ -73,7 +73,7 @@ classdef Sibcjw < PhysicalDom
             % --- Initialization
             obj.matrix.gid_node_phi = [];
             obj.matrix.gsibcwewe = [];
-            obj.matrix.gid_face = [];
+            obj.matrix.gindex = [];
             obj.matrix.sigma_array = [];
             obj.matrix.mur_array = [];
             obj.matrix.cparam_array = [];
@@ -96,10 +96,10 @@ classdef Sibcjw < PhysicalDom
             % ---
             dom = obj.dom;
             % ---
-            gid_face = dom.gid_face;
-            lnb_face  = length(gid_face);
+            gindex = dom.gindex;
+            lnb_face  = length(gindex);
             % ---
-            gid_node_phi = f_uniquenode(dom.parent_mesh.face(:,gid_face));
+            gid_node_phi = f_uniquenode(dom.parent_mesh.face(:,gindex));
             % ---
             sigma_array  = obj.sigma.getvalue('in_dom',dom);
             mur_array    = obj.mur.getvalue('in_dom',dom);
@@ -122,13 +122,13 @@ classdef Sibcjw < PhysicalDom
                 sm = submesh{k};
                 sm.build_intkit;
                 % ---
-                gid_face_{k} = sm.gid_face;
+                gindex_{k} = sm.gindex;
             end
             %--------------------------------------------------------------
             % --- check changes
             is_changed = 1;
             if isequal(gid_node_phi,obj.matrix.gid_node_phi) && ...
-               isequal(gid_face_,obj.matrix.gid_face) && ...
+               isequal(gindex_,obj.matrix.gindex) && ...
                isequal(sigma_array,obj.matrix.sigma_array) && ...
                isequal(skindepth,obj.matrix.skindepth)
                 is_changed = 0;
@@ -139,7 +139,7 @@ classdef Sibcjw < PhysicalDom
             end
             %--------------------------------------------------------------
             obj.matrix.gid_node_phi = gid_node_phi;
-            obj.matrix.gid_face = gid_face_;
+            obj.matrix.gindex = gindex_;
             obj.matrix.sigma_array = sigma_array;
             obj.matrix.skindepth = skindepth;
             obj.matrix.z_sibc = z_sibc;
@@ -154,8 +154,8 @@ classdef Sibcjw < PhysicalDom
                 sm = submesh{k};
                 sm.build_intkit;
                 % ---
-                lid_face_  = sm.lid_face;
-                g_sibc = 1./z_sibc(lid_face_);
+                lindex_  = sm.lindex;
+                g_sibc = 1./z_sibc(lindex_);
                 lmatrix{k} = sm.cwewe('coefficient',g_sibc);
                 % ---
             end
@@ -166,11 +166,11 @@ classdef Sibcjw < PhysicalDom
             % global elementary gsibcwewe matrix
             gsibcwewe = sparse(nb_edge,nb_edge);
             %--------------------------------------------------------------
-            gid_face = obj.matrix.gid_face;
+            gindex = obj.matrix.gindex;
             %--------------------------------------------------------------
             for igr = 1:length(lmatrix)
                 nbEd_inFa = size(lmatrix{igr},2);
-                id_face = gid_face{igr};
+                id_face = gindex{igr};
                 for i = 1:nbEd_inFa
                     for j = i+1 : nbEd_inFa
                         gsibcwewe = gsibcwewe + ...
@@ -183,7 +183,7 @@ classdef Sibcjw < PhysicalDom
             gsibcwewe = gsibcwewe + gsibcwewe.';
             %--------------------------------------------------------------
             for igr = 1:length(lmatrix)
-                id_face = gid_face{igr};
+                id_face = gindex{igr};
                 nbEd_inFa = size(lmatrix{igr},2);
                 for i = 1:nbEd_inFa
                     gsibcwewe = gsibcwewe + ...
@@ -222,7 +222,7 @@ classdef Sibcjw < PhysicalDom
         function postpro(obj)
             % ---
             id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face;
-            lnb_face = length(obj.dom.gid_face);
+            lnb_face = length(obj.dom.gindex);
             % ---
             sigma_array = Array.tensor(obj.matrix.sigma_array,'nb_elem',lnb_face);
             skindepth   = Array.tensor(obj.matrix.skindepth,'nb_elem',lnb_face);
@@ -235,27 +235,27 @@ classdef Sibcjw < PhysicalDom
                 sm = submesh{k};
                 sm.build_intkit;
                 % ---
-                lid_face = sm.lid_face;
-                gid_face = sm.gid_face;
+                lindex = sm.lindex;
+                gindex = sm.gindex;
                 cWes = sm.intkit.cWe{1};
                 % ---
                 if any(f_strcmpi(sm.elem_type,'tri'))
-                    dofe = obj.parent_model.dof.e(id_edge_in_face(1:3,gid_face)).';
+                    dofe = obj.parent_model.dof.e(id_edge_in_face(1:3,gindex)).';
                 elseif any(f_strcmpi(sm.elem_type,'quad'))
-                    dofe = obj.parent_model.dof.e(id_edge_in_face(1:4,gid_face)).';
+                    dofe = obj.parent_model.dof.e(id_edge_in_face(1:4,gindex)).';
                 end
                 %----------------------------------------------------------
-                es(1,lid_face) = es(1,lid_face) + sum(squeeze(cWes(:,1,:)) .* dofe,2).';
-                es(2,lid_face) = es(2,lid_face) + sum(squeeze(cWes(:,2,:)) .* dofe,2).';
-                js(1,lid_face) = sigma_array(lid_face,1).' .* es(1,lid_face);
-                js(2,lid_face) = sigma_array(lid_face,1).' .* es(2,lid_face);
+                es(1,lindex) = es(1,lindex) + sum(squeeze(cWes(:,1,:)) .* dofe,2).';
+                es(2,lindex) = es(2,lindex) + sum(squeeze(cWes(:,2,:)) .* dofe,2).';
+                js(1,lindex) = sigma_array(lindex,1).' .* es(1,lindex);
+                js(2,lindex) = sigma_array(lindex,1).' .* es(2,lindex);
                 %----------------------------------------------------------
-                obj.parent_model.field.es(:,gid_face) = es(:,lid_face);
-                obj.parent_model.field.js(:,gid_face) = js(:,lid_face);
+                obj.parent_model.field.es(:,gindex) = es(:,lindex);
+                obj.parent_model.field.js(:,gindex) = js(:,lindex);
                 %----------------------------------------------------------
-                obj.parent_model.field.ps(:,gid_face) = ...
-                    real(1/2 .* skindepth(lid_face,1).' .* ...
-                    sum(es(:,lid_face) .* conj(js(:,lid_face))));
+                obj.parent_model.field.ps(:,gindex) = ...
+                    real(1/2 .* skindepth(lindex,1).' .* ...
+                    sum(es(:,lindex) .* conj(js(:,lindex))));
                 %----------------------------------------------------------
             end
         end

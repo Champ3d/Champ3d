@@ -19,7 +19,7 @@
 classdef SurfaceDom2d < SurfaceDom
     properties
         parent_mesh
-        gid_face
+        gindex
         defined_on
         condition
     end

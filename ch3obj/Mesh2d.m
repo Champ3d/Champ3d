@@ -36,7 +36,7 @@ classdef Mesh2d < Mesh
                 args.id_yline = []
                 % ---
                 args.elem_code = []
-                args.gid_elem = []
+                args.gindex = []
                 args.condition char = []
                 % ---
                 args.dom_obj {mustBeA(args.dom_obj,{'VolumeDom2d'})}
@@ -75,7 +75,7 @@ classdef Mesh2d < Mesh
                 args.id_yline = []
                 % ---
                 args.elem_code = []
-                args.gid_elem = []
+                args.gindex = []
                 args.condition char = []
             end
             % ---

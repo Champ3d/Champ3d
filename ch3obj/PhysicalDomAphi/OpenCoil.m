@@ -52,22 +52,22 @@ classdef OpenCoil < Coil
             % ---
             vdom = obj.dom;
             % ---
-            gid_elem = vdom.gid_elem;
-            gid_node_vdom = f_uniquenode(parent_mesh.elem(:,vdom.gid_elem));
-            lwewe = parent_mesh.cwewe('id_elem',gid_elem);
+            gindex = vdom.gindex;
+            gid_node_vdom = f_uniquenode(parent_mesh.elem(:,vdom.gindex));
+            lwewe = parent_mesh.cwewe('id_elem',gindex);
             % ---
             gwewe = sparse(nb_edge,nb_edge);
             for j = 1:nbEd_inEl
                 for k = j+1 : nbEd_inEl
                     gwewe = gwewe + ...
-                        sparse(id_edge_in_elem(j,gid_elem),id_edge_in_elem(j,gid_elem),...
+                        sparse(id_edge_in_elem(j,gindex),id_edge_in_elem(j,gindex),...
                         lwewe(:,j,k),nb_edge,nb_edge);
                 end
             end
             gwewe = gwewe + gwewe.';
             for j = 1:nbEd_inEl
                 gwewe = gwewe + ...
-                    sparse(id_edge_in_elem(j,gid_elem),id_edge_in_elem(j,gid_elem),...
+                    sparse(id_edge_in_elem(j,gindex),id_edge_in_elem(j,gindex),...
                     lwewe(:,j,j),nb_edge,nb_edge);
             end
             % ---
@@ -86,7 +86,7 @@ classdef OpenCoil < Coil
             end
             % ---
             dofuJ = - parent_mesh.discrete.grad * V;
-            vJs = parent_mesh.field_we('dof',dofuJ,'id_elem',gid_elem);
+            vJs = parent_mesh.field_we('dof',dofuJ,'id_elem',gindex);
             vJs = VectorArray.normalize(vJs);
             % ---
             unit_current_field = unit_current_field + vJs;
@@ -105,8 +105,8 @@ classdef OpenCoil < Coil
             id_dom3d = f_to_scellargin(obj.id_dom3d);
             id_dom3d = id_dom3d{1};
             % ---
-            gid_elem = parent_mesh.dom.(id_dom3d).gid_elem;
-            boface = f_boundface(parent_mesh.elem(:,gid_elem),...
+            gindex = parent_mesh.dom.(id_dom3d).gindex;
+            boface = f_boundface(parent_mesh.elem(:,gindex),...
                parent_mesh.node,'elem_type',parent_mesh.elem_type);
             % ---
             gid_node = f_uniquenode(boface);
@@ -151,8 +151,8 @@ classdef OpenCoil < Coil
             % ---
             if isfield(obj.matrix,'unit_current_field')
                 if ~isempty(obj.matrix.unit_current_field)
-                    f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
-                             obj.matrix.unit_current_field(:,obj.matrix.gid_elem),'sfactor',0.2);
+                    f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gindex), ...
+                             obj.matrix.unit_current_field(:,obj.matrix.gindex),'sfactor',0.2);
                 end
             end
         end

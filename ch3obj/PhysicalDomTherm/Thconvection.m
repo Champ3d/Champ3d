@@ -64,7 +64,7 @@ classdef Thconvection < PhysicalDom
             obj.get_geodom;
             obj.dom.is_defining_obj_of(obj);
             % --- Initialization
-            obj.matrix.gid_face = [];
+            obj.matrix.gindex = [];
             obj.matrix.gid_node_t = [];
             obj.matrix.h_array = [];
             obj.matrix.hwnwn = [];
@@ -85,10 +85,10 @@ classdef Thconvection < PhysicalDom
             % ---
             dom = obj.dom;
             % ---
-            gid_face = dom.gid_face;
-            nb_face  = length(gid_face);
+            gindex = dom.gindex;
+            nb_face  = length(gindex);
             % ---
-            gid_node_t = f_uniquenode(dom.parent_mesh.face(:,gid_face));
+            gid_node_t = f_uniquenode(dom.parent_mesh.face(:,gindex));
             % ---
             h_array = obj.h.getvalue('in_dom',obj);
             h_array = Array.tensor(h_array,'nb_elem',nb_face);
@@ -99,12 +99,12 @@ classdef Thconvection < PhysicalDom
             for k = 1:length(submesh)
                 sm = submesh{k};
                 % ---
-                gid_face_{k} = sm.gid_face;
+                gindex_{k} = sm.gindex;
             end
             % --- check changes
             is_changed = 1;
             if isequal(h_array,obj.matrix.h_array) && ...
-               isequal(gid_face_,obj.matrix.gid_face) && ...
+               isequal(gindex_,obj.matrix.gindex) && ...
                isequal(gid_node_t,obj.matrix.gid_node_t)
                 is_changed = 0;
             end
@@ -113,7 +113,7 @@ classdef Thconvection < PhysicalDom
                 return
             end
             %--------------------------------------------------------------
-            obj.matrix.gid_face = gid_face_;
+            obj.matrix.gindex = gindex_;
             obj.matrix.gid_node_t = gid_node_t;
             obj.matrix.h_array = h_array;
             %--------------------------------------------------------------
@@ -122,8 +122,8 @@ classdef Thconvection < PhysicalDom
                 sm = submesh{k};
                 sm.build_intkit;
                 % ---
-                lid_face_  = sm.lid_face;
-                h_sm = h_array(lid_face_);
+                lindex_  = sm.lindex;
+                h_sm = h_array(lindex_);
                 lmatrix{k} = sm.cwnwn('coefficient',h_sm);
                 % ---
             end
@@ -134,11 +134,11 @@ classdef Thconvection < PhysicalDom
             % global elementary hwnwn matrix
             hwnwn = sparse(nb_node,nb_node);
             %--------------------------------------------------------------
-            gid_face = obj.matrix.gid_face;
+            gindex = obj.matrix.gindex;
             %--------------------------------------------------------------
             for igr = 1:length(lmatrix)
                 nbNo_inFa = size(lmatrix{igr},2);
-                id_face = gid_face{igr};
+                id_face = gindex{igr};
                 for i = 1:nbNo_inFa
                     for j = i+1 : nbNo_inFa
                         hwnwn = hwnwn + ...
@@ -151,7 +151,7 @@ classdef Thconvection < PhysicalDom
             hwnwn = hwnwn + hwnwn.';
             %--------------------------------------------------------------
             for igr = 1:length(lmatrix)
-                id_face = gid_face{igr};
+                id_face = gindex{igr};
                 nbNo_inFa = size(lmatrix{igr},2);
                 for i = 1:nbNo_inFa
                     hwnwn = hwnwn + ...
