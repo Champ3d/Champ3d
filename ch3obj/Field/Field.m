@@ -62,17 +62,21 @@ classdef Field < Xhandle
             % obj must be a Field
             % objx may be a Field, a TensorArray, or a VectorArray
             % ---
-            field_obj = Field();
-            % ---
-            V = obj.value;
-            T = rhs_obj.value;
+            X = obj.value;
+            Y = rhs_obj.value;
             % ---
             if isa(rhs_obj,'TensorArray')
-                value_ = VectorArray.multiply(V,T);
+                % X -> v, Y -> t
+                field_obj = Field();
+                value_ = VectorArray.multiply(X,Y);
             elseif isa(rhs_obj,'VectorArray')
-                value_ = VectorArray.dot(V,T);
+                % X -> v, Y -> v
+                field_obj = TensorArray();
+                value_ = VectorArray.dot(X,Y);
             elseif isa(rhs_obj,'Field')
-                value_ = VectorArray.dot(V,T);
+                % X -> v, Y -> v
+                field_obj = TensorArray();
+                value_ = VectorArray.dot(X,Y);
             end
             % ---
             field_obj.value = value_;

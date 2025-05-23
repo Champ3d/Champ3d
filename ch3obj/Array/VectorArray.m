@@ -42,6 +42,7 @@ classdef VectorArray < Array
         end
     end
     % --- Utilily Methods
+    % --- array methods not for obj
     % --- not-cell row-vector column-array
     methods (Static)
         %-------------------------------------------------------------------
@@ -145,6 +146,7 @@ classdef VectorArray < Array
         %-------------------------------------------------------------------
     end
     % --- Utilily Methods
+    % --- array methods not for obj
     % --- cell/not-cell row-vector column-array (general purpose)
     methods (Static)
         %-------------------------------------------------------------------
@@ -166,93 +168,91 @@ classdef VectorArray < Array
             end
         end
         %-------------------------------------------------------------------
-        function vxcoef = multiply(vector_array,varargin)
+        function vxcoef = multiply(varray,tarray)
+            arguments
+                varray
+                tarray
+            end
             % ---
             if nargin <= 1
-                vxcoef = vector_array;
+                vxcoef = varray;
                 return
             end
             % ---
-            if iscell(vector_array)
-                for i = 1:length(vector_array)
-                    vxcoef{i} = zeros(size(vector_array{i}));
-                end
-            elseif isnumeric(vector_array)
-                vxcoef = zeros(size(vector_array));
-            end
+            [tarray, array_type] = Array.tensor(tarray);
             % ---
-            for i = 1:length(varargin)
-                % ---
-                T = varargin{i};
-                if isempty(T)
-                    continue
-                end
-                % ---
-                [T, array_type] = Array.tensor(T);
-                % ---
-                if iscell(vector_array)
-                    %------------------------------------------------------
-                    for ic = 1:length(vector_array)
-                        Vin = vector_array{ic};
-                        if strcmpi(array_type,'scalar')
-                            vxcoef{ic} = Vin .* T;
-                        elseif strcmpi(array_type,'tensor')
-                            vxc = zeros(size(Vin));
-                            if size(vxc,2) == 3
-                                vxc(:,1) = T(:,1,1) .* Vin(:,1) + ...
-                                           T(:,1,2) .* Vin(:,2) + ...
-                                           T(:,1,3) .* Vin(:,3);
-                                vxc(:,2) = T(:,2,1) .* Vin(:,1) + ...
-                                           T(:,2,2) .* Vin(:,2) + ...
-                                           T(:,2,3) .* Vin(:,3);
-                                vxc(:,3) = T(:,3,1) .* Vin(:,1) + ...
-                                           T(:,3,2) .* Vin(:,2) + ...
-                                           T(:,3,3) .* Vin(:,3);
-                            elseif size(vxc,2) == 2
-                                vxc(:,1) = T(:,1,1) .* Vin(:,1) + ...
-                                           T(:,1,2) .* Vin(:,2);
-                                vxc(:,2) = T(:,2,1) .* Vin(:,1) + ...
-                                           T(:,2,2) .* Vin(:,2);
-                            end
-                            vxcoef{ic} = vxc;
-                        end
-                    end
-                    %------------------------------------------------------
-                else
-                    %------------------------------------------------------
+            if iscell(varray)
+                %------------------------------------------------------
+                for ic = 1:length(varray)
+                    V = varray{ic};
                     if strcmpi(array_type,'scalar')
-                        vxcoef = vector_array .* T;
+                        vxcoef{ic} = V .* tarray;
                     elseif strcmpi(array_type,'tensor')
-                        vxcoef = zeros(size(vector_array));
+                        vxc = zeros(size(V));
                         if size(vxc,2) == 3
-                            vxcoef(:,1) = T(:,1,1) .* vector_array(:,1) + ...
-                                          T(:,1,2) .* vector_array(:,2) + ...
-                                          T(:,1,3) .* vector_array(:,3);
-                            vxcoef(:,2) = T(:,2,1) .* vector_array(:,1) + ...
-                                          T(:,2,2) .* vector_array(:,2) + ...
-                                          T(:,2,3) .* vector_array(:,3);
-                            vxcoef(:,3) = T(:,3,1) .* vector_array(:,1) + ...
-                                          T(:,3,2) .* vector_array(:,2) + ...
-                                          T(:,3,3) .* vector_array(:,3);
-                        elseif size(vxcoef,2) == 2
-                            vxcoef(:,1) = T(:,1,1) .* vector_array(:,1) + ...
-                                          T(:,1,2) .* vector_array(:,2);
-                            vxcoef(:,2) = T(:,2,1) .* vector_array(:,1) + ...
-                                          T(:,2,2) .* vector_array(:,2);
+                            vxc(:,1) = tarray(:,1,1) .* V(:,1) + ...
+                                       tarray(:,1,2) .* V(:,2) + ...
+                                       tarray(:,1,3) .* V(:,3);
+                            vxc(:,2) = tarray(:,2,1) .* V(:,1) + ...
+                                       tarray(:,2,2) .* V(:,2) + ...
+                                       tarray(:,2,3) .* V(:,3);
+                            vxc(:,3) = tarray(:,3,1) .* V(:,1) + ...
+                                       tarray(:,3,2) .* V(:,2) + ...
+                                       tarray(:,3,3) .* V(:,3);
+                        elseif size(vxc,2) == 2
+                            vxc(:,1) = tarray(:,1,1) .* V(:,1) + ...
+                                       tarray(:,1,2) .* V(:,2);
+                            vxc(:,2) = tarray(:,2,1) .* V(:,1) + ...
+                                       tarray(:,2,2) .* V(:,2);
                         end
+                        vxcoef{ic} = vxc;
                     end
-                     %------------------------------------------------------
                 end
+                %------------------------------------------------------
+            else
+                %------------------------------------------------------
+                if strcmpi(array_type,'scalar')
+                    vxcoef = varray .* tarray;
+                elseif strcmpi(array_type,'tensor')
+                    vxcoef = zeros(size(varray));
+                    if size(vxcoef,2) == 3
+                        vxcoef(:,1) = tarray(:,1,1) .* varray(:,1) + ...
+                                      tarray(:,1,2) .* varray(:,2) + ...
+                                      tarray(:,1,3) .* varray(:,3);
+                        vxcoef(:,2) = tarray(:,2,1) .* varray(:,1) + ...
+                                      tarray(:,2,2) .* varray(:,2) + ...
+                                      tarray(:,2,3) .* varray(:,3);
+                        vxcoef(:,3) = tarray(:,3,1) .* varray(:,1) + ...
+                                      tarray(:,3,2) .* varray(:,2) + ...
+                                      tarray(:,3,3) .* varray(:,3);
+                    elseif size(vxcoef,2) == 2
+                        vxcoef(:,1) = tarray(:,1,1) .* varray(:,1) + ...
+                                      tarray(:,1,2) .* varray(:,2);
+                        vxcoef(:,2) = tarray(:,2,1) .* varray(:,1) + ...
+                                      tarray(:,2,2) .* varray(:,2);
+                    end
+                end
+                 %------------------------------------------------------
             end
         end
         %-------------------------------------------------------------------
-        function vconj = conjugate(vector_array)
+        function vout = conj(vector_array)
             if iscell(vector_array)
                 for i = 1:length(vector_array)
-                    vconj{i} = conj(vector_array{i});
+                    vout{i} = conj(vector_array{i});
                 end
             else
-                vconj = conj(vector_array);
+                vout = conj(vector_array);
+            end
+        end
+        %-------------------------------------------------------------------
+        function vout = uminus(vector_array)
+            if iscell(vector_array)
+                for i = 1:length(vector_array)
+                    vout{i} = - vector_array{i};
+                end
+            else
+                vout = - vector_array;
             end
         end
         %-------------------------------------------------------------------
@@ -263,6 +263,10 @@ classdef VectorArray < Array
         %-------------------------------------------------------------------
         function set.value(obj,val)
             obj.value = Array.vector(val);
+        end
+        %-------------------------------------------------------------------
+        function gid_elem = gid_elem(obj)
+            gid_elem = obj.parent_dom.gid_elem;
         end
         %-------------------------------------------------------------------
     end

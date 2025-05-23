@@ -43,6 +43,7 @@ classdef TensorArray < Array
         end
     end
     % --- Utilily Methods
+    % --- array methods not for obj
     methods (Static)
         %-------------------------------------------------------------------
         function tinv = inverse(tensor_array)
@@ -111,6 +112,10 @@ classdef TensorArray < Array
             txt = tarray1 .* tarray2;
         end
         %-------------------------------------------------------------------
+        function txt = divide(tarray1,tarray2)
+            txt = tarray1 ./ tarray2;
+        end
+        %-------------------------------------------------------------------
     end
     % --- obj's methods
     methods
@@ -149,8 +154,8 @@ classdef TensorArray < Array
         end
         %-------------------------------------------------------------------
     end
+
     % --- obj's operators
-    % --- performed with full-size
     methods
         %-------------------------------------------------------------------
         function value = uplus(obj)
@@ -187,17 +192,47 @@ classdef TensorArray < Array
             % obj([...])
             % use obj([...]).value or =+ obj to getvalue
             % ---
-            field_obj = Field();
-            % ---
-            T = obj.value;
-            V = rhs_obj.value;
+            X = obj.value;
+            Y = rhs_obj.value;
             % ---
             if isa(rhs_obj,'TensorArray')
-                value_ = TensorArray.multiply(V,T);
+                % X -> t, Y -> t
+                field_obj = TensorArray();
+                value_ = TensorArray.multiply(X,Y);
             elseif isa(rhs_obj,'VectorArray')
-                value_ = VectorArray.dot(V,T);
+                % X -> t, Y -> v
+                field_obj = VectorArray();
+                value_ = VectorArray.multiply(Y,X);
             elseif isa(rhs_obj,'Field')
-                value_ = VectorArray.multiply(V,T);
+                % X -> t, Y -> v
+                field_obj = Field();
+                value_ = VectorArray.multiply(Y,X);
+            end
+            % ---
+            field_obj.value = value_;
+            % ---
+        end
+        %-------------------------------------------------------------------
+        function field_obj = mrdivide(obj,rhs_obj)
+            % ---
+            % obj([...])
+            % use obj([...]).value or =+ obj to getvalue
+            % ---
+            X = obj.value;
+            Y = rhs_obj.value;
+            % ---
+            if isa(rhs_obj,'TensorArray')
+                % X -> t, Y -> t
+                field_obj = TensorArray();
+                value_ = TensorArray.multiply(X,Y);
+            elseif isa(rhs_obj,'VectorArray')
+                % X -> t, Y -> v
+                field_obj = VectorArray();
+                value_ = VectorArray.multiply(Y,X);
+            elseif isa(rhs_obj,'Field')
+                % X -> t, Y -> v
+                field_obj = Field();
+                value_ = VectorArray.multiply(Y,X);
             end
             % ---
             field_obj.value = value_;
