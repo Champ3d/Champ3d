@@ -43,7 +43,7 @@ classdef VectorArray < Array
     % --- Utilily Methods
     % --- array methods not for obj
     % --- not-cell row-vector column-array
-    methods (Static)
+    methods (Static, Sealed)
         %-------------------------------------------------------------------
         function varray = normalize(vector_array)
             varray = Array.vector(vector_array);
@@ -94,11 +94,10 @@ classdef VectorArray < Array
             % ---
         end
         %-------------------------------------------------------------------
-        function vtime = at_time(vector_array,frequency,t)
+        function vtime = at_time(vector_array,time_fraction_of_one_period)
             arguments
                 vector_array
-                frequency = 1
-                t = 0
+                time_fraction_of_one_period = 0
             end
             varray = Array.vector(vector_array);
             % ---
@@ -107,7 +106,7 @@ classdef VectorArray < Array
             else
                 mag = abs(varray);
                 ang = angle(varray);
-                vtime = mag .* cos(2*pi*frequency*t + ang);
+                vtime = mag .* cos(2*pi*time_fraction_of_one_period + ang);
             end
             % ---
         end

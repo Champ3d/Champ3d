@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Array < Xhandle
+classdef (Abstract) Array < Xhandle
     % --- Contructor
     methods
         function obj = Array()
@@ -24,7 +24,7 @@ classdef Array < Xhandle
         end
     end
     % --- Utilily Methods
-    methods (Static)
+    methods (Static, Sealed)
         %-------------------------------------------------------------------
         function [varray, array_type] = vector(array,args)
             arguments
