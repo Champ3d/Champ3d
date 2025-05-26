@@ -87,7 +87,7 @@ classdef OpenCoil < Coil
             % ---
             dofuJ = - parent_mesh.discrete.grad * V;
             vJs = parent_mesh.field_we('dof',dofuJ,'id_elem',gindex);
-            vJs = VectorArray.normalize(vJs);
+            vJs = Array.normalize(vJs);
             % ---
             unit_current_field = unit_current_field + vJs;
             % ---

@@ -41,81 +41,7 @@ classdef TensorArray < Array
             % ---
         end
     end
-    % --- Utilily Methods
-    % --- array methods not for obj
-    methods (Static)
-        %-------------------------------------------------------------------
-        function tinv = inverse(tensor_array)
-            % ---
-            [tensor_array,array_type] = Array.tensor(tensor_array);
-            if strcmpi(array_type,'scalar')
-                tinv = 1./tensor_array;
-            elseif strcmpi(array_type,'tensor')
-                sizeg = size(tensor_array);
-                dim = sizeg(2);
-                % ---
-                if dim == 2
-                    % --- 
-                    tinv = zeros(sizeg(1),2,2);
-                    % ---
-                    a11(1,:) = tensor_array(:,1,1);
-                    a12(1,:) = tensor_array(:,1,2);
-                    a21(1,:) = tensor_array(:,2,1);
-                    a22(1,:) = tensor_array(:,2,2);
-                    d = a11.*a22 - a21.*a12;
-                    ix = find(d);
-                    tinv(ix,1,1) = +1./d(ix).*a22(ix);
-                    tinv(ix,1,2) = -1./d(ix).*a12(ix);
-                    tinv(ix,2,1) = -1./d(ix).*a21(ix);
-                    tinv(ix,2,2) = +1./d(ix).*a11(ix);
-                    % ---
-                elseif dim == 3
-                    % --- 
-                    tinv = zeros(sizeg(1),3,3);
-                    % ---
-                    a11(1,:) = tensor_array(:,1,1);
-                    a12(1,:) = tensor_array(:,1,2);
-                    a13(1,:) = tensor_array(:,1,3);
-                    a21(1,:) = tensor_array(:,2,1);
-                    a22(1,:) = tensor_array(:,2,2);
-                    a23(1,:) = tensor_array(:,2,3);
-                    a31(1,:) = tensor_array(:,3,1);
-                    a32(1,:) = tensor_array(:,3,2);
-                    a33(1,:) = tensor_array(:,3,3);
-                    A11 = a22.*a33 - a23.*a32;
-                    A12 = a32.*a13 - a12.*a33;
-                    A13 = a12.*a23 - a13.*a22;
-                    A21 = a23.*a31 - a21.*a33;
-                    A22 = a33.*a11 - a31.*a13;
-                    A23 = a13.*a21 - a23.*a11;
-                    A31 = a21.*a32 - a31.*a22;
-                    A32 = a31.*a12 - a32.*a11;
-                    A33 = a11.*a22 - a12.*a21;
-                    d = a11.*a22.*a33 + a21.*a32.*a13 + a31.*a12.*a23 - ...
-                        a11.*a32.*a23 - a31.*a22.*a13 - a21.*a12.*a33;
-                    ix = find(d);
-                    tinv(ix,1,1) = 1./d(ix).*A11(ix);
-                    tinv(ix,1,2) = 1./d(ix).*A12(ix);
-                    tinv(ix,1,3) = 1./d(ix).*A13(ix);
-                    tinv(ix,2,1) = 1./d(ix).*A21(ix);
-                    tinv(ix,2,2) = 1./d(ix).*A22(ix);
-                    tinv(ix,2,3) = 1./d(ix).*A23(ix);
-                    tinv(ix,3,1) = 1./d(ix).*A31(ix);
-                    tinv(ix,3,2) = 1./d(ix).*A32(ix);
-                    tinv(ix,3,3) = 1./d(ix).*A33(ix);
-                end
-            end
-        end
-        %-------------------------------------------------------------------
-        function txt = multiply(tarray1,tarray2)
-            txt = tarray1 .* tarray2;
-        end
-        %-------------------------------------------------------------------
-        function txt = divide(tarray1,tarray2)
-            txt = tarray1 ./ tarray2;
-        end
-        %-------------------------------------------------------------------
-    end
+
     % --- obj's methods
     methods
         %-------------------------------------------------------------------
@@ -218,13 +144,13 @@ classdef TensorArray < Array
                 V = rhs_obj.value;
                 % ---
                 outobj = VectorArray();
-                value_ = VectorArray.multiply(V,T);
+                value_ = Array.multiply(V,T);
             elseif isa(rhs_obj,'Field')
                 T = lhs_obj.value;
                 V = rhs_obj.value;
                 % ---
                 outobj = Field();
-                value_ = VectorArray.multiply(V,T);
+                value_ = Array.multiply(V,T);
             end
             % ---
             outobj.value = value_;
@@ -251,13 +177,13 @@ classdef TensorArray < Array
                 V = denominator.value;
                 % ---
                 outobj = VectorArray();
-                value_ = VectorArray.multiply(V,TensorArray.inverse(T));
+                value_ = Array.multiply(V,TensorArray.inverse(T));
             elseif isa(denominator,'Field')
                 T = numerator.value;
                 V = denominator.value;
                 % ---
                 outobj = Field();
-                value_ = VectorArray.multiply(V,TensorArray.inverse(T));
+                value_ = Array.multiply(V,TensorArray.inverse(T));
             end
             % ---
             outobj.value = value_;

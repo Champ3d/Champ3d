@@ -82,7 +82,7 @@ classdef VectorElemField < ElemField & VectorField
                 title('Norm');
                 node_ = obj.parent_model.parent_mesh.node;
                 elem = obj.parent_model.parent_mesh.elem(:,gindex);
-                v__ = VectorArray.norm(v_);
+                v__ = Array.norm(v_);
                 f_patch('node',node_,'elem',elem,'elem_field',v__);
             else
                 for i = 1:4
@@ -105,7 +105,7 @@ classdef VectorElemField < ElemField & VectorField
                         % ---
                         node_ = obj.parent_model.parent_mesh.node;
                         elem = obj.parent_model.parent_mesh.elem(:,gindex);
-                        v__ = VectorArray.norm(VectorArray.max(v_));
+                        v__ = Array.norm(VectorArray.max(v_));
                         f_patch('node',node_,'elem',elem,'elem_field',v__);
                     end
                     % ---

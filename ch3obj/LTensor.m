@@ -118,9 +118,9 @@ classdef LTensor < Xhandle
                 end
             end
             % --- normalize
-            ltensor.main_dir = VectorArray.normalize(ltensor.main_dir);
-            ltensor.ort1_dir = VectorArray.normalize(ltensor.ort1_dir);
-            ltensor.ort2_dir = VectorArray.normalize(ltensor.ort2_dir);
+            ltensor.main_dir = Array.normalize(ltensor.main_dir);
+            ltensor.ort1_dir = Array.normalize(ltensor.ort1_dir);
+            ltensor.ort2_dir = Array.normalize(ltensor.ort2_dir);
             % ---
             if ~isempty(obj.rot_axis) && ~isempty(obj.rot_angle)
                 for i = 1:nb_elem

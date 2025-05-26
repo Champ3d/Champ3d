@@ -87,19 +87,19 @@ classdef Field < Array
                 T = rhs_obj.value;
                 % ---
                 outobj = Field();
-                value_ = VectorArray.multiply(V,T);
+                value_ = Array.multiply(V,T);
             elseif isa(rhs_obj,'VectorArray')
                 V1 = obj.value;
                 V2 = rhs_obj.value;
                 % ---
                 outobj = TensorArray();
-                value_ = VectorArray.dot(V1,V2);
+                value_ = Array.dot(V1,V2);
             elseif isa(rhs_obj,'Field')
                 V1 = obj.value;
                 V2 = rhs_obj.value;
                 % ---
                 outobj = TensorArray();
-                value_ = VectorArray.dot(V1,V2);
+                value_ = Array.dot(V1,V2);
             end
             % ---
             outobj.value = value_;

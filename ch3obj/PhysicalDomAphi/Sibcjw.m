@@ -146,8 +146,8 @@ classdef Sibcjw < PhysicalDom
             % obj.matrix.mur_array = mur_array;
             % obj.matrix.cparam_array = cparam_array;
             %--------------------------------------------------------------
-            obj.tarray{it}.sigma = TensorArray('parent_dom',obj,'value',sigma_array);
-            obj.tarray{it}.skindepth = TensorArray('parent_dom',obj,'value',skindepth);
+            obj.tarray{it}.sigma = TensorArray(sigma_array,'parent_dom',obj);
+            obj.tarray{it}.skindepth = TensorArray(skindepth,'parent_dom',obj);
             %--------------------------------------------------------------
             % local gsibcwewe matrix
             for k = 1:length(submesh)

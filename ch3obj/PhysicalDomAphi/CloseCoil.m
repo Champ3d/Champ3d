@@ -91,7 +91,7 @@ classdef CloseCoil < Coil
                 % ---
                 dofJs = - parent_mesh.discrete.grad * V;
                 vJs = parent_mesh.field_we('dof',dofJs,'id_elem',gindex);
-                vJs = VectorArray.normalize(vJs);
+                vJs = Array.normalize(vJs);
                 % ---
                 unit_current_field = unit_current_field + vJs;
                 % --- XTODO
@@ -100,7 +100,7 @@ classdef CloseCoil < Coil
                 end
                 alpha = [];
             end
-            unit_current_field = VectorArray.normalize(unit_current_field);
+            unit_current_field = Array.normalize(unit_current_field);
         end
     end
     % --- Utility Methods

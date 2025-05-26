@@ -124,7 +124,7 @@ classdef VectorField < Field
         %         Vfi = Array.vector(vector_field);
         %     end
         %     % ---
-        %     val = VectorArray.dot(Vin,Vfi);
+        %     val = Array.dot(Vin,Vfi);
         % end
         % -----------------------------------------------------------------
 

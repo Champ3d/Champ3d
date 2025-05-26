@@ -70,7 +70,7 @@ classdef PAphiFaceField < ScalarFaceField
                     % ---
                     E = obj.Efield.cvalue(id_face);
                     J = obj.Jfield.cvalue(id_face);
-                    EJconj = real(VectorArray.dot(E,conj(J)));
+                    EJconj = real(Array.dot(E,conj(J)));
                     % ---
                     val(lindex,:) = obj.Efield.cmultiply(tarray,gindex);
                 end
@@ -82,7 +82,7 @@ classdef PAphiFaceField < ScalarFaceField
             % ---
             % E = obj.Efield.cvalue(id_elem);
             % Jconj = VectorArray.conjugate(obj.Jfield.cvalue(id_elem));
-            % val = VectorArray.dot(E,conj(J));
+            % val = Array.dot(E,conj(J));
             % ---
         end
         % -----------------------------------------------------------------

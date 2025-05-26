@@ -105,7 +105,7 @@ classdef LVector < Xhandle
                 end
             end
             % --- normalize
-            lvector.main_dir = VectorArray.normalize(lvector.main_dir);
+            lvector.main_dir = Array.normalize(lvector.main_dir);
             % ---
             if ~isempty(obj.rot_axis) && ~isempty(obj.rot_angle)
                 for i = 1:nb_elem
