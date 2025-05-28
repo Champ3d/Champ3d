@@ -318,35 +318,34 @@ classdef Parameter < Xhandle
                 fargs = [];
                 return
             end
-            % ---
+            % -------------------------------------------------------------
             parameter_dependency_search = [];
-            if isa(dom,'PhysicalDom')
-                meshdom = dom.dom;
-                parameter_dependency_search = dom.parameter_dependency_search;
-            else
-                meshdom = dom;
+            meshdom = [];
+            place = [];
+            id_place_target = [];
+            if ~isempty(dom)
+                if isa(dom,'PhysicalDom')
+                    meshdom = dom.dom;
+                    parameter_dependency_search = dom.parameter_dependency_search;
+                else
+                    meshdom = dom;
+                end
+                % ---
+                if isempty(parameter_dependency_search)
+                    parameter_dependency_search = 'by_coordinates';
+                end
+                % ---
+                if isa(meshdom,'VolumeDom')
+                    place = 'elem';
+                    id_place_target = meshdom.gindex;
+                elseif isa(meshdom,'SurfaceDom')
+                    place = 'face';
+                    id_place_target = meshdom.gindex;
+                else
+                    error('must give #dom with .gindex or .gindex !');
+                end
             end
-            % ---
-            if isempty(parameter_dependency_search)
-                parameter_dependency_search = 'by_coordinates';
-            end
-            % ---
-            if isa(meshdom,'VolumeDom')
-                place = 'elem';
-                id_place_target = meshdom.gindex;
-            elseif isa(meshdom,'SurfaceDom')
-                place = 'face';
-                id_place_target = meshdom.gindex;
-            elseif isprop(meshdom,'gindex')
-                place = 'elem';
-                id_place_target = meshdom.gindex;
-            elseif isprop(meshdom,'gindex')
-                place = 'face';
-                id_place_target = meshdom.gindex;
-            else
-                error('must give #dom with .gindex or .gindex !');
-            end
-            % ---
+            % -------------------------------------------------------------
             fargs = cell(1,length(obj.depend_on));
             % ---
             target_dom   = meshdom;

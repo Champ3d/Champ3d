@@ -185,6 +185,10 @@ classdef (Abstract) Array < Xhandle
     methods (Static, Sealed)
         %-------------------------------------------------------------------
         function array_type = type(array)
+            if isempty(array)
+                array_type = 'scalar';
+                return
+            end
             array_type = [];
             s = size(array);
             lens = length(s);

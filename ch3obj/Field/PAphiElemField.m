@@ -57,16 +57,15 @@ classdef PAphiElemField < ScalarElemField
                 return
             end
             % ---
-            E = obj.Efield.cvalue(id_elem);
-            J = obj.Jfield.cvalue(id_elem);
-            val = 1/2 .* real(Array.dot(E,conj(J)));
+            val =+ (1/2 * real(obj.Efield(id_elem) * conj(obj.Jfield(id_elem))));
+            % ---
         end
         % -----------------------------------------------------------------
         function val = ivalue(obj,id_elem)
             % ---
             % E = obj.Efield.cvalue(id_elem);
             % Jconj = VectorArray.conjugate(obj.Jfield.cvalue(id_elem));
-            % val = Array.dot(E,conj(J));
+            % val = VectorArray.dot(E,conj(J));
             % ---
         end
         % -----------------------------------------------------------------

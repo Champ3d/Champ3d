@@ -65,7 +65,7 @@ classdef JAphiFaceField < VectorFaceField
                     tarray = obj.sibc.(id_phydom_{iec}).sigma;
                     % ---
                     [gindex,lindex] = intersect(id_face,tarray.parent_dom.gindex);
-                    val(lindex,:) = obj.Efield.cmultiply(tarray,gindex);
+                    val(lindex,:) =+ (obj.Efield(gindex) * tarray(lindex));
                 end
             end
             % ---

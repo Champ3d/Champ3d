@@ -111,9 +111,15 @@ classdef LTime < Xhandle
     methods
         function i = next_it(obj,t)
             i = find(t <= obj.t_array,1);
+            if isempty(i)
+                i = obj.back_it(t);
+            end
         end
         function i = back_it(obj,t)
             i = length(obj.t_array) - find(t >= obj.t_array(end:-1:1),1) + 1;
+            if isempty(i)
+                i = obj.next_it(t);
+            end
         end
     end
 end

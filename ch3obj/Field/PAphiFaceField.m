@@ -58,7 +58,7 @@ classdef PAphiFaceField < ScalarFaceField
                 return
             end
             % ---
-            val = zeros(length(id_face),2);
+            val = zeros(length(id_face),1);
             % ---
             if ~isempty(obj.sibc)
                 id_phydom_ = fieldnames(obj.sibc);
@@ -68,11 +68,8 @@ classdef PAphiFaceField < ScalarFaceField
                     % ---
                     [gindex,lindex] = intersect(id_face,tarray.parent_dom.gindex);
                     % ---
-                    E = obj.Efield.cvalue(id_face);
-                    J = obj.Jfield.cvalue(id_face);
-                    EJconj = real(Array.dot(E,conj(J)));
-                    % ---
-                    val(lindex,:) = obj.Efield.cmultiply(tarray,gindex);
+                    val(lindex,:) =+ (1/2 * real(tarray(lindex) * ...
+                        obj.Efield(gindex) * conj(obj.Jfield(gindex))));
                 end
             end
             % ---
