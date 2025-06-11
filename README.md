@@ -1,10 +1,10 @@
 # **Champ3d**
 _Matlab Platform for Computational Physics in Electrical Engineering_
 ### Applications
-- [x] Induction Heating
+- [x] Induction Welding/Heating
 - [x] Rotational/Linear Electrical Machines
 - [x] Inductive Power Transfer
-- [x] EEddy Current Testing
+- [x] Eddy Current Testing
 ### Supported models
 **Champ3d** supports, when it's possible, all combinations of the models listed below:
 - [x] Electromagnetic
@@ -19,7 +19,7 @@ _Matlab Platform for Computational Physics in Electrical Engineering_
   - [x] Radiation
 - [x] Electric circuit
   - [x] Weak coupling
-  - [ ] Strong coupling
+  - [x] Strong coupling
 ### Numerical methods
 + [x] FEM
   - [x] 2D on quadrilateral and triangle mesh
@@ -42,4 +42,4 @@ _Matlab Platform for Computational Physics in Electrical Engineering_
   To run programmatically electronic/electric circuit simulations. **Champ3d** provides an interface to LTSpice.
 ----
 
-**Champ3d** is copyright (C) 2023 H-K. Bui and distributed under the terms of the GNU GENERAL PUBLIC LICENSE Version 3. See LICENSE and CREDITS files for more information.
+**Champ3d** is copyright (C) 2023-2025 H-K. Bui and distributed under the terms of the GNU GENERAL PUBLIC LICENSE Version 3. See LICENSE and CREDITS files for more information.

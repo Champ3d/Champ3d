@@ -121,5 +121,8 @@ classdef LTime < Xhandle
                 i = obj.next_it(t);
             end
         end
+        function t = t_at(obj,it)
+            t = obj.t_array(it);
+        end
     end
 end

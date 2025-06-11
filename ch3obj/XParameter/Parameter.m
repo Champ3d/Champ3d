@@ -21,7 +21,7 @@ classdef Parameter < Xhandle
         parent_model
         f
         depend_on
-        at_it
+        dit
         from
         varargin_list
         fvectorized
@@ -59,13 +59,9 @@ classdef Parameter < Xhandle
         function setup(obj,args)
             arguments
                 obj
-                args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
+                args.parent_model
                 args.f = []
-                args.depend_on {mustBeMember(args.depend_on,...
-                    {'celem','cface','velem','sface','ledge',...
-                     'J','V','I','Z','T','B','E','H','A','P','Phi',...
-                     'ltime'})}
-                args.at_it
+                args.depend_on
                 args.from = []
                 args.varargin_list = []
                 args.fvectorized = 0
@@ -83,14 +79,7 @@ classdef Parameter < Xhandle
                 args.depend_on = '';
             end
             % ---
-            by_default_at_it = 0;
-            if ~isfield(args,'at_it')
-                by_default_at_it = 1;
-                args.depend_on = f_to_scellargin(args.depend_on);
-                for i = 1:length(args.depend_on)
-                    args.at_it{i} = 0;
-                end
-            end
+
             % ---
             if isnumeric(args.f)
                 const = args.f;
@@ -126,23 +115,23 @@ classdef Parameter < Xhandle
             obj.parent_model = args.parent_model;
             obj.f = args.f;
             obj.depend_on = f_to_scellargin(args.depend_on);
-            obj.at_it = f_to_scellargin(args.at_it);
+            obj.dit = f_to_scellargin(args.at_it);
             obj.from = f_to_scellargin(args.from);
             obj.varargin_list = f_to_scellargin(args.varargin_list);
             obj.fvectorized = args.fvectorized;
             % --- check
-            for i = 1:length(obj.at_it)
-                if ~isnumeric(obj.at_it{i})
+            for i = 1:length(obj.dit)
+                if ~isnumeric(obj.dit{i})
                     error('#at_it must be of form {[array],[array],...}');
                 end
             end
             % --- check
-            if length(obj.depend_on) ~= length(obj.at_it)
+            if length(obj.depend_on) ~= length(obj.dit)
                 error('size of #at_it must corresponds to #depend_on');
             end
             % --- check
             nb_fargin = f_nargin(obj.f);
-            if by_default_at_it
+            if by_default_it
                 if nb_fargin > 0
                     if nb_fargin ~= length(obj.depend_on)
                         error('Number of input arguments of #f must corresponds to #depend_on');
@@ -155,8 +144,8 @@ classdef Parameter < Xhandle
             else
                 % ---
                 len_it = 0;
-                for i = 1:length(obj.at_it)
-                    len_it = len_it + len_it(obj.at_it{i});
+                for i = 1:length(obj.dit)
+                    len_it = len_it + len_it(obj.dit{i});
                 end
                 if nb_fargin > 0
                     if nb_fargin ~= len_it
@@ -386,10 +375,16 @@ classdef Parameter < Xhandle
             target_model = obj.parent_model;
             % ---
             depon__ = obj.depend_on;
+            id_coil__ = obj.id_coil;
+            dit__ = obj.dit;
             source_model_  = obj.from;
             for i = 1:length(depon__)
-                depon_ = depon__{i};
-                source_model  = source_model_{i};
+                % ---
+                depon_       = depon__{i};
+                id_coil_     = id_coil__{i};
+                dit_         = dit__{i};
+                source_model = source_model_{i};
+                % ---
                 if any(f_strcmpi(depon_,{'celem','cface','cedge','velem','sface','ledge'}))
                     % take from paramater parent_model's mesh
                     fargs{i} = target_model.parent_mesh.(depon_)(:,id_place_target);
@@ -399,28 +394,24 @@ classdef Parameter < Xhandle
                 elseif any(f_strcmpi(depon_,{'fr'}))
                     % take from parent_model of paramater object
                     fargs{i} = target_model.fr;
-                elseif contains(depon_,{'V.','I.','Z.'})
-                    % --- id_coil
-                    depon_ = split(depon_,'.');
-                    quantity = depon_{1};
-                    id_coil = depon_{2};
+                elseif any(f_strcmpi(depon_,{'V','I','Z'}))
                     % ---
                     if ~isprop(source_model,'coil')
                         error('no coil in source model !');
                     else
-                        if ~isfield(source_model.coil,id_coil)
-                            error(['no #coil ' id_coil ' in source model !'])
+                        if ~isfield(source_model.coil,id_coil_)
+                            error(['no #coil ' id_coil_ ' in source model !'])
                         end
                     end
                     % get by time interpolation
                     next_it = source_model.ltime.next_it(target_model.ltime.t_now);
                     back_it = source_model.ltime.back_it(target_model.ltime.t_now);
                     if next_it == back_it
-                        fargs{i} = source_model.coil.(id_coil).(quantity){back_it};
+                        fargs{i} = source_model.coil.(id_coil_).(depon_){back_it};
                     else
                         % ---
-                        val01 = source_model.coil.(id_coil).(quantity){back_it};
-                        val02 = source_model.coil.(id_coil).(quantity){next_it};
+                        val01 = source_model.coil.(id_coil_).(depon_){back_it};
+                        val02 = source_model.coil.(id_coil_).(depon_){next_it};
                         % ---
                         delta_v = val02 - val01;
                         delta_t = source_model.ltime.t_array(next_it) - source_model.ltime.t_array(back_it);
@@ -434,9 +425,14 @@ classdef Parameter < Xhandle
                     % physical quantities
                     % must be able to take from other model with different ltime, mesh/dom
                     % ---
+                    target_it = target_model.ltime.it - dit_;
+                    it_max = target_model.ltime.it_max;
+                    target_it = min(it_max,max(1,target_it));
+                    target_t_now = target_model.ltime.t_at(target_it);
+                    % ---
                     if isequal(source_model, target_model)
                         % no interpolation
-                        fargs{i} = source_model.field{target_model.ltime.it}.(depon_).(place).cvalue(id_place_target);
+                        fargs{i} = source_model.field{target_it}.(depon_).(place).cvalue(id_place_target);
                     else
                         if isequal(source_model.parent_mesh, target_model.parent_mesh)
                             if isequal(source_model.ltime.t_array, target_model.ltime.t_array)

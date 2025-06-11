@@ -78,9 +78,18 @@ classdef PhysicalDom < Xhandle
                                          'Consider ScalarParameter, VectorParameter, TensorParameter, ' ...
                                          'LTensor or LVector ' ...
                                          'for general purpose. \n']);
-                                error('constant parameter error');
+                                error('Constant parameter error');
                             end
                             % ---------------------------------------------
+                        end
+                    elseif isa(obj.(param),'Parameter')
+                        if ~isempty(obj.(param).parent_model)
+                            if ~isequal(obj.(param).parent_model,obj.parent_model)
+                                fprintf('#parameter parent_model must be equal to physical dom parent_model \n');
+                                error('Parameter error');
+                            end
+                        else
+                            obj.(param).parent_model = obj.parent_model;
                         end
                     end
                 end
@@ -282,10 +291,10 @@ classdef PhysicalDom < Xhandle
             if any(f_strcmpi(args.field_name,{'pv'}))
                 fs = obj.parent_model.field.(args.field_name);
                 % ---
-                gindex = obj.dom.gindex;
-                celem = obj.parent_model.parent_mesh.celem(:,gindex);
+                gindex_ = obj.dom.gindex;
+                celem = obj.parent_model.parent_mesh.celem(:,gindex_);
                 % ---
-                scatter3(celem(1,:),celem(2,:),celem(3,:),[],fs(gindex));
+                scatter3(celem(1,:),celem(2,:),celem(3,:),[],fs(gindex_));
                 f_colormap;
                 return
             end
