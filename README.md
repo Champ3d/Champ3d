@@ -1,5 +1,5 @@
 # **Champ3d**
-_Matlab Platform for Computational Physics in Electrical Engineering_
+_Matlab Framework for Computational Physics in Electrical Engineering_
 ### Applications
 - [x] Induction Welding/Heating
 - [x] Rotational/Linear Electrical Machines
