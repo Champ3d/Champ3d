@@ -16,10 +16,10 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef GSphere < GShape3d
+classdef BSphere < Shape3d
     properties
         r
-        center = []
+        center = [0, 0, 0]
     end
     % --- Valid args list
     methods (Static)
@@ -29,13 +29,13 @@ classdef GSphere < GShape3d
     end
     % --- Constructors
     methods
-        function obj = GSphere(args)
+        function obj = BSphere(args)
             arguments
                 args.r
-                args.center
+                args.center = [0, 0, 0]
             end
             % ---
-            obj = obj@GShape3d;
+            obj = obj@Shape3d;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -50,8 +50,8 @@ classdef GSphere < GShape3d
     % --- setup/reset
     methods (Static)
         function setup(obj)
-            if isempty(obj.center)
-                obj.center = [0 0 0];
+            if isnumeric(obj.center)
+                % XTODO
             end
         end
     end
@@ -64,7 +64,11 @@ classdef GSphere < GShape3d
     end
     % --- Methods
     methods
-        % -----------------------------------------------------------------
+        %------------------------------------------------------------------
+        function build(obj)
+            
+        end
+        %------------------------------------------------------------------
         %------------------------------------------------------------------
     end
 

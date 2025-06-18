@@ -151,6 +151,7 @@ classdef SurfaceDom < MeshDom
                             gindex_ = f_unique(intersect(f_torowv(dom1.gindex),f_torowv(dom2.gindex)).');
                     end
                 elseif i > 1
+                    % XTODO
                     switch oper
                         case '+'
                             

@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef GCube < GShape3d
+classdef GCube < Shape3d
     properties
 
         center
@@ -34,7 +34,7 @@ classdef GCube < GShape3d
                 args.id
             end
             % ---
-            obj = obj@GShape3d;
+            obj = obj@Shape3d;
             % ---
             if isempty(fieldnames(args))
                 return

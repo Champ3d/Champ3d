@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef GShape3d < Xhandle
+classdef Shape3d < Xhandle
     properties
         geofile
         building_formular
@@ -29,21 +29,8 @@ classdef GShape3d < Xhandle
     end
     % --- Constructors
     methods
-        function obj = GShape3d(args)
-            arguments
-                args.id
-            end
-            % ---
+        function obj = Shape3d()
             obj = obj@Xhandle;
-            % ---
-            if isempty(fieldnames(args))
-                return
-            end
-            % ---
-            obj <= args;
-            % ---
-            Shape3d.setup(obj);
-            % ---
         end
     end
     % --- setup/reset
@@ -62,6 +49,9 @@ classdef GShape3d < Xhandle
     % --- Methods
     methods
         % -----------------------------------------------------------------
+        function build(obj)
+            
+        end
         % -----------------------------------------------------------------
     end
 
@@ -81,23 +71,23 @@ classdef GShape3d < Xhandle
 
     % --- Methods
     methods
-        function objy = plus(obj,objx)
-            objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
+        function objout = plus(obj,objx)
+            objout = Shape3d;
             % ---
-            obj.is_defining_obj_of(objy);
-            objx.is_defining_obj_of(objy);
+            obj.is_defining_obj_of(objout);
+            objx.is_defining_obj_of(objout);
         end
-        function objy = minus(obj,objx)
-            objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
+        function objout = minus(obj,objx)
+            objout = Shape3d;
             % ---
-            obj.is_defining_obj_of(objy);
-            objx.is_defining_obj_of(objy);
+            obj.is_defining_obj_of(objout);
+            objx.is_defining_obj_of(objout);
         end
-        function objy = mpower(obj,objx)
-            objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
+        function objout = mpower(obj,objx)
+            objout = Shape3d;
             % ---
-            obj.is_defining_obj_of(objy);
-            objx.is_defining_obj_of(objy);
+            obj.is_defining_obj_of(objout);
+            objx.is_defining_obj_of(objout);
         end
     end
 end
