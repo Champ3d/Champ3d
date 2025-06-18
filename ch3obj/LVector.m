@@ -75,8 +75,6 @@ classdef LVector < Xhandle
                 id_elem = meshdom.gindex;
             elseif isprop(meshdom,'gindex')
                 id_elem = meshdom.gindex;
-            elseif isprop(meshdom,'gindex')
-                id_elem = meshdom.gindex;
             end
             % ---
             nb_elem = length(id_elem);
