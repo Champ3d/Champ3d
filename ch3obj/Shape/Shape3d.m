@@ -95,6 +95,16 @@ classdef Shape3d < Xhandle
             % ---
         end
         % -----------------------------------------------------------------
+        function duplicate(obj,args)
+            arguments
+                obj
+                args
+            end
+            % ---
+            obj.transform = struct('type','duplicate');
+            % ---
+        end
+        % -----------------------------------------------------------------
     end
 
     % --- Methods
