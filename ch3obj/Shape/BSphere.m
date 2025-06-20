@@ -47,6 +47,10 @@ classdef BSphere < VolumeShape
                 return
             end
             % ---
+            if (args.bottom_cut_ratio == 1 && args.top_cut_ratio == 1)
+                error('Degenerated sphere ! #bottom_cut_ratio = 1, #top_cut_ratio = 1');
+            end
+            % ---
             obj <= args;
             % ---
             BSphere.setup(obj);

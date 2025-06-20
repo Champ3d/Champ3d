@@ -83,7 +83,10 @@ classdef Shape < Xhandle
     % --- Methods
     methods
         function objout = plus(obj,objx)
-            objout = Shape3d;
+            % ---
+            if isa(obj,'VolumeShape')
+                objout = VolumeShape;
+            end
             % ---
             obj.is_defining_obj_of(objout);
             objx.is_defining_obj_of(objout);
@@ -93,7 +96,10 @@ classdef Shape < Xhandle
             objout.building_formular.operation = '+';
         end
         function objout = minus(obj,objx)
-            objout = Shape3d;
+            % ---
+            if isa(obj,'VolumeShape')
+                objout = VolumeShape;
+            end
             % ---
             obj.is_defining_obj_of(objout);
             objx.is_defining_obj_of(objout);
@@ -103,7 +109,10 @@ classdef Shape < Xhandle
             objout.building_formular.operation = '-';
         end
         function objout = mpower(obj,objx)
-            objout = Shape3d;
+            % ---
+            if isa(obj,'VolumeShape')
+                objout = VolumeShape;
+            end
             % ---
             obj.is_defining_obj_of(objout);
             objx.is_defining_obj_of(objout);
