@@ -29,7 +29,7 @@ classdef TetraMeshFromGMSH < TetraMesh
         function obj = TetraMeshFromGMSH(args)
             arguments
                 args.id = ''
-                args.physical_volume {mustBeA(args.physical_volume,'PhysicalVolume')}
+                args.physical_volume
                 args.mesh_file char = ''
             end
             % ---
@@ -142,19 +142,35 @@ classdef TetraMeshFromGMSH < TetraMesh
             end
             % ---
             geofile = fopen(geoname,'w');
-            
-
-
             % --- Init
-            % id_volume_list = 0;
+            fprintf(geofile,'%s \n','// Init');
+            fprintf(geofile,'%s \n','SetFactory("OpenCASCADE");');
+            fprintf(geofile,'%s \n','id_volume_list = 0;');
             % ---
             obj.physical_volume = f_to_scellargin(obj.physical_volume);
             % ---
+            nb_phyvol = length(obj.physical_volume);
+            elem_code = zeros(1,nb_phyvol);
+            id_vdom   = cell(1,nb_phyvol);
+            % ---
             for i = 1:length(obj.physical_volume)
                 phyvol = obj.physical_volume{i};
-                id_phyvol = f_str2code(phyvol.id,'code_type','integer');
-                
+                % ---
+                elem_code(i) = f_str2code(phyvol.id,'code_type','integer');
+                id_vdom{i} = phyvol.id;
+                % ---
+                fprintf(geofile,'%s \n',phyvol.geocode);
             end
+            % ---
+
+
+
+
+            % ---
+            % for i = 1:nb_phyvol
+            %     obj.add_vdom('id',id_vdom{i},'elem_code',elem_code(i));
+            % end
+            % ---
         end
         %------------------------------------------------------------------
     end

@@ -18,8 +18,8 @@
 
 classdef PhysicalVolume < Xhandle
     properties
-        id
         volume_shape
+        geocode
     end
     % --- Valid args list
     methods (Static)
@@ -46,6 +46,8 @@ classdef PhysicalVolume < Xhandle
             % ---
             obj <= args;
             % ---
+            PhysicalVolume.setup(obj);
+            % ---
         end
     end
     % --- setup/reset
@@ -53,6 +55,13 @@ classdef PhysicalVolume < Xhandle
         function setup(obj)
             % ---
             obj.volume_shape.is_defining_obj_of(obj);
+            % ---
+            obj.geocode = obj.volume_shape.geocode;
+            % ---
+            id_phyvol = f_str2code(obj.id,'code_type','integer');
+            obj.geocode = [obj.geocode 'id_dom_string = "' obj.id '";' newline];
+            obj.geocode = [obj.geocode 'id_dom_number = ' num2str(id_phyvol,'%d') ';' newline];
+            obj.geocode = [obj.geocode 'Physical Volume(Str(id_dom_string), id_dom_number) = {volume_list~{id_volume_list}()};' newline];
             % ---
         end
     end
