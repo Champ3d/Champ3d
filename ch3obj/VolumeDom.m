@@ -80,7 +80,19 @@ classdef VolumeDom < MeshDom
             node = obj.parent_mesh.node;
             elem = obj.parent_mesh.elem(:,obj.gindex);
             % -------------------------------------------------------------
-            sm{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
+            if isa(obj.parent_mesh,'TetraMesh')
+                sm{1} = TetraMesh('node',node,'elem',elem);
+            elseif isa(obj.parent_mesh,'PrismMesh')
+                sm{1} = PrismMesh('node',node,'elem',elem);
+            elseif isa(obj.parent_mesh,'HexMesh')
+                sm{1} = HexMesh('node',node,'elem',elem);
+            elseif isa(obj.parent_mesh,'TriMesh')
+                sm{1} = TriMesh('node',node,'elem',elem);
+            elseif isa(obj.parent_mesh,'QuadMesh')
+                sm{1} = QuadMesh('node',node,'elem',elem);
+            else
+                sm = [];
+            end
             sm{1}.gindex = obj.gindex;
             sm{1}.parent_mesh = obj.parent_mesh;
             % ---

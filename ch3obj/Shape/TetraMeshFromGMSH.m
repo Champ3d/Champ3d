@@ -28,6 +28,10 @@ classdef TetraMeshFromGMSH < TetraMesh
     methods
         function obj = TetraMeshFromGMSH(args)
             arguments
+                % --- super
+                args.node
+                args.elem
+                % --- sub
                 args.id = ''
                 args.physical_volume
                 args.mesh_file char = ''
@@ -135,6 +139,9 @@ classdef TetraMeshFromGMSH < TetraMesh
             % ---
             geoname = [obj.id '.geo'];
             mshname = [obj.id '.m'];
+            % ---
+            obj.mesh_file = mshname;
+            % ---
             if isfile(geoname)
                 fprintf('Cleaning ...\n');
                 system(['rm ' geoname ' ' mshname]);
@@ -161,15 +168,41 @@ classdef TetraMeshFromGMSH < TetraMesh
                 % ---
                 fprintf(geofile,'%s \n',phyvol.geocode);
             end
+            % --- Final
+            fprintf(geofile,'%s \n',GMSHWriter.write_final('',mshname));
+            fclose(geofile);
             % ---
-
-
-
-
+            call_GMSH_run = [Ch3Config.GMSHExecutable ' ' ...
+                             geoname ' ' ...
+                             '-nopopup -n'];
             % ---
-            % for i = 1:nb_phyvol
-            %     obj.add_vdom('id',id_vdom{i},'elem_code',elem_code(i));
-            % end
+            try
+                fprintf('GMSH running ... \n');
+                status = system(call_GMSH_run);
+                fprintf('Done.\n');
+                if status == 0
+                    k = 0;
+                    while ~isfile(mshname)
+                        if k == 0
+                            f_fprintf(0,'Waiting mesh file ... \n');
+                        end
+                        k = 1;
+                    end
+                    % ---
+                    fprintf('Done.\n');
+                    % ---
+                    obj.build_from_mesh_file;
+                    % ---
+                end
+            catch
+                f_fprintf(1,'/!\\',0,'can not run ',1,geoname,0,'\n');
+                return
+            end
+            % ---
+            % ---
+            for i = 1:nb_phyvol
+                obj.add_vdom('id',id_vdom{i},'elem_code',elem_code(i));
+            end
             % ---
         end
         %------------------------------------------------------------------

@@ -52,6 +52,15 @@ classdef GMSHWriter
         %------------------------------------------------------------------
         %------------------------------------------------------------------
         %------------------------------------------------------------------
+        function geocode = write_final(geocode,mesh_file_name)
+            arguments
+                geocode char
+                mesh_file_name char
+            end
+            finalcode = fileread('final_.geo');
+            finalcode = regexprep(finalcode,'Save[\s]*[\w]*[^;]*',['Save "' mesh_file_name '"']);
+            geocode = [geocode newline finalcode];
+        end
         %------------------------------------------------------------------
         function geocode = write_scalar_parameter(geocode,pname,pvalue)
             arguments
