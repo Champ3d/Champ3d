@@ -84,7 +84,12 @@ classdef SurfaceDom < MeshDom
             % ---
             nb_face = size(face,2);
             % ---
-            id_tria = find(face(4,:) == 0);
+            if size(face,1) == 4
+                id_tria = find(face(4,:) == 0);
+            elseif size(face,1) == 3
+                id_tria = 1:nb_face;
+            end
+            % ---
             id_quad = setdiff(1:nb_face,id_tria);
             % ---
             nb_sm = 0;
