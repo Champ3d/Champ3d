@@ -84,9 +84,9 @@ classdef GMSHWriter
         %------------------------------------------------------------------
         function geocode = rotate(origin,axis,angle,nb_copy)
             arguments
-                origin = [0, 0, 0]
-                axis = [0, 0, 0]
-                angle = 0
+                origin  = [0, 0, 0]
+                axis    = [0, 0, 0]
+                angle   = 0
                 nb_copy = 0
             end
             % ---
@@ -109,6 +109,23 @@ classdef GMSHWriter
             % ---
         end
         %------------------------------------------------------------------
+        function geocode = dilate(origin,scale,nb_copy)
+            arguments
+                origin  = [0, 0, 0]
+                scale   = [1, 1, 1]
+                nb_copy = 0
+            end
+            % ---
+            geocode = newline;
+            geocode = [geocode fileread('__dilate.geo')];
+            % ---
+            geocode = GMSHWriter.write_vector_parameter(geocode,'origin',origin);
+            geocode = GMSHWriter.write_vector_parameter(geocode,'scale',scale);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'nb_copy',nb_copy);
+            % ---
+            geocode = [geocode newline];
+            % ---
+        end
         %------------------------------------------------------------------
         %------------------------------------------------------------------
         %------------------------------------------------------------------

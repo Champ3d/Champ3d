@@ -118,6 +118,8 @@ classdef Shape < Xhandle
                         geocode = [geocode ...
                             GMSHWriter.rotate(t.origin,t.axis,t.angle,t.nb_copy)];
                     case 'dilate'
+                        geocode = [geocode ...
+                            GMSHWriter.dilate(t.origin,t.scale,t.nb_copy)];
                 end
             end
         end
