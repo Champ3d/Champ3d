@@ -65,7 +65,6 @@ classdef Shape < Xhandle
                 obj
                 args.origin = [0 0 0]
                 args.scale = [1 1 1]
-                args.nb_copy = 0
             end
             % ---
             if length(args.scale) == 1
@@ -73,8 +72,7 @@ classdef Shape < Xhandle
             end
             % ---
             obj.transform{end + 1} = struct('type','dilate',...
-                'origin',args.origin,'scale',args.scale, ...
-                'nb_copy',args.nb_copy);
+                'origin',args.origin,'scale',args.scale);
             % ---
         end
         % -----------------------------------------------------------------
@@ -114,12 +112,14 @@ classdef Shape < Xhandle
                 t = obj.transform{i};
                 switch t.type
                     case 'translate'
+                        geocode = [geocode ...
+                            GMSHWriter.translate(t.distance,t.nb_copy)];
                     case 'rotate'
                         geocode = [geocode ...
                             GMSHWriter.rotate(t.origin,t.axis,t.angle,t.nb_copy)];
                     case 'dilate'
                         geocode = [geocode ...
-                            GMSHWriter.dilate(t.origin,t.scale,t.nb_copy)];
+                            GMSHWriter.dilate(t.origin,t.scale)];
                 end
             end
         end

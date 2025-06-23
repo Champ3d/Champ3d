@@ -109,11 +109,10 @@ classdef GMSHWriter
             % ---
         end
         %------------------------------------------------------------------
-        function geocode = dilate(origin,scale,nb_copy)
+        function geocode = dilate(origin,scale)
             arguments
                 origin  = [0, 0, 0]
                 scale   = [1, 1, 1]
-                nb_copy = 0
             end
             % ---
             geocode = newline;
@@ -121,12 +120,31 @@ classdef GMSHWriter
             % ---
             geocode = GMSHWriter.write_vector_parameter(geocode,'origin',origin);
             geocode = GMSHWriter.write_vector_parameter(geocode,'scale',scale);
-            geocode = GMSHWriter.write_scalar_parameter(geocode,'nb_copy',nb_copy);
             % ---
             geocode = [geocode newline];
             % ---
         end
         %------------------------------------------------------------------
+        function geocode = translate(distance,nb_copy)
+            arguments
+                distance = [0, 0, 0]
+                nb_copy  = 0
+            end
+            % ---
+            if isequal(f_torowv(distance),[0 0 0])
+                geocode = '';
+                return
+            end
+            % ---
+            geocode = newline;
+            geocode = [geocode fileread('__translate.geo')];
+            % ---
+            geocode = GMSHWriter.write_vector_parameter(geocode,'distance',distance);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'nb_copy',nb_copy);
+            % ---
+            geocode = [geocode newline];
+            % ---
+        end
         %------------------------------------------------------------------
         %------------------------------------------------------------------
         function geocode = final(mesh_file_name)
