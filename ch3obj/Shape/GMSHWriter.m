@@ -53,30 +53,31 @@ classdef GMSHWriter
             % ---
         end
         %------------------------------------------------------------------
-        function geocode = bbar(r,c,bcut,tcut,angle)
+        function geocode = bbox(c,len,orientation)
             arguments
-                r = 1
-                c = [0 0 0]
-                bcut = 0
-                tcut = 0
-                angle = 360
+                c   = [0 0 0]
+                len = [1, 1, 1]
+                orientation = [0 0 1]
             end
             % ---
-            bcut  = max(0, min(1, bcut));
-            tcut  = max(0, min(1, tcut));
-            angle = max(0, min(2*pi, angle*pi/180));
+            if any(len == 0)
+                geocode = '';
+                return
+            end
             % ---
-            angle_1 = interp1([0 1], [-pi/2 0], bcut);
-            angle_2 = interp1([1 0], [0 +pi/2], tcut);
+            oori = [0 0 1];
+            corner = c - len./2;
+            axis = cross(oori,orientation);
+            angle = acos(dot(oori,orientation) / (norm(oori) * norm(orientation)));
             % ---
             geocode = newline;
-            geocode = [geocode fileread('__BSphere.geo')];
+            geocode = [geocode fileread('__BBox.geo')];
             % ---
-            geocode = GMSHWriter.write_scalar_parameter(geocode,'radius',r);
             geocode = GMSHWriter.write_vector_parameter(geocode,'center',c);
-            geocode = GMSHWriter.write_scalar_parameter(geocode,'opening_angle_1',angle_1);
-            geocode = GMSHWriter.write_scalar_parameter(geocode,'opening_angle_2',angle_2);
-            geocode = GMSHWriter.write_scalar_parameter(geocode,'opening_angle_3',angle);
+            geocode = GMSHWriter.write_vector_parameter(geocode,'corner',corner);
+            geocode = GMSHWriter.write_vector_parameter(geocode,'len',len);
+            geocode = GMSHWriter.write_vector_parameter(geocode,'axis',axis);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'angle',angle);
             % ---
             geocode = [geocode newline];
             % ---

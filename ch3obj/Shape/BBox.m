@@ -16,22 +16,19 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef BCube < VolumeShape
+classdef BBox < VolumeShape
     properties
-
-        center
-    end
-    % --- Valid args list
-    methods (Static)
-        function argslist = validargs()
-            argslist = {'id'};
-        end
+        center = [0, 0, 0]
+        len    = [1, 1, 1]
+        orientation = [0 0 1]
     end
     % --- Constructors
     methods
-        function obj = BCube(args)
+        function obj = BBox(args)
             arguments
-                args.id
+                args.center = [0, 0, 0]
+                args.len    = [1, 1, 1]
+                args.orientation = [0 0 1]
             end
             % ---
             obj = obj@VolumeShape;
@@ -40,41 +37,48 @@ classdef BCube < VolumeShape
                 return
             end
             % ---
+            if any(args.len == 0)
+                error('Degenerated box ! one of len is zero.');
+            end
+            % ---
             obj <= args;
             % ---
-            BCube.setup(obj);
+            BBox.setup(obj);
             % ---
         end
     end
     % --- setup/reset
     methods (Static)
         function setup(obj)
-
+            obj.set_parameter;
         end
     end
     methods (Access = public)
         function reset(obj)
-            BCube.setup(obj);
+            BBox.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
     end
     % --- Methods
     methods
-        % -----------------------------------------------------------------
+        %------------------------------------------------------------------
+        function geocode = geocode(obj)
+            c   = obj.center.getvalue;
+            len = obj.len.getvalue;
+            orientation = obj.orientation.getvalue;
+            % ---
+            geocode = GMSHWriter.bbox(c,len,orientation);
+            % ---
+            geocode = obj.transformgeocode(geocode);
+            % ---
+        end
         %------------------------------------------------------------------
     end
 
-    % --- Methods
-    methods (Access = protected)
-        % -----------------------------------------------------------------
-        
-        % -----------------------------------------------------------------
-    end
-
-    % --- Methods
+    % --- Plot
     methods
-        function plot(obj,args)
+        function plot(obj)
             % XTODO
         end
     end

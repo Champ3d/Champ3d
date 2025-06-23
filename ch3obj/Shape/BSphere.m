@@ -83,15 +83,8 @@ classdef BSphere < VolumeShape
     end
 
     % --- Methods
-    methods (Access = protected)
-        % -----------------------------------------------------------------
-        
-        % -----------------------------------------------------------------
-    end
-
-    % --- Methods
     methods
-        function plot(obj,args)
+        function plot(obj)
             % XTODO
         end
     end
