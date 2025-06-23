@@ -149,6 +149,45 @@ classdef GMSHWriter
             % ---
         end
         %------------------------------------------------------------------
+        function geocode = bhollowcylinder(c,ri,ro,hei,opening_angle,orientation)
+            arguments
+                c  = [0 0 0]
+                ri = 1
+                ro = 2
+                hei = 1
+                opening_angle = 360
+                orientation = [0 0 1]
+            end
+            % ---
+            if (hei <= 0) || (ri < 0) || (ro <= 0) || (ro <= ri)
+                geocode = '';
+                return
+            end
+            % ---
+            if ri == 0
+                geocode = GMSHWriter.bcylinder(c,ro,hei,opening_angle,orientation);
+                return
+            end
+            % ---
+            bottom = f_torowv(c) - hei/2 .* f_torowv(orientation); 
+            opening_angle = opening_angle * pi/180;
+            orientation = orientation ./ norm(orientation);
+            % ---
+            geocode = newline;
+            geocode = [geocode fileread('__BHollowCylinder.geo')];
+            % ---
+            geocode = GMSHWriter.write_vector_parameter(geocode,'center',c);
+            geocode = GMSHWriter.write_vector_parameter(geocode,'bottom',bottom);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'ri',ri);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'ro',ro);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'hei',hei);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'opening_angle',opening_angle);
+            geocode = GMSHWriter.write_vector_parameter(geocode,'orientation',orientation);
+            % ---
+            geocode = [geocode newline];
+            % ---
+        end
+        %------------------------------------------------------------------
         function geocode = rotate(origin,axis,angle,nb_copy)
             arguments
                 origin  = [0, 0, 0]
