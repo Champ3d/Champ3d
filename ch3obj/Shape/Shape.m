@@ -85,7 +85,8 @@ classdef Shape < Xhandle
             % --- XTODO
             % should put list in config file ?
             paramlist = {'r','center','bottom_cut_ratio','top_cut_ratio','opening_angle',...
-                         'len','orientation'};
+                         'len','orientation',...
+                         'rtorus','rsection'};
             % ---
             for i = 1:length(paramlist)
                 param = paramlist{i};

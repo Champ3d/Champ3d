@@ -83,6 +83,40 @@ classdef GMSHWriter
             % ---
         end
         %------------------------------------------------------------------
+        function geocode = btorus(c,rtorus,rsection,opening_angle,orientation)
+            arguments
+                c  = [0 0 0]
+                rtorus = 2
+                rsection = 1
+                opening_angle = 360
+                orientation = [0 0 1]
+            end
+            % ---
+            if (rtorus <= 0) || (rsection <= 0) || opening_angle == 0
+                geocode = '';
+                return
+            end
+            % ---
+            opening_angle = opening_angle * pi/180;
+            % ---
+            oori = [0 0 1];
+            axis = cross(oori,orientation);
+            angle = acos(dot(oori,orientation) / (norm(oori) * norm(orientation)));
+            % ---
+            geocode = newline;
+            geocode = [geocode fileread('__BTorus.geo')];
+            % ---
+            geocode = GMSHWriter.write_vector_parameter(geocode,'center',c);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'rtorus',rtorus);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'rsection',rsection);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'opening_angle',opening_angle);
+            geocode = GMSHWriter.write_vector_parameter(geocode,'axis',axis);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'angle',angle);
+            % ---
+            geocode = [geocode newline];
+            % ---
+        end
+        %------------------------------------------------------------------
         function geocode = rotate(origin,axis,angle,nb_copy)
             arguments
                 origin  = [0, 0, 0]
@@ -172,7 +206,7 @@ classdef GMSHWriter
                 pvalue
             end
             pcode   = [pname ' = ' num2str(pvalue,16)];
-            geocode = regexprep(geocode,[pname '[\s]*=(?!=)[\s]*[\w]*[^;]*'],pcode);
+            geocode = regexprep(geocode,['(?<!\w)' pname '[\s]*=(?!=)[\s]*[\w]*[^;]*'],pcode);
         end
         %------------------------------------------------------------------
         function geocode = write_vector_parameter(geocode,pname,pvalue)
@@ -185,7 +219,7 @@ classdef GMSHWriter
                       '{' num2str(pvalue(1),16) ', ' ...
                           num2str(pvalue(2),16) ', ' ...
                           num2str(pvalue(3),16) '}'];
-            geocode   = regexprep(geocode,[pname '[\s]*=(?!=)[\s]*[\w]*[^;]*'],pcode);
+            geocode   = regexprep(geocode,['(?<!\w)' pname '[\s]*=(?!=)[\s]*[\w]*[^;]*'],pcode);
         end
         %------------------------------------------------------------------
     end
