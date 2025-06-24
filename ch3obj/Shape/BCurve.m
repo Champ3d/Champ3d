@@ -297,7 +297,7 @@ classdef BCurve < CurveShape
                             z_{end + 1} = z_{end};
                         end
                         % ---
-                        p13d = [y_{end} z_{end} z_{end}];
+                        p13d = [x_{end} y_{end} z_{end}];
                         flagnode = (p03d + p13d)./2;
                         % ---
                     case 'ago_xz'
@@ -325,7 +325,7 @@ classdef BCurve < CurveShape
                             z_{end + 1} = p02d(2) + dz(idx);
                         end
                         % ---
-                        p13d = [y_{end} z_{end} z_{end}];
+                        p13d = [x_{end} y_{end} z_{end}];
                         flagnode = (p03d + p13d)./2;
                         % ---
                     case 'ago_yz'
@@ -353,7 +353,7 @@ classdef BCurve < CurveShape
                             z_{end + 1} = p02d(2) + dz(idy);
                         end
                         % ---
-                        p13d = [y_{end} z_{end} z_{end}];
+                        p13d = [x_{end} y_{end} z_{end}];
                         flagnode = (p03d + p13d)./2;
                         % ---
                 end
@@ -459,7 +459,11 @@ classdef BCurve < CurveShape
                 node(:,i) = obj.flag{i}.node.';
                 vect(:,i) = obj.flag{i}.vector.';
             end
-            f_quiver(node,vect,'vtype','equal');
+            % ---
+            dx = diff(obj.x); dy = diff(obj.y); dz = diff(obj.z);
+            dmax = max(norm([dx;dy;dz]));
+            % ---
+            f_quiver(node,vect,'sfactor',dmax/40); colorbar off;
         end
     end
 end
