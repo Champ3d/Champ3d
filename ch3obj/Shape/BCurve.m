@@ -225,9 +225,6 @@ classdef BCurve < CurveShape
                             y_{end + 1} = y_{end};
                             z_{end + 1} = z_{end};
                         end
-                        % ---
-                        flag_{end + 1}.node = 1;
-                        % ---
                     case 'ygo'
                         len = go_.len;
                         if len ~= 0
@@ -289,15 +286,19 @@ classdef BCurve < CurveShape
                         dnum   = go_.dnum;
                         da     = angle/dnum;
                         center = [go_.center(1) go_.center(2)];
-                        p0 = [x_{end} y_{end}];
+                        p02d = [x_{end} y_{end}];
+                        p03d = [x_{end} y_{end} z_{end}];
                         % ---
-                        [dx, dy] = obj.cal_ago2d(da,dnum,p0,center);
+                        [dx, dy] = obj.cal_ago2d(da,dnum,p02d,center);
                         % ---
                         for idx = 1:length(dx)
-                            x_{end + 1} = p0(1) + dx(idx);
-                            y_{end + 1} = p0(2) + dy(idx);
+                            x_{end + 1} = p02d(1) + dx(idx);
+                            y_{end + 1} = p02d(2) + dy(idx);
                             z_{end + 1} = z_{end};
                         end
+                        % ---
+                        p13d = [y_{end} z_{end} z_{end}];
+                        flagnode = (p03d + p13d)./2;
                         % ---
                     case 'ago_xz'
                         angle = go_.angle;
@@ -313,15 +314,19 @@ classdef BCurve < CurveShape
                         dnum   = go_.dnum;
                         da     = angle/dnum;
                         center = [go_.center(1) go_.center(3)];
-                        p0 = [x_{end} z_{end}];
+                        p02d = [x_{end} z_{end}];
+                        p03d = [x_{end} y_{end} z_{end}];
                         % ---
-                        [dx, dz] = obj.cal_ago2d(da,dnum,p0,center);
+                        [dx, dz] = obj.cal_ago2d(da,dnum,p02d,center);
                         % ---
                         for idx = 1:length(dx)
-                            x_{end + 1} = p0(1) + dx(idx);
+                            x_{end + 1} = p02d(1) + dx(idx);
                             y_{end + 1} = y_{end};
-                            z_{end + 1} = p0(2) + dz(idx);
+                            z_{end + 1} = p02d(2) + dz(idx);
                         end
+                        % ---
+                        p13d = [y_{end} z_{end} z_{end}];
+                        flagnode = (p03d + p13d)./2;
                         % ---
                     case 'ago_yz'
                         angle = go_.angle;
@@ -337,15 +342,50 @@ classdef BCurve < CurveShape
                         dnum   = go_.dnum;
                         da     = angle/dnum;
                         center = [go_.center(2) go_.center(3)];
-                        p0 = [y_{end} z_{end}];
+                        p02d = [y_{end} z_{end}];
+                        p03d = [x_{end} y_{end} z_{end}];
                         % ---
-                        [dy, dz] = obj.cal_ago2d(da,dnum,p0,center);
+                        [dy, dz] = obj.cal_ago2d(da,dnum,p02d,center);
                         % ---
                         for idy = 1:length(dy)
                             x_{end + 1} = x_{end};
-                            y_{end + 1} = p0(1) + dy(idy);
-                            z_{end + 1} = p0(2) + dz(idy);
+                            y_{end + 1} = p02d(1) + dy(idy);
+                            z_{end + 1} = p02d(2) + dz(idy);
                         end
+                        % ---
+                        p13d = [y_{end} z_{end} z_{end}];
+                        flagnode = (p03d + p13d)./2;
+                        % ---
+                end
+                % --- flag
+                switch go_.type
+                    case {'xgo','ygo','zgo','xygo','xzgo','yzgo','xyzgo'}
+                        % ---
+                        idflag = length(flag_);
+                        flag_{idflag+1}.node = ...
+                            [x_{end-1} y_{end-1} z_{end-1}];
+                        flag_{idflag+1}.vector = ...
+                            [x_{end} y_{end} z_{end}] - [x_{end-1} y_{end-1} z_{end-1}];
+                        flag_{idflag+1}.vector = ...
+                            flag_{idflag+1}.vector ./ norm(flag_{idflag+1}.vector);
+                        % ---
+                    case 'ago_xy'
+                        % ---
+                        idflag = length(flag_);
+                        flag_{idflag+1}.node = flagnode;
+                        flag_{idflag+1}.vector = [0 0 1];
+                        % ---
+                    case 'ago_xz'
+                        % ---
+                        idflag = length(flag_);
+                        flag_{idflag+1}.node = flagnode;
+                        flag_{idflag+1}.vector = [0 1 0];
+                        % ---
+                    case 'ago_yz'
+                        % ---
+                        idflag = length(flag_);
+                        flag_{idflag+1}.node = flagnode;
+                        flag_{idflag+1}.vector = [1 0 0];
                         % ---
                 end
             end
@@ -370,6 +410,7 @@ classdef BCurve < CurveShape
             obj.x = x_;
             obj.y = y_;
             obj.z = z_;
+            obj.flag = flag_;
             % ---
         end
         %------------------------------------------------------------------
@@ -410,7 +451,15 @@ classdef BCurve < CurveShape
     methods
         function plot(obj)
             obj.get_curve;
-            plot3(obj.x,obj.y,obj.z,'-b','LineWidth',3);
+            plot3(obj.x,obj.y,obj.z,'-b','LineWidth',3); hold on;
+            nbflag = length(obj.flag);
+            node = zeros(3,nbflag);
+            vect = zeros(3,nbflag);
+            for i = 1:length(obj.flag)
+                node(:,i) = obj.flag{i}.node.';
+                vect(:,i) = obj.flag{i}.vector.';
+            end
+            f_quiver(node,vect,'vtype','equal');
         end
     end
 end
