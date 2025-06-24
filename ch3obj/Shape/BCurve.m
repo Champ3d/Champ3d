@@ -18,7 +18,7 @@
 
 classdef BCurve < CurveShape
     properties
-        start_point = [0 0]
+        start_node = [0 0]
         type
         go = {}
         x
@@ -30,16 +30,16 @@ classdef BCurve < CurveShape
     methods
         function obj = BCurve(args)
             arguments
-                args.start_point = []
+                args.start_node = []
                 args.type {mustBeMember(args.type,{'open','closed'})}
             end
             % ---
             obj = obj@CurveShape;
             % ---
-            if isempty(args.start_point)
-                error('#start_point must be given !');
-            elseif length(args.start_point) ~= 3
-                error('#start_point must be of dim 3 !');
+            if isempty(args.start_node)
+                error('#start_node must be given !');
+            elseif length(args.start_node) ~= 3
+                error('#start_node must be of dim 3 !');
             end
             % ---
             if ~isfield(args,'type')
@@ -210,9 +210,10 @@ classdef BCurve < CurveShape
     methods (Access = private)
         %------------------------------------------------------------------
         function get_curve(obj)
-            x_ = {obj.start_point(1)};
-            y_ = {obj.start_point(2)};
-            z_ = {obj.start_point(3)};
+            x_ = {obj.start_node(1)};
+            y_ = {obj.start_node(2)};
+            z_ = {obj.start_node(3)};
+            flag_ = {};
             for i = 1:length(obj.go)
                 go_ = obj.go{i};
                 switch go_.type
@@ -224,6 +225,9 @@ classdef BCurve < CurveShape
                             y_{end + 1} = y_{end};
                             z_{end + 1} = z_{end};
                         end
+                        % ---
+                        flag_{end + 1}.node = 1;
+                        % ---
                     case 'ygo'
                         len = go_.len;
                         if len ~= 0
@@ -357,7 +361,7 @@ classdef BCurve < CurveShape
                         f_fprintf(1,'/!\\',0,'bcurve terminals very close, d < 1e-9 !\n');
                     end
                 case 'closed'
-                    f_fprintf(1,'/!\\',0,'Champ3d has forced last point = first point !\n');
+                    f_fprintf(1,'/!\\',0,'Champ3d has forced last node = first node !\n');
                     x_(end) = x_(1);
                     y_(end) = y_(1);
                     z_(end) = z_(1);
