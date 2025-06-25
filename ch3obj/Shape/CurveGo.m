@@ -1,5 +1,5 @@
 %--------------------------------------------------------------------------
-% This code is written by: H-K. Bui, 2023
+% This code is written by: H-K. Bui, 2025
 % as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
 % Champ3d is copyright (c) 2023-2025 H-K. Bui.
@@ -11,19 +11,49 @@
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-function val = f_getvalue(parameter)
-    if isnumeric(parameter)
-        val = parameter;
-    elseif isa(parameter,'Parameter')
-        val = parameter.getvalue;
-    else
-        val = [];
-        f_fprintf(1,'/!\\',0,'Can not get the value of parameter ! \n');
-        f_fprintf(1,'---', 0,'parameter must be numeric or Parameter ! \n');
+classdef CurveGo
+    properties
+        id = ''
+        type
+        len
+        dnum
+        lenx
+        leny
+        lenz
+        angle
+        center
+        dir
+        % ---
+        vi
+        vf
+        div
+        % ---
+    end
+    % --- Constructors
+    methods
+        function obj = CurveGo(args)
+            arguments
+                args.id = ''
+                args.type {mustBeMember(args.type,{'xgo,ygo,zgo,xygo,xzgo,yzgo,xyzgo,ago_xy,ago_xz,ago_yz'})}
+                args.len
+                args.dnum
+                args.lenx
+                args.leny
+                args.lenz
+                args.angle
+                args.center
+                args.dir
+            end
+            obj.id = id;
+        end
+    end
+    % ---
+    methods
+        
     end
 end

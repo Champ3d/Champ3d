@@ -26,6 +26,25 @@ classdef CurveShape < Shape
     % --- Methods
     methods (Access = protected)
         % -----------------------------------------------------------------
+        function set_parameter(obj)
+            % --- XTODO
+            % should put list in config file ?
+            paramlist = {'len','lenx','leny','lenz','angle','center','dnum'};
+            % ---
+            for i = 1:length(paramlist)
+                param = paramlist{i};
+                if isprop(obj,param)
+                    if isnumeric(obj.(param))
+                        if ~isempty(obj.(param))
+                            obj.(param) = Parameter('f',obj.(param));
+                        end
+                    elseif ~isa(obj.(param),'Parameter')
+                        f_fprintf(1,'/!\\',0,'parameter must be numeric or Parameter !\n');
+                        error('Parameter error');
+                    end
+                end
+            end
+        end
         % -----------------------------------------------------------------
     end
     % --- Methods

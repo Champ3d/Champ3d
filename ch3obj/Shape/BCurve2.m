@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef BCurve < CurveShape
+classdef BCurve2 < CurveShape
     properties
         start_node = [0 0]
         type
@@ -29,7 +29,7 @@ classdef BCurve < CurveShape
     end
     % --- Constructors
     methods
-        function obj = BCurve(args)
+        function obj = BCurve2(args)
             arguments
                 args.start_node = []
                 args.type {mustBeMember(args.type,{'open','closed'})}
@@ -49,6 +49,8 @@ classdef BCurve < CurveShape
             % ---
             obj <= args;
             % ---
+            BCurve2.set_parameter(obj);
+            % ---
         end
     end
     % --- setup/reset
@@ -59,12 +61,12 @@ classdef BCurve < CurveShape
     end
     methods (Access = public)
         function reset(obj)
-            BCurve.setup(obj);
+            BCurve2.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
     end
-    % --- Methods
+    % --- Methods / go
     methods
         %------------------------------------------------------------------
         function xgo(obj,args)
@@ -75,7 +77,9 @@ classdef BCurve < CurveShape
                 args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('id',args.id,'type','xgo','len',args.len,'dnum',args.dnum);
+            if args.len ~= 0
+                obj.go{end + 1} = struct('id',args.id,'type','xgo','len',args.len,'dnum',args.dnum);
+            end
             % ---
         end
         %------------------------------------------------------------------
@@ -87,7 +91,9 @@ classdef BCurve < CurveShape
                 args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('id',args.id,'type','ygo','len',args.len,'dnum',args.dnum);
+            if args.len ~= 0
+                obj.go{end + 1} = struct('id',args.id,'type','ygo','len',args.len,'dnum',args.dnum);
+            end
             % ---
         end
         %------------------------------------------------------------------
@@ -99,7 +105,9 @@ classdef BCurve < CurveShape
                 args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('id',args.id,'type','zgo','len',args.len,'dnum',args.dnum);
+            if args.len ~= 0
+                obj.go{end + 1} = struct('id',args.id,'type','zgo','len',args.len,'dnum',args.dnum);
+            end
             % ---
         end
         %------------------------------------------------------------------
@@ -112,7 +120,9 @@ classdef BCurve < CurveShape
                 args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('id',args.id,'type','xygo','lenx',args.lenx,'leny',args.leny,'dnum',args.dnum);
+            if args.lenx ~= 0 || args.leny ~= 0
+                obj.go{end + 1} = struct('id',args.id,'type','xygo','lenx',args.lenx,'leny',args.leny,'dnum',args.dnum);
+            end
             % ---
         end
         %------------------------------------------------------------------
@@ -125,7 +135,9 @@ classdef BCurve < CurveShape
                 args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('id',args.id,'type','xzgo','lenx',args.lenx,'lenz',args.lenz,'dnum',args.dnum);
+            if args.lenx ~= 0 || args.lenz ~= 0
+                obj.go{end + 1} = struct('id',args.id,'type','xzgo','lenx',args.lenx,'lenz',args.lenz,'dnum',args.dnum);
+            end
             % ---
         end
         %------------------------------------------------------------------
@@ -138,7 +150,9 @@ classdef BCurve < CurveShape
                 args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('id',args.id,'type','yzgo','leny',args.leny,'lenz',args.lenz,'dnum',args.dnum);
+            if args.leny ~= 0 || args.lenz ~= 0
+                obj.go{end + 1} = struct('id',args.id,'type','yzgo','leny',args.leny,'lenz',args.lenz,'dnum',args.dnum);
+            end
             % ---
         end
         %------------------------------------------------------------------
@@ -152,7 +166,9 @@ classdef BCurve < CurveShape
                 args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('id',args.id,'type','xyzgo','lenx',args.lenx,'leny',args.leny,'lenz',args.lenz,'dnum',args.dnum);
+            if args.lenx ~= 0 || args.leny ~= 0 || args.lenz ~= 0
+                obj.go{end + 1} = struct('id',args.id,'type','xyzgo','lenx',args.lenx,'leny',args.leny,'lenz',args.lenz,'dnum',args.dnum);
+            end
             % ---
         end
         %------------------------------------------------------------------
@@ -200,6 +216,10 @@ classdef BCurve < CurveShape
                 'center',args.center,'dnum',args.dnum,'dir',args.dir);
             % ---
         end
+    end
+
+    % --- Methods / handling
+    methods
         %------------------------------------------------------------------
         function flagfit(obj,args)
             arguments
@@ -207,12 +227,19 @@ classdef BCurve < CurveShape
                 args.id_flag char
                 args.destination
                 args.orientation
+                args.rotation = 0
             end
             % ---
             obj.fit = struct('id_flag',args.id_flag,...
-                'destination',args.destination,'orientation',args.orientation);
+                'destination',args.destination,'orientation',args.orientation, ...
+                'rotation',args.rotation);
             % ---
         end
+        %------------------------------------------------------------------
+    end
+
+    % --- Methods / geocode
+    methods
         %------------------------------------------------------------------
         function geocode = geocode(obj)
             obj.get_curve;
@@ -230,74 +257,73 @@ classdef BCurve < CurveShape
         end
         %------------------------------------------------------------------
     end
-    % --- 
+    
+    % --- private
     methods (Access = private)
         %------------------------------------------------------------------
-        function get_curve(obj)
-            x_ = {obj.start_node(1)};
-            y_ = {obj.start_node(2)};
-            z_ = {obj.start_node(3)};
+        function div(obj,args)
+            arguments
+                obj
+                args.id_flag char
+                args.destination
+                args.orientation
+            end
+            % ---
+            obj.fit = struct('id_flag',args.id_flag,...
+                'destination',args.destination,'orientation',args.orientation);
+            % ---
+        end
+        %------------------------------------------------------------------
+        function get_go(obj)
+            % ---
+            node = {[obj.start_node(1), obj.start_node(2), obj.start_node(3)]};
             flag_ = {};
+            % ---
             for i = 1:length(obj.go)
                 go_ = obj.go{i};
                 switch go_.type
                     case 'xgo'
-                        % --- XTODO for Parameter
-                        len = go_.len;
-                        if len ~= 0
-                            x_{end + 1} = x_{end} + len;
-                            y_{end + 1} = y_{end};
-                            z_{end + 1} = z_{end};
-                        end
+                        len = go_.len.getvalue;
+                        go_.vlen = len .* [1 0 0];
+                        go_.vi = go_.vlen ./ norm(go_.vlen);
+                        go_.vf = go_.vi;
                     case 'ygo'
-                        len = go_.len;
-                        if len ~= 0
-                            x_{end + 1} = x_{end};
-                            y_{end + 1} = y_{end} + len;
-                            z_{end + 1} = z_{end};
-                        end
+                        len = go_.len.getvalue;
+                        go_.vlen = len .* [0 1 0];
+                        go_.vi = go_.vlen ./ norm(go_.vlen);
+                        go_.vf = go_.vi;
                     case 'zgo'
-                        len = go_.len;
-                        if len ~= 0
-                            x_{end + 1} = x_{end};
-                            y_{end + 1} = y_{end};
-                            z_{end + 1} = z_{end} + len;
-                        end
+                        len = go_.len.getvalue;
+                        go_.vlen = len .* [0 0 1];
+                        go_.vi = go_.vlen ./ norm(go_.vlen);
+                        go_.vf = go_.vi;
                     case 'xygo'
-                        lenx = go_.lenx;
-                        leny = go_.leny;
-                        if lenx ~= 0 || leny ~= 0
-                            x_{end + 1} = x_{end} + lenx;
-                            y_{end + 1} = y_{end} + leny;
-                            z_{end + 1} = z_{end};
-                        end
+                        lenx = go_.lenx.getvalue;
+                        leny = go_.leny.getvalue;
+                        go_.vlen = [lenx, leny, 0];
+                        go_.vi = go_.vlen ./ norm(go_.vlen);
+                        go_.vf = go_.vi;
                     case 'xzgo'
-                        lenx = go_.lenx;
-                        lenz = go_.lenz;
-                        if lenx ~= 0 || lenz ~= 0
-                            x_{end + 1} = x_{end} + lenx;
-                            y_{end + 1} = y_{end};
-                            z_{end + 1} = z_{end} + lenz;
-                        end
+                        lenx = go_.lenx.getvalue;
+                        lenz = go_.lenz.getvalue;
+                        go_.vlen = [lenx, 0, lenz];
+                        go_.vi = go_.vlen ./ norm(go_.vlen);
+                        go_.vf = go_.vi;
                     case 'yzgo'
-                        leny = go_.leny;
-                        lenz = go_.lenz;
-                        if leny ~= 0 || lenz ~= 0
-                            x_{end + 1} = x_{end};
-                            y_{end + 1} = y_{end} + leny;
-                            z_{end + 1} = z_{end} + lenz;
-                        end
+                        leny = go_.leny.getvalue;
+                        lenz = go_.lenz.getvalue;
+                        go_.vlen = [0, leny, lenz];
+                        go_.vi = go_.vlen ./ norm(go_.vlen);
+                        go_.vf = go_.vi;
                     case 'xyzgo'
-                        lenx = go_.lenx;
-                        leny = go_.leny;
-                        lenz = go_.lenz;
-                        if lenx ~= 0 || leny ~= 0 || lenz ~= 0
-                            x_{end + 1} = x_{end} + lenx;
-                            y_{end + 1} = y_{end} + leny;
-                            z_{end + 1} = z_{end} + lenz;
-                        end
-                    case 'ago_xy'
-                        angle = go_.angle;
+                        lenx = go_.lenx.getvalue;
+                        leny = go_.leny.getvalue;
+                        lenz = go_.lenz.getvalue;
+                        go_.vlen = [lenx, leny, lenz];
+                        go_.vi = go_.vlen ./ norm(go_.vlen);
+                        go_.vf = go_.vi;
+                    case {'ago_xy','ago_xz','ago_yz'}
+                        angle = go_.angle.getvalue;
                         dir = go_.dir;
                         % ---
                         switch dir
@@ -307,112 +333,88 @@ classdef BCurve < CurveShape
                                 angle = -abs(angle);
                         end
                         % ---
-                        dnum   = go_.dnum;
-                        da     = angle/dnum;
-                        center = [go_.center(1) go_.center(2)];
-                        p02d = [x_{end} y_{end}];
-                        p03d = [x_{end} y_{end} z_{end}];
+                        center = go_.center.getvalue;
                         % ---
-                        [dx, dy] = obj.calform_ago2d(da,dnum,p02d,center);
+                        p03d = node{end};
                         % ---
-                        for idx = 1:length(dx)
-                            x_{end + 1} = p02d(1) + dx(idx);
-                            y_{end + 1} = p02d(2) + dy(idx);
-                            z_{end + 1} = z_{end};
-                        end
-                        % ---
-                        p13d = [x_{end} y_{end} z_{end}];
-                        flagnode = (p03d + p13d)./2;
-                        % ---
-                    case 'ago_xz'
-                        angle = go_.angle;
-                        dir = go_.dir;
-                        % ---
-                        switch dir
-                            case 'ccw'
-                                angle = +abs(angle);
-                            case 'clock'
-                                angle = -abs(angle);
-                        end
-                        % ---
-                        dnum   = go_.dnum;
-                        da     = angle/dnum;
-                        center = [go_.center(1) go_.center(3)];
-                        p02d = [x_{end} z_{end}];
-                        p03d = [x_{end} y_{end} z_{end}];
-                        % ---
-                        [dx, dz] = obj.calform_ago2d(da,dnum,p02d,center);
-                        % ---
-                        for idx = 1:length(dx)
-                            x_{end + 1} = p02d(1) + dx(idx);
-                            y_{end + 1} = y_{end};
-                            z_{end + 1} = p02d(2) + dz(idx);
-                        end
-                        % ---
-                        p13d = [x_{end} y_{end} z_{end}];
-                        flagnode = (p03d + p13d)./2;
-                        % ---
-                    case 'ago_yz'
-                        angle = go_.angle;
-                        dir = go_.dir;
-                        % ---
-                        switch dir
-                            case 'ccw'
-                                angle = +abs(angle);
-                            case 'clock'
-                                angle = -abs(angle);
-                        end
-                        % ---
-                        dnum   = go_.dnum;
-                        da     = angle/dnum;
-                        center = [go_.center(2) go_.center(3)];
-                        p02d = [y_{end} z_{end}];
-                        p03d = [x_{end} y_{end} z_{end}];
-                        % ---
-                        [dy, dz] = obj.calform_ago2d(da,dnum,p02d,center);
-                        % ---
-                        for idy = 1:length(dy)
-                            x_{end + 1} = x_{end};
-                            y_{end + 1} = p02d(1) + dy(idy);
-                            z_{end + 1} = p02d(2) + dz(idy);
-                        end
-                        % ---
-                        p13d = [x_{end} y_{end} z_{end}];
-                        flagnode = (p03d + p13d)./2;
+                        dx0 = 0; dy0 = 0; dz0 = 0;
+                        dx1 = 0; dy1 = 0; dz1 = 0;
+                        ddx = 0; ddy = 0; ddz = 0;
                         % ---
                 end
-                % --- flag
+
+                % --- continued...
+                switch go_.type
+                    case 'ago_xy'
+                        center = center([1 2]);
+                        p02d   = p03d([1 2]);
+                        % ---
+                        [dx, dy] = obj.calform_ago2d(angle,30,p02d,center); % 30 may be enough
+                        dx0 = dx(1);   dy0 = dy(1);
+                        dx1 = dx(end); dy1 = dy(end);
+                        % ---
+                        [ddx, ddy] = obj.calform_ago2d(angle,1,p02d,center);
+                    case 'ago_xz'
+                        center = center([1 3]);
+                        p02d   = p03d([1 3]);
+                        % ---
+                        [dx, dz] = obj.calform_ago2d(angle,30,p02d,center);
+                        dx0 = dx(1);   dz0 = dz(1);
+                        dx1 = dx(end); dz1 = dz(end);
+                        % ---
+                        [ddx, ddz] = obj.calform_ago2d(angle,1,p02d,center);
+                    case 'ago_yz'
+                        center = center([2 3]);
+                        p02d   = p03d([2 3]);
+                        % ---
+                        [dy, dz] = obj.calform_ago2d(angle,30,p02d,center);
+                        dy0 = dy(1);   dz0 = dz(1);
+                        dy1 = dy(end); dz1 = dz(end);
+                        % ---
+                        [ddy, ddz] = obj.calform_ago2d(angle,1,p02d,center);
+                end
+
+                % --- continued...
+                switch go_.type
+                    case {'ago_xy','ago_xz','ago_yz'}
+                        dmove0 = [dx0, dy0, dz0];
+                        dmove1 = [dx1, dy1, dz1];
+                        go_.vi = dmove0; go_.vi = go_.vi ./ norm(go_.vi);
+                        go_.vf = dmove1; go_.vf = go_.vf ./ norm(go_.vf);
+                        % ---
+                        ddmove = [ddx, ddy, ddz];
+                        flagnode = p03d + ddmove./2;
+                end
+
+                % --- initial/final nodes
+                go_.ni = node{end};
                 switch go_.type
                     case {'xgo','ygo','zgo','xygo','xzgo','yzgo','xyzgo'}
-                        % ---
-                        idflag = length(flag_);
-                        flag_{idflag+1}.node = ...
-                            [x_{end-1} y_{end-1} z_{end-1}];
-                        flag_{idflag+1}.vector = ...
-                            [x_{end} y_{end} z_{end}] - [x_{end-1} y_{end-1} z_{end-1}];
-                        flag_{idflag+1}.vector = ...
-                            flag_{idflag+1}.vector ./ norm(flag_{idflag+1}.vector);
-                        % ---
-                    case 'ago_xy'
-                        % ---
-                        idflag = length(flag_);
-                        flag_{idflag+1}.node = flagnode;
-                        flag_{idflag+1}.vector = [0 0 1];
-                        % ---
-                    case 'ago_xz'
-                        % ---
-                        idflag = length(flag_);
-                        flag_{idflag+1}.node = flagnode;
-                        flag_{idflag+1}.vector = [0 1 0];
-                        % ---
-                    case 'ago_yz'
-                        % ---
-                        idflag = length(flag_);
-                        flag_{idflag+1}.node = flagnode;
-                        flag_{idflag+1}.vector = [1 0 0];
-                        % ---
+                        node{end + 1} = node{end} + go_.vlen;
+                    case {'ago_xy','ago_xz','ago_yz'}
+                        node{end + 1} = node{end} + ddmove;
                 end
-                % ---
+                go_.nf = node{end};
+                
+                % --- flag
+                idflag = length(flag_);
+                switch go_.type
+                    case {'xgo','ygo','zgo','xygo','xzgo','yzgo','xyzgo'}
+                        fnode = node{end-1};
+                        fvec = node{end} - node{end-1};
+                        fvec = fvec ./ norm(fvec);
+                    case 'ago_xy'
+                        fnode = flagnode;
+                        fvec = [0 0 1];
+                    case 'ago_xz'
+                        fnode = flagnode;
+                        fvec = [0 1 0];
+                    case 'ago_yz'
+                        fnode = flagnode;
+                        fvec = [1 0 0];
+                end
+                flag_{idflag+1}.node = fnode;
+                flag_{idflag+1}.vector = fvec;
                 flag_{idflag+1}.id = go_.id;
                 % ---
             end
@@ -465,11 +467,11 @@ classdef BCurve < CurveShape
             % ---
         end
         %------------------------------------------------------------------
-        function [dx, dy] = calform_ago2d(obj,da,dnum,p0,center)
+        function [dx, dy] = calform_ago2d(da,dnum,p0,center)
             % ---
             if dnum == 0 || norm(p0 - center) < 1e-9
-                dx = [];
-                dy = [];
+                dx = zeros(1,dnum);
+                dy = zeros(1,dnum);
                 return
             end
             % ---
