@@ -69,12 +69,12 @@ classdef BCylinder < VolumeShape
         %------------------------------------------------------------------
         function geocode = geocode(obj)
             c = obj.center.getvalue;
-            r = obj.r.getvalue;
-            hei = obj.hei.getvalue;
-            opening_angle = obj.opening_angle.getvalue;
-            orientation = obj.orientation.getvalue;
+            r_ = obj.r.getvalue;
+            hei_ = obj.hei.getvalue;
+            opening_angle_ = obj.opening_angle.getvalue;
+            orientation_ = obj.orientation.getvalue;
             % ---
-            geocode = GMSHWriter.bcylinder(c,r,hei,opening_angle,orientation);
+            geocode = GMSHWriter.bcylinder(c,r_,hei_,opening_angle_,orientation_);
             % ---
             geocode = obj.transformgeocode(geocode);
             % ---

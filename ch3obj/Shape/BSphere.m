@@ -68,13 +68,13 @@ classdef BSphere < VolumeShape
     methods
         %------------------------------------------------------------------
         function geocode = geocode(obj)
-            r     = obj.r.getvalue;
+            r_    = obj.r.getvalue;
             c     = obj.center.getvalue;
             bcut  = obj.bottom_cut_ratio.getvalue;
             tcut  = obj.top_cut_ratio.getvalue;
             angle = obj.opening_angle.getvalue;
             % ---
-            geocode = GMSHWriter.bsphere(r,c,bcut,tcut,angle);
+            geocode = GMSHWriter.bsphere(r_,c,bcut,tcut,angle);
             % ---
             geocode = obj.transformgeocode(geocode);
             % ---
