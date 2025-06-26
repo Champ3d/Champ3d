@@ -27,6 +27,20 @@ classdef CurveShape < Shape
     methods (Access = protected)
         % -----------------------------------------------------------------
         function set_parameter(obj)
+            % --- for obj
+            paramlist = {'rmin','cutfactor'};
+            % ---
+            for i = 1:length(paramlist)
+                param = paramlist{i};
+                if isprop(obj,param)
+                    if isnumeric(obj.(param))
+                        obj.(param) = Parameter('f',obj.(param));
+                    elseif ~isa(obj.(param),'Parameter')
+                        f_fprintf(1,'/!\\',0,'parameter must be numeric or Parameter !\n');
+                        error('Parameter error');
+                    end
+                end
+            end
             % --- for go
             paramlist = {'len','lenx','leny','lenz','angle','center','dnum'};
             % ---

@@ -26,6 +26,8 @@ classdef BCurve2 < CurveShape
         z
         flag
         fit = []
+        rmin = 0
+        cutfactor = 2
     end
     % --- Constructors
     methods
@@ -259,16 +261,14 @@ classdef BCurve2 < CurveShape
     % --- private
     methods %(Access = private)
         %------------------------------------------------------------------
-        function div(obj)
+        function geonode(obj)
             
         end
         %------------------------------------------------------------------
-        function gobase(obj,rmin,cutfactor)
-            arguments
-                obj
-                rmin = 0
-                cutfactor = 2;
-            end
+        function gobase(obj)
+            % ---
+            rmin_ = obj.rmin.getvalue;
+            cutfactor_ = obj.cutfactor.getvalue;
             % ---
             obj.where2cut;
             % ---
@@ -279,7 +279,7 @@ classdef BCurve2 < CurveShape
             for i = 1:lengo
                 g = obj.go{i};
                 % ---
-                if rmin > norm(g.vlen)/(2*cutfactor)
+                if rmin_ > norm(g.vlen)/(2*cutfactor_)
                     f_fprintf(1,'/!\\',0,'Too small angle corner too build volume curve !\n');
                     f_fprintf(0,'check go #',1,num2str(i),0,'\n');
                     return
@@ -289,12 +289,12 @@ classdef BCurve2 < CurveShape
                     case {'xgo','ygo','zgo','xygo','xzgo','yzgo','xyzgo'}
                         ulen = g.vlen ./ norm(g.vlen);
                         if g.icut
-                            nstart = g.ni + cutfactor * rmin .* ulen;
+                            nstart = g.ni + cutfactor_ * rmin_ .* ulen;
                         else
                             nstart = g.ni;
                         end
                         if g.fcut
-                            nstop = g.nf - cutfactor * rmin .* ulen;
+                            nstop = g.nf - cutfactor_ * rmin_ .* ulen;
                         else
                             nstop = g.nf;
                         end
@@ -341,26 +341,20 @@ classdef BCurve2 < CurveShape
                     case {'ago_xy','ago_xz','ago_yz'}
                         ddiv = [dx; dy; dz];
                         % ---
-                        dlen = 0;
-                        if g.icut && rmin > 0
+                        if g.icut && rmin_ > 0
                             for idiv = 1:length(dx)
-                                dlen = dlen + ddiv(:,idiv);
-                                if norm(dlen) >= cutfactor * rmin
-                                    node0 = g.ni + dlen;
-                                    idiv0 = idiv + 1;
+                                if norm(ddiv(:,idiv)) >= cutfactor_ * rmin_
+                                    idiv0 = idiv;
                                     break
                                 end
                             end
                         else
-                            node0 = g.ni;
                             idiv0 = 1;
                         end
                         % ---
-                        dlen = 0;
-                        if g.fcut && rmin > 0
+                        if g.fcut && rmin_ > 0
                             for idiv = length(dx):-1:1
-                                dlen = dlen + ddiv(:,idiv);
-                                if norm(dlen) >= cutfactor * rmin
+                                if norm(g.vlen - ddiv(:,idiv)) >= cutfactor_ * rmin_
                                     idiv1 = idiv;
                                     break
                                 end
@@ -369,14 +363,18 @@ classdef BCurve2 < CurveShape
                             idiv1 = length(dx);
                         end
                         % ---
-                        g.node = zeros(3,idiv1 - idiv0 + 1);
-                        g.node(:,1) = node0;
-                        k = 1;
+                        node_ = {};
+                        if ~g.icut || rmin_ == 0
+                            node_{end+1} = g.ni;
+                        end
                         for idiv = idiv0:idiv1
-                            k = k+1;
-                            g.node(:,k) = node0 + ddiv(:,idiv);
+                            node_{end+1} = g.ni + ddiv(:,idiv);
+                        end
+                        if ~g.fcut || rmin_ == 0
+                            node_{end+1} = g.nf;
                         end
                         % ---
+                        g.node = cell2mat(node_);
                 end
             end
         end
@@ -672,7 +670,7 @@ classdef BCurve2 < CurveShape
             % ---
             plot3(x,y,z,'-b','LineWidth',3); hold on;
             % ---
-            obj.gobase(1);
+            obj.gobase;
             for i = 1:length(obj.go)
                 g = obj.go{i};
                 plot3(g.node(1,:),g.node(2,:),g.node(3,:),'-r','LineWidth',3); hold on;
