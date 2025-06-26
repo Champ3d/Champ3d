@@ -242,15 +242,9 @@ classdef BCurve < CurveShape
     methods
         %------------------------------------------------------------------
         function geocode = geocode(obj)
-            obj.get_curve;
+            obj.geonode;
             % ---
-            c = obj.center.getvalue;
-            r = obj.r.getvalue;
-            hei = obj.hei.getvalue;
-            opening_angle = obj.opening_angle.getvalue;
-            orientation = obj.orientation.getvalue;
-            % ---
-            geocode = GMSHWriter.bcylinder(c,r,hei,opening_angle,orientation);
+            geocode = GMSHWriter.bcurve(obj.x, obj.y, obj.z, obj.type);
             % ---
             geocode = obj.transformgeocode(geocode);
             % ---
@@ -259,10 +253,47 @@ classdef BCurve < CurveShape
     end
     
     % --- private
-    methods %(Access = private)
+    methods (Access = private)
         %------------------------------------------------------------------
         function geonode(obj)
-            
+            % ---
+            obj.gobase;
+            % ---
+            node = [];
+            for i = 1:length(obj.go)
+                g = obj.go{i};
+                node = [node, g.node];
+            end
+            dnode = vecnorm(diff(node,1,2));
+            irm = find(dnode < 1e-9); % XTODO : tol
+            node(:,irm) = [];
+            % ---
+            if ~isempty(obj.fit)
+                idflag = obj.fit.id_flag;
+                for i = 1:length(obj.flag)
+                    if strcmpi(obj.flag{i}.id,idflag)
+                        node = node + f_tocolv(obj.fit.destination) - f_tocolv(obj.flag{i}.node);
+                        % ---
+                        fv  = obj.flag{i}.vector;
+                        ori = obj.fit.orientation;
+                        % ---
+                        rot_angle = acosd(dot(fv,ori) / (norm(fv) * norm(ori)));
+                        rot_axis = cross(ori,fv);
+                        if norm(rot_axis) < 1e-12
+                            rot_axis = [0 0 -sign(dot([1 0 0],[lOx 0]))];
+                        end
+                        % ---
+                        node = f_rotaroundaxis(node,'rot_angle',rot_angle, ...
+                            'rot_axis',rot_axis,'axis_origin',obj.fit.destination);
+                        % ---
+                    end
+                end
+            end
+            % ---
+            obj.x = node(1,:);
+            obj.y = node(2,:);
+            obj.z = node(3,:);
+            % ---
         end
         %------------------------------------------------------------------
         function gobase(obj)
@@ -272,7 +303,7 @@ classdef BCurve < CurveShape
             % ---
             obj.where2cut;
             % ---
-            nbp = 20; % may be enough
+            nbp = 30; % XTODO : may be enough
             % ---
             lengo = length(obj.go);
             % ---
@@ -467,12 +498,6 @@ classdef BCurve < CurveShape
                         % ---
                         center = g.center.getvalue;
                         % ---
-                        % if i == 1
-                        %     p03d = [obj.start_node(1); obj.start_node(2); obj.start_node(3)];
-                        % else
-                        %     p03d = obj.go{i-1}.nf;
-                        % end
-                        % ---
                         p03d = node{end};
                         % ---
                         dx0 = 0; dy0 = 0; dz0 = 0;
@@ -577,35 +602,6 @@ classdef BCurve < CurveShape
                     end
             end
             % ---
-
-
-
-            % ---
-            % if ~isempty(obj.fit)
-            %     idflag = obj.fit.id_flag;
-            %     for i = 1:length(flag_)
-            %         if strcmpi(flag_{i}.id,idflag)
-            %             node = node + f_tocolv(obj.fit.destination) - f_tocolv(flag_{i}.node);
-            %             % ---
-            %             fv  = flag_{i}.vector;
-            %             ori = obj.fit.orientation;
-            %             % ---
-            %             rot_angle = acosd(dot(fv,ori) / (norm(fv) * norm(ori)));
-            %             rot_axis = cross(ori,fv);
-            %             if norm(rot_axis) < 1e-12
-            %                 rot_axis = [0 0 -sign(dot([1 0 0],[lOx 0]))];
-            %             end
-            %             % ---
-            %             node = f_rotaroundaxis(node,'rot_angle',rot_angle, ...
-            %                 'rot_axis',rot_axis,'axis_origin',obj.fit.destination);
-            %             % ---
-            %         end
-            %     end
-            % end
-            % ---
-            % obj.x = node(1,:);
-            % obj.y = node(2,:);
-            % obj.z = node(3,:);
             obj.flag = flag_;
             % ---
         end
