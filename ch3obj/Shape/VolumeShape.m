@@ -38,6 +38,27 @@ classdef VolumeShape < Shape
             end
         end
         % -----------------------------------------------------------------
+        function geocode = transformgeocode(obj,geocode)
+            arguments
+                obj
+                geocode
+            end
+            % ---
+            for i = 1:length(obj.transform)
+                t = obj.transform{i};
+                switch t.type
+                    case 'translate'
+                        geocode = [geocode ...
+                            GMSHWriter.translate_volume(t.distance,t.nb_copy)];
+                    case 'rotate'
+                        geocode = [geocode ...
+                            GMSHWriter.rotate_volume(t.origin,t.axis,t.angle,t.nb_copy)];
+                    case 'dilate'
+                        geocode = [geocode ...
+                            GMSHWriter.dilate_volume(t.origin,t.scale)];
+                end
+            end
+        end
         % -----------------------------------------------------------------
     end
 

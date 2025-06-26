@@ -106,28 +106,6 @@ classdef Shape < Xhandle
             end
         end
         % -----------------------------------------------------------------
-        function geocode = transformgeocode(obj,geocode)
-            arguments
-                obj
-                geocode
-            end
-            % ---
-            for i = 1:length(obj.transform)
-                t = obj.transform{i};
-                switch t.type
-                    case 'translate'
-                        geocode = [geocode ...
-                            GMSHWriter.translate(t.distance,t.nb_copy)];
-                    case 'rotate'
-                        geocode = [geocode ...
-                            GMSHWriter.rotate(t.origin,t.axis,t.angle,t.nb_copy)];
-                    case 'dilate'
-                        geocode = [geocode ...
-                            GMSHWriter.dilate(t.origin,t.scale)];
-                end
-            end
-        end
-        % -----------------------------------------------------------------
     end
 
     % --- Methods

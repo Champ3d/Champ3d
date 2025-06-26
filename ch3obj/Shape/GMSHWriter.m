@@ -208,7 +208,7 @@ classdef GMSHWriter
             % ---
         end
         %------------------------------------------------------------------
-        function geocode = rotate(origin,axis,angle,nb_copy)
+        function geocode = rotate_volume(origin,axis,angle,nb_copy)
             arguments
                 origin  = [0, 0, 0]
                 axis    = [0, 0, 0]
@@ -224,7 +224,7 @@ classdef GMSHWriter
             angle = angle*pi/180;
             % ---
             geocode = newline;
-            geocode = [geocode fileread('__rotate.geo')];
+            geocode = [geocode fileread('__rotateVolume.geo')];
             % ---
             geocode = GMSHWriter.write_vector_parameter(geocode,'origin',origin);
             geocode = GMSHWriter.write_vector_parameter(geocode,'axis',axis);
@@ -235,14 +235,14 @@ classdef GMSHWriter
             % ---
         end
         %------------------------------------------------------------------
-        function geocode = dilate(origin,scale)
+        function geocode = dilate_volume(origin,scale)
             arguments
                 origin  = [0, 0, 0]
                 scale   = [1, 1, 1]
             end
             % ---
             geocode = newline;
-            geocode = [geocode fileread('__dilate.geo')];
+            geocode = [geocode fileread('__dilateVolume.geo')];
             % ---
             geocode = GMSHWriter.write_vector_parameter(geocode,'origin',origin);
             geocode = GMSHWriter.write_vector_parameter(geocode,'scale',scale);
@@ -251,7 +251,7 @@ classdef GMSHWriter
             % ---
         end
         %------------------------------------------------------------------
-        function geocode = translate(distance,nb_copy)
+        function geocode = translate_volume(distance,nb_copy)
             arguments
                 distance = [0, 0, 0]
                 nb_copy  = 0
@@ -263,7 +263,76 @@ classdef GMSHWriter
             end
             % ---
             geocode = newline;
-            geocode = [geocode fileread('__translate.geo')];
+            geocode = [geocode fileread('__translateVolume.geo')];
+            % ---
+            geocode = GMSHWriter.write_vector_parameter(geocode,'distance',distance);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'nb_copy',nb_copy);
+            % ---
+            geocode = [geocode newline];
+            % ---
+        end
+        %------------------------------------------------------------------
+        function geocode = rotate_surface(origin,angle,nb_copy)
+            arguments
+                origin  = [0, 0]
+                angle   = 0
+                nb_copy = 0
+            end
+            % ---
+            origin = [origin(1) origin(2) 0];
+            % ---
+            if angle == 0
+                geocode = '';
+                return
+            end
+            % ---
+            angle = angle*pi/180;
+            % ---
+            geocode = newline;
+            geocode = [geocode fileread('__rotateSurface.geo')];
+            % ---
+            geocode = GMSHWriter.write_vector_parameter(geocode,'origin',origin);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'angle',angle);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'nb_copy',nb_copy);
+            % ---
+            geocode = [geocode newline];
+            % ---
+        end
+        %------------------------------------------------------------------
+        function geocode = dilate_surface(origin,scale)
+            arguments
+                origin  = [0, 0]
+                scale   = [1, 1]
+            end
+            % ---
+            origin = [origin(1) origin(2) 0];
+            scale  = [scale(1) scale(2) 0];
+            % ---
+            geocode = newline;
+            geocode = [geocode fileread('__dilateSurface.geo')];
+            % ---
+            geocode = GMSHWriter.write_vector_parameter(geocode,'origin',origin);
+            geocode = GMSHWriter.write_vector_parameter(geocode,'scale',scale);
+            % ---
+            geocode = [geocode newline];
+            % ---
+        end
+        %------------------------------------------------------------------
+        function geocode = translate_surface(distance,nb_copy)
+            arguments
+                distance = [0, 0, 0]
+                nb_copy  = 0
+            end
+            % ---
+            distance = [distance(1) distance(2) 0];
+            % ---
+            if isequal(f_torowv(distance),[0 0 0])
+                geocode = '';
+                return
+            end
+            % ---
+            geocode = newline;
+            geocode = [geocode fileread('__translateSurface.geo')];
             % ---
             geocode = GMSHWriter.write_vector_parameter(geocode,'distance',distance);
             geocode = GMSHWriter.write_scalar_parameter(geocode,'nb_copy',nb_copy);
