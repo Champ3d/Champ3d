@@ -176,7 +176,7 @@ classdef TetraMeshFromGMSH < TetraMesh
             % ---
             call_GMSH_run = [Ch3Config.GMSHExecutable ' ' ...
                              geoname ' ' ...
-                             '-nopopup -n -v 0 -'];
+                             '-v 0 -'];
             % ---
             try
                 fprintf('GMSH running ... \n');
