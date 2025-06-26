@@ -73,9 +73,9 @@ classdef Parameter < Xhandle
             varargin_list_ = args.varargin_list;
             fvectorized_ = args.fvectorized;
             % ---
-            if isempty(args.f)
-                error('#f must be given ! Give a function handle or numeric value');
-            end
+            % if isempty(args.f)
+            %     error('#f must be given ! Give a function handle or numeric value');
+            % end
             % ---
             from_ = [];
             if isnumeric(args.f)
@@ -83,7 +83,7 @@ classdef Parameter < Xhandle
                 % ---
                 sizeconst = size(const);
                 % ---
-                if numel(const) == 1
+                if numel(const) == 1 || isempty(const)
                     f_ = @()(const);
                 elseif numel(const) == 2 || numel(const) == 3
                     const = f_tocolv(const);

@@ -16,9 +16,8 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef CurveGo
+classdef CurveGo < Xhandle
     properties
-        id = ''
         type
         len
         dnum
@@ -29,17 +28,25 @@ classdef CurveGo
         center
         dir
         % ---
+        flag
+        vlen
         vi
         vf
-        div
+        ni
+        nf
+        icut = 0
+        fcut = 0
+        node
         % ---
     end
     % --- Constructors
     methods
         function obj = CurveGo(args)
             arguments
-                args.id = ''
-                args.type {mustBeMember(args.type,{'xgo,ygo,zgo,xygo,xzgo,yzgo,xyzgo,ago_xy,ago_xz,ago_yz'})}
+                args.id char = ''
+                args.type {mustBeMember(args.type,...
+                    {'xgo','ygo','zgo','xygo','xzgo','yzgo','xyzgo',...
+                     'ago_xy','ago_xz','ago_yz'})}
                 args.len
                 args.dnum
                 args.lenx
@@ -49,7 +56,11 @@ classdef CurveGo
                 args.center
                 args.dir
             end
-            obj.id = id;
+            % ---
+            obj = obj@Xhandle;
+            % ---
+            obj <= args;
+            % ---
         end
     end
     % ---

@@ -27,30 +27,24 @@ classdef CurveShape < Shape
     methods (Access = protected)
         % -----------------------------------------------------------------
         function set_parameter(obj)
-            % --- XTODO
-            % should put list in config file ?
+            % --- for go
             paramlist = {'len','lenx','leny','lenz','angle','center','dnum'};
             % ---
             for i = 1:length(paramlist)
                 param = paramlist{i};
-                if isprop(obj,param)
-                    if isnumeric(obj.(param))
-                        if ~isempty(obj.(param))
-                            obj.(param) = Parameter('f',obj.(param));
+                for j = 1:length(obj.go)
+                    if isprop(obj.go{j},param)
+                        if isnumeric(obj.go{j}.(param))
+                            obj.go{j}.(param) = Parameter('f',obj.go{j}.(param));
+                        elseif ~isa(obj.go{j}.(param),'Parameter')
+                            f_fprintf(1,'/!\\',0,'parameter must be numeric or Parameter !\n');
+                            error('Parameter error');
                         end
-                    elseif ~isa(obj.(param),'Parameter')
-                        f_fprintf(1,'/!\\',0,'parameter must be numeric or Parameter !\n');
-                        error('Parameter error');
                     end
                 end
             end
+            % ---
         end
         % -----------------------------------------------------------------
-    end
-    % --- Methods
-    methods
-        function plot(obj,args)
-            % XTODO
-        end
     end
 end
