@@ -19,6 +19,7 @@
 classdef TetraMeshFromGMSH < TetraMesh
     properties
         physical_volume = []
+        airbox_volume = []
         mesh_file = ''
     end
     properties (Access = private)
@@ -33,7 +34,8 @@ classdef TetraMeshFromGMSH < TetraMesh
                 args.elem
                 % --- sub
                 args.id = ''
-                args.physical_volume
+                args.physical_volume {mustBeMember(args.physical_volume,{'PhysicalVolume'})}
+                args.airbox_volume {mustBeMember(args.airbox_volume,{'AirboxVolume'})}
                 args.mesh_file char = ''
             end
             % ---

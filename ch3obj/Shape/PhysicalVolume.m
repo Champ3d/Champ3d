@@ -32,7 +32,7 @@ classdef PhysicalVolume < Xhandle
         function obj = PhysicalVolume(args)
             arguments
                 args.id = ''
-                args.volume_shape (1,1) {mustBeA(args.volume_shape,'Shape')}
+                args.volume_shape (1,1) {mustBeA(args.volume_shape,'VolumeShape')}
                 args.mesh_size = 0
             end
             obj = obj@Xhandle;
@@ -86,6 +86,7 @@ classdef PhysicalVolume < Xhandle
             geocode = [geocode 'id_dom_string = "' obj.id '";' newline];
             geocode = [geocode 'id_dom_number = ' num2str(id_phyvol,'%d') ';' newline];
             geocode = [geocode 'Physical Volume(Str(id_dom_string), id_dom_number) = {volume_list~{id_volume_list}()};' newline];
+            geocode = [geocode 'physical_volume_list += {volume_list~{id_volume_list}()};' newline];
             geocode = [geocode '// ---' newline];
             % --- XTODO : tol
             if mshsize > 1e-9
