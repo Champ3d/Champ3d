@@ -152,13 +152,14 @@ for i = 1:length(fs)
         maxfs = max(fs{i});
         minfs = min(fs{i});
         % ---
+        nb_face = size(face,2);
         if size(face,1) == 4
             id_tria = find(face(4,:) == 0);
         elseif size(face,1) == 3
             id_tria = 1:nb_face;
         end
         % ---
-        id_quad = setdiff(1:size(face,2),id_tria);
+        id_quad = setdiff(1:nb_face,id_tria);
         % ---
         if ~isempty(id_tria)
             msh.Faces = (face(1:3,id_tria)).';
