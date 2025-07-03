@@ -67,6 +67,7 @@ classdef TriMesh < Mesh2d
             obj.build_prokit_done = 0;
             % ---
             obj.cal_flatnode;
+            % ---
         end
     end
     % --- build

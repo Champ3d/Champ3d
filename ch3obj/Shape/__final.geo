@@ -56,7 +56,7 @@ Mesh.MeshSizeFactor = 1;
 Mesh.MeshSizeFromPoints = 1;
 Mesh.Format = 50;
 Mesh.SaveAll = 0;
-Mesh 3;
+//Mesh 3;
 //Coherence Mesh;
 //RenumberMeshNodes;
 //RenumberMeshElements;

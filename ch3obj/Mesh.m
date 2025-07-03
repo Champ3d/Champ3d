@@ -167,22 +167,67 @@ classdef Mesh < Xhandle
         function lock_origin(obj,args)
             arguments
                 obj
-                args.origin = []
+                args.gcoordinates = []
             end
             % ---
-            origin = args.origin;
+            gcoordinates = f_tocolv(args.gcoordinates);
             % ---
             if isa(obj,'Mesh2d')
-                if isempty(origin)
+                if isempty(gcoordinates)
                     return
-                elseif any(origin ~= [0 0])
-                    obj.node = obj.node - origin.';
+                elseif any(gcoordinates ~= [0 0])
+                    obj.node = obj.node + gcoordinates;
                 end
             elseif isa(obj,'Mesh3d')
-                if isempty(origin)
+                if isempty(gcoordinates)
                     return
-                elseif any(origin ~= [0 0 0])
-                    obj.node = obj.node - origin.';
+                elseif any(gcoordinates ~= [0 0 0])
+                    obj.node = obj.node + gcoordinates;
+                end
+            end
+            % ---
+            obj.celem = obj.cal_celem;
+            obj.cface = obj.cal_cface;
+            obj.cedge = obj.cal_cedge;
+        end
+        % -----------------------------------------------------------------
+        function centering(obj,id_dom)
+            arguments
+                obj
+                id_dom = ''
+            end
+            % ---
+            if isempty(id_dom)
+                gcoordinates = f_tocolv(mean(obj.node,2));
+            else
+                if isempty(obj.dom)
+                    gcoordinates = f_tocolv(mean(obj.node,2));
+                else
+                    alldom = fieldnames(obj.dom);
+                    if any(f_strcmpi(id_dom,alldom))
+                        for idd = 1:length(alldom)
+                            if strcmpi(alldom{idd},id_dom)
+                                idnode = f_uniquenode(obj.elem(:,obj.dom.(id_dom).gindex));
+                                gcoordinates = f_tocolv(mean(obj.node(:,idnode),2));
+                            end
+                        end
+                    else
+                        error(['#dom ' id_dom ' not found !']);
+                    end
+                end
+            end
+            % ---
+            if isa(obj,'Mesh2d')
+                if isempty(gcoordinates)
+                    return
+                elseif any(gcoordinates ~= [0 0])
+                    obj.node = obj.node - gcoordinates;
+                end
+            elseif isa(obj,'Mesh3d')
+                if isempty(gcoordinates)
+                    return
+                elseif any(gcoordinates ~= [0 0 0])
+                    obj.node = obj.node - gcoordinates;
                 end
             end
             % ---
@@ -208,7 +253,7 @@ classdef Mesh < Xhandle
             end
             % ---
             obj.node = f_rotaroundaxis(obj.node, ...
-                'rot_axis_origin',rot_axis_origin, ...
+                'axis_origin',rot_axis_origin, ...
                 'rot_axis',rot_axis,'rot_angle',rot_angle);
             % ---
             obj.celem = obj.cal_celem;

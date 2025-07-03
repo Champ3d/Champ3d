@@ -77,7 +77,7 @@ classdef Mesh3d < Mesh
                 % ---
                 args.id char = []
                 % ---
-                args.defined_on char = []
+                args.defined_on {mustBeMember(args.defined_on,{'bound','bound_face','interface'})}
                 args.id_dom3d = []
                 % ---
                 args.elem_code = []
@@ -89,6 +89,10 @@ classdef Mesh3d < Mesh
             % ---
             if isempty(args.id)
                 error('#id must be given !');
+            end
+            % ---
+            if ~isfield(args,'defined_on')
+                args.defined_on = '';
             end
             % --- surface dom is always created from vdom
             % no more need to def defining_obj

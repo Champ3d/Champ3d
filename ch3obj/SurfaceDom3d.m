@@ -37,7 +37,7 @@ classdef SurfaceDom3d < SurfaceDom
                 args.gindex
                 args.condition
                 % ---
-                args.defined_on char
+                args.defined_on {mustBeMember(args.defined_on,{'bound','bound_face','interface',''})}
                 args.id_dom3d
             end
             % ---

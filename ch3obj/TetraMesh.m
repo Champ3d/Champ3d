@@ -63,6 +63,7 @@ classdef TetraMesh < Mesh3d
             obj.build_discrete_done = 0;
             obj.build_intkit_done = 0;
             obj.build_prokit_done = 0;
+            % ---
         end
     end
     methods (Access = public)

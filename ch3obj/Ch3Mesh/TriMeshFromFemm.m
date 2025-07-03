@@ -117,6 +117,7 @@ classdef TriMeshFromFemm < TriMesh
             obj.data = data_;
             % --- 2d elem surface
             obj.velem = f_volume(node_,elem_,'elem_type',obj.elem_type);
+            % ---
             % --- edge length
             % obj.sface = f_ledge(node_,edge_);
             % obj.ledge = obj.sface;
