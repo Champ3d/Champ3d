@@ -5,24 +5,23 @@
 % for path : use single-double quote format '" ... "'
 % to be able to include space and special characters
 % -------------------------------------------------------------------------
-% ExecutableOpenSCADLocation : link to executable file not folder
-% ExecutableLTSpiceLocation  : link to executable file not folder
-% ExecutableFEMMLocation     : link to executable file not folder
-% -------------------------------------------------------------------------
 % Typical values for macos
-% ExecutableLTSpiceLocation = '"/Applications/LTspice.app/Contents/MacOS/LTspice"'
-% ExecutableOpenSCADLocation = '"/Applications/OpenSCAD-2021.01.app/Contents/MacOS/OpenSCAD"'
-% ExecutableFEMMLocation = ''
+% LTSpiceExecutable  = '"/Applications/LTspice.app/Contents/MacOS/LTspice"'
+% OpenSCADExecutable = '"/Applications/OpenSCAD-2021.01.app/Contents/MacOS/OpenSCAD"'
+% GMSHExecutable = '"/Applications/Gmsh.app/Contents/MacOS/gmsh"'
+% FEMMLocation = ''
 % -------------------------------------------------------------------------
 % Typical values for windows
-% ExecutableLTSpiceLocation = '"C:/Program Files/LTC/LTspiceXVII/XVIIx64.exe"';
-% ExecutableOpenSCADLocation 
-% ExecutableFEMMLocation
+% LTSpiceExecutable = '"C:/Program Files/LTC/LTspiceXVII/XVIIx64.exe"';
+% OpenSCADExecutable
+% GMSHExecutable
+% FEMMLocation
 % -------------------------------------------------------------------------
 classdef Ch3Config
     properties (Constant)
-        ExecutableLTSpiceLocation = '"/Applications/LTspice.app/Contents/MacOS/LTspice"'
-        ExecutableOpenSCADLocation = '"/Applications/OpenSCAD-2021.01.app/Contents/MacOS/OpenSCAD"'
-        ExecutableFEMMLocation = ''
+        LTSpiceExecutable  = '"/Applications/LTspice.app/Contents/MacOS/LTspice"'
+        OpenSCADExecutable = '"/Applications/OpenSCAD-2021.01.app/Contents/MacOS/OpenSCAD"'
+        GMSHExecutable = '"/Applications/Gmsh.app/Contents/MacOS/gmsh"'
+        FEMMLocation = ''
     end
 end

@@ -29,7 +29,7 @@ classdef VectorParameter < Parameter
             arguments
                 args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
                 args.f = []
-                args.depend_on char
+                args.depend_on
                 args.from = []
                 args.varargin_list = []
                 args.fvectorized = 0

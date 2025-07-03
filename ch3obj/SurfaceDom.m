@@ -84,7 +84,12 @@ classdef SurfaceDom < MeshDom
             % ---
             nb_face = size(face,2);
             % ---
-            id_tria = find(face(4,:) == 0);
+            if size(face,1) == 4
+                id_tria = find(face(4,:) == 0);
+            elseif size(face,1) == 3
+                id_tria = 1:nb_face;
+            end
+            % ---
             id_quad = setdiff(1:nb_face,id_tria);
             % ---
             nb_sm = 0;
@@ -151,6 +156,7 @@ classdef SurfaceDom < MeshDom
                             gindex_ = f_unique(intersect(f_torowv(dom1.gindex),f_torowv(dom2.gindex)).');
                     end
                 elseif i > 1
+                    % XTODO
                     switch oper
                         case '+'
                             
@@ -206,8 +212,6 @@ classdef SurfaceDom < MeshDom
             objy.gindex = f_unique([f_torowv(obj.gindex), f_torowv(objx.gindex)].');
             objy.build_from_gindex;
             % ---
-            %obj.transfer_dep_def(objx,objy);
-            % ---
             obj.is_defining_obj_of(objy);
             objx.is_defining_obj_of(objy);
             % ---
@@ -229,8 +233,6 @@ classdef SurfaceDom < MeshDom
             objy.gindex = f_unique(setdiff(f_torowv(obj.gindex),f_torowv(objx.gindex)).');
             objy.build_from_gindex;
             % ---
-            %obj.transfer_dep_def(objx,objy);
-            % ---
             obj.is_defining_obj_of(objy);
             objx.is_defining_obj_of(objy);
             % ---
@@ -251,8 +253,6 @@ classdef SurfaceDom < MeshDom
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
             objy.gindex = f_unique(intersect(f_torowv(obj.gindex),f_torowv(objx.gindex)).');
             objy.build_from_gindex;
-            % ---
-            %obj.transfer_dep_def(objx,objy);
             % ---
             obj.is_defining_obj_of(objy);
             objx.is_defining_obj_of(objy);

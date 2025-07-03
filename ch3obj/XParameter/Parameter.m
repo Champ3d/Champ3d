@@ -41,8 +41,8 @@ classdef Parameter < Xhandle
             arguments
                 args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
                 args.f
-                args.depend_on char
-                args.from {mustBeA(args.from,{'PhysicalModel','CplModel'})}
+                args.depend_on
+                args.from
                 args.varargin_list
                 args.fvectorized
             end
@@ -73,9 +73,9 @@ classdef Parameter < Xhandle
             varargin_list_ = args.varargin_list;
             fvectorized_ = args.fvectorized;
             % ---
-            if isempty(args.f)
-                error('#f must be given ! Give a function handle or numeric value');
-            end
+            % if isempty(args.f)
+            %     error('#f must be given ! Give a function handle or numeric value');
+            % end
             % ---
             from_ = [];
             if isnumeric(args.f)
@@ -83,7 +83,7 @@ classdef Parameter < Xhandle
                 % ---
                 sizeconst = size(const);
                 % ---
-                if numel(const) == 1
+                if numel(const) == 1 || isempty(const)
                     f_ = @()(const);
                 elseif numel(const) == 2 || numel(const) == 3
                     const = f_tocolv(const);
@@ -100,7 +100,16 @@ classdef Parameter < Xhandle
             elseif isa(args.f,'function_handle')
                 f_ = args.f;
                 if isempty(args.from)
-                    error('#from must be given ! Give EMModel, THModel, ... ');
+                    args.depend_on = f_to_scellargin(args.depend_on);
+                    depon_is_all_free_param = 1;
+                    for idepon = 1:length(args.depend_on)
+                        if ~isa(args.depend_on{idepon},'Parameter')
+                            depon_is_all_free_param = 0;
+                        end
+                    end
+                    if ~depon_is_all_free_param
+                        error('#from must be given ! Give EMModel, THModel, ... ');
+                    end
                 else
                     from_ = f_to_scellargin(args.from);
                 end
@@ -122,29 +131,35 @@ classdef Parameter < Xhandle
             id_coil_   = cell(1,len_depon);
             % ---
             for i = 1:length(depon)
-                str00 = depon{i};
-                % ---
-                str00 = split(str00,'.');
-                % ---
-                if length(str00) == 2
-                    id_coil_{i} = str00{2};
-                elseif length(str00) == 1
-                    id_coil_{i} = '';
-                else
-                    error("#depend_on must be of form : 'celem','B','B(i)','V.id_coil','V(i).id_coil','ltime',...");
-                end
-                % ---
-                str00 = str00{1};
-                % ---
-                if contains(str00,'(')
-                    str01 = extractBetween(str00,'','(');
-                    depend_on_{i} = str01{1};
+                if isa(depon{i},'Parameter')
+                    depend_on_{i} = depon{i};
+                elseif ischar(depon{i})
+                    str00 = depon{i};
                     % ---
-                    str02 = extractBetween(str00,'(',')');
-                    dit_{i} = str2double(str02{1});
+                    str00 = split(str00,'.');
+                    % ---
+                    if length(str00) == 2
+                        id_coil_{i} = str00{2};
+                    elseif length(str00) == 1
+                        id_coil_{i} = '';
+                    else
+                        error("#depend_on must be of form : 'celem','B','B(i)','V.id_coil','V(i).id_coil','ltime',...");
+                    end
+                    % ---
+                    str00 = str00{1};
+                    % ---
+                    if contains(str00,'(')
+                        str01 = extractBetween(str00,'','(');
+                        depend_on_{i} = str01{1};
+                        % ---
+                        str02 = extractBetween(str00,'(',')');
+                        dit_{i} = str2double(str02{1});
+                    else
+                        depend_on_{i} = str00;
+                        dit_{i} = 0;
+                    end
                 else
-                    depend_on_{i} = str00;
-                    dit_{i} = 0;
+                    error('#depend_on must be char or Parameter');
                 end
             end
             % --- check
@@ -154,14 +169,23 @@ classdef Parameter < Xhandle
                     error('Number of input arguments of #f must corresponds to #depend_on');
                 end
                 % ---
-                len_from = length(from_);
-                if len_from ~= len_depon
-                    if len_from == 1
-                        for i = 1:len_depon
-                            from_{i} = from_{1};
+                depon_is_all_free_param = 1;
+                for idepon = 1:length(depend_on_)
+                    if ~isa(depend_on_{idepon},'Parameter')
+                        depon_is_all_free_param = 0;
+                    end
+                end
+                % ---
+                if ~depon_is_all_free_param
+                    len_from = length(from_);
+                    if len_from ~= len_depon
+                        if len_from == 1
+                            for i = 1:len_depon
+                                from_{i} = from_{1};
+                            end
+                        else
+                            error('Size if #from must be coherent with #depend_on');
                         end
-                    else
-                        error('Size if #from must be coherent with #depend_on');
                     end
                 end
                 % ---
@@ -391,7 +415,27 @@ classdef Parameter < Xhandle
             end
             % -------------------------------------------------------------
             fargs = cell(1,length(obj.depend_on));
-            % ---
+            % -------------------------------------------------------------
+            % --- free defined parameter
+            if isempty(obj.parent_model)
+                % --- free defined parameter
+                for i = 1:length(obj.depend_on)
+                    if isa(obj.depend_on{i},'Parameter')
+                        fargs{i} = obj.depend_on{i}.getvalue;
+                    else
+                        pvalue__ = obj.from{i}.(obj.depend_on{i});
+                        if isnumeric(pvalue__)
+                            fargs{i} = pvalue__;
+                        elseif isa(pvalue__,'Parameter')
+                            fargs{i} = pvalue__.getvalue;
+                        else
+                            fargs{i} = [];
+                        end
+                    end
+                end
+                return
+            end
+            % -------------------------------------------------------------
             target_dom   = meshdom;
             target_model = obj.parent_model;
             % ---
@@ -399,9 +443,16 @@ classdef Parameter < Xhandle
             id_coil__ = obj.id_coil;
             dit__     = obj.dit;
             source_model_  = obj.from;
+            % -------------------------------------------------------------
             for i = 1:length(depon__)
                 % ---
                 depon_       = depon__{i};
+                % ---
+                if isa(depon_,'Parameter')
+                    fargs{i} = depon_.getvalue;
+                    continue;
+                end
+                % ---
                 id_coil_     = id_coil__{i};
                 dit_         = dit__{i};
                 source_model = source_model_{i};

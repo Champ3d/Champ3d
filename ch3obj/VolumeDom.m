@@ -80,7 +80,19 @@ classdef VolumeDom < MeshDom
             node = obj.parent_mesh.node;
             elem = obj.parent_mesh.elem(:,obj.gindex);
             % -------------------------------------------------------------
-            sm{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
+            if isa(obj.parent_mesh,'TetraMesh')
+                sm{1} = TetraMesh('node',node,'elem',elem);
+            elseif isa(obj.parent_mesh,'PrismMesh')
+                sm{1} = PrismMesh('node',node,'elem',elem);
+            elseif isa(obj.parent_mesh,'HexMesh')
+                sm{1} = HexMesh('node',node,'elem',elem);
+            elseif isa(obj.parent_mesh,'TriMesh')
+                sm{1} = TriMesh('node',node,'elem',elem);
+            elseif isa(obj.parent_mesh,'QuadMesh')
+                sm{1} = QuadMesh('node',node,'elem',elem);
+            else
+                sm = [];
+            end
             sm{1}.gindex = obj.gindex;
             sm{1}.parent_mesh = obj.parent_mesh;
             % ---
@@ -369,13 +381,17 @@ classdef VolumeDom < MeshDom
                 submesh_{i}.plot(argu{:}); hold on
                 % ---
                 celem = submesh_{i}.cal_celem;
-                celem = celem(:,1);
+                dim   = size(celem,1);
                 id = replace(obj.id,'_','-');
-                if length(celem) == 2
-                    t = text(celem(1),celem(2),id);
+                if dim == 2
+                    [~, imax] = max(celem(2,:));
+                    celem = celem(:,imax);
+                    t = text(celem(1),celem(2),['<-----' id]);
                     t.FontWeight = 'bold';
-                elseif length(celem) == 3
-                    t = text(celem(1),celem(2),celem(3),id);
+                elseif dim == 3
+                    [~, imax] = max(celem(3,:));
+                    celem = celem(:,imax);
+                    t = text(celem(1),celem(2),celem(3),['<-----' id]);
                     t.FontWeight = 'bold';
                 end
             end
