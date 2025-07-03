@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef PhysicalVolume < Xhandle
+classdef AirboxVolume < Xhandle
     properties
         volume_shape
         mesh_size = 0
@@ -32,7 +32,7 @@ classdef PhysicalVolume < Xhandle
     end
     % --- Constructors
     methods
-        function obj = PhysicalVolume(args)
+        function obj = AirboxVolume(args)
             arguments
                 args.id = ''
                 args.volume_shape (1,1) {mustBeA(args.volume_shape,'VolumeShape')}
@@ -40,12 +40,12 @@ classdef PhysicalVolume < Xhandle
             end
             obj = obj@Xhandle;
             % ---
-            if isempty(args.id)
-                error('#id must be given !');
-            end
-            % ---
             if ~isfield(args,'volume_shape')
                 error('#volume_shape must be given !');
+            end
+            % ---
+            if isempty(args.id)
+                args.id = 'by_default_air';
             end
             % ---
             if isnumeric(args.mesh_size)
@@ -56,7 +56,7 @@ classdef PhysicalVolume < Xhandle
             % ---
             obj <= args;
             % ---
-            PhysicalVolume.setup(obj);
+            AirboxVolume.setup(obj);
             % ---
         end
     end
@@ -71,7 +71,7 @@ classdef PhysicalVolume < Xhandle
     end
     methods (Access = public)
         function reset(obj)
-            PhysicalVolume.setup(obj);
+            AirboxVolume.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
@@ -87,12 +87,9 @@ classdef PhysicalVolume < Xhandle
     % --- Methods
     methods (Access = public)
         function geocode = geocode(obj)
-            mshsize = obj.mesh_size.getvalue;
-            % ---
-            geocode = [obj.volume_shape.geocode newline ...
-                       GMSHWriter.finish_physicalvolume(obj.id,obj.id_number,mshsize) ...
-                       newline];
-            % ---
+            geocode = [newline '// --- airbox' newline ...
+                       obj.volume_shape.geocode newline ...
+                       GMSHWriter.finish_airboxvolume newline];
         end
     end
 

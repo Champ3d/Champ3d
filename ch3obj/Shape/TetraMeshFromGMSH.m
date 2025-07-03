@@ -21,6 +21,9 @@ classdef TetraMeshFromGMSH < TetraMesh
         physical_volume = []
         airbox_volume = []
         mesh_file = ''
+        use_user_defined_airbox = 0
+        use_bounding_box_airbox = 0
+        tol_mesh_size = 1e-9
     end
     properties (Access = private)
         build_from
@@ -34,9 +37,11 @@ classdef TetraMeshFromGMSH < TetraMesh
                 args.elem
                 % --- sub
                 args.id = ''
-                args.physical_volume {mustBeMember(args.physical_volume,{'PhysicalVolume'})}
-                args.airbox_volume {mustBeMember(args.airbox_volume,{'AirboxVolume'})}
+                args.physical_volume
+                args.airbox_volume (1,1) {mustBeA(args.airbox_volume,{'AirboxVolume'})}
                 args.mesh_file char = ''
+                args.use_bounding_box_airbox {mustBeMember(args.use_bounding_box_airbox,{0,1})}
+                args.tol_mesh_size = 1e-9
             end
             % ---
             obj = obj@TetraMesh;
@@ -53,6 +58,18 @@ classdef TetraMeshFromGMSH < TetraMesh
                 obj.build_from = 'mesh_file';
             else
                 error('#physical_volume or #mesh_file must be given !');
+            end
+            % ---
+            if isfield(args,'airbox_volume')
+                obj.use_user_defined_airbox = 1;
+                obj.use_bounding_box_airbox = 0;
+            elseif ~isfield(args,'use_bounding_box_airbox')
+                obj.use_user_defined_airbox = 0;
+                obj.use_bounding_box_airbox = 0;
+            else
+                if args.use_bounding_box_airbox == 1
+                    obj.use_user_defined_airbox = 0;
+                end
             end
             % ---
             if isempty(args.id)
@@ -152,9 +169,18 @@ classdef TetraMeshFromGMSH < TetraMesh
             % ---
             geofile = fopen(geoname,'w');
             % --- Init
-            initgeocode = GMSHWriter.init;
+            initgeocode = GMSHWriter.init(obj.use_user_defined_airbox, ...
+                                          obj.use_bounding_box_airbox, ...
+                                          obj.tol_mesh_size);
             fprintf(geofile,'%s \n',initgeocode);
-            % ---
+            % --- airbox volume
+            if obj.use_user_defined_airbox
+                aboxvol = obj.airbox_volume;
+                aboxvol.is_defining_obj_of(obj);
+                % ---
+                fprintf(geofile,'%s \n',aboxvol.geocode);
+            end
+            % --- physical volume
             obj.physical_volume = f_to_scellargin(obj.physical_volume);
             % ---
             nb_phyvol = length(obj.physical_volume);
@@ -166,13 +192,20 @@ classdef TetraMeshFromGMSH < TetraMesh
                 % ---
                 phyvol.is_defining_obj_of(obj);
                 % ---
-                elem_code(i) = f_str2code(phyvol.id,'code_type','integer');
+                elem_code(i) = phyvol.id_number;
                 id_vdom{i} = phyvol.id;
                 % ---
                 fprintf(geofile,'%s \n',phyvol.geocode);
             end
             % --- Final
-            fprintf(geofile,'%s \n',GMSHWriter.final(mshname));
+            if obj.use_user_defined_airbox
+                fprintf(geofile,'%s \n',GMSHWriter.final(mshname, ...
+                    obj.airbox_volume.id, ...
+                    obj.airbox_volume.id_number, ...
+                    obj.airbox_volume.mesh_size.getvalue));
+            else
+                fprintf(geofile,'%s \n',GMSHWriter.final(mshname));
+            end
             fclose(geofile);
             % ---
             call_GMSH_run = [Ch3Config.GMSHExecutable ' ' ...
@@ -199,7 +232,6 @@ classdef TetraMeshFromGMSH < TetraMesh
                 f_fprintf(1,'/!\\',0,'can not run ',1,geoname,0,'\n');
                 return
             end
-            % ---
             % ---
             for i = 1:nb_phyvol
                 obj.add_vdom('id',id_vdom{i},'elem_code',elem_code(i));

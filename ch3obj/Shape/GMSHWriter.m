@@ -472,6 +472,30 @@ classdef GMSHWriter
             % ---
         end
         %------------------------------------------------------------------
+        function geocode = finish_physicalvolume(id_dom_string,id_dom_number,mesh_size)
+            arguments
+                id_dom_string
+                id_dom_number
+                mesh_size
+            end
+            % ---
+            geocode = newline;
+            geocode = [geocode fileread('__finishPhysicalVolume.geo')];
+            % ---
+            geocode = GMSHWriter.write_string_parameter(geocode,'id_dom_string',id_dom_string);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'id_dom_number',id_dom_number);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'mesh_size',mesh_size);
+            % ---
+            geocode = [geocode newline];
+            % ---
+        end
+        %------------------------------------------------------------------
+        function geocode = finish_airboxvolume()
+            % ---
+            geocode = [newline fileread('__finishAirboxVolume.geo') newline];
+            % ---
+        end
+        %------------------------------------------------------------------
     end
     % --- init/final
     methods (Static)
@@ -510,16 +534,32 @@ classdef GMSHWriter
     % --- init/final
     methods (Static)
         %------------------------------------------------------------------
-        function geocode = init()
+        function geocode = init(use_user_defined_airbox,use_bounding_box_airbox,tol_mesh_size)
+            arguments
+                use_user_defined_airbox = 0
+                use_bounding_box_airbox = 0
+                tol_mesh_size = 1e-9
+            end
             geocode = fileread('__init.geo');
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'use_user_defined_airbox',use_user_defined_airbox);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'use_bounding_box_airbox',use_bounding_box_airbox);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'tol_mesh_size',tol_mesh_size);
             geocode = [geocode newline];
         end
         %------------------------------------------------------------------
-        function geocode = final(mesh_file_name)
+        function geocode = final(mesh_file_name,id_air_dom_string,id_air_dom_number,air_mesh_size)
             arguments
                 mesh_file_name char
+                id_air_dom_string = "by_default_air"
+                id_air_dom_number = 1
+                air_mesh_size = 0
             end
             finalcode = fileread('__final.geo');
+            % ---
+            finalcode = GMSHWriter.write_string_parameter(finalcode,'id_air_dom_string',id_air_dom_string);
+            finalcode = GMSHWriter.write_scalar_parameter(finalcode,'id_air_dom_number',id_air_dom_number);
+            finalcode = GMSHWriter.write_scalar_parameter(finalcode,'air_mesh_size',air_mesh_size);
+            % ---
             geocode = [newline ...
                        finalcode newline ...
                        'Save "' mesh_file_name '";' newline ...
