@@ -156,8 +156,8 @@ classdef TetraMeshFromGMSH < TetraMesh
         %------------------------------------------------------------------
         function build_from_physical_volume(obj)
             % ---
-            geoname = [obj.id '_geofile_auto_generated_.geo'];
-            mshname = [obj.id '_mshfile_auto_generated_.m'];
+            geoname = ['geofile_' obj.id '_auto_generated__.geo'];
+            mshname = ['mshfile_' obj.id '_auto_generated__.m'];
             % ---
             obj.mesh_file = mshname;
             % ---
