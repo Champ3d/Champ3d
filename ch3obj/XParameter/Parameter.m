@@ -120,6 +120,8 @@ classdef Parameter < Xhandle
             % depend_on =
             % 'celem','cface','velem','sface','ledge'}
             % 'E', 'E(0)', {'E(0)','E(-1)'}, {'E(0)','E(-1)','V(0).id_coil'}
+            % ---> E(0)  means E at actual time step
+            % ---> E(-1), E(-2), ... means E at previous time steps
             % ---> idem. with : 'B','T','P','E','H','J','I','Z','A','Phi'
             % 'ltime'
             % ---
@@ -157,6 +159,10 @@ classdef Parameter < Xhandle
                     else
                         depend_on_{i} = str00;
                         dit_{i} = 0;
+                    end
+                    % ---
+                    if dit_{i} > 0
+                        error('Cannot defined dependency on next time step !');
                     end
                 else
                     error('#depend_on must be char or Parameter');
@@ -410,7 +416,7 @@ classdef Parameter < Xhandle
                     place = 'face';
                     id_place_target = meshdom.gindex;
                 else
-                    error('must give #dom with .gindex or .gindex !');
+                    error('must give #dom with .gindex !');
                 end
             end
             % -------------------------------------------------------------
@@ -497,7 +503,7 @@ classdef Parameter < Xhandle
                     % physical quantities
                     % must be able to take from other model with different ltime, mesh/dom
                     % ---
-                    target_it = target_model.ltime.it - dit_;
+                    target_it = target_model.ltime.it + dit_; % dit_ <= 0
                     it_max = target_model.ltime.it_max;
                     target_it = min(it_max,max(1,target_it));
                     target_t = target_model.ltime.t_at(target_it);
@@ -590,6 +596,8 @@ classdef Parameter < Xhandle
                                     node_i(idn,:) = interp_node{k}(id_elem_source,:);
                                 end
                                 % ---
+                                cnode_ = target_model.parent_mesh.celem(:,id_elem_target);
+                                % ---
                                 dim_ = size(valcell{1},2);
                                 if dim_ == 1
                                     valx = zeros(nbINode * nb_elem, 1);
@@ -602,7 +610,6 @@ classdef Parameter < Xhandle
                                     % ---
                                     fxi = scatteredInterpolant(node_i,valx,'linear','none');
                                     % ---
-                                    cnode_ = target_model.parent_mesh.celem(:,id_elem_target);
                                     vx_ = fxi(cnode_.');
                                     vx_(isnan(vx_)) = 0;
                                     fargs{i} = vx_;
@@ -622,7 +629,6 @@ classdef Parameter < Xhandle
                                     fyi = fxi;
                                     fyi.Values = valy;
                                     % ---
-                                    cnode_ = target_model.parent_mesh.celem(:,id_elem_target);
                                     vx_ = fxi(cnode_.');
                                     vy_ = fyi(cnode_.');
                                     vx_(isnan(vx_)) = 0;
@@ -652,7 +658,6 @@ classdef Parameter < Xhandle
                                     fyi = scatteredInterpolant(node_i,valy,'linear','none');
                                     fzi = scatteredInterpolant(node_i,valz,'linear','none');
                                     % ---
-                                    cnode_ = target_model.parent_mesh.celem(:,id_elem_target);
                                     vx_ = fxi(cnode_.');
                                     vy_ = fyi(cnode_.');
                                     vz_ = fzi(cnode_.');
@@ -725,6 +730,8 @@ classdef Parameter < Xhandle
                                         node_i(idn,:) = interp_node{k};
                                     end
                                     % ---
+                                    cnode_ = target_model.parent_mesh.cface(:,id_face_target);
+                                    % ---
                                     dim_ = size(valcell{1},2);
                                     if dim_ == 1
                                         valx = zeros(nbINode * nb_face, 1);
@@ -737,7 +744,6 @@ classdef Parameter < Xhandle
                                         % ---
                                         fxi = scatteredInterpolant(node_i,valx,'linear','none');
                                         % ---
-                                        cnode_ = target_model.parent_mesh.cface(:,id_face_target);
                                         vx_ = fxi(cnode_.');
                                         vx_(isnan(vx_)) = 0;
                                         fargs{i} = vx_;
@@ -757,7 +763,6 @@ classdef Parameter < Xhandle
                                         fyi = fxi;
                                         fyi.Values = valy;
                                         % ---
-                                        cnode_ = target_model.parent_mesh.cface(:,id_face_target);
                                         vx_ = fxi(cnode_.');
                                         vy_ = fyi(cnode_.');
                                         vx_(isnan(vx_)) = 0;
@@ -783,7 +788,6 @@ classdef Parameter < Xhandle
                                         fzi = fxi;
                                         fzi.Values = valz;
                                         % ---
-                                        cnode_ = target_model.parent_mesh.cface(:,id_face_target);
                                         vx_ = fxi(cnode_.');
                                         vy_ = fyi(cnode_.');
                                         vz_ = fzi(cnode_.');
@@ -795,7 +799,7 @@ classdef Parameter < Xhandle
                                     end
                                     % --------------------------------------------------------------
                                 elseif ~isempty(id_elem_source)
-                                    % --- XTODO : not optimat code writing/organization
+                                    % --- XTODO : not optimal code writing/organization
                                     % --- time interpolated data
                                     next_it = source_model.ltime.next_it(target_t);
                                     back_it = source_model.ltime.back_it(target_t);
@@ -833,6 +837,8 @@ classdef Parameter < Xhandle
                                         node_i(idn,:) = interp_node{k}(id_elem_source,:);
                                     end
                                     % ---
+                                    cnode_ = target_model.parent_mesh.cface(:,id_face_target);
+                                    % ---
                                     dim_ = size(valcell{1},2);
                                     if dim_ == 1
                                         valx = zeros(nbINode * nb_elem, 1);
@@ -845,7 +851,6 @@ classdef Parameter < Xhandle
                                         % ---
                                         fxi = scatteredInterpolant(node_i,valx,'linear','none');
                                         % ---
-                                        cnode_ = target_model.parent_mesh.cface(:,id_face_target);
                                         vx_ = fxi(cnode_.');
                                         vx_(isnan(vx_)) = 0;
                                         fargs{i} = vx_;
@@ -865,7 +870,6 @@ classdef Parameter < Xhandle
                                         fyi = fxi;
                                         fyi.Values = valy;
                                         % ---
-                                        cnode_ = target_model.parent_mesh.cface(:,id_face_target);
                                         vx_ = fxi(cnode_.');
                                         vy_ = fyi(cnode_.');
                                         vx_(isnan(vx_)) = 0;
@@ -891,7 +895,6 @@ classdef Parameter < Xhandle
                                         fzi = fxi;
                                         fzi.Values = valz;
                                         % ---
-                                        cnode_ = target_model.parent_mesh.cface(:,id_face_target);
                                         vx_ = fxi(cnode_.');
                                         vy_ = fyi(cnode_.');
                                         vz_ = fzi(cnode_.');

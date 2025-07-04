@@ -35,6 +35,7 @@ classdef PhysicalModel < Xhandle
             obj@Xhandle;
             % --- initialization
             obj.ltime = LTime;
+            obj.moving_frame = NotMovingFrame;
         end
     end
     % --- Utility Methods
