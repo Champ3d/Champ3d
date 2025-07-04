@@ -49,53 +49,6 @@ classdef EmModel < PhysicalModel
     % --- Utility Methods
     methods
         % -----------------------------------------------------------------
-        function add_ltime(obj,args)
-            arguments
-                obj
-                % ---
-                args.ltime_array {mustBeNumeric} = []
-                args.t0 {mustBeNumeric} = 0
-                args.t_end {mustBeNumeric} = 0
-                args.dnum {mustBeNumeric} = 1
-                args.ltime_obj {mustBeA(args.ltime_obj,'LTime')}
-            end
-            % ---
-            if isfield(args,'ltime_obj')
-                ltime_obj = args.ltime_obj;
-            else
-                argu = f_to_namedarg(args,'for','LTime');
-                ltime_obj = LTime(argu{:});
-            end
-            % ---
-            obj.ltime = ltime_obj;
-        end
-        % -----------------------------------------------------------------
-        function add_movingframe(obj,args)
-            arguments
-                obj
-                % ---
-                args.move_type {mustBeMember(args.move_type,{'linear','rotational'})}
-                args.lin_dir
-                args.lin_step
-                args.rot_origin
-                args.rot_axis
-                args.rot_angle
-                args.movingframe_obj {mustBeA(args.movingframe_obj,'MovingFrame')}
-            end
-            % ---
-            if isfield(args,'movingframe_obj')
-                movingframe_obj = args.movingframe_obj;
-            elseif f_strcmpi(args.move_type,'linear')
-                argu = f_to_namedarg(args,'for','LinearMovingFrame');
-                movingframe_obj = LinearMovingFrame(argu{:});
-            elseif f_strcmpi(args.move_type,'rotational')
-                argu = f_to_namedarg(args,'for','RotationalMovingFrame');
-                movingframe_obj = RotationalMovingFrame(argu{:});
-            end
-            % ---
-            obj.moving_frame = movingframe_obj;
-        end
-        % -----------------------------------------------------------------
         function add_econductor(obj,args)
             arguments
                 obj
@@ -267,6 +220,53 @@ classdef EmModel < PhysicalModel
             % ---
             obj.pmagnet.(args.id) = phydom;
         end
+        % -----------------------------------------------------------------
+        % function add_ltime(obj,args)
+        %     arguments
+        %         obj
+        %         % ---
+        %         args.ltime_array {mustBeNumeric} = []
+        %         args.t0 {mustBeNumeric} = 0
+        %         args.t_end {mustBeNumeric} = 0
+        %         args.dnum {mustBeNumeric} = 1
+        %         args.ltime_obj {mustBeA(args.ltime_obj,'LTime')}
+        %     end
+        %     % ---
+        %     if isfield(args,'ltime_obj')
+        %         ltime_obj = args.ltime_obj;
+        %     else
+        %         argu = f_to_namedarg(args,'for','LTime');
+        %         ltime_obj = LTime(argu{:});
+        %     end
+        %     % ---
+        %     obj.ltime = ltime_obj;
+        % end
+        % -----------------------------------------------------------------
+        % function add_movingframe(obj,args)
+        %     arguments
+        %         obj
+        %         % ---
+        %         args.move_type {mustBeMember(args.move_type,{'linear','rotational'})}
+        %         args.lin_dir
+        %         args.lin_step
+        %         args.rot_origin
+        %         args.rot_axis
+        %         args.rot_angle
+        %         args.movingframe_obj {mustBeA(args.movingframe_obj,'MovingFrame')}
+        %     end
+        %     % ---
+        %     if isfield(args,'movingframe_obj')
+        %         movingframe_obj = args.movingframe_obj;
+        %     elseif f_strcmpi(args.move_type,'linear')
+        %         argu = f_to_namedarg(args,'for','LinearMovingFrame');
+        %         movingframe_obj = LinearMovingFrame(argu{:});
+        %     elseif f_strcmpi(args.move_type,'rotational')
+        %         argu = f_to_namedarg(args,'for','RotationalMovingFrame');
+        %         movingframe_obj = RotationalMovingFrame(argu{:});
+        %     end
+        %     % ---
+        %     obj.moving_frame = movingframe_obj;
+        % end
         % -----------------------------------------------------------------
     end
 end

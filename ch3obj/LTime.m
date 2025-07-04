@@ -20,6 +20,7 @@ classdef LTime < Xhandle
 
     % --- Properties
     properties
+        parent_model
         it = 0
         t_array
     end

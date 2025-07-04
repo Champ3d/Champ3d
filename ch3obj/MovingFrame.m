@@ -19,7 +19,7 @@
 classdef MovingFrame < Xhandle
     
     properties
-        
+        parent_model
     end
 
     % --- Contructor
@@ -31,8 +31,10 @@ classdef MovingFrame < Xhandle
 
     % --- Methods
     methods (Abstract)
-        move(obj)
-        inverse_move(obj)
+        movenode(obj)
+        inverse_movenode(obj)
+        movevector(obj)
+        inverse_movevector(obj)
     end
 
 end

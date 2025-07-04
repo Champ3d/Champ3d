@@ -54,16 +54,6 @@ classdef LinearMovingFrame < MovingFrame
 
     % --- Methods
     methods
-        function movnode = move(obj,fixnode)
-            ldir = obj.lin_dir.get;
-            lstp = obj.lin_step.get;
-            movnode = fixnode + lstp .* ldir;
-        end
-        function movnode = inverse_move(obj,fixnode)
-            ldir = obj.lin_dir.get;
-            lstp = obj.lin_step.get;
-            movnode = fixnode - lstp .* ldir;
-        end
         function moved = movenode(obj,node,it)
             arguments
                 obj
@@ -76,14 +66,16 @@ classdef LinearMovingFrame < MovingFrame
                 lstp = obj.lin_step.getvalue;
                 moved = node + lstp .* ldir;
             else
-                it0 = obj.lin_dir.parent_model.ltime.it;
-                obj.lin_dir.parent_model.ltime.it = it;
+                it0 = obj.parent_model.ltime.it;
+                % ---
+                obj.parent_model.ltime.it = it;
                 ldir = obj.lin_dir.getvalue;
                 lstp = obj.lin_step.getvalue;
                 moved = node + lstp .* ldir;
                 % ---
-                obj.lin_dir.parent_model.ltime.it = it0;
+                obj.parent_model.ltime.it = it0;
             end
+            % ---
         end
         function moved = inverse_movenode(obj,node,it)
             arguments
@@ -91,7 +83,22 @@ classdef LinearMovingFrame < MovingFrame
                 node
                 it = []
             end
-            moved = node;
+            % ---
+            if isempty(it)
+                ldir = obj.lin_dir.getvalue;
+                lstp = obj.lin_step.getvalue;
+                moved = node + lstp .* ldir;
+            else
+                it0 = obj.parent_model.ltime.it;
+                % ---
+                obj.parent_model.ltime.it = it;
+                ldir = obj.lin_dir.getvalue;
+                lstp = obj.lin_step.getvalue;
+                moved = node - lstp .* ldir;
+                % ---
+                obj.parent_model.ltime.it = it0;
+            end
+            % ---
         end
         function moved = movevector(obj,vector,it)
             arguments
