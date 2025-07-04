@@ -187,7 +187,7 @@ classdef HexMesh < Mesh3d
             refelem.nbG = length(refelem.U);
             % ---
             refelem.nbI = 9;
-            e = 1e-6;
+            e = -1e-6;
             refelem.nU = [-1 +1 +1 -1 -1 +1 +1 -1];
             refelem.nV = [-1 -1 +1 +1 -1 -1 +1 +1];
             refelem.nW = [-1 -1 -1 -1 +1 +1 +1 +1];

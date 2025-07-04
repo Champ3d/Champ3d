@@ -188,7 +188,7 @@ classdef TetraMesh < Mesh3d
             refelem.nbG = length(refelem.U);
             % --- XTODO : check why Duplicate data points have been detected
             refelem.nbI = 5;
-            e = 1e-6;
+            e = -1e-6;
             refelem.nU = [ 0 +1  0  0 ];
             refelem.nV = [ 0  0 +1  0 ];
             refelem.nW = [ 0  0  0 +1 ];
