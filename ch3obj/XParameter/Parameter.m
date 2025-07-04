@@ -600,10 +600,12 @@ classdef Parameter < Xhandle
                                         valx(idn) = valcell{k}(:,1);
                                     end
                                     % ---
-                                    fxi = scatteredInterpolant(node_i,valx,'linear','linear');
+                                    fxi = scatteredInterpolant(node_i,valx,'linear','none');
                                     % ---
                                     cnode_ = target_model.parent_mesh.celem(:,id_elem_target);
-                                    fargs{i} = fxi(cnode_.');
+                                    vx_ = fxi(cnode_.');
+                                    vx_(isnan(vx_)) = 0;
+                                    fargs{i} = vx_;
                                     % ---
                                 elseif dim_ == 2
                                     valx = zeros(nbINode * nb_elem, 1);
@@ -616,13 +618,15 @@ classdef Parameter < Xhandle
                                         valy(idn) = valcell{k}(:,2);
                                     end
                                     % ---
-                                    fxi = scatteredInterpolant(node_i,valx,'linear','linear');
+                                    fxi = scatteredInterpolant(node_i,valx,'linear','none');
                                     fyi = fxi;
                                     fyi.Values = valy;
                                     % ---
                                     cnode_ = target_model.parent_mesh.celem(:,id_elem_target);
                                     vx_ = fxi(cnode_.');
                                     vy_ = fyi(cnode_.');
+                                    vx_(isnan(vx_)) = 0;
+                                    vy_(isnan(vy_)) = 0;
                                     fargs{i} = [vx_ vy_];
                                     % ---
                                 elseif dim_ == 3
@@ -731,10 +735,12 @@ classdef Parameter < Xhandle
                                             valx(idn) = valcell{k}(:,1);
                                         end
                                         % ---
-                                        fxi = scatteredInterpolant(node_i,valx,'linear','linear');
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
                                         % ---
                                         cnode_ = target_model.parent_mesh.cface(:,id_face_target);
-                                        fargs{i} = fxi(cnode_.');
+                                        vx_ = fxi(cnode_.');
+                                        vx_(isnan(vx_)) = 0;
+                                        fargs{i} = vx_;
                                         % ---
                                     elseif dim_ == 2
                                         valx = zeros(nbINode * nb_face, 1);
@@ -747,13 +753,15 @@ classdef Parameter < Xhandle
                                             valy(idn) = valcell{k}(:,2);
                                         end
                                         % ---
-                                        fxi = scatteredInterpolant(node_i,valx,'linear','linear');
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
                                         fyi = fxi;
                                         fyi.Values = valy;
                                         % ---
                                         cnode_ = target_model.parent_mesh.cface(:,id_face_target);
                                         vx_ = fxi(cnode_.');
                                         vy_ = fyi(cnode_.');
+                                        vx_(isnan(vx_)) = 0;
+                                        vy_(isnan(vy_)) = 0;
                                         fargs{i} = [vx_ vy_];
                                         % ---
                                     elseif dim_ == 3
@@ -769,7 +777,7 @@ classdef Parameter < Xhandle
                                             valz(idn) = valcell{k}(:,3);
                                         end
                                         % ---
-                                        fxi = scatteredInterpolant(node_i,valx,'linear','linear');
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
                                         fyi = fxi;
                                         fyi.Values = valy;
                                         fzi = fxi;
@@ -779,6 +787,9 @@ classdef Parameter < Xhandle
                                         vx_ = fxi(cnode_.');
                                         vy_ = fyi(cnode_.');
                                         vz_ = fzi(cnode_.');
+                                        vx_(isnan(vx_)) = 0;
+                                        vy_(isnan(vy_)) = 0;
+                                        vz_(isnan(vz_)) = 0;
                                         fargs{i} = [vx_ vy_ vz_];
                                         % ---
                                     end
@@ -832,10 +843,12 @@ classdef Parameter < Xhandle
                                             valx(idn) = valcell{k}(:,1);
                                         end
                                         % ---
-                                        fxi = scatteredInterpolant(node_i,valx,'linear','linear');
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
                                         % ---
                                         cnode_ = target_model.parent_mesh.cface(:,id_face_target);
-                                        fargs{i} = fxi(cnode_.');
+                                        vx_ = fxi(cnode_.');
+                                        vx_(isnan(vx_)) = 0;
+                                        fargs{i} = vx_;
                                         % ---
                                     elseif dim_ == 2
                                         valx = zeros(nbINode * nb_elem, 1);
@@ -848,13 +861,15 @@ classdef Parameter < Xhandle
                                             valy(idn) = valcell{k}(:,2);
                                         end
                                         % ---
-                                        fxi = scatteredInterpolant(node_i,valx,'linear','linear');
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
                                         fyi = fxi;
                                         fyi.Values = valy;
                                         % ---
                                         cnode_ = target_model.parent_mesh.cface(:,id_face_target);
                                         vx_ = fxi(cnode_.');
                                         vy_ = fyi(cnode_.');
+                                        vx_(isnan(vx_)) = 0;
+                                        vy_(isnan(vy_)) = 0;
                                         fargs{i} = [vx_ vy_];
                                         % ---
                                     elseif dim_ == 3
@@ -870,7 +885,7 @@ classdef Parameter < Xhandle
                                             valz(idn) = valcell{k}(:,3);
                                         end
                                         % ---
-                                        fxi = scatteredInterpolant(node_i,valx,'linear','linear');
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
                                         fyi = fxi;
                                         fyi.Values = valy;
                                         fzi = fxi;
@@ -880,6 +895,9 @@ classdef Parameter < Xhandle
                                         vx_ = fxi(cnode_.');
                                         vy_ = fyi(cnode_.');
                                         vz_ = fzi(cnode_.');
+                                        vx_(isnan(vx_)) = 0;
+                                        vy_(isnan(vy_)) = 0;
+                                        vz_(isnan(vz_)) = 0;
                                         fargs{i} = [vx_ vy_ vz_];
                                         % ---
                                     end
