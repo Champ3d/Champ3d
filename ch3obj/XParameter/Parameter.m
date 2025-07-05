@@ -516,7 +516,10 @@ classdef Parameter < Xhandle
                         % no interpolation
                         fargs{i} = source_model.field{target_it}.(depon_).(place).cvalue(id_place_target);
                     else
-                        if isequal(source_model.parent_mesh, target_model.parent_mesh)
+                        if isequal(source_model.parent_mesh, target_model.parent_mesh) && ...
+                           isa(source_model.moving_frame,'NotMovingFrame') && ...
+                           isa(target_model.moving_frame,'NotMovingFrame')
+                            % ---
                             if isequal(source_model.ltime.t_array, target_model.ltime.t_array)
                                 % no interpolation
                                 fargs{i} = source_model.field{target_it}.(depon_).(place).cvalue(id_place_target);
@@ -546,22 +549,29 @@ classdef Parameter < Xhandle
                                 id_elem_target = id_place_target;
                                 % --- take just what needed
                                 if f_strcmpi(parameter_dependency_search,'by_coordinates')
-                                    id_elem_source = f_findelem(source_model.parent_mesh.node,source_model.parent_mesh.elem,...
-                                                'in_box',target_model.parent_mesh.localbox(id_elem_target));
-                                elseif f_strcmpi(parameter_dependency_search,'by_id_dom')
+                                    id_elem_source = f_findelem(source_model.moving_frame.node(target_t),source_model.parent_mesh.elem,...
+                                                'in_box',target_model.parent_mesh.localbox(id_elem_target,target_t));
+                                else
                                     id_elem_source = [];
-                                    id_dom_source = fieldnames(source_model.parent_mesh.dom);
-                                    for ids = 1:length(id_dom_source)
-                                        if f_strcmpi(id_dom_source{ids},target_dom.id)
-                                            id_elem_source = source_model.parent_mesh.dom.(id_dom_source{ids}).gindex;
+                                    if f_strcmpi(parameter_dependency_search,'by_id_dom') && ...
+                                       isa(source_model.moving_frame,'NotMovingFrame') && ...
+                                       isa(target_model.moving_frame,'NotMovingFrame')
+                                        id_dom_source = fieldnames(source_model.parent_mesh.dom);
+                                        for ids = 1:length(id_dom_source)
+                                            if f_strcmpi(id_dom_source{ids},target_dom.id)
+                                                id_elem_source = source_model.parent_mesh.dom.(id_dom_source{ids}).gindex;
+                                            end
+                                        end
+                                        if isempty(id_elem_source)
+                                            f_fprintf(0,'volumedom',1,target_dom.id,0,'not found on source model !',...
+                                                0,'champ3d performs #parameter_dependency_search by_coordinates \n');
                                         end
                                     end
-                                    if isempty(id_elem_source)
-                                        f_fprintf(0,'volumedom',1,target_dom.id,0,'not found on source model !',...
-                                            0,'champ3d performs #parameter_dependency_search by_coordinates \n');
-                                            id_elem_source = f_findelem(source_model.parent_mesh.node,source_model.parent_mesh.elem,...
-                                                'in_box',target_model.parent_mesh.localbox(id_elem_target));
-                                    end
+                                end
+                                % ---
+                                if isempty(id_elem_source)
+                                    id_elem_source = f_findelem(source_model.moving_frame.node(target_t),source_model.parent_mesh.elem,...
+                                        'in_box',target_model.parent_mesh.localbox(id_elem_target,target_t));
                                 end
                                 % --- time interpolated data
                                 next_it = source_model.ltime.next_it(target_t);
@@ -601,6 +611,7 @@ classdef Parameter < Xhandle
                                 end
                                 % ---
                                 cnode_ = target_model.parent_mesh.celem(:,id_elem_target);
+                                cnode_ = target_model.moving_frame.movenode(cnode_,target_t);
                                 cnode_ = source_model.moving_frame.inverse_movenode(cnode_,target_t);
                                 % ---
                                 dim_ = size(valcell{1},2);
@@ -673,6 +684,8 @@ classdef Parameter < Xhandle
                                     vz_(isnan(vz_)) = 0;
                                     fargs{i} = [vx_ vy_ vz_];
                                     % ---
+                                    fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
+                                    % ---
                                 end
                             elseif f_strcmpi(place,'face')
                                 % ---
@@ -680,21 +693,32 @@ classdef Parameter < Xhandle
                                 % --- take just what needed
                                 id_face_source = [];
                                 id_elem_source = [];
+                                % ---
                                 if f_strcmpi(parameter_dependency_search,'by_coordinates')
-                                    id_elem_source = f_findelem(source_model.parent_mesh.node,source_model.parent_mesh.elem,...
-                                                'in_box',target_model.parent_mesh.localbox);
-                                elseif f_strcmpi(parameter_dependency_search,'by_id_dom')
-                                    id_dom_source = fieldnames(source_model.parent_mesh.dom);
-                                    for ids = 1:length(id_dom_source)
-                                        if f_strcmpi(id_dom_source{ids},target_dom.id)
-                                            id_face_source = source_model.parent_mesh.dom.(id_dom_source{ids}).gindex;
+                                    id_elem_source = f_findelem(source_model.moving_frame.node(target_t),source_model.parent_mesh.elem,...
+                                                'in_box',target_model.parent_mesh.localbox([],target_t));
+                                else
+                                    if f_strcmpi(parameter_dependency_search,'by_id_dom') && ...
+                                       isa(source_model.moving_frame,'NotMovingFrame') && ...
+                                       isa(target_model.moving_frame,'NotMovingFrame')
+                                        id_dom_source = fieldnames(source_model.parent_mesh.dom);
+                                        for ids = 1:length(id_dom_source)
+                                            if f_strcmpi(id_dom_source{ids},target_dom.id)
+                                                id_face_source = source_model.parent_mesh.dom.(id_dom_source{ids}).gindex;
+                                            end
                                         end
-                                    end
-                                    if isempty(id_face_source)
-                                        f_fprintf(0,'surfacedom',1,target_dom.id,0,'not found on source model !',...
-                                            0,'champ3d performs #parameter_dependency_search by_coordinates \n');
-                                            id_elem_source = f_findelem(source_model.parent_mesh.node,source_model.parent_mesh.elem,...
-                                                'in_box',target_model.parent_mesh.localbox);
+                                        if isempty(id_face_source)
+                                            f_fprintf(0,'surfacedom',1,target_dom.id,0,'not found on source model !',...
+                                                0,'champ3d performs #parameter_dependency_search by_coordinates \n');
+                                            id_elem_source = f_findelem(source_model.moving_frame.node(target_t),source_model.parent_mesh.elem,...
+                                                        'in_box',target_model.parent_mesh.localbox([],target_t));
+                                        end
+                                    else
+                                        if isempty(id_face_source)
+                                            % --- XTODO add log message
+                                            id_elem_source = f_findelem(source_model.moving_frame.node(target_t),source_model.parent_mesh.elem,...
+                                                        'in_box',target_model.parent_mesh.localbox([],target_t));
+                                        end
                                     end
                                 end
                                 % ------------------------------------------------------------------
@@ -738,6 +762,8 @@ classdef Parameter < Xhandle
                                     end
                                     % ---
                                     cnode_ = target_model.parent_mesh.cface(:,id_face_target);
+                                    cnode_ = target_model.moving_frame.movenode(cnode_,target_t);
+                                    cnode_ = source_model.moving_frame.inverse_movenode(cnode_,target_t);
                                     % ---
                                     dim_ = size(valcell{1},2);
                                     if dim_ == 1
@@ -776,6 +802,8 @@ classdef Parameter < Xhandle
                                         vy_(isnan(vy_)) = 0;
                                         fargs{i} = [vx_ vy_];
                                         % ---
+                                        fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
+                                        % ---
                                     elseif dim_ == 3
                                         valx = zeros(nbINode * nb_face, 1);
                                         valy = zeros(nbINode * nb_face, 1);
@@ -802,6 +830,8 @@ classdef Parameter < Xhandle
                                         vy_(isnan(vy_)) = 0;
                                         vz_(isnan(vz_)) = 0;
                                         fargs{i} = [vx_ vy_ vz_];
+                                        % ---
+                                        fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
                                         % ---
                                     end
                                     % --------------------------------------------------------------
@@ -845,6 +875,8 @@ classdef Parameter < Xhandle
                                     end
                                     % ---
                                     cnode_ = target_model.parent_mesh.cface(:,id_face_target);
+                                    cnode_ = target_model.moving_frame.movenode(cnode_,target_t);
+                                    cnode_ = source_model.moving_frame.inverse_movenode(cnode_,target_t);
                                     % ---
                                     dim_ = size(valcell{1},2);
                                     if dim_ == 1
@@ -883,6 +915,8 @@ classdef Parameter < Xhandle
                                         vy_(isnan(vy_)) = 0;
                                         fargs{i} = [vx_ vy_];
                                         % ---
+                                        fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
+                                        % ---
                                     elseif dim_ == 3
                                         valx = zeros(nbINode * nb_elem, 1);
                                         valy = zeros(nbINode * nb_elem, 1);
@@ -910,7 +944,11 @@ classdef Parameter < Xhandle
                                         vz_(isnan(vz_)) = 0;
                                         fargs{i} = [vx_ vy_ vz_];
                                         % ---
+                                        fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
+                                        % ---
                                     end
+                                else
+                                    fargs{i} = 0;
                                 end
                                 % ------------------------------------------------------------------
                             end

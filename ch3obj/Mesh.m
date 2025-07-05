@@ -148,20 +148,46 @@ classdef Mesh < Xhandle
     % --- Geo
     methods
         % -----------------------------------------------------------------
-        function lbox = localbox(obj,id_elem)
-            if nargin <= 1
+        function lbox = localbox(obj,id_elem,t)
+            arguments
+                obj
+                id_elem = []
+                t = []
+            end
+            % ---
+            if isempty(id_elem)
                 id_node_ = 1:obj.nb_node;
             else
                 id_node_ = f_uniquenode(obj.elem(:,id_elem));
             end
-            lbox.xmin = min(obj.node(1,id_node_));
-            lbox.xmax = max(obj.node(1,id_node_));
-            lbox.ymin = min(obj.node(2,id_node_));
-            lbox.ymax = max(obj.node(2,id_node_));
+            % ---
+            xmin = min(obj.node(1,id_node_));
+            xmax = max(obj.node(1,id_node_));
+            ymin = min(obj.node(2,id_node_));
+            ymax = max(obj.node(2,id_node_));
             if size(obj.node,1) == 3
-                lbox.zmin = min(obj.node(3,id_node_));
-                lbox.zmax = max(obj.node(3,id_node_));
+                zmin = min(obj.node(3,id_node_));
+                zmax = max(obj.node(3,id_node_));
             end
+            % ---
+            if ~isempty(t) && isprop(obj,'parent_model')
+                limnodes = ...
+                    obj.parent_model.moving_frame.movenode([xmin xmax; ymin ymax; zmin; zmax],t);
+                xmin = limnodes(1,1);
+                xmax = limnodes(2,1);
+                ymin = limnodes(3,1);
+                ymax = limnodes(1,2);
+                zmin = limnodes(2,2);
+                zmax = limnodes(3,2);
+            end
+            % ---
+            lbox.xmin = xmin;
+            lbox.xmax = xmax;
+            lbox.ymin = ymin;
+            lbox.ymax = ymax;
+            lbox.zmin = zmin;
+            lbox.zmax = zmax;
+            % ---
         end
         % -----------------------------------------------------------------
         function lock_origin(obj,args)

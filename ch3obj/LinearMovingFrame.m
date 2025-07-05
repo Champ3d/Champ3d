@@ -102,6 +102,7 @@ classdef LinearMovingFrame < MovingFrame
             end
             % ---
         end
+
         function moved = inverse_movenode(obj,node,t)
             arguments
                 obj
@@ -150,6 +151,7 @@ classdef LinearMovingFrame < MovingFrame
             end
             % ---
         end
+
         function moved = movevector(obj,vector,t)
             arguments
                 obj
@@ -158,6 +160,7 @@ classdef LinearMovingFrame < MovingFrame
             end
             moved = vector;
         end
+
         function moved = inverse_movevector(obj,vector,t)
             arguments
                 obj

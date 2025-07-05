@@ -37,4 +37,17 @@ classdef MovingFrame < Xhandle
         inverse_movevector(obj)
     end
 
+    % --- 
+    methods
+        function node = node(obj,t)
+            arguments
+                obj
+                t = []
+            end
+            % ---
+            node = obj.movenode(obj.parent_model.parent_mesh.node,t);
+            % ---
+        end
+    end
+
 end
