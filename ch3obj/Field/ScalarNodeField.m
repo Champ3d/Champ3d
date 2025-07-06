@@ -33,7 +33,7 @@ classdef ScalarNodeField < NodeField
                 args.id_meshdom = []
                 args.id_elem = []
                 args.id_face = []
-                args.show_dom = 1
+                args.show_dom = 0
             end
             % ---
             if isempty(args.id_meshdom)
@@ -75,9 +75,9 @@ classdef ScalarNodeField < NodeField
                 end
             end
             % ---
-            if args.show_dom
-                dom.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
-            end
+            % if args.show_dom
+            %     dom.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
+            % end
             % ---
             if isa(dom,'VolumeDom3d')
                 node_ = obj.parent_model.moving_frame.node;

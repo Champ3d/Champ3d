@@ -31,7 +31,7 @@ classdef ScalarFaceField < FaceField
                 args.meshdom_obj = []
                 args.id_meshdom = []
                 args.id_face = []
-                args.show_dom = 1
+                args.show_dom = 0
             end
             % ---
             gindex = [];
@@ -67,7 +67,7 @@ classdef ScalarFaceField < FaceField
             end
             % ---
             if ~isempty(gindex)
-                node_ = obj.parent_model.parent_mesh.node;
+                node_ = obj.parent_model.moving_frame.node;
                 face_ = obj.parent_model.parent_mesh.face(:,gindex);
                 f_patch('node',node_,'face',face_,'face_field',obj.cvalue(gindex));
             end

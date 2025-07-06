@@ -31,7 +31,7 @@ classdef ScalarElemField < ElemField
                 args.meshdom_obj = []
                 args.id_meshdom = []
                 args.id_elem = []
-                args.show_dom = 1
+                args.show_dom = 0
             end
             % ---
             if isempty(args.id_meshdom)
@@ -60,11 +60,11 @@ classdef ScalarElemField < ElemField
                 end
             end
             % ---
-            if args.show_dom
-                dom.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
-            end
+            % if args.show_dom
+            %     dom.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
+            % end
             % ---
-            node_ = obj.parent_model.parent_mesh.node;
+            node_ = obj.parent_model.moving_frame.node;
             elem = obj.parent_model.parent_mesh.elem(:,gindex);
             f_patch('node',node_,'elem',elem,'elem_field',obj.cvalue(gindex));
         end

@@ -48,6 +48,33 @@ classdef MovingFrame < Xhandle
             node = obj.movenode(obj.parent_model.parent_mesh.node,t);
             % ---
         end
+        function node = celem(obj,t)
+            arguments
+                obj
+                t = []
+            end
+            % ---
+            node = obj.movenode(obj.parent_model.parent_mesh.celem,t);
+            % ---
+        end
+        function node = cface(obj,t)
+            arguments
+                obj
+                t = []
+            end
+            % ---
+            node = obj.movenode(obj.parent_model.parent_mesh.cface,t);
+            % ---
+        end
+        function node = cedge(obj,t)
+            arguments
+                obj
+                t = []
+            end
+            % ---
+            node = obj.movenode(obj.parent_model.parent_mesh.cedge,t);
+            % ---
+        end
         function lbox = localbox(obj,id_elem,t)
             arguments
                 obj

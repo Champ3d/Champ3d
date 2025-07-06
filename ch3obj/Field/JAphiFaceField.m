@@ -71,8 +71,40 @@ classdef JAphiFaceField < VectorFaceField
             % ---
         end
         % -----------------------------------------------------------------
-        function val = ivalue(obj,id_elem)
-
+        function val = ivalue(obj,id_face)
+            % ---
+            if nargin <= 1
+                id_face = 1:obj.parent_model.parent_mesh.nb_face;
+            end
+            % ---
+            if isempty(id_face)
+                val = [];
+                return
+            end
+            % ---
+            nbI = obj.parent_model.parent_mesh.refelem.nbI;
+            val = {};
+            for i = 1:nbI
+                val{i} = zeros(length(id_face),3);
+            end
+            % ---
+            if ~isempty(obj.sibc)
+                id_phydom_ = fieldnames(obj.sibc);
+                % ---
+                for iec = 1:length(id_phydom_)
+                    tarray = obj.sibc.(id_phydom_{iec}).sigma;
+                    % ---
+                    [gindex,lindex] = intersect(id_face,tarray.parent_dom.gindex);
+                    vcell =+ (obj.Efield({gindex}) * tarray(lindex));
+                    if iec == 1
+                        
+                    end
+                end
+                for i = 1:nbI
+                    val{i}(lindex,:) = vcell{i};
+                end
+            end
+            % ---
         end
         % -----------------------------------------------------------------
         function val = gvalue(obj,id_elem)

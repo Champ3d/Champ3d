@@ -66,11 +66,11 @@ classdef VectorFaceField < FaceField & VectorField
                 end
             end
             % ---
-            if args.show_dom
-                dom.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
-            end
+            % if args.show_dom
+            %     dom.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
+            % end
             % ---
-            node_ = obj.parent_model.parent_mesh.node;
+            node_ = obj.parent_model.moving_frame.node;
             face_ = obj.parent_model.parent_mesh.face(:,gindex);
             v_ = obj.cvalue(gindex);
             if isreal(v_)
