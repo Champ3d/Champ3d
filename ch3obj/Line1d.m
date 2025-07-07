@@ -39,11 +39,13 @@ classdef Line1d < Xhandle
                 args.id char
                 args.len {mustBeNumeric}  = 0
                 args.dtype {mustBeMember(args.dtype,{'lin','log+','log-','log+-','log-+','log='})} = 'lin'
-                args.dnum {mustBeInteger} = 1
+                args.dnum {mustBeNumeric} = 1
                 args.flog {mustBeNumeric} = 1.05
             end
             % ---
             obj@Xhandle;
+            % ---
+            args.dnum = floor(args.dnum);
             % ---
             if isempty(fieldnames(args))
                 return
