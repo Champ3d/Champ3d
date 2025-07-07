@@ -135,6 +135,8 @@ classdef Sibcjw < PhysicalDom
             end
             %--------------------------------------------------------------
             if ~is_changed && obj.build_done == 1
+                obj.tarray{it}.sigma = TensorArray(sigma_array,'parent_dom',obj);
+                obj.tarray{it}.skindepth = TensorArray(skindepth,'parent_dom',obj);
                 return
             end
             %--------------------------------------------------------------
