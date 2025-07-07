@@ -148,11 +148,10 @@ classdef Mesh < Xhandle
     % --- Geo
     methods
         % -----------------------------------------------------------------
-        function lbox = localbox(obj,id_elem,t)
+        function lbox = localbox(obj,id_elem)
             arguments
                 obj
                 id_elem = []
-                t = []
             end
             % ---
             if isempty(id_elem)
@@ -170,23 +169,14 @@ classdef Mesh < Xhandle
                 zmax = max(obj.node(3,id_node_));
             end
             % ---
-            % if ~isempty(t) && isprop(obj,'parent_model')
-            %     limnodes = ...
-            %         obj.parent_model.moving_frame.movenode([xmin xmax; ymin ymax; zmin zmax],t);
-            %     xmin = limnodes(1,1);
-            %     xmax = limnodes(2,1);
-            %     ymin = limnodes(3,1);
-            %     ymax = limnodes(1,2);
-            %     zmin = limnodes(2,2);
-            %     zmax = limnodes(3,2);
-            % end
-            % ---
             lbox.xmin = xmin;
             lbox.xmax = xmax;
             lbox.ymin = ymin;
             lbox.ymax = ymax;
-            lbox.zmin = zmin;
-            lbox.zmax = zmax;
+            if size(obj.node,1) == 3
+                lbox.zmin = zmin;
+                lbox.zmax = zmax;
+            end
             % ---
         end
         % -----------------------------------------------------------------
@@ -224,23 +214,30 @@ classdef Mesh < Xhandle
             end
             % ---
             if isempty(id_dom)
-                gcoordinates = f_tocolv(mean(obj.node,2));
+                lbox = obj.localbox;
             else
                 if isempty(obj.dom)
-                    gcoordinates = f_tocolv(mean(obj.node,2));
+                    lbox = obj.localbox;
                 else
                     alldom = fieldnames(obj.dom);
                     if any(f_strcmpi(id_dom,alldom))
                         for idd = 1:length(alldom)
                             if strcmpi(alldom{idd},id_dom)
-                                idnode = f_uniquenode(obj.elem(:,obj.dom.(id_dom).gindex));
-                                gcoordinates = f_tocolv(mean(obj.node(:,idnode),2));
+                                id_elem = obj.dom.(id_dom).gindex;
+                                lbox = obj.localbox(id_elem);
+                                break
                             end
                         end
                     else
                         error(['#dom ' id_dom ' not found !']);
                     end
                 end
+            end
+            % ---
+            if isa(obj,'Mesh2d')
+                gcoordinates = [(lbox.xmax + lbox.xmin)/2; (lbox.ymax + lbox.ymin)/2];
+            elseif isa(obj,'Mesh3d')
+                gcoordinates = [(lbox.xmax + lbox.xmin)/2; (lbox.ymax + lbox.ymin)/2; (lbox.zmax + lbox.zmin)/2];
             end
             % ---
             if isa(obj,'Mesh2d')
@@ -287,19 +284,8 @@ classdef Mesh < Xhandle
             obj.cedge = obj.cal_cedge;
         end
         % -----------------------------------------------------------------
-        function celem = cal_celem(obj,args)
-            arguments
-                obj
-                args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'local'
-            end
-            % ---
-            coordinate_system = args.coordinate_system;
-            % ---
-            if f_strcmpi(coordinate_system,'local')
-                node_ = obj.node;
-            else
-                %node_ = obj.gnode;
-            end
+        function celem = cal_celem(obj)
+            node_ = obj.node;
             % ---
             dim_  = size(node_,1);
             elem_ = obj.elem;
@@ -313,19 +299,8 @@ classdef Mesh < Xhandle
             % ---
         end
         % ---
-        function cface = cal_cface(obj,args)
-            arguments
-                obj
-                args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'local'
-            end
-            % ---
-            coordinate_system = args.coordinate_system;
-            % ---
-            if f_strcmpi(coordinate_system,'local')
-                node_ = obj.node;
-            else
-                %node_ = obj.gnode;
-            end
+        function cface = cal_cface(obj)
+            node_ = obj.node;
             % ---
             dim_  = size(node_,1);
             % ---
@@ -339,19 +314,8 @@ classdef Mesh < Xhandle
             end
         end
         % ---
-        function cedge = cal_cedge(obj,args)
-            arguments
-                obj
-                args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'local'
-            end
-            % ---
-            coordinate_system = args.coordinate_system;
-            % ---
-            if f_strcmpi(coordinate_system,'local')
-                node_ = obj.node;
-            else
-                %node_ = obj.gnode;
-            end
+        function cedge = cal_cedge(obj)
+            node_ = obj.node;
             % ---
             dim_  = size(node_,1);
             % ---
@@ -361,8 +325,12 @@ classdef Mesh < Xhandle
             edge_ = obj.edge;
             nb_edge_ = size(edge_,2);
             % ---
-            cedge = mean(reshape(node_(:,edge_(1:nbNo_inEd,:)),dim_,nbNo_inEd,nb_edge_),2);
-            cedge = squeeze(cedge);
+            if ~isempty(edge_)
+                cedge = mean(reshape(node_(:,edge_(1:nbNo_inEd,:)),dim_,nbNo_inEd,nb_edge_),2);
+                cedge = squeeze(cedge);
+            else
+                cedge = [];
+            end
         end
         function cal_flatnode(obj)
             % ---
