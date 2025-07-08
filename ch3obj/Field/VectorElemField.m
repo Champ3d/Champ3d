@@ -82,7 +82,7 @@ classdef VectorElemField < ElemField & VectorField
             % ---
             if args.show_dom
                 pmsh = obj.parent_model.parent_mesh;
-                msh = feval(class(pmsh),'node',pmsh.node,'elem',pmsh.elem(:,gindex));
+                msh = Mesh.submesh(pmsh,gindex);
                 % ---
                 % msh.plot('face_color',args.face_color, ...
                 %          'edge_color',args.edge_color, ...

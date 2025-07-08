@@ -129,6 +129,30 @@ classdef Mesh < Xhandle
         end
         % ---
     end
+    % --- Utility
+    methods (Static)
+        % -----------------------------------------------------------------
+        function submesh = submesh(parent_mesh,id_elem)
+            arguments
+                parent_mesh
+                id_elem
+            end
+            % ---
+            if isa(parent_mesh,'HexMesh')
+                submesh = HexMesh('node',parent_mesh.node,'elem',parent_mesh.elem(:,id_elem));
+            elseif isa(parent_mesh,'PrismMesh')
+                submesh = PrismMesh('node',parent_mesh.node,'elem',parent_mesh.elem(:,id_elem));
+            elseif isa(parent_mesh,'TetraMesh')
+                submesh = TetraMesh('node',parent_mesh.node,'elem',parent_mesh.elem(:,id_elem));
+            elseif isa(parent_mesh,'TriMesh')
+                submesh = TriMesh('node',parent_mesh.node,'elem',parent_mesh.elem(:,id_elem));
+            elseif isa(parent_mesh,'QuadMesh')
+                submesh = QuadMesh('node',parent_mesh.node,'elem',parent_mesh.elem(:,id_elem));
+            end
+            % ---
+        end
+        % -----------------------------------------------------------------
+    end
     % --- Add
     methods
         % -----------------------------------------------------------------
