@@ -109,7 +109,8 @@ classdef Bsfield < PhysicalDom
             end
             %--------------------------------------------------------------
             if ~is_changed && obj.build_done == 1
-                obj.tarray{it}.bs = obj.tarray{it-1}.bs;
+                % obj.tarray{it}.bs = obj.tarray{it-1}.bs;  % XTODO
+                obj.tarray{it}.bs = VectorArray(bs_array,'parent_dom',obj);
                 return
             end
             %--------------------------------------------------------------

@@ -23,6 +23,36 @@ classdef (Abstract) Array < Xhandle
             obj = obj@Xhandle;
         end
     end
+
+    % --- factory
+    methods
+        %-------------------------------------------------------------------
+        function objout = create(array,args)
+            arguments
+                array
+                args.parent_dom {mustBeA(args.parent_dom,{'PhysicalDom','MeshDom'})}
+            end
+            % ---
+            array_type = Array.type(array);
+            if any(f_strcmpi(array_type,{'scalar','tensor'}))
+                if isfield(args,'parent_dom')
+                    objout = TensorArray(array,'parent_dom',args.parent_dom);
+                else
+                    objout = TensorArray(array);
+                end
+            elseif f_strcmpi(array_type,'vector')
+                if isfield(args,'parent_dom')
+                    objout = VectorArray(array,'parent_dom',args.parent_dom);
+                else
+                    objout = VectorArray(array);
+                end
+            else
+                f_fprintf(1,'/!\\',0,'cannot create array object ! check array format !');
+                objout = [];
+            end
+        end
+    end
+
     % --- obj's method (overload)
     methods
         %-------------------------------------------------------------------
