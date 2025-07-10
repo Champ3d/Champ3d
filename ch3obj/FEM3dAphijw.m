@@ -43,18 +43,18 @@ classdef FEM3dAphijw < FEM3dAphi
             % ---
             obj <= args;
             % ---
-            
-            % ---
         end
     end
-    % --- setup
-    methods (Static)
-        function setup(obj)
-            obj.build_done = 0;
-            obj.base_matrix_done = 0;
-            obj.parent_mesh.is_defining_obj_of(obj);
-        end
-    end
+    
+    % --- XTODO : setup/reset
+    % methods (Static)
+    %     function setup(obj)
+    %         obj.build_done = 0;
+    %         obj.base_matrix_done = 0;
+    %         obj.parent_mesh.is_defining_obj_of(obj);
+    %     end
+    % end
+
     % --- build
     methods
         %------------------------------------------------------------------

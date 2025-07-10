@@ -133,7 +133,7 @@ classdef EmModel < PhysicalModel
                 phydom = Sibcjw(argu{:});
                 obj.sibc.(args.id) = phydom;
             else
-                f_fprintf(1,'Sibc',0,'is only supported with',1,'FEM3dAphijw',0,'(<ver.2025.05) ! \n');
+                f_fprintf(1,'Sibc',0,'is only supported with',1,'FEM3dAphijw',0,'(<ver.2025.07) ! \n');
             end
         end
         % -----------------------------------------------------------------

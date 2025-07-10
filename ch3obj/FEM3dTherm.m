@@ -128,12 +128,14 @@ classdef FEM3dTherm < ThModel
             end
             % --- which it
             if isempty(args.it)
-                it = obj.ltime.it; % it = obj.gtime.it ??
+                it = obj.ltime.it;
             else
                 it = args.it;
                 obj.ltime.it = it;
             end
             %--------------------------------------------------------------
+            obj.parent_mesh.build;
+            % ---
             obj.dof{it}.T = NodeDof('parent_model',obj);
             % ---
             obj.field{it}.T.elem = ...
