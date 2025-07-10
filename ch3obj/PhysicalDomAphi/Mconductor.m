@@ -67,6 +67,7 @@ classdef Mconductor < PhysicalDom
             obj.matrix.nu0nurwfwf = [];
             obj.matrix.nur_array = [];
             obj.matrix.mur_array = [];
+            obj.tarray = [];
             % ---
             obj.build_done = 0;
             % ---
@@ -81,6 +82,8 @@ classdef Mconductor < PhysicalDom
     % --- build
     methods
         function build(obj)
+            % ---
+            it = obj.parent_model.ltime.it;
             % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
@@ -101,12 +104,18 @@ classdef Mconductor < PhysicalDom
             end
             %--------------------------------------------------------------
             if ~is_changed && obj.build_done == 1
+                obj.tarray{it}.nur = obj.tarray{it-1}.nur;
+                obj.tarray{it}.mur = obj.tarray{it-1}.mur;
                 return
             end
             %--------------------------------------------------------------
             obj.matrix.gindex = gindex;
             obj.matrix.nur_array = nur_array;
             obj.matrix.mur_array = mur_array;
+            %--------------------------------------------------------------
+            if isa(obj.mur,'Tensor')
+            obj.tarray{it}.bs = VectorArray(bs_array,'parent_dom',obj);
+            obj.tarray{it}.bs = VectorArray(bs_array,'parent_dom',obj);
             %--------------------------------------------------------------
             % local nu0nurwfwf matrix
             lmatrix = parent_mesh.cwfwf('id_elem',gindex,'coefficient',nu0nur);

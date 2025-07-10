@@ -72,6 +72,8 @@ classdef Airbox < PhysicalDom
     methods
         function build(obj)
             % ---
+            it = obj.parent_model.ltime.it;
+            % ---
             dom = obj.dom;
             obj.dom.get_gid;
             obj.matrix.gid_elem = dom.gid.gid_elem;

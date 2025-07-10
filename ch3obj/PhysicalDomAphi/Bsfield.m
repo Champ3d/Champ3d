@@ -75,6 +75,7 @@ classdef Bsfield < PhysicalDom
             obj.matrix.bs_array = [];
             obj.matrix.wfbs = [];
             obj.matrix.a_bs = [];
+            obj.tarray = [];
             % ---
             obj.build_done = 0;
             % ---
@@ -88,6 +89,8 @@ classdef Bsfield < PhysicalDom
     % --- build
     methods
         function build(obj)
+            % ---
+            it = obj.parent_model.ltime.it;
             % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
@@ -106,11 +109,14 @@ classdef Bsfield < PhysicalDom
             end
             %--------------------------------------------------------------
             if ~is_changed && obj.build_done == 1
+                obj.tarray{it}.bs = obj.tarray{it-1}.bs;
                 return
             end
             %--------------------------------------------------------------
             obj.matrix.gindex = gindex;
             obj.matrix.bs_array = bs_array;
+            %--------------------------------------------------------------
+            obj.tarray{it}.bs = VectorArray(bs_array,'parent_dom',obj);
             %--------------------------------------------------------------
             % local wfbs matrix
             lmatrix = parent_mesh.cwfvf('id_elem',gindex,'vector_field',bs_array);

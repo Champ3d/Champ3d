@@ -512,6 +512,8 @@ classdef Parameter < Xhandle
                     target_it = min(it_max,max(1,target_it));
                     target_t = target_model.ltime.t_at(target_it);
                     % ---
+                    source_available_max_it = length(source_model.field);
+                    % ---
                     if isequal(source_model, target_model)
                         % no interpolation
                         fargs{i} = source_model.field{target_it}.(depon_).(place).cvalue(id_place_target);
@@ -527,11 +529,15 @@ classdef Parameter < Xhandle
                             % ---
                             if isequal(source_model.ltime.t_array, target_model.ltime.t_array)
                                 % no interpolation
-                                fargs{i} = source_model.field{target_it}.(depon_).(place).cvalue(id_place_target);
+                                if target_it > source_available_max_it
+                                    fargs{i} = source_model.field{end}.(depon_).(place).cvalue(id_place_target);
+                                else
+                                    fargs{i} = source_model.field{target_it}.(depon_).(place).cvalue(id_place_target);
+                                end
                             else
                                 % get by time interpolation
-                                next_it = source_model.ltime.next_it(target_t);
-                                back_it = source_model.ltime.back_it(target_t);
+                                next_it = min(source_model.ltime.next_it(target_t),source_available_max_it);
+                                back_it = min(source_model.ltime.back_it(target_t),source_available_max_it);
                                 if next_it == back_it
                                     fargs{i} = source_model.field{back_it}.(depon_).(place).cvalue(id_place_target);
                                 else
@@ -586,8 +592,8 @@ classdef Parameter < Xhandle
                                         'in_box',target_model.moving_frame.localbox(id_elem_target,target_t));
                                 end
                                 % --- time interpolated data
-                                next_it = source_model.ltime.next_it(target_t);
-                                back_it = source_model.ltime.back_it(target_t);
+                                next_it = min(source_model.ltime.next_it(target_t),source_available_max_it);
+                                back_it = min(source_model.ltime.back_it(target_t),source_available_max_it);
                                 if next_it == back_it
                                     valcell = source_model.field{back_it}.(depon_).elem.ivalue(id_elem_source);
                                 else
@@ -743,8 +749,8 @@ classdef Parameter < Xhandle
                                 % ------------------------------------------------------------------
                                 if ~isempty(id_face_source)
                                     % --- time interpolated data
-                                    next_it = source_model.ltime.next_it(target_t);
-                                    back_it = source_model.ltime.back_it(target_t);
+                                    next_it = min(source_model.ltime.next_it(target_t),source_available_max_it);
+                                    back_it = min(source_model.ltime.back_it(target_t),source_available_max_it);
                                     if next_it == back_it
                                         valcell = source_model.field{back_it}.(depon_).face.ivalue(id_face_source);
                                     else
@@ -857,8 +863,8 @@ classdef Parameter < Xhandle
                                 elseif ~isempty(id_elem_source)
                                     % --- XTODO : not optimal code writing/organization
                                     % --- time interpolated data
-                                    next_it = source_model.ltime.next_it(target_t);
-                                    back_it = source_model.ltime.back_it(target_t);
+                                    next_it = min(source_model.ltime.next_it(target_t),source_available_max_it);
+                                    back_it = min(source_model.ltime.back_it(target_t),source_available_max_it);
                                     if next_it == back_it
                                         valcell = source_model.field{back_it}.(depon_).elem.ivalue(id_elem_source);
                                     else
