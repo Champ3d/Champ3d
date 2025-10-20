@@ -157,7 +157,8 @@ classdef TetraMeshFromGMSH < TetraMesh
         function build_from_physical_volume(obj)
             % ---
             geoname = ['geofile_' obj.id '_auto_generated__.geo'];
-            mshname = ['mshfile_' obj.id '_auto_generated__.m'];
+            %mshname = ['mshfile_' obj.id '_auto_generated__.m'];
+            mshname = ['geofile_' obj.id '_auto_generated__.m'];
             % ---
             obj.mesh_file = mshname;
             % ---
@@ -212,10 +213,11 @@ classdef TetraMeshFromGMSH < TetraMesh
             end
             fclose(geofile);
             % ---
-            gmshargu = [geoname ' -3 -o ' mshname];
+            %gmshargu = [geoname ' -3 -o ' mshname];
+            gmshargu = [geoname ' -3 '];
             call_GMSH_run = [Ch3Config.GMSHExecutable ' ' ...
                              gmshargu];
-            fprintf([call_GMSH_run '\n']);
+            fprintf([call_GMSH_run ' \n']);
             % ---
             try
                 k = 0;
@@ -228,21 +230,21 @@ classdef TetraMeshFromGMSH < TetraMesh
                 fclose("all");
                 fprintf('GMSH running ... \n');
                 [status, cmdout] = system(call_GMSH_run);
+                disp(cmdout);
                 fprintf('Done.\n');
                 fclose("all");
-                if status == 0
-                    k = 0;
-                    while ~isfile(mshname)
-                        if k == 0
-                            f_fprintf(0,'Waiting mesh file ... \n');
-                        end
-                        k = 1;
+                % ---
+                k = 0;
+                while ~isfile(mshname)
+                    if k == 0
+                        f_fprintf(0,'Waiting mesh file ... \n');
                     end
-                    % ---
-                    obj.build_from_mesh_file;
-                    fclose("all");
-                    % ---
+                    k = 1;
                 end
+                % ---
+                obj.build_from_mesh_file;
+                fclose("all");
+                % ---
             catch
                 f_fprintf(1,'/!\\',0,'can not run ',1,geoname,0,'\n');
                 return

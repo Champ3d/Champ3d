@@ -593,12 +593,13 @@ classdef GMSHWriter
             % ---
             pcode = [pname ' = {'];
             for i = 1:length(pvalue)
-                pcode  = [pcode num2str(pvalue(i),16) ', '];
-                if mod(i,10) == 0
-                    pcode = [pcode newline];
-                end
+                pcode  = [pcode num2str(pvalue(i),16) ','];
+                % if mod(i,10) == 0
+                %     pcode = [pcode newline];
+                % end
             end
-            pcode(end-1:end) = []; % ',newline'
+            %pcode(end-1:end) = []; % ',newline'
+            pcode(end) = []; % ','
             pcode = [pcode '}'];
             geocode = regexprep(geocode,['(?<!\w)' pname '(?!\w)[\s]*=(?!=)[\s]*[\w]*[^;]*'],pcode);
         end

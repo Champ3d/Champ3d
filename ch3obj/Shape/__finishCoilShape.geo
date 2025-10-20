@@ -1,6 +1,6 @@
 // ---
 surface_center = CenterOfMass Surface{surface_list~{id_surface_list}};
-destination = {x(0),y(0),z(0)};
+destination = {x(1),y(1),z(1)};
 // ---
 distance = {destination(0)-surface_center(0), destination(1)-surface_center(1), destination(2)-surface_center(2)};
 Translate {distance(0), distance(1), distance(2)} { Surface{surface_list~{id_surface_list}()}; }
@@ -13,7 +13,7 @@ If (Fabs(fit_angle) > 1e-6)
 EndIf
 // --- choice
 rotation = 0;
-curve_axis = {x(1)-x(0), y(1)-y(0), z(1)-z(0)};
+curve_axis = {x(2)-x(1), y(2)-y(1), z(2)-z(1)};
 // ---
 If (Fabs(rotation) > 1e-6)
     Rotate {{curve_axis(0), curve_axis(1), curve_axis(2)}, {destination(0), destination(1), destination(2)}, rotation} { Surface{surface_list~{id_surface_list}()}; }
