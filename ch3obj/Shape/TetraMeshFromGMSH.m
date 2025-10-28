@@ -24,9 +24,11 @@ classdef TetraMeshFromGMSH < TetraMesh
         use_user_defined_airbox = 0
         use_bounding_box_airbox = 0
         tol_mesh_size = 1e-9
+        %id_vdom
     end
     properties (Access = private)
         build_from
+        id_vdom
     end
     % --- Constructors
     methods
@@ -39,9 +41,11 @@ classdef TetraMeshFromGMSH < TetraMesh
                 args.id = ''
                 args.physical_volume
                 args.airbox_volume (1,1) {mustBeA(args.airbox_volume,{'AirboxVolume'})}
-                args.mesh_file char = ''
                 args.use_bounding_box_airbox (1,1) {mustBeNumericOrLogical} = 0
                 args.tol_mesh_size = 1e-9
+                % --- build from mesh file
+                args.mesh_file char = ''
+                args.id_vdom = []
             end
             % ---
             obj = obj@TetraMesh;
@@ -56,6 +60,7 @@ classdef TetraMeshFromGMSH < TetraMesh
             elseif ~isempty(args.mesh_file)
                 args.physical_volume = [];
                 obj.build_from = 'mesh_file';
+                obj.id_vdom = args.id_vdom;
             else
                 error('#physical_volume or #mesh_file must be given !');
             end
@@ -94,6 +99,7 @@ classdef TetraMeshFromGMSH < TetraMesh
             % ---
             if strcmpi(obj.build_from,'physical_volume')
                 obj.build_from_physical_volume;
+                obj.build_from_mesh_file;
             end
         end
     end
@@ -145,6 +151,27 @@ classdef TetraMeshFromGMSH < TetraMesh
                     obj.sface = f_area(node_,face_);
                     obj.ledge = f_ledge(node_,edge_);
                     % ---
+                    if ~isempty(obj.physical_volume)
+                        nb_phyvol = length(obj.physical_volume);
+                        % ---
+                        for i = 1:nb_phyvol
+                            phyvol = obj.physical_volume{i};
+                            elem_code = phyvol.id_number;
+                            idvdom = phyvol.id;
+                            % ---
+                            obj.add_vdom('id',idvdom,'elem_code',elem_code);
+                        end
+                    elseif ~isempty(obj.id_vdom)
+                        nb_phyvol = length(obj.id_vdom);
+                        % ---
+                        for i = 1:nb_phyvol
+                            idvdom = obj.id_vdom{i};
+                            elem_code = f_str2code(idvdom,"code_type","integer");
+                            % ---
+                            obj.add_vdom('id',idvdom,'elem_code',elem_code);
+                        end
+                    end
+                    % ---
                 else
                     f_fprintf(1,'/!\\',0,'Only .m mesh file is acceptable !\n');
                     error(['Can not run #mesh_file ' obj.mesh_file]);
@@ -157,8 +184,8 @@ classdef TetraMeshFromGMSH < TetraMesh
         function build_from_physical_volume(obj)
             % ---
             geoname = ['geofile_' obj.id '_auto_generated__.geo'];
-            %mshname = ['mshfile_' obj.id '_auto_generated__.m'];
-            mshname = ['geofile_' obj.id '_auto_generated__.m'];
+            mshname = ['mshfile_' obj.id '_auto_generated__.m'];
+            %mshname = ['geofile_' obj.id '_auto_generated__.m'];
             % ---
             obj.mesh_file = mshname;
             % ---
@@ -213,8 +240,8 @@ classdef TetraMeshFromGMSH < TetraMesh
             end
             fclose(geofile);
             % ---
-            %gmshargu = [geoname ' -3 -o ' mshname];
-            gmshargu = [geoname ' -3 '];
+            gmshargu = [geoname ' -3 -o ' mshname];
+            %gmshargu = [geoname ' -3 '];
             call_GMSH_run = [Ch3Config.GMSHExecutable ' ' ...
                              gmshargu];
             fprintf([call_GMSH_run ' \n']);
@@ -233,26 +260,27 @@ classdef TetraMeshFromGMSH < TetraMesh
                 disp(cmdout);
                 fprintf('Done.\n');
                 fclose("all");
+                pause(5);
                 % ---
-                k = 0;
-                while ~isfile(mshname)
-                    if k == 0
-                        f_fprintf(0,'Waiting mesh file ... \n');
-                    end
-                    k = 1;
-                end
-                % ---
-                obj.build_from_mesh_file;
-                fclose("all");
+                % k = 0;
+                % while ~isfile(mshname)
+                %     if k == 0
+                %         f_fprintf(0,'Waiting mesh file ... \n');
+                %     end
+                %     k = 1;
+                % end
+                % % ---
+                % obj.build_from_mesh_file;
+                % fclose("all");
                 % ---
             catch
                 f_fprintf(1,'/!\\',0,'can not run ',1,geoname,0,'\n');
                 return
             end
             % ---
-            for i = 1:nb_phyvol
-                obj.add_vdom('id',id_vdom{i},'elem_code',elem_code(i));
-            end
+            % for i = 1:nb_phyvol
+            %     obj.add_vdom('id',id_vdom{i},'elem_code',elem_code(i));
+            % end
             % ---
         end
         %------------------------------------------------------------------
