@@ -22,7 +22,8 @@ if contains(id2test,'...')
         valide_id = all_id;
     else
         id2test = replace(id2test,'...','');
-        check_valide = regexp(all_id,[id2test '\w*']);
+        check_valide = regexp(string(all_id),string(id2test) + '\w*');
+        %check_valide = regexp(all_id,[id2test '\w*']);
         % ---
         valide_id = {};
         k = 0;
@@ -34,7 +35,7 @@ if contains(id2test,'...')
         end
     end
 else
-    check_valide = strcmpi(id2test,all_id);
+    check_valide = strcmpi(string(id2test),string(all_id));
     % ---
     valide_id = {};
     k = 0;

@@ -80,9 +80,17 @@ classdef PrismMeshFromTriMesh < PrismMesh
                 return
             end
             % ---
-            obj.parent_mesh2d.is_defining_obj_of(obj);
-            obj.parent_mesh1d.is_defining_obj_of(obj);
+            if isempty(obj.parent_mesh1d)
+                if isprop(obj.parent_mesh2d,'parent_mesh')
+                    obj.parent_mesh1d = obj.parent_mesh2d.parent_mesh;
+                end
+            end
             % ---
+            obj.parent_mesh2d.is_defining_obj_of(obj);
+            if obj.parent_mesh2d.parent_mesh ~= obj.parent_mesh1d
+                obj.parent_mesh1d.is_defining_obj_of(obj);
+            end
+            %--------------------------------------------------------------
             obj.id_zline = f_to_scellargin(obj.id_zline);
             % ---
             all_id_line = fieldnames(obj.parent_mesh1d.dom);
@@ -92,7 +100,11 @@ classdef PrismMeshFromTriMesh < PrismMesh
                 id = obj.id_zline{i};
                 valid_id = f_validid(id,all_id_line);
                 for j = 1:length(valid_id)
-                    zline = [zline obj.parent_mesh1d.dom.(valid_id{j})];
+                    % ---
+                    dom1d = obj.parent_mesh1d.dom.(valid_id{j});
+                    % dom1d.is_defining_obj_of(obj);
+                    % ---
+                    zline = [zline dom1d];
                 end
             end
             % ---
@@ -103,9 +115,8 @@ classdef PrismMeshFromTriMesh < PrismMesh
                 %-----
                 zl = zline(i);
                 %-----
-                zl.setup;
                 z = zl.node;
-                zdiv   = [zdiv z];
+                zdiv = [zdiv z];
                 %-----
                 nbz = length(z);
                 nb_layer = nb_layer + nbz;
