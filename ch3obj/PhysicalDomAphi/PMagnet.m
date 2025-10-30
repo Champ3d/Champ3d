@@ -68,7 +68,11 @@ classdef PMagnet < PhysicalDom
             % ---
         end
     end
-
+    methods (Access = public)
+        function reset(obj)
+            PMagnet.setup(obj);
+        end
+    end
     % --- build
     methods
         function build(obj)

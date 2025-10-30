@@ -315,11 +315,13 @@ classdef FEM3dAphijw < FEM3dAphi
             % ---
             obj.parent_mesh.build;
             % ---
-            obj.dof{it}.A = EdgeDof('parent_model',obj);
-            obj.dof{it}.Phi = NodeDof('parent_model',obj);
-            obj.dof{it}.B = FaceDof('parent_model',obj);
-            obj.dof{it}.E = EdgeDof('parent_model',obj);
-            obj.dof{it}.V = [];
+            if it > length(obj.dof)
+                obj.dof{it}.A = EdgeDof('parent_model',obj);
+                obj.dof{it}.Phi = NodeDof('parent_model',obj);
+                obj.dof{it}.B = FaceDof('parent_model',obj);
+                obj.dof{it}.E = EdgeDof('parent_model',obj);
+                obj.dof{it}.V = [];
+            end
             %--------------------------------------------------------------
             obj.field{it}.A.elem = ...
                 EdgeDofBasedVectorElemField('parent_model',obj,'dof',obj.dof{it}.A);

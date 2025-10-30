@@ -75,7 +75,6 @@ classdef Mconductor < PhysicalDom
     end
     methods (Access = public)
         function reset(obj)
-            obj.setup_done = 0;
             Mconductor.setup(obj);
         end
     end

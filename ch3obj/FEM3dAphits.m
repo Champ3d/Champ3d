@@ -42,17 +42,25 @@ classdef FEM3dAphits < FEM3dAphi
             % ---
             obj <= args;
             % ---
+            obj.parent_mesh.is_defining_obj_of(obj);
+            % ---
         end
     end
 
     % --- XTODO : setup/reset
-    % methods (Static)
-    %     function setup(obj)
-    %         obj.build_done = 0;
-    %         obj.base_matrix_done = 0;
-    %         obj.parent_mesh.is_defining_obj_of(obj);
-    %     end
-    % end
+    methods (Static)
+        function setup(obj)
+            obj.build_done = 0;
+            obj.basematrix_done = 0;
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            FEM3dAphits.setup(obj);
+            % --- reset dependent obj
+            % obj.reset_dependent_obj;
+        end
+    end
 
     % --- build
     methods
@@ -330,12 +338,14 @@ classdef FEM3dAphits < FEM3dAphi
             % ---
             obj.parent_mesh.build;
             % ---
-            obj.dof{it}.A = EdgeDof('parent_model',obj);
-            obj.dof{it}.Phi = NodeDof('parent_model',obj);
-            obj.dof{it}.B = FaceDof('parent_model',obj);
-            obj.dof{it}.E = EdgeDof('parent_model',obj);
-            obj.dof{it}.V = [];
-            %--------------------------------------------------------------
+            if it > length(obj.dof)
+                obj.dof{it}.A = EdgeDof('parent_model',obj);
+                obj.dof{it}.Phi = NodeDof('parent_model',obj);
+                obj.dof{it}.B = FaceDof('parent_model',obj);
+                obj.dof{it}.E = EdgeDof('parent_model',obj);
+                obj.dof{it}.V = [];
+            end
+            %-----------------------------------------------------------------
             obj.field{it}.A.elem = ...
                 EdgeDofBasedVectorElemField('parent_model',obj,'dof',obj.dof{it}.A);
             obj.field{it}.Phi.node = ...
@@ -346,7 +356,7 @@ classdef FEM3dAphits < FEM3dAphi
                 EdgeDofBasedVectorElemField('parent_model',obj,'dof',obj.dof{it}.E);
             obj.field{it}.E.face = ...
                 EdgeDofBasedVectorFaceField('parent_model',obj,'dof',obj.dof{it}.E);
-            %--------------------------------------------------------------
+            %-----------------------------------------------------------------
             obj.field{it}.H.elem = ...
                 HAphiElemField('parent_model',obj,'Bfield',obj.field{it}.B.elem);
             obj.field{it}.J.elem = ...
@@ -359,6 +369,10 @@ classdef FEM3dAphits < FEM3dAphi
             obj.field{it}.P.face = ...
                 PAphiFaceField('parent_model',obj,'Efield',obj.field{it}.E.face,...
                 'Jfield',obj.field{it}.J.face);
+            %------------------------------------------------------------------
+            obj.field{it}.Wm.elem = ...
+                WmAphiElemField('parent_model',obj,'Bfield',obj.field{it}.B.elem,...
+                'Hfield',obj.field{it}.H.elem);
             %------------------------------------------------------------------
             if it > 1
                 %--------------------------------------------------------------
@@ -397,9 +411,15 @@ classdef FEM3dAphits < FEM3dAphi
                                   obj.dof{it}.Phi.value(id_node_phi_unknown); ...
                                   zeros(len_dphi_unknown,1)];
                         else
-                            x0 = [obj.dof{it-1}.A.value(id_edge_a_unknown); ...
-                                  obj.dof{it-1}.Phi.value(id_node_phi_unknown); ...
-                                  zeros(len_dphi_unknown,1)];
+                            if any(obj.dof{it}.A.value) || any(obj.dof{it}.Phi.value)
+                                x0 = [obj.dof{it}.A.value(id_edge_a_unknown); ...
+                                      obj.dof{it}.Phi.value(id_node_phi_unknown); ...
+                                      zeros(len_dphi_unknown,1)];
+                            else
+                                x0 = [obj.dof{it-1}.A.value(id_edge_a_unknown); ...
+                                      obj.dof{it-1}.Phi.value(id_node_phi_unknown); ...
+                                      zeros(len_dphi_unknown,1)];
+                            end
                         end
                     end
                     % --- qmr + jacobi
@@ -484,6 +504,8 @@ classdef FEM3dAphits < FEM3dAphi
         function postpro(obj)
             %----------------------------------------------------------------------
             it = obj.ltime.it;
+            %----------------------------------------------------------------------
+
             %----------------------------------------------------------------------
             id_coil__ = {};
             if ~isempty(obj.coil)

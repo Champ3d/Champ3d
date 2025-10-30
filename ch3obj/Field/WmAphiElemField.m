@@ -16,25 +16,26 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef HAphiElemField < VectorElemField
+classdef WmAphiElemField < ScalarElemField
     properties
         parent_model
-        mconductor
         Bfield
+        Hfield
     end
     % --- Contructor
     methods
-        function obj = HAphiElemField(args)
+        function obj = WmAphiElemField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
                 args.Bfield {mustBeA(args.Bfield,'FaceDofBasedVectorElemField')}
+                args.Hfield {mustBeA(args.Hfield,'HAphiElemField')}
             end
             % ---
-            obj = obj@VectorElemField;
+            obj = obj@ScalarElemField;
             % ---
             if nargin >1
-                if ~isfield(args,'parent_model') || ~isfield(args,'Bfield')
-                    error('#parent_model and #Bfield must be given !');
+                if ~isfield(args,'parent_model') || ~isfield(args,'Bfield') || ~isfield(args,'Hfield')
+                    error('#parent_model, #Bfield, #Hfield must be given !');
                 end
             end
             % ---
@@ -55,25 +56,9 @@ classdef HAphiElemField < VectorElemField
                 val = [];
                 return
             end
-            % ---
-            %val = zeros(length(id_elem),3);
-            % ---
-            mu0 = 4 * pi * 1e-7;
-            nu0 = 1/mu0;
-            % ---
-            val =+ (obj.Bfield(id_elem) * nu0);
-            % ---
-            if ~isempty(obj.mconductor)
-                id_phydom_ = fieldnames(obj.mconductor);
-                % ---
-                for iec = 1:length(id_phydom_)
-                    tarray = obj.mconductor.(id_phydom_{iec}).nur;
-                    % ---
-                    [gindex,lindex] = intersect(id_elem,tarray.parent_dom.gindex);
-                    val(lindex,:) =+ (obj.Bfield(gindex) * (tarray(lindex) * nu0));
-                end
-            end
-            % ---
+            % --- linear
+            val =+ (1/2 * real(obj.Bfield(id_elem) * obj.Hfield(id_elem)));
+            % --- non-linear -- XTODO
         end
         % -----------------------------------------------------------------
         function val = ivalue(obj,id_elem)
@@ -86,31 +71,9 @@ classdef HAphiElemField < VectorElemField
                 val = [];
                 return
             end
-            % ---
-            nbI = obj.parent_model.parent_mesh.refelem.nbI;
-            val = {};
-            for i = 1:nbI
-                %val{i} = zeros(length(id_elem),3);
-                % val{i} =+ (obj.Bfield(id_elem) * nu0);
-            end
-            % ---
-            mu0 = 4 * pi * 1e-7;
-            nu0 = 1/mu0;
-            % ---
-            if ~isempty(obj.mconductor)
-                id_phydom_ = fieldnames(obj.mconductor);
-                % ---
-                for iec = 1:length(id_phydom_)
-                    tarray = obj.mconductor.(id_phydom_{iec}).nur;
-                    % ---
-                    [gindex,lindex] = intersect(id_elem,tarray.parent_dom.gindex);
-                    vcell =+ (obj.Bfield({gindex}) * (tarray(lindex) * nu0));
-                end
-                for i = 1:nbI
-                    val{i}(lindex,:) = vcell{i};
-                end
-            end
-            % ---
+            % --- linear
+            val =+ (1/2 * real(obj.Bfield({id_elem}) * obj.Hfield({id_elem})));
+            % --- non-linear -- XTODO
         end
         % -----------------------------------------------------------------
         function val = gvalue(obj,id_elem)

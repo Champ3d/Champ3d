@@ -86,7 +86,7 @@ classdef HexaMeshFromQuadMesh < HexMesh
             end
             % ---
             obj.parent_mesh2d.is_defining_obj_of(obj);
-            if obj.parent_mesh2d.parent_mesh ~= obj.parent_mesh1d
+            if ~isequal(obj.parent_mesh2d.parent_mesh,obj.parent_mesh1d)
                 obj.parent_mesh1d.is_defining_obj_of(obj);
             end
             %--------------------------------------------------------------
