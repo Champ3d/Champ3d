@@ -89,13 +89,13 @@ classdef HAphiElemField < VectorElemField
             % ---
             nbI = obj.parent_model.parent_mesh.refelem.nbI;
             val = {};
-            for i = 1:nbI
-                %val{i} = zeros(length(id_elem),3);
-                % val{i} =+ (obj.Bfield(id_elem) * nu0);
-            end
             % ---
             mu0 = 4 * pi * 1e-7;
             nu0 = 1/mu0;
+            for i = 1:nbI
+                %val{i} = zeros(length(id_elem),3);
+                val{i} =+ (obj.Bfield(id_elem) * nu0);
+            end
             % ---
             if ~isempty(obj.mconductor)
                 id_phydom_ = fieldnames(obj.mconductor);
