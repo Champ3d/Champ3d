@@ -5,7 +5,7 @@
          [
             {"name":"parent_model", "kind":"namevalue", "type":[["PhysicalModel"],["CplModel"]]},
             {"name":"f", "kind":"namevalue", "type":[["numeric"],["function_handle"]],"purpose":"numeric or @fname or @(x)(fx)"},
-            {"name":"depend_on", "kind":"namevalue", "type":["char", "choices={'celem','cface','velem','sface','ledge','B','B(i)','V.id_coil','V(i).id_coil','ltime','T','P','E','H','J','Z','A','Phi'}"]},
+            {"name":"depend_on", "kind":"namevalue", "type":["char", "string", "choices={'celem','cface','velem','sface','ledge','B','B(i)','V.id_coil','V(i).id_coil','ltime','T','P','E','H','J','Z','A','Phi'}"]},
             {"name":"from", "kind":"namevalue", "type":[["PhysicalModel"],["CplModel"],["Shape"]]},
             {"name":"varargin_list", "kind":"namevalue", "type":["cell"],"purpose":"{'arg1',value,'arg2',value,...}"},
             {"name":"fvectorized", "kind":"namevalue", "type":["numeric", "choices={0,1}"]}
@@ -17,7 +17,7 @@
          [
             {"name":"parent_model", "kind":"namevalue", "type":[["PhysicalModel"],["CplModel"]]},
             {"name":"f", "kind":"namevalue", "type":[["numeric"],["function_handle"]],"purpose":"numeric or @fname or @(x)(fx)"},
-            {"name":"depend_on", "kind":"namevalue", "type":["char", "choices={'celem','cface','velem','sface','ledge','B','B(i)','V.id_coil','V(i).id_coil','ltime','T','P','E','H','J','Z','A','Phi'}"]},
+            {"name":"depend_on", "kind":"namevalue", "type":["char", "string", "choices={'celem','cface','velem','sface','ledge','B','B(i)','V.id_coil','V(i).id_coil','ltime','T','P','E','H','J','Z','A','Phi'}"]},
             {"name":"from", "kind":"namevalue", "type":[["PhysicalModel"],["CplModel"],["Shape"]]},
             {"name":"varargin_list", "kind":"namevalue", "type":["cell"],"purpose":"{'arg1',value,'arg2',value,...}"},
             {"name":"fvectorized", "kind":"namevalue", "type":["numeric", "choices={0,1}"]}
@@ -29,7 +29,7 @@
          [
             {"name":"parent_model", "kind":"namevalue", "type":[["PhysicalModel"],["CplModel"]]},
             {"name":"f", "kind":"namevalue", "type":[["numeric"],["function_handle"]],"purpose":"numeric or @fname or @(x)(fx)"},
-            {"name":"depend_on", "kind":"namevalue", "type":["char", "choices={'celem','cface','velem','sface','ledge','B','B(i)','V.id_coil','V(i).id_coil','ltime','T','P','E','H','J','Z','A','Phi'}"]},
+            {"name":"depend_on", "kind":"namevalue", "type":["char", "string", "choices={'celem','cface','velem','sface','ledge','B','B(i)','V.id_coil','V(i).id_coil','ltime','T','P','E','H','J','Z','A','Phi'}"]},
             {"name":"from", "kind":"namevalue", "type":[["PhysicalModel"],["CplModel"],["Shape"]]},
             {"name":"varargin_list", "kind":"namevalue", "type":["cell"],"purpose":"{'arg1',value,'arg2',value,...}"},
             {"name":"fvectorized", "kind":"namevalue", "type":["numeric", "choices={0,1}"]}
@@ -41,7 +41,7 @@
          [
             {"name":"parent_model", "kind":"namevalue", "type":[["PhysicalModel"],["CplModel"]]},
             {"name":"f", "kind":"namevalue", "type":[["numeric"],["function_handle"]],"purpose":"numeric or @fname or @(x)(fx)"},
-            {"name":"depend_on", "kind":"namevalue", "type":["char", "choices={'celem','cface','velem','sface','ledge','B','B(i)','V.id_coil','V(i).id_coil','ltime','T','P','E','H','J','Z','A','Phi'}"]},
+            {"name":"depend_on", "kind":"namevalue", "type":["char", "string", "choices={'celem','cface','velem','sface','ledge','B','B(i)','V.id_coil','V(i).id_coil','ltime','T','P','E','H','J','Z','A','Phi'}"]},
             {"name":"from", "kind":"namevalue", "type":[["PhysicalModel"],["CplModel"],["Shape"]]},
             {"name":"varargin_list", "kind":"namevalue", "type":["cell"],"purpose":"{'arg1',value,'arg2',value,...}"},
             {"name":"fvectorized", "kind":"namevalue", "type":["numeric", "choices={0,1}"]}

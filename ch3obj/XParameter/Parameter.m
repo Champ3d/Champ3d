@@ -135,7 +135,7 @@ classdef Parameter < Xhandle
             for i = 1:length(depon)
                 if isa(depon{i},'Parameter')
                     depend_on_{i} = depon{i};
-                elseif ischar(depon{i})
+                elseif ischar(depon{i}) || isstring(depon{i})
                     str00 = depon{i};
                     % ---
                     str00 = split(str00,'.');
