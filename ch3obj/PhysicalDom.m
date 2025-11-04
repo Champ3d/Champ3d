@@ -70,7 +70,7 @@ classdef PhysicalDom < Xhandle
                                 obj.(param) = ScalarParameter('parent_model',obj.parent_model,'f',obj.(param));
                             elseif numel(const) == 2 || numel(const) == 3
                                 obj.(param) = VectorParameter('parent_model',obj.parent_model,'f',obj.(param));
-                            elseif isequal(sizeconst,[2 2]) || isequal(sizeconst,[3 3])
+                            elseif isequal(size(const),[2 2]) || isequal(size(const),[3 3])
                                 obj.(param) = TensorParameter('parent_model',obj.parent_model,'f',obj.(param));
                             else
                                 fprintf(['Constant parameter must be a single scalar, ' ...
