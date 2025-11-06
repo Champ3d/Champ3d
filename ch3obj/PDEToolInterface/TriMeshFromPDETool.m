@@ -160,7 +160,7 @@ classdef TriMeshFromPDETool < TriMesh
                 end
             end
             % ---
-            [p,e,t] = refinemesh(obj.mesh_gd, obj.petds.p, obj.petds.p, obj.petds.p, numid);
+            [p,e,t] = refinemesh(obj.mesh_gd, obj.petds.p, obj.petds.e, obj.petds.t, numid);
             % ---
             obj.getmesh(p,e,t);
             % --- reset dependent obj

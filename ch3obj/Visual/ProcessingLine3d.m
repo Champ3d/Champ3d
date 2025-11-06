@@ -76,7 +76,7 @@ classdef ProcessingLine3d < ProcessingSurface3d
     end
 
     % --- Methods
-    methods (Access = private, Hidden)
+    methods
         % -----------------------------------------------------------------
         function build(obj)
             % ---

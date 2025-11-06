@@ -80,16 +80,29 @@ classdef SArcRectangle < PDEToolShape2d
             x = x + obj.center(1);
             y = y + obj.center(2);
             % ---
+            if obj.orientation ~= 0
+                p = [x; y];
+                p = f_rotaroundaxis(p,"axis_origin",[0 0],"rot_axis",[0 0 1],"rot_angle",obj.orientation);
+                x = p(1,:);
+                y = p(2,:);
+            end
+            % ---
             nbp = length(x);
             gd = [2, nbp, x, y].';
             % --- XTODO
             % da = (a(2) - a(1))/2;
             % dr = 1e-6;
             % r_in = obj.r * cosd(da) - dr;
-            % obj.bottom = [0, -r_in] + obj.center;
-            % obj.top    = [0, +r_in] + obj.center;
-            % obj.left   = [-r_in, 0] + obj.center;
-            % obj.right  = [+r_in, 0] + obj.center;
+            % ---
+            dai = (ai(2) - ai(1))/2;
+            dao = (ao(2) - ao(1))/2;
+            dr = 1e-6;
+            r_in = obj.ri + dr;
+            r_ou = obj.ro * cosd(dao) - dr;
+            obj.bottom = [+r_in, 0] + obj.center;
+            obj.top    = [+r_ou, 0] + obj.center;
+            obj.left   = obj.center;
+            obj.right  = obj.center;
         end
     end
 end

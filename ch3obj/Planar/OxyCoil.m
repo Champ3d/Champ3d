@@ -196,12 +196,18 @@ classdef OxyCoil < Xhandle
                 return
             end
             % --- XTODO
-            [zdown, zup] = obj.zmplate;
-            % ---
-            id_in  = find(args.node(3,:) <= zup & args.node(3,:) >= zdown);
-            id_up  = find(args.node(3,:) > zup);
-            id_do  = find(args.node(3,:) < zdown);
-            % ---
+            if isempty(obj.mplate)
+                id_in = 1:size(args.node,2);
+                id_up = [];
+                id_do = [];
+            else
+                [zdown, zup] = obj.zmplate;
+                % ---
+                id_in  = find(args.node(3,:) <= zup & args.node(3,:) >= zdown);
+                id_up  = find(args.node(3,:) > zup);
+                id_do  = find(args.node(3,:) < zdown);
+                % ---
+            end
             B = zeros(3,size(args.node,2));
             node_in   = args.node(:, id_in);
             node_up   = args.node(:, id_up);
