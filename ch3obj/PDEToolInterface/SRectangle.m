@@ -85,6 +85,26 @@ classdef SRectangle < PDEToolShape2d
             nbp = length(x);
             gd = [2, nbp, x, y].';
             % --- XTODO
+            e = 1e-3;
+            % ---
+            p = [+(1-e) * obj.len(2)/2, 0] + obj.center;
+            top = f_rotaroundaxis(p.',"axis_origin",obj.center,"rot_axis",[0 0 1],"rot_angle",obj.orientation);
+            % ---
+            p = [-(1-e) * obj.len(2)/2, 0] + obj.center;
+            bottom = f_rotaroundaxis(p.',"axis_origin",obj.center,"rot_axis",[0 0 1],"rot_angle",obj.orientation);
+            % ---
+            basemin = min(obj.len([1 3]));
+            p = [0, +(1-e) * basemin/2] + obj.center;
+            left = f_rotaroundaxis(p.',"axis_origin",obj.center,"rot_axis",[0 0 1],"rot_angle",obj.orientation);
+            % ---
+            p = [0, -(1-e) * basemin/2] + obj.center;
+            right = f_rotaroundaxis(p.',"axis_origin",obj.center,"rot_axis",[0 0 1],"rot_angle",obj.orientation);
+            % ---
+            obj.top = top;
+            obj.bottom = bottom;
+            obj.left = left;
+            obj.right = right;
+            % --- XTODO
             % da = (a(2) - a(1))/2;
             % dr = 1e-6;
             % r_in = obj.r * cosd(da) - dr;
