@@ -103,7 +103,7 @@ classdef FEMM2dMag < Xhandle
                 warning('id_material undefined');
             end
             % ---
-            obj.material.(args.id_material) =+ args.material;
+            obj.material.(args.id_material) = args.material';
             obj.material.(args.id_material).parent_model = obj;
             % ---
             % obj.update_material(obj.material.(args.id_material));
@@ -121,7 +121,7 @@ classdef FEMM2dMag < Xhandle
                 warning('id_bc undefined');
             end
             % ---
-            obj.bc.(args.id_bc) =+ args.bc;
+            obj.bc.(args.id_bc) = args.bc';
             obj.bc.(args.id_bc).parent_model = obj;
             % ---
         end
@@ -137,7 +137,7 @@ classdef FEMM2dMag < Xhandle
                 warning('id_circuit undefined');
             end
             % ---
-            obj.circuit.(args.id_circuit) =+ args.circuit;
+            obj.circuit.(args.id_circuit) = args.circuit';
             obj.circuit.(args.id_circuit).id_circuit = args.id_circuit;
             obj.circuit.(args.id_circuit).parent_model = obj;
             % ---
@@ -159,7 +159,7 @@ classdef FEMM2dMag < Xhandle
                 warning('id_wire undefined');
             end
             % ---
-            obj.coil.(args.id_coil) =+ FEMM2dJsCoil;
+            obj.coil.(args.id_coil) = FEMM2dJsCoil';
             obj.coil.(args.id_coil).id_wire = args.id_wire;
             obj.coil.(args.id_coil).id_coil = args.id_coil;
             obj.coil.(args.id_coil).j = args.j;
@@ -188,7 +188,7 @@ classdef FEMM2dMag < Xhandle
                 warning('id_circuit undefined');
             end
             % ---
-            obj.coil.(args.id_coil) =+ FEMM2dIsCoil;
+            obj.coil.(args.id_coil) = FEMM2dIsCoil';
             obj.coil.(args.id_coil).id_wire = args.id_wire;
             obj.coil.(args.id_coil).nb_turn = args.nb_turn;
             obj.coil.(args.id_coil).id_circuit = args.id_circuit;
@@ -209,7 +209,7 @@ classdef FEMM2dMag < Xhandle
                 warning('id_draw undefined');
             end
             % ---
-            obj.draw.(args.id_draw) =+ args.draw;
+            obj.draw.(args.id_draw) = args.draw';
             obj.draw.(args.id_draw).parent_model = obj;
             % ---
             obj.reset_mesh = 1;
@@ -229,7 +229,7 @@ classdef FEMM2dMag < Xhandle
                 warning('id_box undefined');
             end
             % ---
-            obj.box.(args.id_box) =+ args.draw;
+            obj.box.(args.id_box) = args.draw';
             obj.box.(args.id_box).parent_model = obj;
             % ---
             obj.reset_mesh = 1;
@@ -248,7 +248,7 @@ classdef FEMM2dMag < Xhandle
                 warning('id_moveframe undefined');
             end
             % ---
-            obj.moveframe.(args.id_moveframe) =+ args.moveframe;
+            obj.moveframe.(args.id_moveframe) = args.moveframe';
             obj.moveframe.(args.id_moveframe).parent_model = obj;
             obj.moveframe.(args.id_moveframe).id_moveframe = args.id_moveframe;
             % -------------------------------------------------------------
