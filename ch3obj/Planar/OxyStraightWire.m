@@ -95,8 +95,12 @@ classdef OxyStraightWire < Xhandle
             % ---
             d1 = sqrt(a2 + w1.^2);
             d2 = sqrt(a2 + w2.^2);
-            d1(d1 == 0) = 1e-8;
-            d2(d2 == 0) = 1e-8;
+            % ---
+            % d1(d1 == 0) = 1e-8;
+            % d2(d2 == 0) = 1e-8;
+            a2(abs(a2) <= 9e-6) = 9e-6;
+            d1(abs(d1) <= 3e-3) = 3e-3;
+            d2(abs(d2) <= 3e-3) = 3e-3;
             % ---
             mu0 = 4*pi*1e-7;
             By = mu0*obj.signI*I/(4*pi) .* ( v./a2 .* (w2./d2 - w1./d1));

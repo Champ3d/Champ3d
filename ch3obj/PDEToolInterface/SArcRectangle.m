@@ -98,7 +98,7 @@ classdef SArcRectangle < PDEToolShape2d
             bottom = f_rotaroundaxis(p.',"axis_origin",obj.center,"rot_axis",[0 0 1],"rot_angle",obj.orientation);
             % ---
             da = (ao(2) - ao(1))/2;
-            r_ = obj.ri * cosd(da) - e * obj.ri;
+            r_ = obj.ro * cosd(da) - e * obj.ro;
             p = [+r_, 0] + obj.center;
             top = f_rotaroundaxis(p.',"axis_origin",obj.center,"rot_axis",[0 0 1],"rot_angle",obj.orientation);
             % ---

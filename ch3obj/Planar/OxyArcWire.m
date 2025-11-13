@@ -62,7 +62,10 @@ classdef OxyArcWire < Xhandle
             lnode = obj.local_node(node);
             % ---
             rho = sqrt(lnode(1,:).^2 + lnode(2,:).^2);
-            rho(rho <= 1e-6) = 1e-6; % !!!
+            % rho(abs(rho) <= 3e-3) = 3e-3; % !!!
+            rho((rho - obj.r <= +3e-3) & (rho - obj.r >= 0)) = obj.r + 3e-3;
+            rho((rho - obj.r >= -3e-3) & (rho - obj.r <= 0)) = obj.r - 3e-3;
+            % ---
             phi = acos(lnode(1,:)./rho) .* sign(lnode(2,:));
             dz  = lnode(3,:);
             % ---
