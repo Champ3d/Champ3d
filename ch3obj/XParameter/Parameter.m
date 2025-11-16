@@ -690,9 +690,9 @@ classdef Parameter < Xhandle
                                     fzi = fxi;
                                     fzi.Values = valz;
                                     % ---
-                                    fxi = scatteredInterpolant(node_i,valx,'linear','none');
-                                    fyi = scatteredInterpolant(node_i,valy,'linear','none');
-                                    fzi = scatteredInterpolant(node_i,valz,'linear','none');
+                                    % fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                    % fyi = scatteredInterpolant(node_i,valy,'linear','none');
+                                    % fzi = scatteredInterpolant(node_i,valz,'linear','none');
                                     % ---
                                     vx_ = fxi(cnode_.');
                                     vy_ = fyi(cnode_.');
