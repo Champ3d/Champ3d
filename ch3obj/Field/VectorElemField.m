@@ -51,7 +51,8 @@ classdef VectorElemField < ElemField & VectorField
                 args.meshdom_obj = []
                 args.id_meshdom = []
                 args.gindex = []
-                args.show_dom = 1
+                args.show_dom = 0
+                args.type {mustBeMember(args.type,{'vector-real','vector-image','norm','max'})} = 'norm'
             end
             % ---
             if isempty(args.id_meshdom)
@@ -84,10 +85,6 @@ classdef VectorElemField < ElemField & VectorField
                 pmsh = obj.parent_model.parent_mesh;
                 msh = Mesh.submesh(pmsh,gindex);
                 % ---
-                % msh.plot('face_color',args.face_color, ...
-                %          'edge_color',args.edge_color, ...
-                %          'alpha',args.alpha); hold on
-                % ---
                 msh.plot('face_color','none', ...
                          'edge_color','k', ...
                          'alpha',0.5); hold on
@@ -97,45 +94,35 @@ classdef VectorElemField < ElemField & VectorField
             celem = obj.parent_model.moving_frame.celem;
             celem = celem(:,gindex);
             v_ = obj.cvalue(gindex);
-            if isreal(v_)
-                % ---
-                subplot(121)
-                title('Vector');
-                f_quiver(celem,obj.cvalue(gindex));
-                % ---
-                subplot(122)
-                title('Norm');
-                node_ = obj.parent_model.moving_frame.node;
-                elem = obj.parent_model.parent_mesh.elem(:,gindex);
-                v__ = Array.norm(v_);
-                f_patch('node',node_,'elem',elem,'elem_field',v__);
-            else
-                for i = 1:4
-                    % ---
-                    subplot(220 + i);
-                    if i == 1
-                        title('Real part');
-                        v__ = real(v_);
-                        f_quiver(celem,v__);
-                    elseif i == 2
-                        title('Imag part');
-                        v__ = imag(v_);
-                        f_quiver(celem,v__);
-                    elseif i == 3
-                        title('Max');
-                        v__ = VectorArray.max(v_);
-                        f_quiver(celem,v__);
-                    elseif i == 4
-                        title('Max');
-                        % ---
+            switch args.type
+                case 'norm'
+                    if isreal(v_)
+                        node_ = obj.parent_model.moving_frame.node;
+                        elem = obj.parent_model.parent_mesh.elem(:,gindex);
+                        v__ = Array.norm(v_);
+                        f_patch('node',node_,'elem',elem,'elem_field',v__);
+                    else
                         node_ = obj.parent_model.moving_frame.node;
                         elem = obj.parent_model.parent_mesh.elem(:,gindex);
                         v__ = Array.norm(VectorArray.max(v_));
                         f_patch('node',node_,'elem',elem,'elem_field',v__);
                     end
-                    % ---
-                end
+                case 'max'
+                    if isreal(v_)
+                        v__ = v_;
+                    else
+                        v__ = VectorArray.max(v_);
+                    end
+                    f_quiver(celem,v__);
+                case 'vector-real'
+                    v__ = real(v_);
+                    f_quiver(celem,v__);
+                case 'vector-imag'
+                    v__ = imag(v_);
+                    f_quiver(celem,v__);
             end
+            % ---
+            xlabel('x (m)'); ylabel('y (m)'); zlabel('z (m)');
         end
         % -----------------------------------------------------------------
     end
