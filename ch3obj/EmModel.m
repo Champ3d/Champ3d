@@ -166,6 +166,34 @@ classdef EmModel < PhysicalModel
             obj.bsfield.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
+        function add_asfield(obj,args)
+            arguments
+                obj
+                % ---
+                args.id = 'no_id'
+                args.id_dom2d = []
+                args.id_dom3d = []
+                args.as = []
+            end
+            % ---
+            args.parent_model = obj;
+            % ---
+            if isempty(args.id_dom3d)
+                if ~isfield(obj.parent_mesh.dom,'whole_mesh_dom')
+                    obj.parent_mesh.add_whole_mesh_dom;
+                end
+                args.id_dom3d = 'whole_mesh_dom';
+            end
+            % ---
+            argu = f_to_namedarg(args,'for','Asfield');
+            % ---
+            if isa(obj,'FEM3dAphi')
+                phydom = Asfield(argu{:});
+            end
+            % ---
+            obj.asfield.(args.id) = phydom;
+        end
+        % -----------------------------------------------------------------
         function add_embc(obj,args)
             % --- XTODO - other bc types
         end

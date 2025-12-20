@@ -79,7 +79,7 @@ classdef Airbox < PhysicalDom
             obj.matrix.gid_elem = dom.gid.gid_elem;
             obj.matrix.gid_inner_edge = dom.gid.gid_inner_edge;
             obj.matrix.gid_edge = dom.gid.gid_edge;
-            obj.matrix.gid_bound_node = dom.gid.gid_bound_node;
+            % obj.matrix.gid_bound_node = dom.gid.gid_bound_node;
             % ---
             obj.build_done = 1;
         end
@@ -103,8 +103,8 @@ classdef Airbox < PhysicalDom
             obj.parent_model.matrix.id_edge_airbox = ...
                 unique([obj.parent_model.matrix.id_edge_airbox, obj.matrix.gid_edge]);
             % ---
-            obj.parent_model.matrix.id_bound_node_airbox = ...
-                unique([obj.parent_model.matrix.id_bound_node_airbox, obj.matrix.gid_bound_node]);
+            % obj.parent_model.matrix.id_bound_node_airbox = ...
+            %     unique([obj.parent_model.matrix.id_bound_node_airbox, obj.matrix.gid_bound_node]);
         end
     end
 end
