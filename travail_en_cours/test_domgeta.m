@@ -21,12 +21,12 @@ turnA21.pole = -1;
 turnA21.rotate(180);
 figure
 turnA11.plot("color","r"); hold on
-plot3(turnA11.dom.node(1,:),turnA11.dom.node(2,:),turnA11.dom.node(3,:),'o');hold on
+plot3(turnA11.dom.nodebord (1,:),turnA11.dom.nodebord (2,:),turnA11.dom.nodebord (3,:),'o');hold on
+plot3(turnA11.dom.node(1,:),turnA11.dom.node(2,:),turnA11.dom.node(3,:),'*');hold on
+quiver(turnA11.dom.node,turnA11.dom.len);
+view(2)
 
-f_quiver(turnA11.dom.node,turnA11.dom.len);
-
-
-
+%%
 
 figure
 turnA11.plot("color","r"); hold on

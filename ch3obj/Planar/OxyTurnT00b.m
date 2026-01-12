@@ -40,8 +40,8 @@ classdef OxyTurnT00b < OxyTurn
         rmin = 1e-4
     end
     properties (Hidden)
-        rnum = 10
-        onum = 10
+        rnum = 5
+        onum = 5
     end
     % --- Constructors
     methods
@@ -361,6 +361,13 @@ classdef OxyTurnT00b < OxyTurn
                    L=[L u];
 
                    
+
+                    X_bord=[X_bord xdroite];
+                    Y_bord=[Y_bord ydroite];
+
+
+
+
                   %%%%%%%%%%%%%%%%%%%%%%%%%%%% Arc interne %%%%%%%%%%%%%%%%%%%%%%%%%%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     
@@ -387,7 +394,8 @@ classdef OxyTurnT00b < OxyTurn
                         u=[ux;uy;uz];
                         L=[L u];
 
-          
+                        X_bord=[X_bord xpoints];
+                        Y_bord=[Y_bord ypoints];
                 
                   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Coté oblique bas %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
                   
@@ -409,6 +417,11 @@ classdef OxyTurnT00b < OxyTurn
                    uz=zeros(size(uy));
                    u=[ux;uy;uz];
                    L=[L u];
+
+
+                    X_bord=[X_bord xdroite];
+                    Y_bord=[Y_bord ydroite];
+
                   
                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%s
                    %X = fliplr(X);
@@ -416,7 +429,7 @@ classdef OxyTurnT00b < OxyTurn
                    %L = fliplr(L);     
                    %L = -L;            
                
-
+                 obj.dom.nodebord = [X_bord;Y_bord; obj.z .* ones(1,length(X_bord))];
                  obj.dom.node = [X;Y; obj.z .* ones(1,length(X))];
                  obj.dom.len  = L;
 
