@@ -143,11 +143,11 @@ classdef OxyStraightWire < Xhandle
             %d2(abs(d2) <= 3e-3) = 3e-3;
             % ---
             mu0 = 4*pi*1e-7;
-            Az= mu0*I*obj.signI/(4*pi) *(-asinh(w1./sqrt(a2))+asinh(w2./sqrt(a2)));
+            Az = mu0*I*obj.signI/(4*pi) *(-asinh(w1./sqrt(a2))+asinh(w2./sqrt(a2)));
             % ---
             %lfield = [Az;zeros(size(Az));zeros(size(Az))];
-            u=[obj.P2(1)-obj.P1(1);obj.P2(2)-obj.P1(2);0]/norm(obj.P2-obj.P1);
-            A=Az.*u; 
+            u = [obj.P2(1)-obj.P1(1);obj.P2(2)-obj.P1(2);0]/norm(obj.P2-obj.P1);
+            A = Az.*u; 
             % --- Formular 2
             % ---
             AB = [obj.P2(1)-obj.P1(1);obj.P2(2)-obj.P1(2);0];
