@@ -104,7 +104,7 @@ classdef FEM3dAphijw < FEM3dAphi
             obj.matrix.id_elem_mcon = [];
             obj.matrix.id_node_petrode = [];
             obj.matrix.id_node_netrode = [];
-            obj.matrix.id_bound_node_airbox = [];
+            % obj.matrix.id_bound_node_airbox = [];
             %--------------------------------------------------------------
             obj.matrix.sigmawewe = sparse(nb_edge,nb_edge);
             obj.matrix.nu0nurwfwf = sparse(nb_face,nb_face);
@@ -137,7 +137,7 @@ classdef FEM3dAphijw < FEM3dAphi
             % --- airbox
             id_elem_airbox = unique(obj.matrix.id_elem_airbox);
             id_inner_edge_airbox = unique(obj.matrix.id_inner_edge_airbox);
-            id_bound_node_airbox = unique(obj.matrix.id_bound_node_airbox);
+            % id_bound_node_airbox = unique(obj.matrix.id_bound_node_airbox);
             %--------------------------------------------------------------
             id_node_phi = unique(obj.matrix.id_node_phi);
             id_elem_mcon = unique(obj.matrix.id_elem_mcon);

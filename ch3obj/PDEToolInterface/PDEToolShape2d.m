@@ -57,7 +57,7 @@ classdef PDEToolShape2d < Xhandle
             % ---
             obj.center = f_rotaroundaxis(obj.center.',...
                 "axis_origin",[0 0],"rot_axis",[0 0 1],"rot_angle",args.angle);
-            obj.center = obj.center.';
+            obj.center = obj.center(1:2).';
             obj.orientation = obj.orientation + args.angle;
             % ---
         end
