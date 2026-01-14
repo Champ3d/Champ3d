@@ -176,12 +176,35 @@ classdef OxyTurnT00b < OxyTurn
         end
 
       
+       function Linterne = getlinterne(obj, args)
+            arguments
+                obj
+                %args.node (3,:) {mustBeNumeric}
+                args.I = 1
+            end
+            % ---
+           
+            Linterne = 0;
+            cen = f_tocolv(obj.center);ri=obj.ri;ro=obj.ro;
+            ai1 = obj.dir - obj.openi/2;       
+            ao1 = obj.dir -obj.openo/2;       
+            ai2 = obj.dir + obj.openi/2;      
+            ao2 = obj.dir + obj.openo/2;       
+    
+            P11 = [ri*cosd(ai1); ri*sind(ai1)] + cen;   
+            P12 = [ro*cosd(ao1); ro*sind(ao1)] + cen;   
+            P21 = [ri*cosd(ai2); ri*sind(ai2)] + cen;   
+            P22 = [ro*cosd(ao2); ro*sind(ao2)] + cen; 
+
+            mu0=4*pi*1e-7;
+            Linterne= (2*pi*obj.ri+2*pi*obj.ro+norm(P11-P12)+norm(P21-P22))*mu0/(8*pi) ;
+            
+ end
 
 
 
 
-
-
+    
 
 
 
