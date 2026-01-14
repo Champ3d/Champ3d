@@ -40,8 +40,8 @@ classdef OxyTurnT00b < OxyTurn
         rmin = 1e-4
     end
     properties (Hidden)
-        rnum = 10
-        onum = 10
+        rnum = 100
+        onum = 100
     end
     % --- Constructors
     methods
@@ -102,6 +102,8 @@ classdef OxyTurnT00b < OxyTurn
             A = obj.getanode("node",turn_obj.dom.node,"I",args.I);
             turnflux = sum( A(1,:).*obj.dom.len(1,:) + A(2,:).*obj.dom.len(2,:) + A(3,:).*obj.dom.len(3,:) ) ...
                        .* turn_obj.pole; % ds = Oz = +1 (pole)
+            % ---
+            obj.A = A;
         end
 
 
@@ -267,25 +269,74 @@ classdef OxyTurnT00b < OxyTurn
             ao1 = obj.dir - obj.openo/2;
             P11 = [obj.ri*cosd(ai1); obj.ri*sind(ai1)];
             P12 = [obj.ro*cosd(ao1); obj.ro*sind(ao1)];
-            wire01 = OxyStraightWire("P1",P11+cen,"P2",P12+cen,"z",obj.z,"signI",+1*obj.pole);
-            % ---
-            obj.wire{end+1} = wire01;
             % ---
             ai2 = obj.dir + obj.openi/2;
             ao2 = obj.dir + obj.openo/2;
             P21 = [obj.ri*cosd(ai2); obj.ri*sind(ai2)];
             P22 = [obj.ro*cosd(ao2); obj.ro*sind(ao2)];
-            wire02 = OxyStraightWire("P1",P21+cen,"P2",P22+cen,"z",obj.z,"signI",-1*obj.pole);
-            % ---
-            obj.wire{end+1} = wire02;
             % -------------------------------------------------------------------
-            wire03 = OxyArcWire("z",obj.z,"center",cen,"phi1",ai1,"phi2",ai2,"r",obj.ri,"signI",-1*obj.pole);
+            dl_min = 100e-3;
             % ---
-            obj.wire{end+1} = wire03;
+            l12 = norm(P12-P11);
+            u12 = (P12 - P11)./l12;
+            P0  = P11;
+            P1  = P11;
+            for il = 1:floor(l12/dl_min) 
+                wire01 = OxyStraightWire("P1",P0 + (il-1).*dl_min.*u12 + cen, ...
+                                         "P2",P0 +     il.*dl_min.*u12 + cen, ...
+                                         "z",obj.z,"signI",+1*obj.pole);
+                obj.wire{end+1} = wire01;
+                % ---
+                P1 = P0 + il.*dl_min.*u12;
+            end
+            if ~isequal(P1, P12)
+                wire01 = OxyStraightWire("P1",P1 + cen,"P2",P12 + cen,"z",obj.z,"signI",+1*obj.pole);
+                obj.wire{end+1} = wire01;
+            end
             % ---
-            wire04 = OxyArcWire("z",obj.z,"center",cen,"phi1",ao1,"phi2",ao2,"r",obj.ro,"signI",+1*obj.pole);
+            l12 = norm(P22-P21);
+            u12 = (P22 - P21)./l12;
+            P0  = P21;
+            P1  = P21;
+            for il = 1:floor(l12/dl_min) 
+                wire01 = OxyStraightWire("P1",P0 + (il-1).*dl_min.*u12 + cen, ...
+                                         "P2",P0 +     il.*dl_min.*u12 + cen, ...
+                                         "z",obj.z,"signI",-1*obj.pole);
+                obj.wire{end+1} = wire01;
+                % ---
+                P1 = P0 + il.*dl_min.*u12;
+            end
+            if ~isequal(P1, P22)
+                wire01 = OxyStraightWire("P1",P1 + cen,"P2",P22 + cen,"z",obj.z,"signI",-1*obj.pole);
+                obj.wire{end+1} = wire01;
+            end
+            % -------------------------------------------------------------------
+            da_min = 30;
             % ---
-            obj.wire{end+1} = wire04;
+            phi1_  = ai1;
+            while (phi1_ + da_min < ai2)
+                wire03 = OxyArcWire("z",obj.z,"center",cen,"phi1",phi1_,"phi2",phi1_+da_min,"r",obj.ri,"signI",-1*obj.pole);
+                obj.wire{end+1} = wire03;
+                % ---
+                phi1_ = phi1_+da_min;
+            end
+            if phi1_ < ai2
+                wire03 = OxyArcWire("z",obj.z,"center",cen,"phi1",phi1_,"phi2",ai2,"r",obj.ri,"signI",-1*obj.pole);
+                obj.wire{end+1} = wire03;
+            end
+            % ---
+            phi1_  = ao1;
+            while (phi1_ + da_min < ao2)
+                wire03 = OxyArcWire("z",obj.z,"center",cen,"phi1",phi1_,"phi2",phi1_+da_min,"r",obj.ro,"signI",+1*obj.pole);
+                obj.wire{end+1} = wire03;
+                % ---
+                phi1_ = phi1_+da_min;
+            end
+            if phi1_ < ao2
+                wire03 = OxyArcWire("z",obj.z,"center",cen,"phi1",phi1_,"phi2",ao2,"r",obj.ro,"signI",+1*obj.pole);
+                obj.wire{end+1} = wire03;
+            end
+            % ---
             % -------------------------------------------------------------------
             % --- DOM
                cen = f_tocolv(obj.center); cx = cen(1); cy = cen(2);
