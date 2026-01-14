@@ -131,18 +131,28 @@ classdef OxyCoil4 < Xhandle
     end
     % ---
     methods
-        function L = getL(obj, coil_obj)
+       function L = getL(obj, coil_obj)
             if nargin <= 1
                 coil_obj = obj;
             end
             % ---
             obj.getflux(coil_obj);
             L = coil_obj.flux/obj.I;
+            Linterne=0;
+            for i = 1:length(obj.turn)
+               Linterne=Linterne + obj.turn{i}.getlinterne("I",1);
+            end
+            L=L+Linterne;
             % ---
             if isequal(obj,coil_obj)
                 obj.L = L;
             end
-        end
+       end
+
+
+
+
+
         function fl = getflux(obj,coil_obj)
             % ---
             if nargin <= 1 

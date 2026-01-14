@@ -174,6 +174,51 @@ classdef OxyTurnT00b < OxyTurn
                 B = B + obj.wire{i}.getbnode("node",args.node,"I",args.I);
             end
         end
+
+       function Linterne = getlinterne(obj, args)
+            arguments
+                obj
+                %args.node (3,:) {mustBeNumeric}
+                args.I = 1
+            end
+            % ---
+           
+            Linterne = 0;
+            cen = f_tocolv(obj.center);ri=obj.ri;ro=obj.ro;
+            ai1 = obj.dir - obj.openi/2;       
+            ao1 = obj.dir -obj.openo/2;       
+            ai2 = obj.dir + obj.openi/2;      
+            ao2 = obj.dir + obj.openo/2;       
+    
+            P11 = [ri*cosd(ai1); ri*sind(ai1)] + cen;   
+            P12 = [ro*cosd(ao1); ro*sind(ao1)] + cen;   
+            P21 = [ri*cosd(ai2); ri*sind(ai2)] + cen;   
+            P22 = [ro*cosd(ao2); ro*sind(ao2)] + cen; 
+
+            mu0=4*pi*1e-7;
+            Linterne= (2*pi*obj.ri+2*pi*obj.ro+norm(P11-P12)+norm(P21-P22))*mu0/(8*pi) ;
+            
+        end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     end
 
 
@@ -359,117 +404,65 @@ classdef OxyTurnT00b < OxyTurn
                 P22 = [ro*cosd(ao2); ro*sind(ao2)] + cen;   
 
                   X = []; Y = []; L = []; X_bord=[] ; Y_bord=[];
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Arc externe  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
+
+
+                    %------------- Arc externe        
                 
                     n_ext = 2*onum;
-                    delta_alpha_deg = (ao2 - ao1) / n_ext;
-                    alphak_deg = ao1 + (0:n_ext)*delta_alpha_deg;         % <-- 0:n_ext
+                    alphak_deg    = linspace(ao1, ao2, n_ext+1);
                     alpha_mid_deg = 0.5*(alphak_deg(1:end-1) + alphak_deg(2:end));
-                
-                  
-                      xmid = cx + ro * cosd(alpha_mid_deg);
-                      ymid = cy + ro * sind(alpha_mid_deg);
-                      l = ro * deg2rad(delta_alpha_deg);
-                      X=[X xmid];
-                      Y=[Y ymid];
-
-
-                       %-------------------
-                        xpoints=cx+ro*cosd(alphak_deg);
-                        ypoints=cy+ro*sind(alphak_deg);
-                        ux=xpoints(2:end)-xpoints(1:end-1);
-                        uy=ypoints(2:end)-ypoints(1:end-1);
-                        uz=zeros(size(uy));
-                        u=[ux;uy;uz];
-                        L=[L u];
+                    X=[X cx + ro * cosd(alpha_mid_deg)];
+                    Y=[Y  cy + ro * sind(alpha_mid_deg)];
+                    xpoints=cx+ro*cosd(alphak_deg);
+                    ypoints=cy+ro*sind(alphak_deg);
+                    ux = diff(xpoints);
+                    uy = diff(ypoints);
+                    L=[L [ux;uy;zeros(size(uy))]];
                         
-                        X_bord=[X_bord xpoints];
-                        Y_bord=[Y_bord ypoints];
+                        
 
 %            
-%          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Coté oblique haut%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                 %------- Coté oblique haut
 %                 
-                 xdroite = linspace(P21(1), P22(1), rnum+1);
-                 ydroite = linspace(P21(2), P22(2), rnum+1);
-                
-                 longueur = (norm(P21-P22)/rnum)*ones(1,rnum);
-                
-                 xdroite_mid = (xdroite(1:end-1) + xdroite(2:end))/2;
-                 ydroite_mid = (ydroite(1:end-1) + ydroite(2:end))/2;
-                 xdroite_mid=xdroite_mid(end:-1:1);
-                 ydroite_mid=ydroite_mid(end:-1:1);
-                 longueur=longueur(end:-1:1);
-                 X = [X xdroite_mid];
-                 Y = [Y ydroite_mid];
-                 %L = [L longueur];
-                  %----------------------------------------------------------------------------
-                   xdroite=xdroite(end:-1:1);
-                   ydroite=ydroite(end:-1:1);
-                   ux=xdroite(2:end)-xdroite(1:end-1);
-                   uy=ydroite(2:end)-ydroite(1:end-1);
-                   uz=zeros(size(uy));
-                   u=[ux;uy;uz];
-                   L=[L u];
+                 xdroite =flip( linspace(P21(1), P22(1), rnum+1));
+                 ydroite = flip(linspace(P21(2), P22(2), rnum+1));
+                 X = [X (xdroite(1:end-1) + xdroite(2:end))/2];
+                 Y = [Y (ydroite(1:end-1) + ydroite(2:end))/2];
+                 ux = diff(xdroite);
+                 uy = diff(ydroite);
+                 L=[L [ux;uy;zeros(size(uy))]];
 
                    
-                  %%%%%%%%%%%%%%%%%%%%%%%%%%%% Arc interne %%%%%%%%%%%%%%%%%%%%%%%%%%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                  %----------Arc interne 
 
     
-                 delta_alpha_deg = (ai2 - ai1) / onum;
-                 alphak_deg = ai1 + (0:onum)*delta_alpha_deg;
+                 alphak_deg = flip(linspace(ai1, ai2, onum+1));
                  alpha_mid_deg = 0.5*(alphak_deg(1:end-1) + alphak_deg(2:end));
-             
-            
-                
-                  xmid =flip (cx + ri * cosd(alpha_mid_deg));
-                  ymid = flip(cy + ri * sind(alpha_mid_deg));
-                  l = flip(ri * deg2rad(delta_alpha_deg));
-                  X=[X xmid];
-                  Y=[Y ymid];
-                 % L=[L l];
-                
-                  %--------------------------------------------------
-
-                        xpoints=flip(cx+ri*cosd(alphak_deg));
-                        ypoints=flip(cy+ri*sind(alphak_deg));
-                        ux=xpoints(2:end)-xpoints(1:end-1);
-                        uy=ypoints(2:end)-ypoints(1:end-1);
-                        uz=zeros(size(uy));
-                        u=[ux;uy;uz];
-                        L=[L u];
+                 X=[X  cx + ri * cosd(alpha_mid_deg)];
+                 Y=[Y cy + ri * sind(alpha_mid_deg)];
+                 xpoints=cx+ri*cosd(alphak_deg);
+                 ypoints=cy+ri*sind(alphak_deg);
+                  ux = diff(xpoints);
+                  uy = diff(ypoints);
+                  L=[L [ux;uy;zeros(size(uy))]];
 
           
                 
-                  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Coté oblique bas %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+                  %---------------Coté oblique bas 
                   
                   xdroite=linspace(P11(1),P12(1),rnum+1);
                   ydroite=linspace(P11(2),P12(2),rnum+1);
-                
-                
-                  longueur=(norm(P11-P12)/rnum)*ones(1,rnum);
-                
-                  xdroite_mid = (xdroite(1:end-1) + xdroite(2:end))/2;
-                  ydroite_mid = (ydroite(1:end-1) + ydroite(2:end))/2;
-                
-                  X=[X xdroite_mid];
-                  Y=[Y ydroite_mid];
-
-
-                   ux=xdroite(2:end)-xdroite(1:end-1);
-                   uy=ydroite(2:end)-ydroite(1:end-1);
-                   uz=zeros(size(uy));
-                   u=[ux;uy;uz];
-                   L=[L u];
+                  X=[X (xdroite(1:end-1) + xdroite(2:end))/2];
+                  Y=[Y (ydroite(1:end-1) + ydroite(2:end))/2];
+                  ux = diff(xdroite);
+                  uy = diff(ydroite);
+                  L=[L [ux;uy;zeros(size(uy))]];
                   
-                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%s
-                   %X = fliplr(X);
-                   %Y = fliplr(Y);
-                   %L = fliplr(L);     
-                   %L = -L;            
-               
+              
 
                  obj.dom.node = [X;Y; obj.z .* ones(1,length(X))];
                  obj.dom.len  = L;
+
 
             % ---
         end
