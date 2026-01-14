@@ -138,11 +138,6 @@ classdef OxyCoil4 < Xhandle
             % ---
             obj.getflux(coil_obj);
             L = coil_obj.flux/obj.I;
-            Linterne=0;
-            for i = 1:length(obj.turn)
-               Linterne=Linterne + obj.turn{i}.getlinterne("I",1);
-            end
-            L=L+Linterne;
             % ---
             if isequal(obj,coil_obj)
                 obj.L = L;

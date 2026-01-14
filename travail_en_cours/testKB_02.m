@@ -46,7 +46,7 @@ coil1.add_turn(turnA11);
 %coil1.add_mplate("z",tcoil/2+agap+tcoil+dfer,"mur",mur);
 coil1.setup;
 L1a=coil1.getL
-Linterne=turnA11.getlinterne("I",1)
+
 % valeur reference avec mu=1000 2.1306
 % valeur de reference avec mu=1 1.3084
 
