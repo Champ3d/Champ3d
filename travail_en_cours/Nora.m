@@ -3,7 +3,7 @@ close all
 
 R_in=0.100; % rayon interieur
 R_out=0.375; % rayon exterieur
-teta=2*pi/3; % angle de l'arc
+teta=100/360*2*pi; % angle de l'arc
 Radius=5e-3; % rayon fil
 
 
@@ -43,6 +43,12 @@ teta_in=linspace(pi/2-teta/2+delta,pi/2+teta/2-delta,ndec_teta);
 
 Xd=[R_left*cos(pi/2+teta/2) (R_out-Radius)*cos(teta_out) R_right*cos(pi/2-teta/2) (R_in+Radius)*cos(teta_in) ];
 Yd=[var2+R_left*sin(pi/2+teta/2) (R_out-Radius)*sin(teta_out) var2+R_right*sin(pi/2-teta/2) (R_in+Radius)*sin(teta_in) ];
+
+Xr = Xd.*cos(2*pi/3)+Yd.*sin(2*pi/3);
+Yr = -Xd.*sin(2*pi/3)+Yd.*cos(2*pi/3); 
+
+%Xd = Xr;
+%Yd = Yr;
 
 % suppression doublons
 

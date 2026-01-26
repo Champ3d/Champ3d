@@ -56,8 +56,8 @@ m2d = TriMeshFromPDETool("shape",{shCoil01,shCoil02,shIron,shAirbox},"hgrad",1.3
 %m2d.refine([1 2 4]);
 
 %%
-% figure
-% m2d.plot;
+figure
+m2d.plot;
 % return
 %% mesh1d in z
 m1d_z = Mesh1d();
@@ -95,11 +95,11 @@ m3d.add_vdom("id","incoil1",...
              "id_dom2d",{"ro","iron1"},...
              "id_zline",{"zcoil_b"});
 %%
-% figure
-% m3d.plot("face_color","none");
-% m3d.dom.coil1.plot("face_color",f_color(1));
-% m3d.dom.coil2.plot("face_color",f_color(2));
-% m3d.dom.iron.plot("face_color",f_color(3));
+ figure
+ m3d.plot("face_color","none");
+ m3d.dom.coil1.plot("face_color",f_color(1));
+m3d.dom.coil2.plot("face_color",f_color(2));
+ m3d.dom.iron.plot("face_color",f_color(3));
 
 %% Case
 

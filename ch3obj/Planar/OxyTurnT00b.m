@@ -100,7 +100,9 @@ classdef OxyTurnT00b < OxyTurn
             end
             % ---
             A = obj.getanode("node",turn_obj.dom.node,"I",args.I);
-            turnflux = sum( A(1,:).*obj.dom.len(1,:) + A(2,:).*obj.dom.len(2,:) + A(3,:).*obj.dom.len(3,:) ) ...
+            %turnflux = sum( A(1,:).*obj.dom.len(1,:) + A(2,:).*obj.dom.len(2,:) + A(3,:).*obj.dom.len(3,:) ) ...
+            %           .* turn_obj.pole; % ds = Oz = +1 (pole)
+            turnflux = sum( A(1,:).*turn_obj.dom.len(1,:) + A(2,:).*turn_obj.dom.len(2,:) + A(3,:).*turn_obj.dom.len(3,:) ) ...
                        .* turn_obj.pole; % ds = Oz = +1 (pole)
             % ---
             obj.A = A;
