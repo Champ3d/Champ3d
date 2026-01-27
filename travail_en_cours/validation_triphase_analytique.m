@@ -12,7 +12,7 @@ mu0 = 4*pi*1e-7;
 wcoil = 5e-3;
 agap = 200e-3;
 dfer = 5e-3; % distance coil-ferrite
-mur = 1000;
+mur = 1;
 % ---
 tfer = 10e-3;
 tcoil = 5e-3;

@@ -39,7 +39,7 @@ shift_a = 120;
 epsilon = 20;
 %%
 % --- meshsize
-dnum = 20;
+dnum = 30;
 
 
 ri = ri - wcoil/2;
@@ -70,14 +70,6 @@ Coil32 = SArcRectangle("id","fil_in3","center",[wcoil 0],"ri",ri,"ro",ro-2*wcoil
                          "orientation",2*shift_a,"dnum",dnum,"choosed_by","top");
 
 
-
-
-
-
-
-
-
-
 % --- Iron
 shIron = SCircle("id","iron","center",[0 0],"r",1.5*ro,"dnum",2*dnum,"choosed_by","top");
 
@@ -89,12 +81,12 @@ shAirbox = SCircle("id","airbox","center",[0 0],"r",5*ro,"dnum",2*dnum,"choosed_
 m2d = TriMeshFromPDETool("shape",{Coil11,Coil12,Coil21,Coil22,Coil31,Coil32,shIron,shAirbox},"hgrad",1.9,"hmax",1);
 m2d.refine([2 3 4]);
 m2d.refine([2 3 4]);
-%m2d.refine([2 3 4]);
+m2d.refine([2 3 4]);
+m2d.refine([1 5 6 7 8 ]);
 %%
 % figure
 % m2d.plot;
 % return
-
 %%
 % figure
 %hold all
@@ -105,14 +97,14 @@ m2d.refine([2 3 4]);
 %% mesh1d in z
 m1d_z = Mesh1d();
 % ---
-% msize1 = 4;
-% msize2 = 5;
-% msize3 = 8;
-msize1 = 2;
-msize2 = 2;
-msize3 = 2;
+msize1 = 4;
+msize2 = 5;
+msize3 = 8;
+% msize1 = 2;
+% msize2 = 2;
+% msize3 = 4;
 
-m1d_z.add_line1d("id","zabox_b" ,"len",agap,"dnum",msize3,"dtype","log-");
+m1d_z.add_line1d("id","zabox_b" ,"len",2*agap,"dnum",msize3,"dtype","log-");
 m1d_z.add_line1d("id","ziron_b" ,"len",tfer,"dnum",msize1,"dtype","log-");
 m1d_z.add_line1d("id","zdfer_b" ,"len",dfer,"dnum",msize1,"dtype","lin");
 m1d_z.add_line1d("id","zcoil_b" ,"len",tcoil,"dnum",msize2,"dtype","lin");
@@ -120,7 +112,7 @@ m1d_z.add_line1d("id","zagap"   ,"len",agap,"dnum",msize3,"dtype","log+-");
 m1d_z.add_line1d("id","zcoil_t" ,"len",tcoil,"dnum",msize2,"dtype","lin");
 m1d_z.add_line1d("id","zdfer_t" ,"len",dfer,"dnum",msize1,"dtype","lin");
 m1d_z.add_line1d("id","ziron_t" ,"len",tfer,"dnum",msize1,"dtype","log+");
-m1d_z.add_line1d("id","zabox_t" ,"len",agap,"dnum",msize3,"dtype","log+");
+m1d_z.add_line1d("id","zabox_t" ,"len",2*agap,"dnum",msize3,"dtype","log+");
 
 %% mesh3d
 m3d = PrismMeshFromTriMesh("parent_mesh2d",m2d,...
@@ -188,32 +180,35 @@ em_t = FEM3dAphijw('parent_mesh',m3d,"frequency",0);
 
 % --- Physical dom
 
-%em_t.add_mconductor("id","iron","id_dom3d","iron","mur",mur);
+em_t.add_mconductor("id","iron","id_dom3d","iron","mur",mur);
 % ---
 coilt1 = StrandedCloseJsCoil("parent_model",em_t,"id_dom3d","coilt1","cs_area",cs_area,...
                            "spin_vector",[0 0 1],"nb_turn",nb_turn, ...
-                           "Js",J1);
+                           "Js",J1,"coil_mode","tx");
 em_t.add_coil('id','coilt1','coil_obj',coilt1);
 % ---
 coilt2 = StrandedCloseJsCoil("parent_model",em_t,"id_dom3d","coilt2","cs_area",cs_area,...
                            "spin_vector",[0 0 1],"nb_turn",nb_turn, ...
-                           "Js",J2);
+                           "Js",J2,"coil_mode","rx");
 em_t.add_coil('id','coilt2','coil_obj',coilt2);
 %-----
 coilt3 = StrandedCloseJsCoil("parent_model",em_t,"id_dom3d","coilt3","cs_area",cs_area,...
                            "spin_vector",[0 0 1],"nb_turn",nb_turn, ...
-                           "Js",J3);
+                           "Js",J3,"coil_mode","rx");
 em_t.add_coil('id','coilt3','coil_obj',coilt3);
 
 
 % ---
 em_t.solve;
 
-
 L     = em_t.coil.coilt1.Flux / I1 * 1e6
 Mt_12 = em_t.coil.coilt2.Flux / I1 * 1e6
 Mt_13 = em_t.coil.coilt3.Flux / I1 * 1e6
 
+%%
+save valida_3pha_FEM_withCore -v7.3
+
+return
 %%
 figure
 
