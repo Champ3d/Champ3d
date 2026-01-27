@@ -98,7 +98,11 @@ classdef Econductor < PhysicalDom
             gid_node_phi = f_uniquenode(elem);
             % ---
             sigma_array = obj.sigma.getvalue('in_dom',dom);
-            speed_array = obj.speed.getvalue('in_dom',dom);
+            if isa(obj.speed,"Parameter")
+                speed_array = obj.speed.getvalue('in_dom',dom);
+            else
+                speed_array = [0 0 0];
+            end
             % --- check changes
             is_changed = 1;
             if isequal(sigma_array,obj.matrix.sigma_array) && ...
@@ -210,8 +214,10 @@ classdef Econductor < PhysicalDom
             obj.parent_model.matrix.sigmawewe = ...
                 obj.parent_model.matrix.sigmawewe + obj.matrix.sigmawewe;
             %--------------------------------------------------------------
-            obj.parent_model.matrix.sigmavwfxwe = ...
-                obj.parent_model.matrix.sigmavwfxwe + obj.matrix.sigmavwfxwe;
+            if isfield(obj.matrix, 'sigmavwfxwe')
+                obj.parent_model.matrix.sigmavwfxwe = ...
+                    obj.parent_model.matrix.sigmavwfxwe + obj.matrix.sigmavwfxwe;
+            end
             %--------------------------------------------------------------
             obj.parent_model.matrix.id_node_phi = ...
                 unique([obj.parent_model.matrix.id_node_phi, obj.matrix.gid_node_phi]);

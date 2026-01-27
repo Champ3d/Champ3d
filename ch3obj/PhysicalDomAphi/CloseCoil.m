@@ -71,7 +71,7 @@ classdef CloseCoil < Coil
             % ---
             fr = 1;
             em = FEM3dAphijw('parent_mesh',m3d,'frequency',fr,'airbox_bcon','free');
-            em.add_econductor('id','coil','id_dom3d','coil','sigma',1e3);
+            em.add_econductor('id','coil','id_dom3d','coil','sigma',1e3,'speed',[0 0 0]);
             em.add_bsfield('id','coil','bs', - obj.spin_vector);
             em.solve;
             % ---

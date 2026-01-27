@@ -57,7 +57,8 @@ classdef PhysicalDom < Xhandle
             % should put list in config file ?
             paramlist = {'sigma','mur','bs','br','r_ht','r_et',...
                          'Is','Vs','Js',...
-                         'rho','cp','lambda','h','ps','pv'};
+                         'rho','cp','lambda','h','ps','pv', ...
+                         'speed'};
             % ---
             for i = 1:length(paramlist)
                 param = paramlist{i};

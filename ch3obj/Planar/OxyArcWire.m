@@ -118,7 +118,8 @@ classdef OxyArcWire < Xhandle
             % ---
             rho = sqrt(lnode(1,:).^2 + lnode(2,:).^2);
             % ---
-            phi = acos(lnode(1,:)./rho) .* sign(lnode(2,:));
+            phi = atan2(lnode(2,:),lnode(1,:));
+            % ---
             dz  = lnode(3,:);
             % ---
             c1 = (obj.r + rho).^2 + dz.^2;
@@ -126,6 +127,7 @@ classdef OxyArcWire < Xhandle
             m  = 4*obj.r.*rho ./ c1;
             aph1_ = (obj.phi1/180*pi - phi - pi)./2;
             aph2_ = (obj.phi2/180*pi - phi - pi)./2;
+            % ---
             elF_phi1  = mpEllipticF(aph1_,m);
             elF_phi2  = mpEllipticF(aph2_,m);
             elE_phi1  = mpEllipticE(aph1_,m);

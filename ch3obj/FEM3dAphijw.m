@@ -108,6 +108,7 @@ classdef FEM3dAphijw < FEM3dAphi
             %--------------------------------------------------------------
             obj.matrix.sigmawewe = sparse(nb_edge,nb_edge);
             obj.matrix.nu0nurwfwf = sparse(nb_face,nb_face);
+            obj.matrix.sigmavwfxwe = sparse(nb_face,nb_edge);
             %--------------------------------------------------------------
             obj.matrix.t_js = zeros(nb_edge,1);
             obj.matrix.a_bs = zeros(nb_edge,1);
