@@ -71,7 +71,7 @@ Coil32 = SArcRectangle("id","fil_in3","center",[wcoil 0],"ri",ri,"ro",ro-2*wcoil
 
 
 % --- Iron
-shIron = SCircle("id","iron","center",[0 0],"r",1.5*ro,"dnum",2*dnum,"choosed_by","top");
+shIron = SCircle("id","iron","center",[0 0],"r",3*ro,"dnum",2*dnum,"choosed_by","top");
 
 % ---
 shAirbox = SCircle("id","airbox","center",[0 0],"r",5*ro,"dnum",2*dnum,"choosed_by","top");
@@ -104,7 +104,7 @@ msize3 = 8;
 % msize2 = 2;
 % msize3 = 4;
 
-m1d_z.add_line1d("id","zabox_b" ,"len",5*agap,"dnum",2*msize3,"dtype","log-");
+m1d_z.add_line1d("id","zabox_b" ,"len",2*agap,"dnum",msize3,"dtype","log-");
 m1d_z.add_line1d("id","ziron_b" ,"len",tfer,"dnum",msize1,"dtype","log-");
 m1d_z.add_line1d("id","zdfer_b" ,"len",dfer,"dnum",msize1,"dtype","lin");
 m1d_z.add_line1d("id","zcoil_b" ,"len",tcoil,"dnum",msize2,"dtype","lin");
@@ -112,7 +112,7 @@ m1d_z.add_line1d("id","zagap"   ,"len",agap,"dnum",msize3,"dtype","log+-");
 m1d_z.add_line1d("id","zcoil_t" ,"len",tcoil,"dnum",msize2,"dtype","lin");
 m1d_z.add_line1d("id","zdfer_t" ,"len",dfer,"dnum",msize1,"dtype","lin");
 m1d_z.add_line1d("id","ziron_t" ,"len",tfer,"dnum",msize1,"dtype","log+");
-m1d_z.add_line1d("id","zabox_t" ,"len",5*agap,"dnum",2*msize3,"dtype","log+");
+m1d_z.add_line1d("id","zabox_t" ,"len",2*agap,"dnum",msize3,"dtype","log+");
 
 %% mesh3d
 m3d = PrismMeshFromTriMesh("parent_mesh2d",m2d,...
@@ -180,7 +180,7 @@ em_t = FEM3dAphijw('parent_mesh',m3d,"frequency",0);
 
 % --- Physical dom
 
-%em_t.add_mconductor("id","iron","id_dom3d","iron","mur",mur);
+em_t.add_mconductor("id","iron","id_dom3d","iron","mur",mur);
 % ---
 coilt1 = StrandedCloseJsCoil("parent_model",em_t,"id_dom3d","coilt1","cs_area",cs_area,...
                            "spin_vector",[0 0 1],"nb_turn",nb_turn, ...
@@ -206,7 +206,7 @@ Mt_12 = em_t.coil.coilt2.Flux / I1 * 1e6
 Mt_13 = em_t.coil.coilt3.Flux / I1 * 1e6
 
 %%
-save valida_3pha_FEM_noCore -v7.3
+save valida_3pha_FEM_withCore_2 -v7.3
 
 return
 %%

@@ -81,7 +81,7 @@ shAirbox = SCircle("id","airbox","center",[0 0],"r",5*ro,"dnum",2*dnum,"choosed_
 m2d = TriMeshFromPDETool("shape",{Coil11,Coil12,Coil21,Coil22,Coil31,Coil32,shIron,shAirbox},"hgrad",1.9,"hmax",1);
 m2d.refine([2 3 4]);
 m2d.refine([2 3 4]);
-m2d.refine([2 3 4]);
+%m2d.refine([2 3 4]);
 m2d.refine([1 5 6 7 8 ]);
 %%
 % figure
