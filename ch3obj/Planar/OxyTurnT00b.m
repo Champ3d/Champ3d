@@ -25,8 +25,8 @@ classdef OxyTurnT00b < OxyTurn
         dir = 0
         openi = 0
         openo = 0
-        pole = +1  
-        rwire=1e-6  % +1 or -1
+        pole = +1
+        rwire = 1e-6  % +1 or -1
         % ---
         wire
         dom
@@ -74,13 +74,9 @@ classdef OxyTurnT00b < OxyTurn
             obj.makewire;
         end
     end
-
-
-
-
     % ---
     methods
-        
+        % ------------------------------------------------------------------
         function turnflux = getflux(obj, args)
             arguments
                 obj
@@ -100,16 +96,13 @@ classdef OxyTurnT00b < OxyTurn
             end
             % ---
             A = obj.getanode("node",turn_obj.dom.node,"I",args.I);
-            %turnflux = sum( A(1,:).*obj.dom.len(1,:) + A(2,:).*obj.dom.len(2,:) + A(3,:).*obj.dom.len(3,:) ) ...
-            %           .* turn_obj.pole; % ds = Oz = +1 (pole)
             turnflux = sum( A(1,:).*turn_obj.dom.len(1,:) + A(2,:).*turn_obj.dom.len(2,:) + A(3,:).*turn_obj.dom.len(3,:) ) ...
                        .* turn_obj.pole; % ds = Oz = +1 (pole)
             % ---
             obj.A = A;
         end
-
-
-      function A = getanode(obj, args)
+        % ------------------------------------------------------------------
+        function A = getanode(obj, args)
             arguments
                 obj
                 args.node (3,:) {mustBeNumeric}
@@ -123,12 +116,11 @@ classdef OxyTurnT00b < OxyTurn
             % ---
             A = 0;
             for i = 1:length(obj.wire)
-                A = A + obj.wire{i}.getanode("node",args.node,"I",args.I);
+                A = A + obj.wire{i}.getanode("node", args.node, "I", args.I);
             end
-      end
-
-
-      function turnflux = getbds(obj, args)
+        end
+        % ------------------------------------------------------------------
+        function turnflux = getbds(obj, args)
             arguments
                 obj
                 args.turn_obj {mustBeA(args.turn_obj,"OxyTurn")}
@@ -146,19 +138,10 @@ classdef OxyTurnT00b < OxyTurn
                 obj.setup;
             end
             % ---
-            turnflux.B = obj.getbnode("node",turn_obj.dom.node,"I",args.I);
+            turnflux.B = obj.getbnode("node", turn_obj.dom.node, "I", args.I);
             turnflux.flux = sum(turnflux.B(3,:) .* turn_obj.dom.area) .* turn_obj.pole; % ds = Oz = +1 (pole)
         end
-
-
-
-
-
-
-
-
-
-
+        % ------------------------------------------------------------------
         function B = getbnode(obj, args)
             arguments
                 obj
@@ -173,93 +156,56 @@ classdef OxyTurnT00b < OxyTurn
             % ---
             B = 0;
             for i = 1:length(obj.wire)
-                B = B + obj.wire{i}.getbnode("node",args.node,"I",args.I);
+                B = B + obj.wire{i}.getbnode("node", args.node, "I", args.I);
             end
         end
-
-      
-       function Linterne = getlinterne(obj, args)
+        % ------------------------------------------------------------------
+        function Linterne = getlinterne(obj, args)
             arguments
                 obj
-                %args.node (3,:) {mustBeNumeric}
                 args.I = 1
             end
             % ---
-           
-            Linterne = 0;
-            cen = f_tocolv(obj.center);ri=obj.ri;ro=obj.ro;
-            ai1 = obj.dir - obj.openi/2;       
-            ao1 = obj.dir -obj.openo/2;       
-            ai2 = obj.dir + obj.openi/2;      
-            ao2 = obj.dir + obj.openo/2;       
-    
-            P11 = [ri*cosd(ai1); ri*sind(ai1)] + cen;   
-            P12 = [ro*cosd(ao1); ro*sind(ao1)] + cen;   
-            P21 = [ri*cosd(ai2); ri*sind(ai2)] + cen;   
-            P22 = [ro*cosd(ao2); ro*sind(ao2)] + cen; 
-
-            mu0=4*pi*1e-7;
-            Linterne= (2*pi*obj.ri+2*pi*obj.ro+norm(P11-P12)+norm(P21-P22))*mu0/(8*pi) ;
-            
- end
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
+            ri = obj.ri;
+            ro = obj.ro;
+            ai1 = - obj.openi/2;
+            ao1 = - obj.openo/2;
+            ai2 = + obj.openi/2;
+            ao2 = + obj.openo/2;
+            % ---
+            P11 = [ri*cosd(ai1); ri*sind(ai1)];
+            P12 = [ro*cosd(ao1); ro*sind(ao1)];
+            P21 = [ri*cosd(ai2); ri*sind(ai2)];
+            P22 = [ro*cosd(ao2); ro*sind(ao2)];
+            % ---
+            mu0 = 4*pi*1e-7;
+            Linterne = (ri*obj.openi*(pi/180) + ro*obj.openo*(pi/180) + ...
+                        norm(P11-P12) + norm(P21-P22)) * mu0 / (8*pi);
+        end
     end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     % ---
     methods
-        function rotate(obj,angle)
+        % ----------------------------------------------------------
+        function rotate(obj, angle)
             obj.dir = obj.dir + angle;
         end
-        function translate(obj,distance)
+        % ----------------------------------------------------------
+        function translate(obj, distance)
             obj.center = obj.center + distance(1:2);
             if length(distance) == 3
                 obj.z = obj.z + distance(3);
             end
         end
-        function scale(obj,d1,d)
-           
-            [obj.ri,obj.ro,obj.openi,obj.openo]=reduction(obj.ri,obj.ro,obj.openi,obj.openo,d1,d);
-
+        % ----------------------------------------------------------
+        function scale(obj, d1, d)
+            % --- XTODO
+            [obj.ri, obj.ro, obj.openi, obj.openo] = reduction(obj.ri, obj.ro, obj.openi, obj.openo, d1, d);
         end
+        % ----------------------------------------------------------
 
-
-
-
-
-        function plot(obj,args)
+        % ----------------------------------------------------------
+        function plot(obj, args)
             arguments
                 obj
                 args.color = 'b'
@@ -269,7 +215,7 @@ classdef OxyTurnT00b < OxyTurn
             obj.setup;
             % ---
             for i = 1:length(obj.wire)
-                obj.wire{i}.plot('color',args.color,'linewidth',args.linewidth); hold on
+                obj.wire{i}.plot('color', args.color, 'linewidth', args.linewidth); hold on
             end
         end
     end
@@ -296,16 +242,16 @@ classdef OxyTurnT00b < OxyTurn
             u12 = (P12 - P11)./l12;
             P0  = P11;
             P1  = P11;
-            for il = 1:floor(l12/dl_min) 
-                wire01 = OxyStraightWire("P1",P0 + (il-1).*dl_min.*u12 + cen, ...
-                                         "P2",P0 +     il.*dl_min.*u12 + cen, ...
-                                         "z",obj.z,"signI",+1*obj.pole);
+            for il = 1:floor(l12/dl_min)
+                wire01 = OxyStraightWire("P1", P0 + (il-1).*dl_min.*u12 + cen, ...
+                                         "P2", P0 + il.*dl_min.*u12 + cen, ...
+                                         "z", obj.z, "signI", +1*obj.pole);
                 obj.wire{end+1} = wire01;
                 % ---
                 P1 = P0 + il.*dl_min.*u12;
             end
             if ~isequal(P1, P12)
-                wire01 = OxyStraightWire("P1",P1 + cen,"P2",P12 + cen,"z",obj.z,"signI",+1*obj.pole);
+                wire01 = OxyStraightWire("P1", P1 + cen, "P2", P12 + cen, "z", obj.z, "signI", +1*obj.pole);
                 obj.wire{end+1} = wire01;
             end
             % ---
@@ -313,16 +259,16 @@ classdef OxyTurnT00b < OxyTurn
             u12 = (P22 - P21)./l12;
             P0  = P21;
             P1  = P21;
-            for il = 1:floor(l12/dl_min) 
-                wire01 = OxyStraightWire("P1",P0 + (il-1).*dl_min.*u12 + cen, ...
-                                         "P2",P0 +     il.*dl_min.*u12 + cen, ...
-                                         "z",obj.z,"signI",-1*obj.pole);
+            for il = 1:floor(l12/dl_min)
+                wire01 = OxyStraightWire("P1", P0 + (il-1).*dl_min.*u12 + cen, ...
+                                         "P2", P0 + il.*dl_min.*u12 + cen, ...
+                                         "z", obj.z, "signI", -1*obj.pole);
                 obj.wire{end+1} = wire01;
                 % ---
                 P1 = P0 + il.*dl_min.*u12;
             end
             if ~isequal(P1, P22)
-                wire01 = OxyStraightWire("P1",P1 + cen,"P2",P22 + cen,"z",obj.z,"signI",-1*obj.pole);
+                wire01 = OxyStraightWire("P1", P1 + cen, "P2", P22 + cen, "z", obj.z, "signI", -1*obj.pole);
                 obj.wire{end+1} = wire01;
             end
             % -------------------------------------------------------------------
@@ -330,114 +276,102 @@ classdef OxyTurnT00b < OxyTurn
             % ---
             phi1_  = ai1;
             while (phi1_ + da_min < ai2)
-                wire03 = OxyArcWire("z",obj.z,"center",cen,"phi1",phi1_,"phi2",phi1_+da_min,"r",obj.ri,"signI",-1*obj.pole);
+                wire03 = OxyArcWire("z", obj.z, "center", cen, "phi1", phi1_, "phi2", phi1_+da_min, "r", obj.ri, "signI", -1*obj.pole);
                 obj.wire{end+1} = wire03;
                 % ---
-                phi1_ = phi1_+da_min;
+                phi1_ = phi1_ + da_min;
             end
             if phi1_ < ai2
-                wire03 = OxyArcWire("z",obj.z,"center",cen,"phi1",phi1_,"phi2",ai2,"r",obj.ri,"signI",-1*obj.pole);
+                wire03 = OxyArcWire("z", obj.z, "center", cen, "phi1", phi1_, "phi2", ai2, "r", obj.ri, "signI", -1*obj.pole);
                 obj.wire{end+1} = wire03;
             end
             % ---
             phi1_  = ao1;
             while (phi1_ + da_min < ao2)
-                wire03 = OxyArcWire("z",obj.z,"center",cen,"phi1",phi1_,"phi2",phi1_+da_min,"r",obj.ro,"signI",+1*obj.pole);
+                wire03 = OxyArcWire("z", obj.z, "center", cen, "phi1", phi1_, "phi2", phi1_+da_min, "r", obj.ro, "signI", +1*obj.pole);
                 obj.wire{end+1} = wire03;
                 % ---
-                phi1_ = phi1_+da_min;
+                phi1_ = phi1_ + da_min;
             end
             if phi1_ < ao2
-                wire03 = OxyArcWire("z",obj.z,"center",cen,"phi1",phi1_,"phi2",ao2,"r",obj.ro,"signI",+1*obj.pole);
+                wire03 = OxyArcWire("z", obj.z, "center", cen, "phi1", phi1_, "phi2", ao2, "r", obj.ro, "signI", +1*obj.pole);
                 obj.wire{end+1} = wire03;
             end
-            % ---
+
             % -------------------------------------------------------------------
             % --- DOM
-                         cen = f_tocolv(obj.center); cx = cen(1); cy = cen(2);
+            cen = f_tocolv(obj.center); cx = cen(1); cy = cen(2);
 
-               [ri,ro,thetai ,thetao]=reduction(obj.ri,obj.ro,obj.openi,obj.openo,obj.rwire,obj.rwire);
-                %ri = obj.ri+obj.rwire; ro = obj.ro-obj.rwire;
-                rnum = obj.rnum; onum = obj.onum;
+            [ri, ro, thetai, thetao] = reduction(obj.ri, obj.ro, obj.openi, obj.openo, obj.rwire, obj.rwire);
+            rnum = obj.rnum; onum = obj.onum;
 
+            ai1 = obj.dir - thetai/2;
+            ao1 = obj.dir - thetao/2;
+            ai2 = obj.dir + thetai/2;
+            ao2 = obj.dir + thetao/2;
 
-                %[ri2,ro2,thetai2 ,thetao2]=reduction(ri1,ro1,thetai1,thetao1,d1,d)
-    
-                ai1 = obj.dir - thetai/2;       
-                ao1 = obj.dir - thetao/2;       
-                ai2 = obj.dir + thetai/2;      
-                ao2 = obj.dir + thetao/2;       
-    
-                P11 = [ri*cosd(ai1); ri*sind(ai1)] + cen;   
-                P12 = [ro*cosd(ao1); ro*sind(ao1)] + cen;   
-                P21 = [ri*cosd(ai2); ri*sind(ai2)] + cen;   
-                P22 = [ro*cosd(ao2); ro*sind(ao2)] + cen;   
+            P11 = [ri*cosd(ai1); ri*sind(ai1)] + cen;
+            P12 = [ro*cosd(ao1); ro*sind(ao1)] + cen;
+            P21 = [ri*cosd(ai2); ri*sind(ai2)] + cen;
+            P22 = [ro*cosd(ao2); ro*sind(ao2)] + cen;
 
-                  X = []; Y = []; L = []; X_bord=[] ; Y_bord=[];
+            X = []; Y = []; L = []; X_bord = []; Y_bord = [];
 
+            % --- Arc externe (outter arc)
 
-                    %------------- Arc externe        
-                
-                    n_ext = 2*onum;
-                    alphak_deg    = linspace(ao1, ao2, n_ext+1);
-                    alpha_mid_deg = 0.5*(alphak_deg(1:end-1) + alphak_deg(2:end));
-                    X=[X cx + ro * cosd(alpha_mid_deg)];
-                    Y=[Y  cy + ro * sind(alpha_mid_deg)];
-                    xpoints=cx+ro*cosd(alphak_deg);
-                    ypoints=cy+ro*sind(alphak_deg);
-                    ux = diff(xpoints);
-                    uy = diff(ypoints);
-                    L=[L [ux;uy;zeros(size(uy))]];
-                        
-                        
+            n_ext = 2*onum;
+            alphak_deg    = linspace(ao1, ao2, n_ext+1);
+            alpha_mid_deg = 0.5*(alphak_deg(1:end-1) + alphak_deg(2:end));
+            X = [X cx + ro * cosd(alpha_mid_deg)];
+            Y = [Y cy + ro * sind(alpha_mid_deg)];
+            xpoints = cx + ro*cosd(alphak_deg);
+            ypoints = cy + ro*sind(alphak_deg);
+            ux = diff(xpoints);
+            uy = diff(ypoints);
+            L = [L [ux; uy; zeros(size(uy))]];
 
-%            
-%                 %------- Coté oblique haut
-%                 
-                 xdroite =flip( linspace(P21(1), P22(1), rnum+1));
-                 ydroite = flip(linspace(P21(2), P22(2), rnum+1));
-                 X = [X (xdroite(1:end-1) + xdroite(2:end))/2];
-                 Y = [Y (ydroite(1:end-1) + ydroite(2:end))/2];
-                 ux = diff(xdroite);
-                 uy = diff(ydroite);
-                 L=[L [ux;uy;zeros(size(uy))]];
+            % --- Coté oblique haut (Up oblique side)
 
-                   
-                  %----------Arc interne 
+            xdroite = flip(linspace(P21(1), P22(1), rnum+1));
+            ydroite = flip(linspace(P21(2), P22(2), rnum+1));
+            X = [X (xdroite(1:end-1) + xdroite(2:end))/2];
+            Y = [Y (ydroite(1:end-1) + ydroite(2:end))/2];
+            ux = diff(xdroite);
+            uy = diff(ydroite);
+            L = [L [ux; uy; zeros(size(uy))]];
 
-    
-                 alphak_deg = flip(linspace(ai1, ai2, onum+1));
-                 alpha_mid_deg = 0.5*(alphak_deg(1:end-1) + alphak_deg(2:end));
-                 X=[X  cx + ri * cosd(alpha_mid_deg)];
-                 Y=[Y cy + ri * sind(alpha_mid_deg)];
-                 xpoints=cx+ri*cosd(alphak_deg);
-                 ypoints=cy+ri*sind(alphak_deg);
-                  ux = diff(xpoints);
-                  uy = diff(ypoints);
-                  L=[L [ux;uy;zeros(size(uy))]];
+            % --- Arc interne (innner arc)
 
-          
-                
-                  %---------------Coté oblique bas 
-                  
-                  xdroite=linspace(P11(1),P12(1),rnum+1);
-                  ydroite=linspace(P11(2),P12(2),rnum+1);
-                  X=[X (xdroite(1:end-1) + xdroite(2:end))/2];
-                  Y=[Y (ydroite(1:end-1) + ydroite(2:end))/2];
-                  ux = diff(xdroite);
-                  uy = diff(ydroite);
-                  L=[L [ux;uy;zeros(size(uy))]];
-                  
-              
+            alphak_deg = flip(linspace(ai1, ai2, onum+1));
+            alpha_mid_deg = 0.5*(alphak_deg(1:end-1) + alphak_deg(2:end));
+            X = [X cx + ri * cosd(alpha_mid_deg)];
+            Y = [Y cy + ri * sind(alpha_mid_deg)];
+            xpoints = cx + ri*cosd(alphak_deg);
+            ypoints = cy + ri*sind(alphak_deg);
+            ux = diff(xpoints);
+            uy = diff(ypoints);
+            L = [L [ux; uy; zeros(size(uy))]];
 
-                 obj.dom.node = [X;Y; obj.z .* ones(1,length(X))];
-                 obj.dom.len  = L;
+            % --- Coté oblique bas (Low oblique side)
 
-                        
-
+            xdroite = linspace(P11(1), P12(1), rnum+1);
+            ydroite = linspace(P11(2), P12(2), rnum+1);
+            X = [X (xdroite(1:end-1) + xdroite(2:end))/2];
+            Y = [Y (ydroite(1:end-1) + ydroite(2:end))/2];
+            ux = diff(xdroite);
+            uy = diff(ydroite);
+            L = [L [ux; uy; zeros(size(uy))]];
+            
+            % --- Final
+            obj.dom.node = [X; Y; obj.z .* ones(1, length(X))];
+            obj.dom.len  = L;
             % ---
+        end
+        % ----------------------------------------------------------
+        function reduce(obj)
+            arguments
+                obj
+            end
         end
     end
 end
-
-
