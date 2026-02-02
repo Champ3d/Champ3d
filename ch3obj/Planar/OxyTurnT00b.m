@@ -212,8 +212,10 @@ classdef OxyTurnT00b < OxyTurn
                 obj
                 args.distance = 0
             end
-            % ---
-            [obj.ri, obj.ro, obj.openi, obj.openo] = obj.reduce('distance',args.distance);
+            % --- XTODO
+            % --- inverse sign w.r.t reduce()
+            [obj.ri, obj.ro, obj.openi, obj.openo] = ...
+                obj.reduce('distance',-args.distance);
             % ---
         end
         % ----------------------------------------------------------
@@ -409,6 +411,14 @@ classdef OxyTurnT00b < OxyTurn
                 d = args.distance;
             end
             % -------------------------------------------------------------
+            if d <= 0
+                ri = obj.ri;
+                ro = obj.ro;
+                openi = obj.openi;
+                openo = obj.openo;
+                return
+            end
+            % -------------------------------------------------------------
             ri = ri1 + d;               
             ro = ro1 - d;               
             % -------------------------------------------------------------
@@ -433,16 +443,14 @@ classdef OxyTurnT00b < OxyTurn
             c2_haut = c1_haut - d;
             c2_bas  = c1_bas  + d;
             
+            % -------------------------------------------------------------
             dmax_haut = min(c1_haut + ri, c1_haut + ro); 
             dmax_bas  = min(ri - c1_bas , ro - c1_bas );
-        
+            dmax = min(dmax_haut, dmax_bas);
+            if d < 0 || d > dmax
+                error('#rwire too big !');
+            end
             % -------------------------------------------------------------
-%             dmax = min(dmax_haut, dmax_bas);
-%             if d < 0 || d > dmax
-%                 error('#rwire too big !');
-%             end
-            % -------------------------------------------------------------
-        
             root = @(R2,C2) sqrt(R2 - C2.^2);
             
             Pi2_haut = c2_haut*n_haut + root(ri^2, c2_haut)*u_haut;
