@@ -72,6 +72,7 @@ classdef OxyTurnT00b < OxyTurn
     methods
         function setup(obj)
             obj.makewire;
+            obj.makedom;
         end
     end
     % ---
@@ -95,8 +96,16 @@ classdef OxyTurnT00b < OxyTurn
                 obj.setup;
             end
             % ---
-            A = obj.getanode("node",turn_obj.dom.node,"I",args.I);
-            turnflux = sum( A(1,:).*turn_obj.dom.len(1,:) + A(2,:).*turn_obj.dom.len(2,:) + A(3,:).*turn_obj.dom.len(3,:) ) ...
+            if isequal(obj,turn_obj)
+                node = turn_obj.dom.interior.node;
+                len  = turn_obj.dom.interior.len;
+            else
+                node = turn_obj.dom.mean.node;
+                len  = turn_obj.dom.mean.len;
+            end
+            % ---
+            A = obj.getanode("node",node,"I",args.I);
+            turnflux = sum( A(1,:).*len(1,:) + A(2,:).*len(2,:) + A(3,:).*len(3,:) ) ...
                        .* turn_obj.pole; % ds = Oz = +1 (pole)
             % ---
             obj.A = A;
@@ -198,9 +207,14 @@ classdef OxyTurnT00b < OxyTurn
             end
         end
         % ----------------------------------------------------------
-        function scale(obj, d1, d)
-            % --- XTODO
-            [obj.ri, obj.ro, obj.openi, obj.openo] = reduction(obj.ri, obj.ro, obj.openi, obj.openo, d1, d);
+        function scale(obj, args)
+            arguments
+                obj
+                args.distance = 0
+            end
+            % ---
+            [obj.ri, obj.ro, obj.openi, obj.openo] = obj.reduce('distance',args.distance);
+            % ---
         end
         % ----------------------------------------------------------
 
@@ -297,18 +311,28 @@ classdef OxyTurnT00b < OxyTurn
                 wire03 = OxyArcWire("z", obj.z, "center", cen, "phi1", phi1_, "phi2", ao2, "r", obj.ro, "signI", +1*obj.pole);
                 obj.wire{end+1} = wire03;
             end
+        end
+        % -----------------------------------------------------------------
+        function makedom(obj)
+            % --- mean dom
+            obj.dom.mean = obj.caldom(obj.ri, obj.ro, obj.openi, obj.openo);
+            % --- interior dom
+            [ri, ro, openi, openo] = obj.reduce;
+            obj.dom.interior = obj.caldom(ri, ro, openi, openo);
+        end
 
-            % -------------------------------------------------------------------
-            % --- DOM
+        % -----------------------------------------------------------------
+        function dom = caldom(obj,ri,ro,openi,openo)
+
             cen = f_tocolv(obj.center); cx = cen(1); cy = cen(2);
 
-            [ri, ro, thetai, thetao] = reduction(obj.ri, obj.ro, obj.openi, obj.openo, obj.rwire, obj.rwire);
-            rnum = obj.rnum; onum = obj.onum;
+            rnum = obj.rnum;
+            onum = obj.onum;
 
-            ai1 = obj.dir - thetai/2;
-            ao1 = obj.dir - thetao/2;
-            ai2 = obj.dir + thetai/2;
-            ao2 = obj.dir + thetao/2;
+            ai1 = obj.dir - openi/2;
+            ao1 = obj.dir - openo/2;
+            ai2 = obj.dir + openi/2;
+            ao2 = obj.dir + openo/2;
 
             P11 = [ri*cosd(ai1); ri*sind(ai1)] + cen;
             P12 = [ro*cosd(ao1); ro*sind(ao1)] + cen;
@@ -363,15 +387,88 @@ classdef OxyTurnT00b < OxyTurn
             L = [L [ux; uy; zeros(size(uy))]];
             
             % --- Final
-            obj.dom.node = [X; Y; obj.z .* ones(1, length(X))];
-            obj.dom.len  = L;
+            dom.node = [X; Y; obj.z .* ones(1, length(X))];
+            dom.len  = L;
             % ---
         end
-        % ----------------------------------------------------------
-        function reduce(obj)
+        % -----------------------------------------------------------------
+        function [ri, ro, openi, openo] = reduce(obj,args)
             arguments
                 obj
+                args.distance = []
             end
+            % -------------------------------------------------------------
+            ri1 = obj.ri;
+            ro1 = obj.ro;
+            oi1 = obj.openi;
+            oo1 = obj.openo;
+            % -------------------------------------------------------------
+            if isempty(args.distance)
+                d = obj.rwire;
+            else
+                d = args.distance;
+            end
+            % -------------------------------------------------------------
+            ri = ri1 + d;               
+            ro = ro1 - d;               
+            % -------------------------------------------------------------
+            if ri <= 0 || ro <= 0 || ri >= ro || d >= (ro1 - ri1)/2
+                error('Please check dimensions ! #rwire may be too big !');
+            end
+            % -------------------------------------------------------------
+            Pi1_haut = [ri1*cosd(oi1/2),  ri1*sind(oi1/2)];
+            Pi1_bas  = [ri1*cosd(oi1/2), -ri1*sind(oi1/2)];
+            Po1_haut = [ro1*cosd(oo1/2),  ro1*sind(oo1/2)];
+            Po1_bas  = [ro1*cosd(oo1/2), -ro1*sind(oo1/2)];
+            
+            u_haut = (Po1_haut - Pi1_haut) / norm(Po1_haut - Pi1_haut);
+            u_bas  = (Po1_bas  - Pi1_bas ) / norm(Po1_bas  - Pi1_bas );
+            
+            n_haut = [-u_haut(2),  u_haut(1)];
+            n_bas  = [-u_bas(2),   u_bas(1)];
+            
+            c1_haut = dot(n_haut, Pi1_haut);
+            c1_bas  = dot(n_bas,  Pi1_bas);
+            
+            c2_haut = c1_haut - d;
+            c2_bas  = c1_bas  + d;
+            
+            dmax_haut = min(c1_haut + ri, c1_haut + ro); 
+            dmax_bas  = min(ri - c1_bas , ro - c1_bas );
+        
+            % -------------------------------------------------------------
+%             dmax = min(dmax_haut, dmax_bas);
+%             if d < 0 || d > dmax
+%                 error('#rwire too big !');
+%             end
+            % -------------------------------------------------------------
+        
+            root = @(R2,C2) sqrt(R2 - C2.^2);
+            
+            Pi2_haut = c2_haut*n_haut + root(ri^2, c2_haut)*u_haut;
+            Pi2_bas  = c2_bas *n_bas  + root(ri^2, c2_bas )*u_bas;  
+            Po2_haut = c2_haut*n_haut + root(ro^2, c2_haut)*u_haut;
+            Po2_bas  = c2_bas *n_bas  + root(ro^2, c2_bas )*u_bas;
+            
+            Li2 = norm(Pi2_bas - Pi2_haut);
+            Lo2 = norm(Po2_bas - Po2_haut);
+            arg_i = Li2/(2*ri);
+            arg_o = Lo2/(2*ro);
+            
+            % --- angle interne
+            x1 = Pi2_haut(1); 
+            y1 = Pi2_haut(2);
+            x2 = Pi2_bas(1); 
+            y2 = Pi2_bas(2);
+            openi = atan2d(abs(x1*y2 - y1*x2), x1*x2 + y1*y2);
+            
+            % --- angle externe
+            x1 = Po2_haut(1);
+            y1 = Po2_haut(2);
+            x2 = Po2_bas(1);  
+            y2 = Po2_bas(2);
+            openo = atan2d(abs(x1*y2 - y1*x2), x1*x2 + y1*y2);
         end
+        % -----------------------------------------------------------------
     end
 end
