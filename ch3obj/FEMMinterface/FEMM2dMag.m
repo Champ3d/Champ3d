@@ -174,6 +174,7 @@ classdef FEMM2dMag < Xhandle
                 args.id_wire = 'undefined';
                 args.id_circuit = 'undefined';
                 args.nb_turn = 0
+                args.pole = +1
             end
             % ---
             if f_strcmpi(args.id_coil,'undefined')
@@ -191,6 +192,7 @@ classdef FEMM2dMag < Xhandle
             obj.coil.(args.id_coil) = FEMM2dIsCoil';
             obj.coil.(args.id_coil).id_wire = args.id_wire;
             obj.coil.(args.id_coil).nb_turn = args.nb_turn;
+            obj.coil.(args.id_coil).pole = args.pole;
             obj.coil.(args.id_coil).id_circuit = args.id_circuit;
             obj.coil.(args.id_coil).id_coil = args.id_coil;
             obj.coil.(args.id_coil).parent_model = obj;

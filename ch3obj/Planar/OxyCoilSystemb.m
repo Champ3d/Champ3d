@@ -33,6 +33,7 @@ classdef OxyCoilSystemb < Xhandle
     end
     % ---
     methods
+        % -----------------------------------------------------------------
         function add_coil(obj,coil_obj)
             if iscell(coil_obj)
                 for i = 1:length(coil_obj)
@@ -42,7 +43,7 @@ classdef OxyCoilSystemb < Xhandle
                 obj.coil{end+1} = coil_obj;
             end
         end
-        % ---
+        % -----------------------------------------------------------------
         function rotate(obj,angle)
             % ---
             for i = 1:length(obj.coil)
@@ -51,7 +52,7 @@ classdef OxyCoilSystemb < Xhandle
             obj.setup;
             % ---
         end
-        % ---
+        % -----------------------------------------------------------------
         function translate(obj,distance)
             % ---
             for i = 1:length(obj.coil)
@@ -60,11 +61,13 @@ classdef OxyCoilSystemb < Xhandle
             obj.setup;
             % ---
         end
+        % -----------------------------------------------------------------
         function setup(obj)
             for i = 1:length(obj.coil)
                 obj.coil{i}.setup;
             end
         end
+        % -----------------------------------------------------------------
         function plot(obj)
             for i = 1:length(obj.coil)
                 obj.coil{i}.plot("color",f_color(i));
@@ -75,6 +78,7 @@ classdef OxyCoilSystemb < Xhandle
     end
     % ---
     methods
+        % -----------------------------------------------------------------
         function L = getL(obj)
             nbcoil = length(obj.coil);
             L = zeros(nbcoil,nbcoil);
@@ -85,11 +89,29 @@ classdef OxyCoilSystemb < Xhandle
                     if (j==i)
                       L(i,j) = tx.getL(rx);
                     else
-                        L(i,j) = tx.getM(rx);
+                      L(i,j) = tx.getM(rx);
                     end
                 end
             end
         end
+        % -----------------------------------------------------------------
+        function A = getanode(obj,args)
+            arguments
+                obj
+                args.node (3,:) {mustBeNumeric}
+            end
+            % ---
+            if ~isfield(args,"node")
+                A = [];
+                return
+            end
+            % ---
+            A = 0;
+            for i = 1:length(obj.coil)
+                A = A + obj.coil{i}.getanode("node",args.node);
+            end
+        end
+        % -----------------------------------------------------------------
         function B = getbnode(obj,args)
             arguments
                 obj
@@ -106,6 +128,7 @@ classdef OxyCoilSystemb < Xhandle
                 B = B + obj.coil{i}.getbnode("node",args.node);
             end
         end
+        % -----------------------------------------------------------------
     end
     methods (Access = protected)
       function cpObj = copyElement(obj)
