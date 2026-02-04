@@ -11,7 +11,7 @@ tfer = 100e-3;
 tcoil = 5e-3;
 epsilon=20;
 
-nspire=1;
+nspire=2;
 nbphase=3;
 
 distance=wcoil+1e-8;
@@ -35,13 +35,15 @@ for i = 2:nspire
     spirest11(i).scale(distance, distance1);
 end
 
-figure; clf; hold on
-
-cmap = lines(nspire);                 
-for i = 1:nspire
-    spirest11(i).plot("color", cmap(i,:));
-end   
-view(2)
+% figure; clf; hold on
+% 
+% cmap = lines(nspire);                 
+% for i = 1:nspire
+%     spirest11(i).plot("color", cmap(i,:));
+% end   
+% axis off
+% 
+% view(2)
 
 
 
@@ -81,12 +83,22 @@ noyau_primaire.setup();
 
 
 
-figure
+%figure;
 %noyau_primaire.plot("color","r"); hold on
-
 %noyau_secondaire.plot("color","k"); hold on
+%plot3(noyau_primaire.dom.node(1,:),noyau_primaire.dom.node(2,:),noyau_primaire.dom.node(3,:),'k*');hold on
 
- plot3(noyau_primaire.dom.node(1,:),noyau_primaire.dom.node(2,:),noyau_primaire.dom.node(3,:),'k*');hold on
-  %plot3(noyau_primaire.dom.nodebord(1,:),noyau_primaire.dom.nodebord(2,:),noyau_primaire.dom.nodebord(3,:),'bo-');hold on
+t=tic;
 
- %view(2)
+B=noyau_primaire.getbnode;
+temps = toc(t);
+disp(temps)
+
+
+
+figure;
+
+
+
+
+f_quiver(noyau_primaire.dom.node,B);

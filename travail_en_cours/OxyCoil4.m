@@ -338,8 +338,37 @@ classdef OxyCoil4 < Xhandle
                 end
             end
             % ---
+             obj.makeimage_up;
+            for j = 1:length(obj.imagecoil_up)
+                cx = obj.imagecoil_up{j};
+                for k = 1:length(cx.turn)
+                    tx = cx.turn{k};
+                    B(:,id_up) = B(:,id_up) + tx.getbnode("node",node_up,"I",cx.I);
+                end
+            end
+            % ---
+              obj.makeimage_down;
+            for j = 1:length(obj.imagecoil_down)
+                cx = obj.imagecoil_down{j};
+                for k = 1:length(cx.turn)
+                    tx = cx.turn{k};
+                    B(:,id_do) = B(:,id_do) + tx.getbnode("node",node_down,"I",cx.I);
+                end
+            end
         end
+        
     end
+
+
+
+
+
+
+
+
+
+
+
     methods (Access = protected)
         function makeimage_in(obj)
             % ---
@@ -385,14 +414,110 @@ classdef OxyCoil4 < Xhandle
             obj.imagecoil_in = imcoil;
             % ---
         end
+
+
         function makeimage_up(obj)
-            % --- XTODO
-            obj.imagecoil_up = {};
-        end
+                obj.imagecoil_up = {};
+                nbplate = length(obj.mplate);
+                if nbplate == 0, return, end
+            
+                if nbplate == 1
+                    imorder = 1;
+                elseif nbplate == 2
+                    imorder = zeros(2, 2*obj.imagelevel);
+                    imorder(1,:) = repmat([1 2],1,obj.imagelevel);
+                    imorder(2,:) = repmat([2 1],1,obj.imagelevel);
+                end
+            
+                imcoil = {};
+                for i = 1:length(obj.mplate)
+                    imor = imorder(i,:);
+                    k = 0;
+                    for j = 1:length(imor)
+                        k = k + 1;
+            
+                        if k == 1, c0 = obj; else, c0 = imcoil{end}; end
+            
+                        zmir  = obj.mplate{imor(j)}.z;
+                        alpha = (obj.mplate{imor(j)}.mur - 1) / (obj.mplate{imor(j)}.mur + 1);
+                        alpha_dom=(obj.mplate{2}.mur - 1) / (obj.mplate{2}.mur + 1);
+                        if i == 1
+                            expo = 2*k - 1;   
+                        else
+                            expo = 2*k - 2;   
+                        end
+                        coeI = (1+alpha_dom) * alpha^expo;
+            
+                        imc = c0';
+                        imc.mplate = {};
+                        imc.zmirrow(zmir);
+                        imc.I = coeI * obj.I;
+            
+                        imcoil{end+1} = imc;
+                    end
+                end
+            
+                obj.imagecoil_up = imcoil;
+       end
+
+
+
+
+
+
+
+
+
+
         function makeimage_down(obj)
             % --- XTODO
             obj.imagecoil_down = {};
-        end
+            
+                nbplate = length(obj.mplate);
+                if nbplate == 0, return, end
+            
+                if nbplate == 1
+                    imorder = 1;
+                elseif nbplate == 2
+                    imorder = zeros(2, 2*obj.imagelevel);
+                    imorder(1,:) = repmat([2 1],1,obj.imagelevel);
+                    imorder(2,:) = repmat([1 2],1,obj.imagelevel);
+                end
+            
+                imcoil = {};
+                for i = 1:length(obj.mplate)
+                    imor = imorder(i,:);
+                    k = 0;
+                    for j = 1:length(imor)
+                        k = k + 1;
+            
+                        if k == 1, c0 = obj; else, c0 = imcoil{end}; end
+            
+                        zmir  = obj.mplate{imor(j)}.z;
+                        alpha = (obj.mplate{imor(j)}.mur - 1) / (obj.mplate{imor(j)}.mur + 1);
+                        alpha_dom=(obj.mplate{1}.mur - 1) / (obj.mplate{1}.mur + 1);
+                        if i == 1
+                            expo = 2*k - 2;   
+                        else
+                            expo = 2*k - 1;   
+                        end
+                        coeI = (1+alpha_dom) * alpha^expo;
+                        
+            
+                        imc = c0';
+                        imc.mplate = {};
+                        imc.zmirrow(zmir);
+                        imc.I = coeI * obj.I;
+            
+                        imcoil{end+1} = imc;
+                    end
+                end
+            
+                obj.imagecoil_down = imcoil;
+      end
+
+
+
         function [zdown, zup] = zmplate(obj)
             z = [];
             for i = 1:length(obj.mplate)

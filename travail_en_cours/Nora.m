@@ -47,8 +47,8 @@ Yd=[var2+R_left*sin(pi/2+teta/2) (R_out-Radius)*sin(teta_out) var2+R_right*sin(p
 Xr = Xd.*cos(2*pi/3)+Yd.*sin(2*pi/3);
 Yr = -Xd.*sin(2*pi/3)+Yd.*cos(2*pi/3); 
 
-%Xd = Xr;
-%Yd = Yr;
+Xd = Xr;
+Yd = Yr;
 
 % suppression doublons
 
@@ -100,8 +100,8 @@ mu0=4*pi*1e-7;
 Ltotal=L+len*mu0/(8*pi);
 
 %%
-dl=[(xdf+xdi)./2; (ydf+ydi)./2; (zdf+zdi)./2];
-figure
-f_quiver(dl,A)
-
+% dl=[(xdf+xdi)./2; (ydf+ydi)./2; (zdf+zdi)./2];
+% figure
+% f_quiver(dl,A)
+% % 
 
