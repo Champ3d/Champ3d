@@ -16,7 +16,10 @@ nbphase=3;
 
 distance=wcoil+1e-8;
 distance1=wcoil+1e-8;
-
+alpha=1.32;
+beta=2;
+kappa=6.47;
+fr=1000;
 close all;
 
 
@@ -75,7 +78,7 @@ end
 transmetteur = OxyCoilSystem(); 
 transmetteur.add_coil(coilarray);
 
-noyau_primaire=OxyMplate("center",[0 0],"z1",-dfer-tcoil/2,"z2",-dfer-tcoil/2-tfer ,"r",2*ro,"epaisseur",tfer,"coilsystem",transmetteur,"mur",1000);
+noyau_primaire=OxyMplate("center",[0 0],"z1",-dfer-tcoil/2,"z2",-dfer-tcoil/2-tfer ,"r",2*ro,"epaisseur",tfer,"coilsystem",transmetteur,"mur",1000,"alpha",alpha,"beta",beta,"kappa",kappa,"fr",fr);
 noyau_secondaire=noyau_primaire';
 noyau_secondaire.z1=tcoil/2+agap+tcoil+dfer;
 noyau_secondaire.z2=tcoil/2+agap+tcoil+dfer+tfer;
@@ -97,8 +100,9 @@ disp(temps)
 
 
 figure;
-
-
-
-
 f_quiver(noyau_primaire.dom.node,B);
+
+
+any(isnan(B),'all')
+[row, col] = find(isnan(B));
+

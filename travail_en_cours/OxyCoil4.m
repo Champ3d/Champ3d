@@ -105,6 +105,9 @@ classdef OxyCoil4 < Xhandle
                 obj.turn{i}.setup;
             end
             % ---
+            obj.makeimage_in;
+            obj.makeimage_up;
+            obj.makeimage_down;
         end
         % ---
         function plot(obj,args)
@@ -338,7 +341,7 @@ classdef OxyCoil4 < Xhandle
                 end
             end
             % ---
-             obj.makeimage_up;
+            
             for j = 1:length(obj.imagecoil_up)
                 cx = obj.imagecoil_up{j};
                 for k = 1:length(cx.turn)
@@ -347,7 +350,7 @@ classdef OxyCoil4 < Xhandle
                 end
             end
             % ---
-              obj.makeimage_down;
+             
             for j = 1:length(obj.imagecoil_down)
                 cx = obj.imagecoil_down{j};
                 for k = 1:length(cx.turn)
@@ -356,7 +359,7 @@ classdef OxyCoil4 < Xhandle
                 end
             end
         end
-        
+
     end
 
 
@@ -419,7 +422,9 @@ classdef OxyCoil4 < Xhandle
         function makeimage_up(obj)
                 obj.imagecoil_up = {};
                 nbplate = length(obj.mplate);
-                if nbplate == 0, return, end
+                if nbplate == 0
+                    return
+                end
             
                 if nbplate == 1
                     imorder = 1;
@@ -474,7 +479,9 @@ classdef OxyCoil4 < Xhandle
             obj.imagecoil_down = {};
             
                 nbplate = length(obj.mplate);
-                if nbplate == 0, return, end
+                if nbplate == 0
+                    return
+                end
             
                 if nbplate == 1
                     imorder = 1;

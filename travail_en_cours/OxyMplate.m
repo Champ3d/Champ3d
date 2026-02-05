@@ -25,6 +25,10 @@ classdef  OxyMplate < Xhandle
         epaisseur =1e-6
         coilsystem= OxyCoilSystem()
         mur=1000
+        alpha=1.32
+        beta=2
+        kappa=6.47
+        fr
         % ---
         dom
     end
@@ -52,7 +56,11 @@ classdef  OxyMplate < Xhandle
                 args.r {mustBePositive}    = 1e-4
                 args.epaisseur {mustBePositive} = 1e-6
                 args.coilsystem  OxyCoilSystem = OxyCoilSystem()       
-                args.mur {mustBePositive}    = 1000    
+                args.mur {mustBePositive}    = 1000  
+                args.alpha {mustBePositive}    = 1.32  
+                args.beta {mustBePositive}    = 2 
+                args.kappa {mustBePositive}    = 6.47  
+                args.fr {mustBePositive}    = 1000  
             end
             % ---
             obj@Xhandle;
@@ -66,6 +74,10 @@ classdef  OxyMplate < Xhandle
             obj.epaisseur = args.epaisseur;
             obj.coilsystem = args.coilsystem;
             obj.mur=args.mur;
+            obj.alpha=args.alpha;
+            obj.beta=args.beta;
+            obj.kappa=args.kappa;
+            obj.fr=args.fr;
             % ---
         end
     end
@@ -133,7 +145,7 @@ classdef  OxyMplate < Xhandle
   methods
      
 
-         function  B = getbnode(obj)
+      function  B = getbnode(obj)
               arguments
                 obj
        
@@ -143,6 +155,19 @@ classdef  OxyMplate < Xhandle
             for i = 1:length(obj.coilsystem.coil)
                 B = B + obj.coilsystem.coil{i}.getbnode("node",obj.dom.node);
             end
+
+         end
+
+
+
+
+         function perte=getperte(obj)
+            
+             B=obj.getbnode;
+             V = obj.dom.volume(:).';   
+             cst=(obj.kappa*obj.fr^(obj.alpha));
+             p = cst * sum(abs(B).^obj.beta, 1);
+             perte = sum(p .* V); 
 
          end
 
