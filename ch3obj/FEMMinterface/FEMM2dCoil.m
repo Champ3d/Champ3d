@@ -24,6 +24,7 @@ classdef FEMM2dCoil < Xhandle
         id_wire
         id_circuit = []
         nb_turn = 1
+        pole = 1
         % ---
         i
         j
