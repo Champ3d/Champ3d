@@ -76,6 +76,9 @@ classdef OxyCoilSystem < Xhandle
     % ---
     methods
         function L = getL(obj)
+            % ---
+            obj.setup;
+            % ---
             nbcoil = length(obj.coil);
             L = zeros(nbcoil,nbcoil);
             for i = 1:nbcoil
@@ -96,6 +99,8 @@ classdef OxyCoilSystem < Xhandle
                 B = [];
                 return
             end
+            % ---
+            obj.setup;
             % ---
             B = 0;
             for i = 1:length(obj.coil)

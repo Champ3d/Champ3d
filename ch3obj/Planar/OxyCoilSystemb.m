@@ -106,6 +106,8 @@ classdef OxyCoilSystemb < Xhandle
                 return
             end
             % ---
+            obj.setup;
+            % ---
             A = 0;
             for i = 1:length(obj.coil)
                 A = A + obj.coil{i}.getanode("node",args.node);
@@ -122,6 +124,8 @@ classdef OxyCoilSystemb < Xhandle
                 B = [];
                 return
             end
+            % ---
+            obj.setup;
             % ---
             B = 0;
             for i = 1:length(obj.coil)
