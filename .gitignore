@@ -1,23 +1,69 @@
-# matlab
+### MATLAB ###
 *.mat
 *.~m
 *.~*
 *.asv
+*.m~
+*.mex*
+*.mlappinstall
+*.mltbx
+helpsearch*/
+slprj/
+sccprj/
+codegen/
+*.autosave
+*.slxc
+octave-workspace
 
-# mac
-*.DS_Store
-*.Lnk
-*alias
-
-# femm
+### FEMM ###
 *.ans
 *.fem
 
-# others
+### others ###
 *.bin
 
 # ignore all files in directory
 temp/
 private/
-inwork/
-hkb/
+workspace/x__*.m
+workspace/X__*.m
+workspace/**/x__*.m
+workspace/**/X__*.m
+
+### macOS ###
+.DS_Store
+.AppleDouble
+.LSOverride
+*.Lnk
+*alias
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+*.icloud
+
+
+### Windows ###
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
