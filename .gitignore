@@ -25,10 +25,10 @@ octave-workspace
 # ignore all files in directory
 temp/
 private/
-workspace/x__*.m
-workspace/X__*.m
-workspace/**/x__*.m
-workspace/**/X__*.m
+workspace/x__*
+workspace/X__*
+workspace/**/x__*
+workspace/**/X__*
 
 ### macOS ###
 .DS_Store
