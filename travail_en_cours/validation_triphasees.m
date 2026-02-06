@@ -105,12 +105,10 @@ m2d.refine([2 3 4]);
 %% mesh1d in z
 m1d_z = Mesh1d();
 % ---
-% msize1 = 4;
-% msize2 = 5;
-% msize3 = 8;
-msize1 = 2;
-msize2 = 2;
-msize3 = 2;
+ msize1 = 4;
+msize2 = 4;
+ msize3 = 4;
+
 
 m1d_z.add_line1d("id","zabox_b" ,"len",agap,"dnum",msize3,"dtype","log-");
 m1d_z.add_line1d("id","ziron_b" ,"len",tfer,"dnum",msize1,"dtype","log-");
@@ -169,9 +167,9 @@ m3d.add_vdom("id","coilr3",...
 %              "id_dom2d",{"ro","iron1"},...
 %              "id_zline",{"zcoil_b"});
 %%
-% figure
+ figure
 % %m3d.plot("face_color","none");
-% m3d.dom.coilt1.plot("face_color",f_color(1));
+ m3d.dom.coilt1.plot("face_color",f_color(1));
 % m3d.dom.coilt2.plot("face_color",f_color(2));
 % m3d.dom.coilt3.plot("face_color",f_color(3));
 % m3d.dom.iron.plot("face_color",f_color(4));
@@ -188,7 +186,7 @@ em_t = FEM3dAphijw('parent_mesh',m3d,"frequency",0);
 
 % --- Physical dom
 
-%em_t.add_mconductor("id","iron","id_dom3d","iron","mur",mur);
+em_t.add_mconductor("id","iron","id_dom3d","iron","mur",mur);
 % ---
 coilt1 = StrandedCloseJsCoil("parent_model",em_t,"id_dom3d","coilt1","cs_area",cs_area,...
                            "spin_vector",[0 0 1],"nb_turn",nb_turn, ...

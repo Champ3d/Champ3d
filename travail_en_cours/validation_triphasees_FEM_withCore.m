@@ -161,13 +161,13 @@ m3d.add_vdom("id","coilr3",...
 %              "id_dom2d",{"ro","iron1"},...
 %              "id_zline",{"zcoil_b"});
 %%
-% figure
-% %m3d.plot("face_color","none");
-% m3d.dom.coilt1.plot("face_color",f_color(1));
-% m3d.dom.coilt2.plot("face_color",f_color(2));
+figure
+%m3d.plot("face_color","none");
+m3d.dom.coilr1.plot("face_color",f_color(1));
+m3d.dom.coilt1.plot("face_color",f_color(2));
 % m3d.dom.coilt3.plot("face_color",f_color(3));
 % m3d.dom.iron.plot("face_color",f_color(4));
-
+return;
 %%
 I1 = 1;
 nb_turn = 1;
