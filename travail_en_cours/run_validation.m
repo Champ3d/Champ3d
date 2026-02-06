@@ -1,3 +1,0 @@
-validation_triphasees_FEM_noCore;
-validation_triphasees_FEM_withCore;
-validation_triphasees_FEM_withCore_2;
