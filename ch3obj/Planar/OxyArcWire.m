@@ -125,6 +125,10 @@ classdef OxyArcWire < Xhandle
             c1 = (obj.r + rho).^2 + dz.^2;
             c2 = (obj.r).^2 + rho.^2 + dz.^2;
             m  = 4*obj.r.*rho ./ c1;
+            % --- m must be in (0,1)
+            m(m >= 1-1e-6) = 1-1e-6;
+            m(m <= 1e-6) = 1e-6;
+            % ---
             aph1_ = (obj.phi1/180*pi - phi - pi)./2;
             aph2_ = (obj.phi2/180*pi - phi - pi)./2;
             % ---

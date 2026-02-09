@@ -130,6 +130,9 @@ classdef OxyStraightWire < Xhandle
             u  = lnode(2,:);
             v  = lnode(3,:);
             a2 = u.^2 + v.^2;
+            % --- a2 must be > 0
+            a2(a2 <= 1e-9) = 1e-9;
+            % ---
             lenP1P2 = norm(obj.P2-obj.P1);
             w1 = - lnode(1,:);
             w2 = lenP1P2 - lnode(1,:);
