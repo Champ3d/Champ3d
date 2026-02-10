@@ -1,5 +1,5 @@
 
-close all
+%close all
 clear all
 clc
 
@@ -10,11 +10,11 @@ ri = 100e-3;
 ro = 750e-3/2;
 mu0 = 4*pi*1e-7;
 wcoil = 0.1e-3;
-agap = 5e-3;
+agap = 200e-3;
 dfer = 5e-3; % distance coil-ferrite
 mur = 1000;
 % ---
-tfer = 200e-3;
+tfer = 20e-3;
 tcoil = wcoil;
 % --- save
 dataAN.I1 = I1;
@@ -51,7 +51,7 @@ save dataAN dataAN;
 
 %%
 figure
-for ilevel = 1:4:40
+for ilevel = 5
     coil1 = OxyCoil4("I",I1,"imagelevel",ilevel);
     coil1.add_turn(turn11);
     coil1.add_turn(turn12);

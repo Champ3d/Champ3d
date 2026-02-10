@@ -16,26 +16,37 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-%close all
+close all
 clear all
 clc
 
-load dataAN.mat
+
+
+l_coef = unique([linspace(1,2,20) linspace(2,5,20)]);
+nbTest = length(l_coef);
+flux = zeros(4,nbTest);
+
+for itest = 1:nbTest
 
 %% Data
-% --- 
-Tx_nb_turn = 2;
-Tx_I = dataAN.I1;
-Tx_r_in = 5e-3; 
-Tx_r_ex = dataAN.ro;
-Tx_agap = dataAN.dfer;  % coil and ferrite
-Tx_fer_r_in = Tx_r_in;
-l_coef = 1.1;
-Tx_fer_r_ex = l_coef*Tx_r_ex;
-Tx_fer_t    = dataAN.tfer;
+ro = 300e-3;
+ri = 50e-3;
 % ---
-Rx_nb_turn = 2;
-Rx_I = dataAN.I2;
+% radius of the each bundle (group of strands)
+Tx_wire_rBundle  = 5e-3;
+Rx_wire_rBundle  = 5e-3;
+% ---
+Tx_nb_turn = 2;
+Tx_I = 0;
+Tx_r_in = 5e-3; 
+Tx_r_ex = ro;
+Tx_agap = 5e-3;  % coil and ferrite
+Tx_fer_r_in = Tx_r_in;
+Tx_fer_r_ex = Tx_wire_rBundle + l_coef(itest)*Tx_r_ex;
+Tx_fer_t    = 20e-3;
+% ---
+Rx_nb_turn = Tx_nb_turn;
+Rx_I = 0;
 Rx_r_in = Tx_r_in;
 Rx_r_ex = Tx_r_ex; %
 Rx_agap = Tx_agap;  % coil and ferrite
@@ -43,7 +54,7 @@ Rx_fer_r_in = Tx_fer_r_in;
 Rx_fer_r_ex = Tx_fer_r_ex;
 Rx_fer_t    = Tx_fer_t;
 % ---
-airgap = dataAN.agap;   % airgap between Tx and Rx (coil to coil)
+airgap = 200e-3;   % airgap between Tx and Rx (coil to coil)
 % ---
 sigmaCu = 5.8e7;
 murFerrite  = 1000;
@@ -54,17 +65,13 @@ phi_hy = phi_hx;
 fr = 0; % frequency
 %% Derived parameters
 % ---
-% radius of the each bundle (group of strands)
-Tx_wire_rBundle  = dataAN.wcoil;
-Rx_wire_rBundle  = dataAN.wcoil;
-% ---
 Tx_wire_diameter = 71e-6; % for Litz wire if needed
 Tx_wire_nbStrand = floor(pi*Tx_wire_rBundle^2 / (pi*Tx_wire_diameter^2/4)); % for Litz wire if needed
 Rx_wire_diameter = 71e-6; % for Litz wire if needed
 Rx_wire_nbStrand = floor(pi*Rx_wire_rBundle^2 / (pi*Rx_wire_diameter^2/4)); % for Litz wire if needed
 % ---
-Tx_d = dataAN.ro - dataAN.ri;  % distance between turns
-Rx_d = dataAN.ro - dataAN.ri;  % distance between turns
+Tx_d = ro - ri;  % distance between turns
+Rx_d = ro - ri;  % distance between turns
 % ---
 if (Tx_d < 0) || (Rx_d < 0)
     error('Impossible distance between turns');
@@ -93,8 +100,14 @@ mat.Litzwire = FEMM2dWire('wire_type','no_loss',...
     'sigma',0,'nb_strand',Tx_wire_nbStrand,'wire_diameter',Tx_wire_diameter);
 
 % --- Circuit list
-cir.Tx_phase_1 = FEMM2dCircuit('i',Tx_I,'turn_connexion','series');
-cir.Rx_phase_1 = FEMM2dCircuit('i',Rx_I,'turn_connexion','series');
+for i = 1:Tx_nb_turn
+    cirname = ['Tx_phase_' num2str(i)];
+    cir.(cirname) = FEMM2dCircuit('i',0,'turn_connexion','series');
+end
+for i = 1:Rx_nb_turn
+    cirname = ['Rx_phase_' num2str(i)];
+    cir.(cirname) = FEMM2dCircuit('i',0,'turn_connexion','series');
+end
 
 % --- BC (boundary condition) list
 bc.A0    = FEMM2dBCfixedA('a0',0);
@@ -126,7 +139,7 @@ for i = 1:Tx_nb_turn
     draw.Tx_coil{i} = FEMM2dCircle(...
         'ref_point',[Tx_r_ex, -(airgap/2 + Tx_wire_rBundle)],...
         'cen_x',-d2nextTurn,'cen_y',0,...
-        'r',Tx_wire_rBundle,'max_angle_len',2);
+        'r',Tx_wire_rBundle,'max_angle_len',10);
 end
 % ---
 for i = 1:Rx_nb_turn
@@ -134,7 +147,7 @@ for i = 1:Rx_nb_turn
     draw.Rx_coil{i} = FEMM2dCircle(...
         'ref_point',[Tx_r_ex, +(airgap/2 + Rx_wire_rBundle)],...
         'cen_x',-d2nextTurn,'cen_y',0,...
-        'r',Rx_wire_rBundle,'max_angle_len',2);
+        'r',Rx_wire_rBundle,'max_angle_len',10);
 end
 
 %% Build FEMM model
@@ -156,18 +169,30 @@ WPT_CirCoil.add_bc('id_bc','open','bc',bc.open);
 WPT_CirCoil.add_bc('id_bc','symm','bc',bc.dAdn0);
 
 % --- add circuit
-WPT_CirCoil.add_circuit('id_circuit','Tx_phase_1','circuit',cir.Tx_phase_1);
-WPT_CirCoil.add_circuit('id_circuit','Rx_phase_1','circuit',cir.Rx_phase_1);
+for i = 1:Tx_nb_turn
+    id_circ = ['Tx_phase_' num2str(i)];
+    cirname = ['Tx_phase_' num2str(i)];
+    WPT_CirCoil.add_circuit('id_circuit',id_circ,'circuit',cir.(cirname));
+end
+for i = 1:Rx_nb_turn
+    id_circ = ['Rx_phase_' num2str(i)];
+    cirname = ['Rx_phase_' num2str(i)];
+    WPT_CirCoil.add_circuit('id_circuit',id_circ,'circuit',cir.(cirname));
+end
 
 % --- add coil
-WPT_CirCoil.add_iscoil('id_coil','TxCoil_1','id_circuit','Tx_phase_1',...
+for i = 1:Tx_nb_turn
+    id_coil = ['TxCoil_' num2str(i)];
+    cirname = ['Tx_phase_' num2str(i)];
+    WPT_CirCoil.add_iscoil('id_coil',id_coil,'id_circuit',cirname,...
     'id_wire','Litzwire','nb_turn',1,'pole',+1);
-WPT_CirCoil.add_iscoil('id_coil','RxCoil_1','id_circuit','Rx_phase_1',...
+end
+for i = 1:Rx_nb_turn
+    id_coil = ['RxCoil_' num2str(i)];
+    cirname = ['Rx_phase_' num2str(i)];
+    WPT_CirCoil.add_iscoil('id_coil',id_coil,'id_circuit',cirname,...
     'id_wire','Litzwire','nb_turn',1,'pole',+1);
-WPT_CirCoil.add_iscoil('id_coil','TxCoil_2','id_circuit','Tx_phase_1',...
-    'id_wire','Litzwire','nb_turn',1,'pole',-1);
-WPT_CirCoil.add_iscoil('id_coil','RxCoil_2','id_circuit','Rx_phase_1',...
-    'id_wire','Litzwire','nb_turn',1,'pole',-1);
+end
 
 % --- add draw
 WPT_CirCoil.add_draw('id_draw','Tx_fer','draw',draw.Tx_fer);
@@ -193,16 +218,16 @@ WPT_CirCoil.set_dom('id_dom','airbox','id_material','air',...
                      'choosed_by','top');
 WPT_CirCoil.set_dom('id_dom','fine_mesh','id_material','air',...
                      'id_draw','fine_mesh',...
-                     'choosed_by','center','mesh_size',5e-3);
+                     'choosed_by','center','mesh_size',10e-3);
 % ---
 WPT_CirCoil.set_dom('id_dom','Tx_fer','id_material','ferrite',...
                      'id_draw','Tx_fer',...
                      'choosed_by','center',...
-                     'mesh_size',5e-3);
+                     'mesh_size',10e-3);
 WPT_CirCoil.set_dom('id_dom','Rx_fer','id_material','ferrite',...
                      'id_draw','Rx_fer',...
                      'choosed_by','center',...
-                     'mesh_size',5e-3);
+                     'mesh_size',10e-3);
 % ---
 for i = 1:Tx_nb_turn
     id_turn = ['Tx_coil_turn_' num2str(i)];
@@ -228,31 +253,47 @@ WPT_CirCoil.set_bound('id_bound','open','id_bc','open',...
 
 
 % --- solve
-WPT_CirCoil.circuit.Tx_phase_1.i = dataAN.I1;
-WPT_CirCoil.circuit.Rx_phase_1.i = dataAN.I2;
+WPT_CirCoil.circuit.Tx_phase_2.i = 1;
 WPT_CirCoil.solve;
 WPT_CirCoil.getdata;
 
-% ---
-WPT_CirCoil.circuit.Tx_phase_1.get_quantity
-WPT_CirCoil.circuit.Tx_phase_1.quantity
-WPT_CirCoil.circuit.Rx_phase_1.get_quantity
-WPT_CirCoil.circuit.Rx_phase_1.quantity
+%%
+for i = 1:Tx_nb_turn
+    id_circ = ['Tx_phase_' num2str(i)];
+    WPT_CirCoil.circuit.(id_circ).get_quantity;
+    flux(i,itest) = WPT_CirCoil.circuit.(id_circ).quantity.flux_linkage;
+end
+for i = 1:Rx_nb_turn
+    id_circ = ['Rx_phase_' num2str(i)];
+    WPT_CirCoil.circuit.(id_circ).get_quantity;
+    flux(i+2,itest) = WPT_CirCoil.circuit.(id_circ).quantity.flux_linkage;
+end
 
 %%
-nbp = 100;
-px  = linspace(0,2*dataAN.ro,nbp);
-% ---
-py  = -(airgap/2 + Tx_wire_rBundle) .* ones(1,nbp);
-AFEM_01 = mo_geta(px,py);
-AFEM_01 = AFEM_01./(2*pi.*px.');
-% ---
-py  = +(airgap/2 + Rx_wire_rBundle) .* ones(1,nbp);
-% py  = 0 .* ones(1,nbp);
-AFEM_02 = mo_geta(px,py);
-AFEM_02 = AFEM_02./(2*pi.*px.');
+
+end
+
+% save X_ISSUE_FEM2d_V5a_ex_to_in_ri50 l_coef flux
+save X_ISSUE_FEM2d_V5a_in_to_ex_ri50 l_coef flux
+
+return
 %%
 figure
-plot(px, AFEM_01, "bo", "LineWidth", 2, "DisplayName", ['(FEM2d): Lfer = ' num2str(l_coef) ' * r_ex']); hold on
-plot(px, AFEM_02, "ro", "LineWidth", 2, "DisplayName", ['(FEM2d): Lfer = ' num2str(l_coef) ' * r_ex']); hold on
-legend;
+plot(l_coef,flux(1,:),'DisplayName','Tx-ex-coil'); hold on
+plot(l_coef,flux(2,:),'DisplayName','Tx-in-coil');
+plot(l_coef,flux(3,:),'DisplayName','Rx-ex-coil');
+plot(l_coef,flux(4,:),'DisplayName','Rx-in-coil');
+
+%%
+figure
+plot(l_coef,flux(1,:)./flux(1,end),'DisplayName','Tx-ex-coil'); hold on
+plot(l_coef,flux(2,:)./flux(2,end),'DisplayName','Tx-in-coil');
+plot(l_coef,flux(3,:)./flux(3,end),'DisplayName','Rx-ex-coil');
+plot(l_coef,flux(4,:)./flux(4,end),'DisplayName','Rx-in-coil');
+
+
+
+
+
+
+
