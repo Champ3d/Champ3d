@@ -253,7 +253,11 @@ WPT_CirCoil.set_bound('id_bound','open','id_bc','open',...
 
 
 % --- solve
-WPT_CirCoil.circuit.Tx_phase_2.i = 1;
+WPT_CirCoil.circuit.Tx_phase_1.i = 1;
+% WPT_CirCoil.circuit.Tx_phase_2.i = 1;
+% WPT_CirCoil.circuit.Rx_phase_1.i = 1;
+% WPT_CirCoil.circuit.Rx_phase_2.i = 1;
+
 WPT_CirCoil.solve;
 WPT_CirCoil.getdata;
 
