@@ -51,7 +51,7 @@ save dataAN dataAN;
 
 %%
 figure
-for ilevel = 5
+for ilevel = 1:10
     coil1 = OxyCoil4("I",I1,"imagelevel",ilevel);
     coil1.add_turn(turn11);
     coil1.add_turn(turn12);
