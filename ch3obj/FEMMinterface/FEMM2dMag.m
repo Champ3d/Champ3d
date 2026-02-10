@@ -584,6 +584,35 @@ classdef FEMM2dMag < Xhandle
             % ---
         end
         % -----------------------------------------------------------------
+        function A = getA(obj,node)
+            % ---
+            try
+                mi_loadsolution;
+            catch
+                obj.open;
+            end
+            % ---
+            A = mo_geta(node(1,:),node(2,:));
+            % ---
+            if f_strcmpi(obj.problem_type,'axi')
+                A = A./(2*pi.*node(1,:).');
+            end
+            % ---
+        end
+        % -----------------------------------------------------------------
+        function B = getB(obj,node)
+            % ---
+            try
+                mi_loadsolution;
+            catch
+                obj.open;
+            end
+            % ---
+            B = mo_getb(node(1,:),node(2,:));
+            B = B.';
+            % ---
+        end
+        % -----------------------------------------------------------------
     end
     % --- Methods/protected
     methods (Access = protected)
