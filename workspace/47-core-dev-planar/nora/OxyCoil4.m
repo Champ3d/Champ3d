@@ -332,7 +332,7 @@ classdef OxyCoil4 < Xhandle
                 B(:,id_in) = B(:,id_in) + tx.getbnode("node",node_in,"I",obj.I);
             end
             % ---
-            obj.makeimage_in;
+          
             for j = 1:length(obj.imagecoil_in)
                 cx = obj.imagecoil_in{j};
                 for k = 1:length(cx.turn)
@@ -441,7 +441,11 @@ classdef OxyCoil4 < Xhandle
                     for j = 1:length(imor)
                         k = k + 1;
             
-                        if k == 1, c0 = obj; else, c0 = imcoil{end}; end
+                        if k == 1
+                            c0 = obj;
+                        else
+                            c0 = imcoil{end};
+                        end
             
                         zmir  = obj.mplate{imor(j)}.z;
                         alpha = (obj.mplate{imor(j)}.mur - 1) / (obj.mplate{imor(j)}.mur + 1);
@@ -498,7 +502,11 @@ classdef OxyCoil4 < Xhandle
                     for j = 1:length(imor)
                         k = k + 1;
             
-                        if k == 1, c0 = obj; else, c0 = imcoil{end}; end
+                        if k == 1 
+                            c0 = obj;
+                        else 
+                            c0 = imcoil{end};
+                        end
             
                         zmir  = obj.mplate{imor(j)}.z;
                         alpha = (obj.mplate{imor(j)}.mur - 1) / (obj.mplate{imor(j)}.mur + 1);

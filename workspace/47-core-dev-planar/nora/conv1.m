@@ -48,15 +48,20 @@ end
 % 
 % view(2)
 
+z1=-dfer-tcoil/2;
+z2=tcoil/2+agap+tcoil+dfer;
+taille=z2+tfer;
 
+epsilon=4*max(taille,ro);
 
-coilt1 = OxyCoil4("I",1,"imagelevel",1);
+k=foundk(epsilon,z1,z2);
+coilt1 = OxyCoil4("I",1,"imagelevel",4);
 for i=1:nspire
 coilt1.add_turn(spirest11(i));
 
 end
-coilt1.add_mplate("z",-dfer-tcoil/2,"mur",mur);
-coilt1.add_mplate("z",tcoil/2+agap+tcoil+dfer,"mur",mur);
+coilt1.add_mplate("z",z1,"mur",mur);
+coilt1.add_mplate("z",z2,"mur",mur);
 coilt1.setup;
 
 
@@ -77,36 +82,4 @@ end
 
 transmetteur = OxyCoilSystem(); 
 transmetteur.add_coil(coilarray);
-
-noyau_primaire=OxyMplate("center",[0 0],"z1",-dfer-tcoil/2,"z2",-dfer-tcoil/2-tfer ,"r",2*ro,"epaisseur",tfer,"coilsystem",transmetteur,"mur",1000,"alpha",alpha,"beta",beta,"kappa",kappa,"fr",fr);
-noyau_secondaire=noyau_primaire';
-noyau_secondaire.z1=tcoil/2+agap+tcoil+dfer;
-noyau_secondaire.z2=tcoil/2+agap+tcoil+dfer+tfer;
-noyau_primaire.setup();
-
-
-
-figure;
-%noyau_primaire.plot("color","r"); hold on
-%noyau_secondaire.plot("color","k"); hold on
-plot3(noyau_primaire.dom.node(1,:),noyau_primaire.dom.node(2,:),noyau_primaire.dom.node(3,:),'k*');hold on
-
-t=tic;
-
-B=noyau_primaire.getbnode;
-temps = toc(t);
-disp(temps)
-
-
-
-figure;
-f_quiver(noyau_primaire.dom.node,B);
-
-
-any(isnan(B),'all')
-[row, col] = find(isnan(B));
-col = unique(col);
-P = noyau_primaire.dom.node(:,col);
-r = sqrt(sum(P(1:2,:).^2,1));
-[min(r) max(r)]
-
+transmetteur.getL

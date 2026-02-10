@@ -162,6 +162,8 @@ classdef OxyTurnT00b < OxyTurn
                 B = [];
                 return
             end
+             mask = abs(args.node(3,:) - obj.z) <= 1e-6;
+             args.node(3, mask) = args.node(3, mask) + 5e-6;
             % ---
             B = 0;
             for i = 1:length(obj.wire)
