@@ -43,8 +43,8 @@ classdef  OxyMplate < Xhandle
     end
     properties (Hidden)
         rnum = 30
-        anum = 50
-        znum= 50
+        anum = 30
+        znum= 5
     end
     % --- Constructors
     methods

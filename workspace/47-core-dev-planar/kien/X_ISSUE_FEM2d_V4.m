@@ -30,7 +30,7 @@ Tx_r_in = 5e-3;
 Tx_r_ex = dataAN.ro;
 Tx_agap = dataAN.dfer;  % coil and ferrite
 Tx_fer_r_in = Tx_r_in;
-l_coef = 1.1;
+l_coef = 10;
 Tx_fer_r_ex = l_coef*Tx_r_ex;
 Tx_fer_t    = dataAN.tfer;
 % ---
@@ -46,7 +46,7 @@ Rx_fer_t    = Tx_fer_t;
 airgap = dataAN.agap;   % airgap between Tx and Rx (coil to coil)
 % ---
 sigmaCu = 5.8e7;
-murFerrite  = 1000;
+murFerrite  = dataAN.mur;
 sigmaFerrite = 0;
 phi_hx = 0.7346;
 phi_hy = phi_hx;
@@ -243,16 +243,24 @@ WPT_CirCoil.circuit.Rx_phase_1.quantity
 nbp = 100;
 px  = linspace(0,2*dataAN.ro,nbp);
 % ---
-py  = -(airgap/2 + Tx_wire_rBundle) .* ones(1,nbp);
+py  = -(airgap/2 + 2*Tx_wire_rBundle + Tx_agap + Tx_fer_t/2) .* ones(1,nbp);
 AFEM_01 = mo_geta(px,py);
 AFEM_01 = AFEM_01./(2*pi.*px.');
+BFEM_01 = mo_getb(px,py);
 % ---
-py  = +(airgap/2 + Rx_wire_rBundle) .* ones(1,nbp);
+py  = +(airgap/2 + 2*Rx_wire_rBundle + Rx_agap + Rx_fer_t/2) .* ones(1,nbp);
 % py  = 0 .* ones(1,nbp);
 AFEM_02 = mo_geta(px,py);
 AFEM_02 = AFEM_02./(2*pi.*px.');
+BFEM_02 = mo_getb(px,py);
 %%
 figure
 plot(px, AFEM_01, "bo", "LineWidth", 2, "DisplayName", ['(FEM2d): Lfer = ' num2str(l_coef) ' * r_ex']); hold on
 plot(px, AFEM_02, "ro", "LineWidth", 2, "DisplayName", ['(FEM2d): Lfer = ' num2str(l_coef) ' * r_ex']); hold on
+legend;
+
+%%
+figure
+plot(px, vecnorm(BFEM_01.'), "bo", "LineWidth", 2, "DisplayName", ['(FEM2d): Lfer = ' num2str(l_coef) ' * r_ex']); hold on
+plot(px, vecnorm(BFEM_02.'), "ro", "LineWidth", 2, "DisplayName", ['(FEM2d): Lfer = ' num2str(l_coef) ' * r_ex']); hold on
 legend;
