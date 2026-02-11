@@ -27,7 +27,7 @@ nbp = 100;
 px  = linspace(0,2*ro,nbp);
 
 l_coef = unique([linspace(1,2,20) linspace(2,5,20)]);
-nbTest = length(l_coef);
+nbTest = 5;%length(l_coef);
 flux = zeros(4,nbTest);
 
 BFEM_01 = zeros(nbTest,2,nbp);
