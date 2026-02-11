@@ -23,7 +23,7 @@ classdef  OxyMplate < Xhandle
         z2=0
         r = 1e-4
         epaisseur =1e-6
-        coilsystem= OxyCoilSystem()
+        coilsystem 
         mur=1000
         alpha=1.32
         beta=2
@@ -55,7 +55,7 @@ classdef  OxyMplate < Xhandle
                 args.z2 {mustBeNumeric}      = 0
                 args.r {mustBePositive}    = 1e-4
                 args.epaisseur {mustBePositive} = 1e-6
-                args.coilsystem  OxyCoilSystem = OxyCoilSystem()       
+                args.coilsystem  {mustBeA(args.coilsystem,{'OxyCoilSystem','OxyCoilSystemb'})}
                 args.mur {mustBePositive}    = 1000  
                 args.alpha {mustBePositive}    = 1.32  
                 args.beta {mustBePositive}    = 2 

@@ -1,4 +1,4 @@
-close all
+%close all
 clear all
 clc
 
@@ -9,7 +9,7 @@ ri = 100e-3;
 ro = 750e-3/2;
 mu0 = 4*pi*1e-7;
 wcoil = 0.1e-3;
-agap = 100e-3;
+agap = 200e-3;
 dfer = 5e-3; % distance coil-ferrite
 mur = 1000;
 alpha=1.32;
@@ -20,7 +20,7 @@ fr=1000;
 % ---
 tfer = 20e-3;
 tcoil = wcoil;
-coeff=10;
+coeff=2;
 Rnoyau=coeff*ro;
 z1=-dfer-tcoil/2;
 z2=tcoil/2+agap+tcoil+dfer;
@@ -72,7 +72,7 @@ k=foundk(epsilon,z1,z2);
  coil1.add_mplate("z",z2,"mur",mur);
  coil1.setup;
     % ---
- coilsystem = OxyCoilSystem(); 
+ coilsystem = OxyCoilSystemb(); 
  coilsystem.add_coil(coil1);
 
 
@@ -90,29 +90,35 @@ noyau_primaire.setup();
 %plot3(noyau_primaire.dom.node(1,:),noyau_primaire.dom.node(2,:),noyau_primaire.dom.node(3,:),'k*');hold on
 
 %%
-N = 400;
+N = 200;
 
 Rline = noyau_primaire.r;
 zmid=(noyau_primaire.z1+noyau_primaire.z2)/2;
 x = linspace(0, Rline, N);
 node_x = [x +  noyau_primaire.center(1); 0*x +  noyau_primaire.center(2); zmid*ones(1,N)];
-B_xline = coil1.getbnode("node", node_x); 
 
+B_xline = coil1.getbnode("node", node_x); 
+B_xline2 = coilsystem.getbnode("node", node_x); 
 
 Bz = B_xline(3,:);
 Br = B_xline(1,:);  % car y=0, direction radiale = x
 By = B_xline(2,:);
 Bmag = sqrt(Br.^2 + By.^2 + Bz.^2);
 
+Bmag = vecnorm(B_xline);
+Bmag2 = vecnorm(B_xline2);
+
 figure; 
 %plot(x, Br,'color','k' ,'LineWidth', 2); hold on;
 %plot(x, Bz,'color','b' ,'LineWidth', 2);hold on;
-plot(x,Bmag,'color','r' ,'LineWidth', 2)
+plot(x,Bmag,'color','r' ,'LineWidth', 2); hold on
+plot(x,Bmag2,'color','r' ,'LineWidth', 2)
 grid on
 xlabel('r (= x) [m]'); ylabel('B [T]');
 %legend('B_r (= B_x)', 'B_z','|B|');
 title('Champ dans le noyau AN: coupe radiale au milieu (z = zmid)');
 
+return
 %%
 epsr = 1e-6;
 zmin = min(noyau_primaire.z1, noyau_primaire.z2);

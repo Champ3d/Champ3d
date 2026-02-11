@@ -242,6 +242,21 @@ classdef OxyCoil4 < Xhandle
                 end
             end
             % ---
+            for j = 1:length(obj.imagecoil_up)
+                cx = obj.imagecoil_up{j};
+                for k = 1:length(cx.turn)
+                    tx = cx.turn{k};
+                    A(:,id_up) = A(:,id_up) + tx.getanode("node",node_up,"I",cx.I);
+                end
+            end
+            % ---
+            for j = 1:length(obj.imagecoil_down)
+                cx = obj.imagecoil_down{j};
+                for k = 1:length(cx.turn)
+                    tx = cx.turn{k};
+                    A(:,id_do) = A(:,id_do) + tx.getanode("node",node_down,"I",cx.I);
+                end
+            end
         end
         function fl = getbds(obj,coil_obj)
             % ---
@@ -418,13 +433,12 @@ classdef OxyCoil4 < Xhandle
                     % ---
                     zmir  = obj.mplate{imor(j)}.z;
                     alpha = (obj.mplate{imor(j)}.mur - 1) / (obj.mplate{imor(j)}.mur + 1);
-                    alpha_dom=(obj.mplate{2}.mur - 1) / (obj.mplate{2}.mur + 1);
                     if i == 1
                         expo = 2*k - 1;   
                     else
                         expo = 2*k - 2;   
                     end
-                    coeI = (1+alpha_dom) * alpha^expo;
+                    coeI = (1+alpha) * alpha^expo;
                     % ---
                     imc = c0';
                     imc.mplate = {};
@@ -434,6 +448,9 @@ classdef OxyCoil4 < Xhandle
                     imcoil{end+1} = imc;
                 end
             end
+            % ---
+            iremove = [2*(1:obj.imagelevel), 2*obj.imagelevel+2*(1:obj.imagelevel) - 1];
+            imcoil(iremove) = [];
             % ---
             obj.imagecoil_up = imcoil;
         end
@@ -468,13 +485,12 @@ classdef OxyCoil4 < Xhandle
                     % ---
                     zmir  = obj.mplate{imor(j)}.z;
                     alpha = (obj.mplate{imor(j)}.mur - 1) / (obj.mplate{imor(j)}.mur + 1);
-                    alpha_dom=(obj.mplate{1}.mur - 1) / (obj.mplate{1}.mur + 1);
                     if i == 1
                         expo = 2*k - 2;   
                     else
                         expo = 2*k - 1;   
                     end
-                    coeI = (1+alpha_dom) * alpha^expo;
+                    coeI = (1+alpha) * alpha^expo;
                     % ---
                     imc = c0';
                     imc.mplate = {};
@@ -484,6 +500,9 @@ classdef OxyCoil4 < Xhandle
                     imcoil{end+1} = imc;
                 end
             end
+            % ---
+            iremove = [2*(1:obj.imagelevel), 2*obj.imagelevel+2*(1:obj.imagelevel) - 1];
+            imcoil(iremove) = [];
             % ---
             obj.imagecoil_down = imcoil;
         end
