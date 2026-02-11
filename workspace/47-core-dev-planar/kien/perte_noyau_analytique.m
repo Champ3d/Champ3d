@@ -98,7 +98,10 @@ x = linspace(0, Rline, N);
 node_x = [x +  noyau_primaire.center(1); 0*x +  noyau_primaire.center(2); zmid*ones(1,N)];
 
 B_xline = coil1.getbnode("node", node_x); 
+A_xline = coil1.getanode("node", node_x); 
+
 B_xline2 = coilsystem.getbnode("node", node_x); 
+A_xline2 = coilsystem.getanode("node", node_x); 
 
 Bz = B_xline(3,:);
 Br = B_xline(1,:);  % car y=0, direction radiale = x
@@ -113,6 +116,16 @@ figure;
 %plot(x, Bz,'color','b' ,'LineWidth', 2);hold on;
 plot(x,Bmag,'color','r' ,'LineWidth', 2); hold on
 plot(x,Bmag2,'color','r' ,'LineWidth', 2)
+grid on
+xlabel('r (= x) [m]'); ylabel('B [T]');
+%legend('B_r (= B_x)', 'B_z','|B|');
+title('Champ dans le noyau AN: coupe radiale au milieu (z = zmid)');
+
+figure; 
+%plot(x, Br,'color','k' ,'LineWidth', 2); hold on;
+%plot(x, Bz,'color','b' ,'LineWidth', 2);hold on;
+plot(x,vecnorm(A_xline),'color','r' ,'LineWidth', 2); hold on
+plot(x,vecnorm(A_xline2),'color','b' ,'LineWidth', 2)
 grid on
 xlabel('r (= x) [m]'); ylabel('B [T]');
 %legend('B_r (= B_x)', 'B_z','|B|');
