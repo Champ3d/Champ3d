@@ -218,23 +218,32 @@ classdef  OxyMplate < Xhandle
                 rdiv = R * u.^p;
                 rcen = (rdiv(1:end-1) + rdiv(2:end))/2;
                 
+                %---ajout du centre du cercle
+
+               % x_=[x_,0];
+                %y_=[y_,0];
+                %s_ = [s_, pi * rdiv(2)^2];
+
+               
+               epsr = 0.2*rdiv(2);
+               x_ = [x_, epsr];
+               y_ = [y_, 0];
+               s_ = [s_, pi*rdiv(2)^2];
+
+
               
                 adiv = linspace(0, 2*pi, obj.anum+1);   
                 acen = (adiv(1:end-1) + adiv(2:end))/2;
                 da = adiv(2) - adiv(1);
                 
                
-                for i = 1:length(rcen)
+                for i = 2:length(rcen)
                     x_ = [x_, rcen(i).*cos(acen)];
                     y_ = [y_, rcen(i).*sin(acen)];
                     s_ = [s_, ((rdiv(i+1)^2 - rdiv(i)^2) * da / 2) * ones(1, length(acen))];
                 end
                 
-                %---ajout du centre du cercle
-
-                x_=[x_,0];
-                y_=[y_,0];
-                s_ = [s_, pi * rdiv(2)^2];
+              
 
 
                % --- points sur les bords (je veux juste visualiser)
