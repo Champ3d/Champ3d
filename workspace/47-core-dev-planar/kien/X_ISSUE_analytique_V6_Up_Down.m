@@ -10,7 +10,7 @@ ri = 100e-3;
 ro = 750e-3/2;
 mu0 = 4*pi*1e-7;
 wcoil = 0.1e-3;
-agap = 200e-3;
+agap = 100e-3;
 dfer = 5e-3; % distance coil-ferrite
 mur = 1000;
 % ---
@@ -36,11 +36,13 @@ nbp = 200;
 xline = linspace(0,+2*ro,nbp);
 yline = zeros(size(xline));
 % ---
-z0 = - (tcoil/2+dfer+tfer/2);
+z0 = - (tcoil/2+dfer+9*tfer/10);
+% z0 = - (tcoil/2+dfer+5e-3);
 zline = z0 .* ones(size(xline));
 node_01 = [xline; yline; zline];
 % ---
-z0 = + (tcoil/2+agap+tcoil/2+dfer+tfer/2);
+z0 = + (tcoil/2+agap+tcoil/2+dfer+9*tfer/10);
+% z0 = + (tcoil/2+agap+tcoil/2+dfer+5e-3);
 zline = z0 .* ones(size(xline));
 node_02 = [xline; yline; zline];
 %%
@@ -51,7 +53,7 @@ save dataAN dataAN;
 
 %%
 figure
-for ilevel = 5
+for ilevel = 20
     coil1 = OxyCoil4("I",I1,"imagelevel",ilevel);
     coil1.add_turn(turn11);
     coil1.add_turn(turn12);
@@ -70,7 +72,7 @@ for ilevel = 5
 end
 %%
 figure
-for ilevel = 5
+for ilevel = 10
     coil1 = OxyCoil4("I",I1,"imagelevel",ilevel);
     coil1.add_turn(turn11);
     coil1.add_turn(turn12);

@@ -243,12 +243,14 @@ WPT_CirCoil.circuit.Rx_phase_1.quantity
 nbp = 100;
 px  = linspace(0,2*dataAN.ro,nbp);
 % ---
-py  = -(airgap/2 + 2*Tx_wire_rBundle + Tx_agap + Tx_fer_t/2) .* ones(1,nbp);
+py  = -(airgap/2 + 2*Tx_wire_rBundle + Tx_agap + 9*Tx_fer_t/10) .* ones(1,nbp);
+% py  = -(airgap/2 + 2*Tx_wire_rBundle + Tx_agap + 5e-3) .* ones(1,nbp);
 AFEM_01 = mo_geta(px,py);
 AFEM_01 = AFEM_01./(2*pi.*px.');
 BFEM_01 = mo_getb(px,py);
 % ---
-py  = +(airgap/2 + 2*Rx_wire_rBundle + Rx_agap + Rx_fer_t/2) .* ones(1,nbp);
+py  = +(airgap/2 + 2*Rx_wire_rBundle + Rx_agap + 9*Rx_fer_t/10) .* ones(1,nbp);
+% py  = +(airgap/2 + 2*Rx_wire_rBundle + Rx_agap + 5e-3) .* ones(1,nbp);
 AFEM_02 = mo_geta(px,py);
 AFEM_02 = AFEM_02./(2*pi.*px.');
 BFEM_02 = mo_getb(px,py);

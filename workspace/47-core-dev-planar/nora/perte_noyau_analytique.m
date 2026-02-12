@@ -1,4 +1,4 @@
-close all
+%close all
 clear all
 clc
 
@@ -18,7 +18,7 @@ kappa=6.47;
 fr=1000;
 
 % ---
-tfer = 20e-3;
+tfer = 200e-3;
 tcoil = wcoil;
 coeff=10;
 Rnoyau=coeff*ro;
@@ -112,7 +112,7 @@ grid on
 xlabel('r (= x) [m]'); ylabel('B [T]');
 %legend('B_r (= B_x)', 'B_z','|B|');
 title('Champ dans le noyau AN: coupe radiale au milieu (z = zmid)');
-
+return
 %%
 epsr = 1e-6;
 zmin = min(noyau_primaire.z1, noyau_primaire.z2);

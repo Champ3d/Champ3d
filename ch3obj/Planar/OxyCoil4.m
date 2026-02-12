@@ -105,6 +105,16 @@ classdef OxyCoil4 < Xhandle
                 obj.turn{i}.setup;
             end
             % ---
+            nbplate = length(obj.mplate);
+            % ---
+            if nbplate == 2
+                if obj.mplate{1}.z > obj.mplate{2}.z
+                    mpdown = obj.mplate{2};
+                    obj.mplate{2} = obj.mplate{1};
+                    obj.mplate{1} = mpdown;
+                end
+            end
+            % ---
             obj.makeimage_in;
             obj.makeimage_up;
             obj.makeimage_down;
@@ -438,7 +448,7 @@ classdef OxyCoil4 < Xhandle
                     else
                         expo = 2*k - 2;   
                     end
-                    coeI = (1+alpha) * alpha^expo;
+                    coeI = (1+alpha) * alpha^k;
                     % ---
                     imc = c0';
                     imc.mplate = {};
@@ -451,6 +461,15 @@ classdef OxyCoil4 < Xhandle
             % ---
             iremove = [2*(1:obj.imagelevel), 2*obj.imagelevel+2*(1:obj.imagelevel) - 1];
             imcoil(iremove) = [];
+            % ---
+            if nbplate == 2
+                alpha = (obj.mplate{2}.mur - 1) / (obj.mplate{2}.mur + 1);
+                imc = obj';
+                imc.mplate = {};
+                imc.I = (1+alpha) * obj.I;
+                % ---
+                imcoil{end+1} = imc;
+            end
             % ---
             obj.imagecoil_up = imcoil;
         end
@@ -490,7 +509,7 @@ classdef OxyCoil4 < Xhandle
                     else
                         expo = 2*k - 1;   
                     end
-                    coeI = (1+alpha) * alpha^expo;
+                    coeI = (1+alpha) * alpha^k;
                     % ---
                     imc = c0';
                     imc.mplate = {};
@@ -503,6 +522,15 @@ classdef OxyCoil4 < Xhandle
             % ---
             iremove = [2*(1:obj.imagelevel), 2*obj.imagelevel+2*(1:obj.imagelevel) - 1];
             imcoil(iremove) = [];
+            % ---
+            if nbplate == 2
+                alpha = (obj.mplate{1}.mur - 1) / (obj.mplate{1}.mur + 1);
+                imc = obj';
+                imc.mplate = {};
+                imc.I = (1+alpha) * obj.I;
+                % ---
+                imcoil{end+1} = imc;
+            end
             % ---
             obj.imagecoil_down = imcoil;
         end
