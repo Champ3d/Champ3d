@@ -254,7 +254,7 @@ classdef OxyTurnT00b < OxyTurn
             P21 = [obj.ri*cosd(ai2); obj.ri*sind(ai2)];
             P22 = [obj.ro*cosd(ao2); obj.ro*sind(ao2)];
             % -------------------------------------------------------------------
-            dl_min = 100e-3;
+            dl_min = 1000;
             % ---
             l12 = norm(P12-P11);
             u12 = (P12 - P11)./l12;
