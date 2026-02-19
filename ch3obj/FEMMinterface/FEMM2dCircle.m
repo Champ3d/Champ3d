@@ -90,9 +90,9 @@ classdef FEMM2dCircle < FEMM2dDraw
             id_bound_ = [id_box '_bottom_bound'];
             obj.bound.bottom.id = f_str2code(id_bound_,'code_type','integer');
             obj.bound.left.id = obj.bound.bottom.id; % same as bottom
-            obj.bound.bottom.type = 'segment';
-            obj.bound.left.type = 'segment';
-            mi_selectsegment(obj.bottom(1),obj.bottom(2));
+            obj.bound.bottom.type = 'arc_segment';
+            obj.bound.left.type = 'arc_segment';
+            mi_selectarcsegment(obj.bottom(1),obj.bottom(2));
             mi_setgroup(obj.bound.bottom.id);
             
             % ---
