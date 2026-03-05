@@ -19,7 +19,7 @@
 classdef Econductor < PhysicalDom
     properties
         sigma
-        speed = 0
+        speed = [0 0 0]
     end
     % ---
     properties (Access = private)
