@@ -22,7 +22,8 @@ classdef OxyTurnT01 < OxyTurn
         z = 0
         r = 0
         rwire = 1e-6
-        pole = +1       % +1 or -1
+        pole = +1  
+        I=1 % +1 or -1
         % ---
         wire
         dom
@@ -48,6 +49,7 @@ classdef OxyTurnT01 < OxyTurn
                 args.r {mustBePositive}     = 1e-4
                 args.rwire {mustBePositive} = 1e-6
                 args.pole {mustBeNumeric}   = +1        % +1 or -1
+                args.I {mustBeNumeric}   = 1  
             end
             % ---
             obj@OxyTurn;
@@ -112,6 +114,21 @@ classdef OxyTurnT01 < OxyTurn
             end
             obj.setup;
         end
+
+        function turnmir = mirrorx(obj,xmir)
+            turnmir = obj';
+            turnmir.center(1) = 2*xmir - obj.center(1);
+            turnmir.setup;
+        end
+
+         function turnmir = mirrory(obj,ymir)
+                turnmir = obj';
+                turnmir.center(2) = 2*ymir - obj.center(2);
+                turnmir.setup;
+          end
+
+
+
         function scale(obj,distance)
             obj.r = obj.r + distance;
             obj.setup;

@@ -14,7 +14,7 @@ agap = 100e-3;
 dfer = 5e-3; % distance coil-ferrite
 mur = 1000;
 % ---
-tfer = 20e-3;
+tfer = 200e-3;
 tcoil = wcoil;
 % --- save
 dataAN.I1 = I1;
@@ -37,7 +37,7 @@ xline = linspace(0,+2*ro,nbp);
 yline = zeros(size(xline));
 % ---
 z0 = - (tcoil/2+dfer+9*tfer/10);
-% z0 = - (tcoil/2+dfer+5e-3);
+ %z0 = - (tcoil/2+dfer+5e-3);
 zline = z0 .* ones(size(xline));
 node_01 = [xline; yline; zline];
 % ---

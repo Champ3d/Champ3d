@@ -8,9 +8,9 @@ M=max(z1,z2);
 
  end
 
-k1=floor((epsilon-M)/(2*S))+1;
-k2=floor((epsilon/2-M)/(2*S)+1)+1;
-k=max(k1,k2);
+k=floor((epsilon+M)/(2*S)+1);
+%k2=floor((epsilon/2-M)/(2*S)+1)+1;
+%k=max(k1,k2);
 
 
 end

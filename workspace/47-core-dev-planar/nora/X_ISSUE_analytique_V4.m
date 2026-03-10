@@ -10,7 +10,7 @@ ri = 100e-3;
 ro = 750e-3/2;
 mu0 = 4*pi*1e-7;
 wcoil = 0.1e-3;
-agap = 100e-3;
+agap = 200e-3;
 dfer = 5e-3; % distance coil-ferrite
 mur = 1000;
 % ---
@@ -33,6 +33,7 @@ turn11 = OxyTurnT00b("center",[0 0],"dir",0,"ri",ri,"ro",ro,"rwire",wcoil,"z",0,
 turn12 = turn11'; turn12.rotate(180); turn12.pole = +1;
 %%
 nbp = 200;
+L_interet=2*ro;
 xline = linspace(0,+2*ro,nbp);
 yline = zeros(size(xline));
 % ---
@@ -54,12 +55,12 @@ z1=-dfer-tcoil/2;
 z2=tcoil/2+agap+tcoil+dfer;
 
 %taille=z2+tfer;
-taille=tfer+dfer+wcoil+agap+tcoil+dfer+tfer;
+l_interet=tfer+dfer+wcoil+agap+tcoil+dfer+tfer;
 
-epsilon=5*max(taille,ro);
+epsilon=3*max(l_interet,L_interet);
 
 k=foundk(epsilon,z1,z2)
-return
+%return
 %%
 figure(1);clf;hold on;
 figure(2);clf;hold on;

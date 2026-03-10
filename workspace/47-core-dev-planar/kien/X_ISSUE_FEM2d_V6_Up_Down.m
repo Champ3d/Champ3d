@@ -250,7 +250,7 @@ AFEM_01 = AFEM_01./(2*pi.*px.');
 BFEM_01 = mo_getb(px,py);
 % ---
 py  = +(airgap/2 + 2*Rx_wire_rBundle + Rx_agap + 9*Rx_fer_t/10) .* ones(1,nbp);
-% py  = +(airgap/2 + 2*Rx_wire_rBundle + Rx_agap + 5e-3) .* ones(1,nbp);
+ %py  = +(airgap/2 + 2*Rx_wire_rBundle + Rx_agap + 5e-3) .* ones(1,nbp);
 AFEM_02 = mo_geta(px,py);
 AFEM_02 = AFEM_02./(2*pi.*px.');
 BFEM_02 = mo_getb(px,py);
