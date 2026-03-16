@@ -2,7 +2,7 @@
 % Inf long but finite thick and width plate 
 %   of dim : tP x wP centered at [0, -tP/2]
 
-close all
+%close all
 clear all
 clc
 
@@ -36,9 +36,20 @@ img = imagesys.imageregion1;
 %%
 nbp = 400;
 px  = linspace(-wP/2,+wP/2,nbp);
-py  = +agap/2 .* ones(1,nbp);
+py  = 5*agap .* ones(1,nbp);
 node = [px; py];
 induction_mag = calculBregion(c0, I0, xmir, ymir, mur, k, node);
+%%
+ coeff=(-2*tP/3);
+ pxNoyau  = linspace(-wP/2,+wP/2,nbp);
+ pyNoyau = coeff .* ones(1,nbp);
+ node_noyau = [pxNoyau; pyNoyau];
+ induction_mag_noyau = calculBregion(c0, I0, xmir, ymir, mur, k, node_noyau);
+
+
+
+
+
 
 
 %%
@@ -50,10 +61,21 @@ dataANA.wP   = wP;
 dataANA.agap = agap;
 dataANA.px = px;
 dataANA.py = py;
+ dataANA.pxNoyau = pxNoyau;
+ dataANA.pyNoyau = pyNoyau;
 
 save('dataANA.mat','dataANA')
 %%
 figure
-%plot(px, vecnorm(induction_mag.region0), "r-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
+
 plot(px, vecnorm(induction_mag.region1), "b-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
-%plot(px, vecnorm(induction_mag.region2), "k-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
+
+title(" Induction magnétique region 1 à 10*agap")
+%%
+%  figure
+%  plot(pxNoyau, vecnorm(induction_mag_noyau.region0), "r-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
+%  
+%  title(" Induction magnétique region 0 à -2*tp/3")
+% % 
+
+

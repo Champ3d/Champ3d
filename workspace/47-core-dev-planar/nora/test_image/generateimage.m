@@ -31,18 +31,21 @@ imagesys.addregion0(turnmmplacepos,turnmmplaceI);
 
 
 
-for i = 2:2k-1
+for i = 2:k
 
     turnpb = imagesys.imageregion0{end};
     probleme = 3-probleme;
 
     if probleme == 1
         turnmirpos =fmiry(turnpb.pos,ymir) ;
-        turnmirI = alpha * turnpb.I;
-    
+        turnmirI = -alpha * turnpb.I;
+        %turnmirI = alpha * turnpb.I;
+
         turnmmplacepos = turnpb.pos;
-        turnmmplaceI = beta * turnpb.I;
-            
+        turnmmplaceI = (1-alpha) * turnpb.I;
+        %turnmmplaceI = beta* turnpb.I;
+             
+
          if turnmirpos(2) > ymir
             imagesys.addregion0(turnmirpos, turnmirI);
             imagesys.addregion1(turnmmplacepos,turnmmplaceI);
@@ -54,10 +57,10 @@ for i = 2:2k-1
     else
         
         turnmirpos = fmirx(turnpb.pos,xmir) ;
-        turnmirI = alpha * turnpb.I;
+        turnmirI = -alpha * turnpb.I;
     
         turnmmplacepos = turnpb.pos;
-        turnmmplaceI = beta * turnpb.I;
+        turnmmplaceI = (1-alpha) * turnpb.I;
     
         if turnmirpos(1) > xmir
             imagesys.addregion0(turnmirpos, turnmirI);

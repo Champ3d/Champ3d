@@ -1,4 +1,4 @@
-close all
+%close all
 clear all
 clc
 
@@ -8,9 +8,9 @@ I0   = 1;
 
 xmir = 0.1;
 ymir = 0;
-
+&
 mur  = 1000;
-k    = 4;
+k    = 5;
 
 % --- positions miroirs théoriques
 px  = fmirx(c0,xmir);
@@ -19,11 +19,17 @@ pxy = fmiry(px,ymir);
 
 alpha = (mur - 1)/(mur + 1);
 beta  = 1 + alpha;
+alphaprime=-alpha;
+betaprime=1-alpha;
+
 
 disp(' ')
 disp('Coefficients')
 fprintf('alpha = %.12g\n', alpha)
 fprintf('beta  = %.12g\n', beta)
+fprintf('alpha'' = %.12g\n', alphaprime)
+fprintf('beta''  = %.12g\n', betaprime)
+
 
 disp(' ')
 disp('Positions théoriques')
@@ -33,7 +39,7 @@ fprintf('py  = [%g , %g]\n',py(1),py(2))
 fprintf('pxy = [%g , %g]\n',pxy(1),pxy(2))
 
 
-imagesys = generateimage(c0,I0,xmir,ymir,mur,k);
+imagesys = generateimage_brouillon(c0,I0,xmir,ymir,mur,k);
 
 
 disp(' ')
