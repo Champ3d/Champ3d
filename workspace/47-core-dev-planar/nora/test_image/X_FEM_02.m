@@ -118,10 +118,10 @@ BFEM_01 = WPT_CirCoil.getB([px; py]);
 BFEM_02 = WPT_CirCoil.getB([pxNoyau; pyNoyau]);
 
 %%
-figure
-plot(px, vecnorm(BFEM_01), "bo", "LineWidth", 2, 'DisplayName', 'FEM_1'); hold on
-legend;
-%%
 % figure
-% plot(pxNoyau, vecnorm(BFEM_02), "ro", "LineWidth", 2, 'DisplayName', 'FEM_0'); hold on
+% plot(px, vecnorm(BFEM_01), "bo", "LineWidth", 2, 'DisplayName', 'FEM_1'); hold on
 % legend;
+%
+figure
+plot(pxNoyau, vecnorm(BFEM_02), "ro", "LineWidth", 2, 'DisplayName', 'FEM_0'); hold on
+legend;
