@@ -5,6 +5,7 @@ function induction_mag = calculBregion(c0, I, xmir, ymir, mur, k, node)
     B0 = 0;
 
     imagesys = generateimage_brouillon(c0, I, xmir, ymir, mur, k);
+%     imagesys = generateimage(c0, I, xmir, ymir, mur, k);
     id1 = (node(2,:) > ymir) & (node(1,:) <= xmir);
     id0 = (node(2,:) <= ymir) & (node(1,:) <= xmir);
     id2 = (node(2,:) <= ymir) & (node(1,:) > xmir);

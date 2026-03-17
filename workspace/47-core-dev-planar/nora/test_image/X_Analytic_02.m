@@ -3,7 +3,7 @@
 %   of dim : tP x wP centered at [0, -tP/2]
 
 %close all
-clear all
+%clear all
 clc
 
 % ---
@@ -34,14 +34,14 @@ img = imagesys.imageregion1;
 %img.I
 
 %%
-nbp = 400;
-px  = linspace(-wP/2,+wP/2,nbp);
-py  = 20*agap .* ones(1,nbp);
+nbp = 500;
+px  = linspace(+wP/4,+wP/2,nbp);
+py  = 2*agap .* ones(1,nbp);
 node = [px; py];
 induction_mag = calculBregion(c0, I0, xmir, ymir, mur, k, node);
 %%
- coeff=(-tP/2);
- pxNoyau  = linspace(-wP/2,+wP/2,nbp);
+ coeff=(-tP/20);
+ pxNoyau  = linspace(+wP/4,+wP/2,nbp);
  pyNoyau = coeff .* ones(1,nbp);
  node_noyau = [pxNoyau; pyNoyau];
  induction_mag_noyau = calculBregion(c0, I0, xmir, ymir, mur, k, node_noyau);
@@ -66,16 +66,24 @@ dataANA.py = py;
 
 save('dataANA.mat','dataANA')
 %%
-% figure
-% 
-% plot(px, vecnorm(induction_mag.region1), "b-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
-% 
-% title(" Induction magnétique region 1 à 20*agap")
+figure
+subplot(121)
+plot(px, (induction_mag.region1(1,:)), "b-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
+subplot(122)
+plot(px, (induction_mag.region1(2,:)), "b-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
+title(" Induction magnétique region 1")
+%% ---
+figure
+subplot(121)
+plot(px, (induction_mag_noyau.region0(1,:)), "b-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
+subplot(122)
+plot(px, (induction_mag_noyau.region0(2,:)), "b-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
+title(" Induction magnétique region 2")
 %%
- figure
- plot(pxNoyau, vecnorm(induction_mag_noyau.region0), "r-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
- 
- title(" Induction magnétique region 0 à -tp/2")
+%  figure
+%  plot(pxNoyau, vecnorm(induction_mag_noyau.region0), "r-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
+%  
+%  title(" Induction magnétique region 0 à -tp/2")
 % 
 
 

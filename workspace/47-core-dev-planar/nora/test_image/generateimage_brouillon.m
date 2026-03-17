@@ -102,6 +102,7 @@ for i = 2:k
     end
 end
 
+
 probleme = 2;
 
 imagesys.addregion2(c0,I);
