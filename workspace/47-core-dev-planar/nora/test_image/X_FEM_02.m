@@ -19,7 +19,7 @@ px = dataANA.px;
 py = dataANA.py;
 pxNoyau=dataANA.pxNoyau;
  pyNoyau=dataANA.pyNoyau ;
-R_bound = 2*max([tP,wP,agap]);
+R_bound = 3*max([tP,wP,agap]);
 %% Prepare : materials / circuit / BC / draw
 %
 %
@@ -120,19 +120,19 @@ BFEM_02 = WPT_CirCoil.getB([pxNoyau; pyNoyau]);
 %%
 figure
 subplot(121)
-plot(px, (BFEM_01(1,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM_1'); hold on
+plot(px, (BFEM_01(1,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM region1'); hold on
 subplot(122)
-plot(px, (BFEM_01(2,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM_1'); hold on
+plot(px, (BFEM_01(2,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM region1'); hold on
 legend;
 
 %%
 figure
 subplot(121)
-plot(px, (BFEM_02(1,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM_1'); hold on
+plot(px, (BFEM_02(1,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM region0'); hold on
 subplot(122)
-plot(px, (BFEM_02(2,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM_1'); hold on
+plot(px, (BFEM_02(2,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM region0'); hold on
 legend;
-%
+
 % figure
 % plot(pxNoyau, vecnorm(BFEM_02), "ro", "LineWidth", 2, 'DisplayName', 'FEM_0'); hold on
 % legend;

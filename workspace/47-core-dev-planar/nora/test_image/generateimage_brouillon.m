@@ -107,9 +107,9 @@ probleme = 2;
 
 imagesys.addregion2(c0,I);
 turnmirpos=fmirx(c0,xmir);
-turnmirI=I/alpha;
+turnmirI=I/(alpha);
 imagesys.addregion2(turnmirpos,turnmirI);
-turnmirI=(1+alpha)*I/alpha;
+turnmirI=(1+alpha)*I/(alpha);
 imagesys.addregion0(turnmirpos,turnmirI);
 
 

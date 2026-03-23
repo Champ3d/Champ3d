@@ -8,9 +8,9 @@ I0   = 1;
 
 xmir = 0.1;
 ymir = 0;
-&
+
 mur  = 1000;
-k    = 5;
+k    = 100;
 
 % --- positions miroirs théoriques
 px  = fmirx(c0,xmir);
