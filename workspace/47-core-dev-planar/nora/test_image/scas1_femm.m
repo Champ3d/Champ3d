@@ -19,7 +19,7 @@ px = dataANA.px;
 py = dataANA.py;
 pxNoyau=dataANA.pxNoyau;
  pyNoyau=dataANA.pyNoyau ;
-R_bound = 4*max([tP,wP,agap]);
+R_bound = 2*max([tP,wP,agap]);
 %% Prepare : materials / circuit / BC / draw
 %
 %
@@ -45,7 +45,7 @@ bc.open  = FEMM2dBCopen('ro',R_bound);
 % --- airbox
 draw.airbox  = FEMM2dCircle('cen_x',0,'cen_y',0,'r',R_bound);
 draw.Tx_fer  = FEMM2dRectangle('cen_x',0,'cen_y',-tP/2,'len_x',wP,'len_y',tP);
-draw.finmesh = FEMM2dRectangle('cen_x',c0(1),'cen_y',agap,'len_x',2*(wP/2-c0(1)),'len_y',2*agap);
+draw.finmesh = FEMM2dRectangle('cen_x',c0(1),'cen_y',agap,'len_x',wP/20,'len_y',2*agap);
 draw.Tx_coil = FEMM2dCircle('cen_x',c0(1),'cen_y',c0(2),'r',0.1e-3,'max_angle_len',2);
 
 %% Build FEMM model
@@ -86,16 +86,16 @@ WPT_CirCoil.add_box('id_box','airbox','draw',draw.airbox);
 WPT_CirCoil.set_dom('id_dom','airbox','id_material','air',...
                      'id_draw','airbox',...
                      'choosed_by','top',...
-                     'mesh_size',20e-3);
+                     'mesh_size',100e-3);
 WPT_CirCoil.set_dom('id_dom','finmesh','id_material','air',...
                      'id_draw','finmesh',...
                      'choosed_by','top',...
-                     'mesh_size',0.2e-3);
+                     'mesh_size',0.5e-3);
 % ---
 WPT_CirCoil.set_dom('id_dom','Tx_fer','id_material','ferrite',...
                      'id_draw','Tx_fer',...
                      'choosed_by','center',...
-                     'mesh_size',2e-3);
+                     'mesh_size',10e-3);
 % ---
 WPT_CirCoil.set_dom('id_dom','Tx_coil','id_material','TxCoil', ...
         'id_draw','Tx_coil', ...

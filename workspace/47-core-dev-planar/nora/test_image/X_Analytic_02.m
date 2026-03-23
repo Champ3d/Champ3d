@@ -65,7 +65,7 @@ dataANA.py = py;
  dataANA.pyNoyau = pyNoyau;
 
 save('dataANA.mat','dataANA')
-return;
+
 %%
 figure
 sgtitle(" Induction magnétique region 1 à agap/2")
@@ -81,12 +81,6 @@ subplot(121)
 plot(px, (induction_mag_noyau.region0(1,:)), "b-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
 subplot(122)
 plot(px, (induction_mag_noyau.region0(2,:)), "b-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
-
-%
- figure
- plot(pxNoyau, vecnorm(induction_mag_noyau.region0), "r-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
- 
- title(" Induction magnétique region 0 ")
 
 
 
