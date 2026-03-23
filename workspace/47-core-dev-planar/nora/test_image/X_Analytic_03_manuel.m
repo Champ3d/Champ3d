@@ -38,9 +38,9 @@ alp2 = - alp;
 B{1} = fB([0.495 , 0.004], node, I0);
 B{2} = fB([0.495 , -0.004], node, alp*I0); % alpha I
 B{3} = fB([0.505 , -0.004], node, alp*alp2*I0); % alpha alpha' I
-B{4} = fB([0.505 , 0.004], node, -alp2*I0); % alpha' I
-B{5} = fB([0.505 , -0.004], node, -I0); % I
-B{6} = fB([0.505 , 0.004], node, -I0/alp); % I
+B{4} = fB([0.505 , 0.004], node,  alp2*I0); % alpha' I
+B{5} = fB([0.505 , -0.004], node, I0); % I
+B{6} = fB([0.505 , 0.004], node,  I0/alp); % I
 
 %%
 figure
