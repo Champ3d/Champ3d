@@ -3,14 +3,22 @@ clear all
 clc
 
 
-c0   = [0.09 0.002];
-I0   = 1;
+mur = 2000;
 
-xmir = 0.1;
+tP = 1000e-3;
+wP = 1000e-3;
+cP = [0, -tP/2];
+% ---
+agap = 4e-3;
+% ---
+I0 = 1;
+x0 = 0;
+y0 = agap;
+c0 = [wP/2-5e-3, y0];
+
+xmir = +wP/2;
 ymir = 0;
-
-mur  = 1000;
-k    = 100;
+k=40;
 
 % --- positions miroirs théoriques
 px  = fmirx(c0,xmir);
