@@ -78,8 +78,12 @@ classdef FEM3dTherm < ThModel
             if obj.ltime.it <= 1
                 Tprev = 0;
             else
-                Tprev = obj.dof{obj.ltime.it - 1}.T.value;
-                delta_t = obj.ltime.t_array(obj.ltime.it) - obj.ltime.t_array(obj.ltime.it - 1);
+                try
+                    Tprev = obj.dof{obj.ltime.it - 1}.T.value;
+                catch
+                    Tprev = 0;
+                end
+                    delta_t = obj.ltime.t_array(obj.ltime.it) - obj.ltime.t_array(obj.ltime.it - 1);
             end
             %--------------------------------------------------------------
             % --- LSH
@@ -171,7 +175,11 @@ classdef FEM3dTherm < ThModel
                         if it == 1
                             x0 = obj.dof{it}.T.value(obj.matrix.id_node_t);
                         else
-                            x0 = obj.dof{it-1}.T.value(obj.matrix.id_node_t);
+                            try
+                                x0 = obj.dof{it-1}.T.value(obj.matrix.id_node_t);
+                            catch
+                                x0 = [];
+                            end
                         end
                     end
                     % --- qmr + jacobi
