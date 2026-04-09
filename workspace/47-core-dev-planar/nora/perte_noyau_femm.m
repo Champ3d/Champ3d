@@ -1,23 +1,5 @@
-%--------------------------------------------------------------------------
-% This code is written by: H-K. Bui, 2024
-% as a contribution to Champ3d code.
-%--------------------------------------------------------------------------
-% Champ3d is copyright (c) 2023-2025 H-K. Bui.
-% This program is free software: you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-% This program is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
-% See LICENSE and CREDITS files for more information.
-% Huu-Kien.Bui@univ-nantes.fr
-% IREENA Lab - UR 4642, Nantes Universite'
-%--------------------------------------------------------------------------
-
 %close all
-%clear all
+clear all
 clc
 
 load dataAN.mat
@@ -27,11 +9,10 @@ load dataAN.mat
 Tx_nb_turn = 2;
 Tx_I = dataAN.I1;
 Tx_r_in = 5e-3; 
-%Tx_r_in = dataAN.ri;
 Tx_r_ex = dataAN.ro;
 Tx_agap = dataAN.dfer;  % coil and ferrite
 Tx_fer_r_in = Tx_r_in;
-l_coef = 1.1;
+l_coef = 10;
 Tx_fer_r_ex = dataAN.Rnoyau;
 Tx_fer_t    = dataAN.tfer;
 % ---
@@ -47,12 +28,12 @@ Rx_fer_t    = Tx_fer_t;
 airgap = dataAN.agap;   % airgap between Tx and Rx (coil to coil)
 % ---
 sigmaCu = 5.8e7;
-murFerrite  = 1000;
+murFerrite  = dataAN.mur;
 sigmaFerrite = 0;
 phi_hx = 0.7346;
 phi_hy = phi_hx;
 % ---
-fr = 0;%dataAN.fr; % frequency
+fr = 0; % frequency
 %% Derived parameters
 % ---
 % radius of the each bundle (group of strands)
@@ -241,68 +222,25 @@ WPT_CirCoil.circuit.Rx_phase_1.get_quantity
 WPT_CirCoil.circuit.Rx_phase_1.quantity
 
 %%
-zmin_core = -(airgap/2 + 2*Tx_wire_rBundle + Tx_agap + Tx_fer_t);
-zmax_core = -(airgap/2 + 2*Tx_wire_rBundle + Tx_agap);
-%zmin_core = dataAN.z1_plate - dataAN.tfer;
-%zmax_core = dataAN.z1_plate;
-zmid_core = 0.5*(zmin_core + zmax_core);
-N = 400;
-rline = linspace(0, Tx_fer_r_ex, N);
-zline = zmid_core * ones(1,N);
-B_x_femm=mo_getb(rline,zline);
-Br_x_femm=B_x_femm(:,1);
-Bz_x_femm=B_x_femm(:,2);
-Bmag_x_femm=sqrt(abs(Br_x_femm).^2+abs(Bz_x_femm).^2);
+nbp = 200;
+xline = linspace(0,2*dataAN.ro,nbp);
+% ---
+z0  = -(airgap/2 + 2*Tx_wire_rBundle + Tx_agap + Tx_fer_t/2) .* ones(1,nbp);
+ %z0  = -(airgap/2 + 2*Tx_wire_rBundle + Tx_agap + 5e-3) .* ones(1,nbp);
+A = mo_geta(xline,z0)./(2*pi.*xline.');
 
-figure; 
-%plot(rline, Br_x_femm, 'color','k' ,'LineWidth', 2); hold on;
-%plot(rline, Bz_x_femm,'color','b' ,'LineWidth', 2);hold on;
-plot(rline,Bmag_x_femm,'color','k' ,'LineWidth', 2)
-grid on
-xlabel('r  [m]'); ylabel('B [T]');
-%legend('B_r', 'B_z','|B|');
-title('Champ dans le noyau FEMM: coupe radiale au milieu (z = zmid)');
-
-
+B= mo_getb(xline,z0);
 
 %%
+figure
+plot(xline, A, "ko", "LineWidth", 2); hold on
+xlabel(' x [m]'); ylabel('A ');
 
-epsr = 1e-6;                      
-zax  = linspace(zmin_core, zmax_core, N);
-rax  = epsr * ones(1,N);
-
-B_z_femm=mo_getb(rax,zax);
-Br_z_femm=B_z_femm(:,1);
-Bz_z_femm=B_z_femm(:,2);
-Bmag_z_femm=sqrt(abs(Br_z_femm).^2+abs(Bz_z_femm).^2);
-
-figure; 
-%plot(zax , Br_z_femm,'color','k' , 'LineWidth', 2); hold on;
-%plot(zax , Bz_z_femm,'color','b' ,'LineWidth', 2);hold on;
-plot(zax ,Bmag_z_femm,'color','k' ,'LineWidth', 2)
-grid on
-xlabel('z  [m]'); ylabel('B [T]');
-%legend('B_r', 'B_z','|B|');
-title('Champ dans le noyau FEMM : coupe axiale proche de l’axe (r≈0)');
+title('A dans le noyau FEMM: coupe radiale au milieu ');
 
 %%
-Nrectangle=500;
-x_values=linspace(Tx_fer_r_in,Tx_fer_r_ex,Nrectangle);
-mo_selectblock([0 -(airgap/2 + 2*Tx_wire_rBundle + Tx_agap + Tx_fer_t/2)]);
-volume=mo_blockintegral(10);
-sub_volume=mo_blockintegral(10)/Nrectangle;
-mo_clearblock;
-perte_steinmetz_primaire=0;
-k=dataAN.kappa;
-b=dataAN.beta;
-a=dataAN.alpha;
-fr=dataAN.fr;
+figure
+plot(xline, vecnorm(B.'), "ko", "LineWidth", 2); hold on
+xlabel(' x [m]'); ylabel('B [T]');
 
-for i=1:Nrectangle
-B=mo_getb(x_values(i),zmid_core);
-valeur_Br=abs( B(1) );
-
-valeur_Bz=abs(B(2));
-perte_steinmetz_primaire=perte_steinmetz_primaire+k*(fr^a)*(valeur_Br^b)*sub_volume + k*(fr^a)*(valeur_Bz^b)*sub_volume;
-
-end
+title('B dans le noyau FEMM: coupe radiale au milieu ');

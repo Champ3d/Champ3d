@@ -65,7 +65,7 @@ dataANA.py = py;
  dataANA.pyNoyau = pyNoyau;
 
 save('dataANA.mat','dataANA')
-
+return
 %%
 figure
 sgtitle(" Induction magnétique region 1 à agap/2")

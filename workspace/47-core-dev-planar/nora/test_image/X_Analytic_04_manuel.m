@@ -33,7 +33,7 @@ posxy = fmiry(posx,ymir);
 
 %%
 nbp = 500;
-px  = linspace(+wP/4,+wP/2,nbp);
+px  = linspace(+wP/4,+2*wP,nbp);
 py  = agap/2.*ones(1,nbp);%agap/2 .* ones(1,nbp);
 node = [px; py];
 

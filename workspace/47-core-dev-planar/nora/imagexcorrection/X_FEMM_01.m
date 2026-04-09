@@ -8,18 +8,21 @@ clear all
 clc
 
 
-load dataANA.mat
-c0   = dataANA.c0;
-mur  = dataANA.mur;
-I0   = dataANA.I0;
-tP   = dataANA.tP;
-wP   = dataANA.wP;
-agap = dataANA.agap;
-px = dataANA.px;
-py = dataANA.py;
-pxNoyau=dataANA.pxNoyau;
- pyNoyau=dataANA.pyNoyau ;
-R_bound = 4*max([tP,wP,agap]);
+load dataAN.mat
+c0   = dataAN.c0;
+mur  = dataAN.mur;
+I0   = dataAN.I0;
+tP   = dataAN.tP;
+wP   = dataAN.wP;
+agap = dataAN.agap;
+px = dataAN.px;
+py = dataAN.py;
+pxNoyau=dataAN.pxNoyau;
+ pyNoyau=dataAN.pyNoyau ;
+z1primaire=dataAN.z1primaire;
+z1secondaire=dataAN.z1secondaire;
+distance_nf=dataAN.distance_nf;
+R_bound = 2*max([tP,wP,agap]);
 %% Prepare : materials / circuit / BC / draw
 %
 %
@@ -44,8 +47,9 @@ bc.open  = FEMM2dBCopen('ro',R_bound);
 % --- Draw list
 % --- airbox
 draw.airbox  = FEMM2dCircle('cen_x',0,'cen_y',0,'r',R_bound);
-draw.Tx_fer  = FEMM2dRectangle('cen_x',0,'cen_y',-tP/2,'len_x',wP,'len_y',tP);
-draw.finmesh = FEMM2dRectangle('cen_x',c0(1),'cen_y',agap,'len_x',2*(wP/2-c0(1)),'len_y',2*agap);
+draw.Tx_fer  = FEMM2dRectangle('cen_x',0,'cen_y',-z1primaire-tP/2,'len_x',wP,'len_y',tP);
+draw.Rx_fer  = FEMM2dRectangle('cen_x',0,'cen_y',z1secondaire+tP/2,'len_x',wP,'len_y',tP);
+draw.finmesh = FEMM2dRectangle('cen_x',0,'cen_y',distance_nf,'len_x',wP/2,'len_y',2*distance_nf);
 draw.Tx_coil = FEMM2dCircle('cen_x',c0(1),'cen_y',c0(2),'r',0.1e-3,'max_angle_len',2);
 
 %% Build FEMM model
@@ -77,6 +81,7 @@ WPT_CirCoil.add_draw('id_draw','Tx_fer','draw',draw.Tx_fer);
 WPT_CirCoil.add_draw('id_draw','finmesh','draw',draw.finmesh);
 % ---
 WPT_CirCoil.add_draw('id_draw','Tx_coil','draw',draw.Tx_coil);
+WPT_CirCoil.add_draw('id_draw','Rx_fer','draw',draw.Rx_fer);
 
 
 % --- add box (airbox, domain limits)
@@ -90,12 +95,20 @@ WPT_CirCoil.set_dom('id_dom','airbox','id_material','air',...
 WPT_CirCoil.set_dom('id_dom','finmesh','id_material','air',...
                      'id_draw','finmesh',...
                      'choosed_by','top',...
-                     'mesh_size',0.2e-3);
+                     'mesh_size',0.5e-3);
 % ---
 WPT_CirCoil.set_dom('id_dom','Tx_fer','id_material','ferrite',...
                      'id_draw','Tx_fer',...
                      'choosed_by','center',...
                      'mesh_size',2e-3);
+
+
+WPT_CirCoil.set_dom('id_dom','Rx_fer','id_material','ferrite',...
+                     'id_draw','Rx_fer',...
+                     'choosed_by','center',...
+                     'mesh_size',2e-3);
+
+
 % ---
 WPT_CirCoil.set_dom('id_dom','Tx_coil','id_material','TxCoil', ...
         'id_draw','Tx_coil', ...
@@ -107,9 +120,9 @@ WPT_CirCoil.set_bound('id_bound','open','id_bc','open',...
     'id_box','airbox','choosed_by','all');
 
 % --- solve
-WPT_CirCoil.circuit.Tx.i = dataANA.I0;
+WPT_CirCoil.circuit.Tx.i = dataAN.I0;
 WPT_CirCoil.solve;
-% WPT_CirCoil.getdata;
+WPT_CirCoil.getdata;
 
 
 %%
@@ -120,19 +133,14 @@ BFEM_02 = WPT_CirCoil.getB([pxNoyau; pyNoyau]);
 %%
 figure(1)
 subplot(121)
-plot(px, (BFEM_01(1,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM region1'); hold on
+plot(px, (BFEM_01(1,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM '); hold on
 subplot(122)
-plot(px, (BFEM_01(2,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM region1'); hold on
+plot(px, (BFEM_01(2,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM '); hold on
 legend;
-
 %%
 figure(2)
 subplot(121)
-plot(px, (BFEM_02(1,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM region0'); hold on
+plot(px, (BFEM_02(1,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM '); hold on
 subplot(122)
-plot(px, (BFEM_02(2,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM region0'); hold on
+plot(px, (BFEM_02(2,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM '); hold on
 legend;
-
-% figure
-% plot(pxNoyau, vecnorm(BFEM_02), "ro", "LineWidth", 2, 'DisplayName', 'FEM_0'); hold on
-% legend;
