@@ -18,26 +18,26 @@ distance_nf=10e-3;
 agap = 200e-3;
 % ---
 I0 = 1;
-x0 = 0;
-y0 = agap;
+x0 = wP/4;
+y0 = distance_nf;
 c0 = [x0, y0];
 
 
-z1secondaire=agap+distance_nf;
-z1primaire=distance_nf;
+z1secondaire=agap;
+z1primaire=0;
 
-imagelevel=2;
+imagelevel=10;
 
 
 %%
 nbp = 300;
-px  = linspace(-wP/4,+wP/2,nbp);
-py  = agap/2.*ones(1,nbp);%agap/2 .* ones(1,nbp);
+px  = linspace(-wP/2,x0-10e-3,nbp);
+py  = distance_nf.*ones(1,nbp);%agap/2 .* ones(1,nbp);
 node = [px; py];
 induction_mag = calculBregion(c0,I0,z1primaire,z1secondaire,tP,mur,imagelevel,node);
 %%
- coeff=-10e-3;
-   pxNoyau = linspace(-wP/4,+wP/2,nbp);
+ coeff=agap-2*distance_nf;
+ pxNoyau = linspace(-wP/2,+wP/2,nbp);
  pyNoyau = coeff .* ones(1,nbp);
  node_noyau = [pxNoyau; pyNoyau];
 induction_mag_noyau = calculBregion(c0,I0,z1primaire,z1secondaire,tP,mur,imagelevel, node_noyau);
@@ -77,9 +77,9 @@ plot(px, (induction_mag.region3(2,:)), "b-", "LineWidth", 2, 'DisplayName', 'AN'
 figure(2);hold on;
 sgtitle(" Induction magnétique region 2")
 subplot(121)
-plot(px, (induction_mag_noyau.region2(1,:)), "b-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
+plot(pxNoyau, induction_mag_noyau.region3(1,:), "b-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
 subplot(122)
-plot(px, (induction_mag_noyau.region2(2,:)), "b-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
+plot(pxNoyau, induction_mag_noyau.region3(2,:), "b-", "LineWidth", 2, 'DisplayName', 'AN'); hold on
 
 
 

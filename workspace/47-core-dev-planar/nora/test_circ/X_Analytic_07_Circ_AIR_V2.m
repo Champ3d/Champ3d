@@ -16,8 +16,8 @@ Tx_agap = 10e-3; % distance coil-ferrite
 Rx_agap = 10e-3; % distance coil-ferrite
 mur = 2000;
 % ---
-rfertx = rtx + 100e-3; % 50e-3
-rferrx = rrx + 100e-3; % 50e-3
+rfertx = rtx + 10e-3; % 50e-3
+rferrx = rrx + 10e-3; % 50e-3
 tfer = 15e-3;
 tcoil = rwire;
 % --- save

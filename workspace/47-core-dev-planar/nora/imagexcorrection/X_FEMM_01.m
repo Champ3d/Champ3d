@@ -49,7 +49,7 @@ bc.open  = FEMM2dBCopen('ro',R_bound);
 draw.airbox  = FEMM2dCircle('cen_x',0,'cen_y',0,'r',R_bound);
 draw.Tx_fer  = FEMM2dRectangle('cen_x',0,'cen_y',-z1primaire-tP/2,'len_x',wP,'len_y',tP);
 draw.Rx_fer  = FEMM2dRectangle('cen_x',0,'cen_y',z1secondaire+tP/2,'len_x',wP,'len_y',tP);
-draw.finmesh = FEMM2dRectangle('cen_x',0,'cen_y',distance_nf,'len_x',wP/2,'len_y',2*distance_nf);
+draw.finmesh = FEMM2dRectangle('cen_x',c0(1),'cen_y',c0(2),'len_x',wP/2,'len_y',2*distance_nf);
 draw.Tx_coil = FEMM2dCircle('cen_x',c0(1),'cen_y',c0(2),'r',0.1e-3,'max_angle_len',2);
 
 %% Build FEMM model
@@ -140,7 +140,7 @@ legend;
 %%
 figure(2)
 subplot(121)
-plot(px, (BFEM_02(1,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM '); hold on
+plot(pxNoyau, (BFEM_02(1,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM '); hold on
 subplot(122)
-plot(px, (BFEM_02(2,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM '); hold on
+plot(pxNoyau, (BFEM_02(2,:)), "ro", "LineWidth", 2, 'DisplayName', 'FEM '); hold on
 legend;

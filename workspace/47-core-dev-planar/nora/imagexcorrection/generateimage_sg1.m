@@ -76,8 +76,8 @@ if ~isempty(a_traiter_region2)
                 imagesys.addregion2(imagemirpos, imagemirI, 2, 1);
                 a_traiter_region2{end+1} = imagesys.imageregion2{end};
 
-                imagesys.addregion3(imagetransmispos, imagetransmisI, 3, 3);
-                a_traiter_region3{end+1} = imagesys.imageregion3{end};
+%                 imagesys.addregion3(imagetransmispos, imagetransmisI, 3, 3);
+%                 a_traiter_region3{end+1} = imagesys.imageregion3{end};
 
             else
                 imageinitialpos  = fmiry(source.pos, z_int);
@@ -89,8 +89,8 @@ if ~isempty(a_traiter_region2)
                 imagesys.addregion2(imageinitialpos, imageinitialI, 2, 1);
                 a_traiter_region2{end+1} = imagesys.imageregion2{end};
 
-                imagesys.addregion3(imagetransmispos, imagetransmisI, 3, 3);
-                a_traiter_region3{end+1} = imagesys.imageregion3{end};
+%                 imagesys.addregion3(imagetransmispos, imagetransmisI, 3, 3);
+%                 a_traiter_region3{end+1} = imagesys.imageregion3{end};
             end
 
             a_traiter_region2{i}.deja_traite = true;
@@ -295,8 +295,8 @@ if ~isempty(a_traiter_region4)
                 imagesys.addregion4(imagemirpos, imagemirI, 4, 4);
                 a_traiter_region4{end+1} = imagesys.imageregion4{end};
 
-                imagesys.addregion3(imagetransmispos, imagetransmisI, 3, 2);
-                a_traiter_region3{end+1} = imagesys.imageregion3{end};
+%                 imagesys.addregion3(imagetransmispos, imagetransmisI, 3, 2);
+%                 a_traiter_region3{end+1} = imagesys.imageregion3{end};
 
 
             else
@@ -309,8 +309,8 @@ if ~isempty(a_traiter_region4)
                 imagesys.addregion4(imageinitialpos, imageinitialI, 4, 4);
                 a_traiter_region4{end+1} = imagesys.imageregion4{end};
 
-                imagesys.addregion3(imagetransmispos, imagetransmisI, 3, 2);
-                a_traiter_region3{end+1} = imagesys.imageregion3{end};
+%                 imagesys.addregion3(imagetransmispos, imagetransmisI, 3, 2);
+%                 a_traiter_region3{end+1} = imagesys.imageregion3{end};
             end
 
             a_traiter_region4{i}.deja_traite = true;
