@@ -60,6 +60,7 @@ classdef OxyTurnT01b < OxyTurn
     methods
         function setup(obj)
             obj.makewire;
+            obj.makedom;
         end
     end
     % ---
@@ -146,6 +147,11 @@ classdef OxyTurnT01b < OxyTurn
                 B = B + obj.wire{i}.getbnode("node",args.node,"I",args.I);
             end
         end
+        % ------------------------------------------------------------------
+        function Linterne = getlinterne(obj)
+            mu0 = 4*pi*1e-7;
+            Linterne = (2*pi*obj.r) * mu0 / (8*pi);
+        end
     end
     % ---
     methods
@@ -190,25 +196,24 @@ classdef OxyTurnT01b < OxyTurn
             % ---
             obj.wire{end+1} = wire02;
             % -------------------------------------------------------------------
-            % --- DOM
-            % x_ = [];
-            % y_ = [];
-            % s_ = [];
-            % rdiv = linspace(0,obj.r - obj.rwire,obj.rnum);
-            % dr = rdiv(2) - rdiv(1);
-            % rcen = (rdiv(1:end-1) + rdiv(2:end))./2;
-            % for i = 1:length(rcen)
-            %     adiv = linspace(0, 2*pi, obj.anum + i);
-            %     da = adiv(2) - adiv(1);
-            %     x_ = [x_, rcen(i) .* cos(adiv)];
-            %     y_ = [y_, rcen(i) .* sin(adiv)];
-            %     s_ = [s_, ((rdiv(i+1)^2 - rdiv(i)^2) .* da/pi) .* ones(1,length(adiv))];
-            % end
-            % % ---
-            % z_ = obj.z .* ones(size(x_));
-            % obj.dom.node = [x_+cen(1); y_+cen(2); z_];
-            % obj.dom.area = s_;
+        end
+        % -----------------------------------------------------------------
+        function makedom(obj)
+            cen = obj.center;
+            % --- mean dom
+            adiv = linspace(0, 2*pi, obj.anum);
+            rdiv = obj.r;
+            x_ = rdiv .* cos(adiv) + cen(1);
+            y_ = rdiv .* sin(adiv) + cen(2);
             % ---
+            vdiv = zeros(3,length(adiv) - 1);
+            vdiv(1,:) = x_(2:end) - x_(1:end-1);
+            vdiv(2,:) = y_(2:end) - y_(1:end-1);
+            % ---
+            obj.dom.mean.node = [x_(1:end-1) ; y_(1:end-1); obj.z .* ones(1,length(x_)-1)];
+            obj.dom.mean.len  = vdiv;
+            
+            % --- interior dom
             adiv = linspace(0, 2*pi, obj.anum);
             rdiv = obj.r - obj.rwire;
             x_ = rdiv .* cos(adiv) + cen(1);
@@ -218,8 +223,8 @@ classdef OxyTurnT01b < OxyTurn
             vdiv(1,:) = x_(2:end) - x_(1:end-1);
             vdiv(2,:) = y_(2:end) - y_(1:end-1);
             % ---
-            obj.dom.node = [x_(1:end-1) ; y_(1:end-1); obj.z .* ones(1,length(x_)-1)];
-            obj.dom.len  = vdiv;
+            obj.dom.interior.node = [x_(1:end-1) ; y_(1:end-1); obj.z .* ones(1,length(x_)-1)];
+            obj.dom.interior.len  = vdiv;
         end
     end
 end
