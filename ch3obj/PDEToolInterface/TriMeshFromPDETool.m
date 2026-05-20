@@ -198,6 +198,8 @@ classdef TriMeshFromPDETool < TriMesh
             obj.node = node_;
             obj.elem = elem_;
             obj.elem_code = elem_code_;
+            obj.edge = f_edge(elem_,'elem_type','tri');
+            obj.face = f_face(elem_,'elem_type','tri');
             % --- 2d elem surface
             obj.velem = f_volume(node_,elem_,'elem_type',obj.elem_type);
             % ---
