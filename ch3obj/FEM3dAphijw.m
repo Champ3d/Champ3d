@@ -291,7 +291,7 @@ classdef FEM3dAphijw < FEM3dAphi
             arguments
                 obj
                 args.tol_out = 1e-3; % tolerance of outer loop
-                args.tol_in  = 1e-6; % tolerance of inner loop
+                args.tol_in  = 1e-8; % tolerance of inner loop
                 args.maxniter_out = 5; % maximum iteration of outer loop
                 args.maxniter_in = 1e3; % maximum iteration of inner loop
             end

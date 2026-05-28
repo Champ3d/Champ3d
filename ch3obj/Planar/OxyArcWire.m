@@ -117,6 +117,7 @@ classdef OxyArcWire < Xhandle
             lnode = obj.local_node(node);
             % ---
             rho = sqrt(lnode(1,:).^2 + lnode(2,:).^2);
+            rho(rho <= 1e-6) = 1e-6;
             % ---
             phi = atan2(lnode(2,:),lnode(1,:));
             % ---
@@ -126,8 +127,8 @@ classdef OxyArcWire < Xhandle
             c2 = (obj.r).^2 + rho.^2 + dz.^2;
             m  = 4*obj.r.*rho ./ c1;
             % --- m must be in (0,1)
-            m(m >= 1-1e-6) = 1-1e-6;
-            m(m <= 1e-6) = 1e-6;
+            m(m >= 1-1e-8) = 1-1e-8;
+            m(m <= 1e-8) = 1e-8;
             % ---
             aph1_ = (obj.phi1/180*pi - phi - pi)./2;
             aph2_ = (obj.phi2/180*pi - phi - pi)./2;

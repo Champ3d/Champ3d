@@ -98,9 +98,9 @@ classdef OxyStraightWire < Xhandle
             % ---
             % d1(d1 == 0) = 1e-8;
             % d2(d2 == 0) = 1e-8;
-            a2(abs(a2) <= 9e-6) = 9e-6;
-            d1(abs(d1) <= 3e-3) = 3e-3;
-            d2(abs(d2) <= 3e-3) = 3e-3;
+            a2(abs(a2) <= 1e-6) = 1e-6;
+            d1(abs(d1) <= 1e-6) = 1e-6;
+            d2(abs(d2) <= 1e-6) = 1e-6;
             % ---
             mu0 = 4*pi*1e-7;
             By = mu0*obj.signI*I/(4*pi) .* ( v./a2 .* (w2./d2 - w1./d1));
@@ -131,7 +131,7 @@ classdef OxyStraightWire < Xhandle
             v  = lnode(3,:);
             a2 = u.^2 + v.^2;
             % --- a2 must be > 0
-            a2(a2 <= 1e-9) = 1e-9;
+            a2(a2 <= 1e-6) = 1e-6;
             % ---
             lenP1P2 = norm(obj.P2-obj.P1);
             w1 = - lnode(1,:);
