@@ -178,12 +178,12 @@ classdef QuadMesh < Mesh2d
             refelem.cWeigh  = 4;
             refelem.nbG = length(refelem.U);
             % ---
-            refelem.nbI = 5;
+            refelem.nbI = 9;
             e = 1e-6;
             refelem.nU = [-1 +1 +1 -1];
             refelem.nV = [-1 -1 +1 +1];
-            refelem.iU = [(1+e) * refelem.nU    0];
-            refelem.iV = [(1+e) * refelem.nV    0];
+            refelem.iU = [(1+e) * refelem.nU    0  +1+e  -1-e     0     0];
+            refelem.iV = [(1+e) * refelem.nV    0     0     0  +1+e  -1-e];
             % ---
             refelem.N{1} = @(u,v) 1/4 * (1-u) .* (1-v);
             refelem.N{2} = @(u,v) 1/4 * (1+u) .* (1-v);
