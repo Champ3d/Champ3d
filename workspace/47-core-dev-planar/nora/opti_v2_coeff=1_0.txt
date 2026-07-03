@@ -1,0 +1,9 @@
+
+===== RESULTAT GA =====
+fval = 8.59615994976e-06
+Temps opti : 15.13 s
+x1 = -7.49995
+x2 = -7.49999
+x3 = 0.37503
+x4 = 0.37503
+Image sauvegardée : figure1.png

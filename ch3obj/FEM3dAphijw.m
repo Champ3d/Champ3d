@@ -112,6 +112,7 @@ classdef FEM3dAphijw < FEM3dAphi
             %--------------------------------------------------------------
             obj.matrix.t_js = zeros(nb_edge,1);
             obj.matrix.a_bs = zeros(nb_edge,1);
+            obj.matrix.a_Is = zeros(nb_edge,1);
             obj.matrix.a_pm = zeros(nb_edge,1);
             %--------------------------------------------------------------
             allowed_physical_dom = {'nomesh','airbox','mconductor'};
@@ -180,9 +181,14 @@ classdef FEM3dAphijw < FEM3dAphi
             LHS = [LHS; S12.' S22]; clear S12 S22;
             %--------------------------------------------------------------
             % --- RHS
+            % ---
             bsfieldRHS = obj.parent_mesh.discrete.rot.' * ...
-                obj.matrix.nu0nurwfwf * ...
+                ((1/mu0).* obj.matrix.wfwf) * ...
                 obj.parent_mesh.discrete.rot * obj.matrix.a_bs;
+            % ---
+            filCoilRHS = obj.parent_mesh.discrete.rot.' * ...
+                ((1/mu0).* obj.matrix.wfwf) * ...
+                obj.parent_mesh.discrete.rot * obj.matrix.a_Is;
             % ---
             pmagnetRHS = obj.parent_mesh.discrete.rot.' * ...
                 ((1/mu0).* obj.matrix.wfwf) * ...
@@ -190,7 +196,7 @@ classdef FEM3dAphijw < FEM3dAphi
             % ---
             jscoilRHS = obj.parent_mesh.discrete.rot.' * obj.matrix.wewf.' * obj.matrix.t_js;
             %--------------------------------------------------------------
-            RHS = bsfieldRHS + pmagnetRHS + jscoilRHS;
+            RHS = bsfieldRHS + pmagnetRHS + jscoilRHS + filCoilRHS;
             RHS = RHS(id_edge_a_unknown,1);
             RHS = [RHS; zeros(length(id_node_phi_unknown),1)];
             %--------------------------------------------------------------
@@ -285,7 +291,7 @@ classdef FEM3dAphijw < FEM3dAphi
             arguments
                 obj
                 args.tol_out = 1e-3; % tolerance of outer loop
-                args.tol_in  = 1e-6; % tolerance of inner loop
+                args.tol_in  = 1e-8; % tolerance of inner loop
                 args.maxniter_out = 5; % maximum iteration of outer loop
                 args.maxniter_in = 1e3; % maximum iteration of inner loop
             end

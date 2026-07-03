@@ -54,6 +54,9 @@ classdef VolumeShape < Shape
                     opecode = GMSHWriter.intersection_volume;
                     geocode = [geocode newline opecode newline];
             end
+            % ---
+            geocode = obj.transformgeocode(geocode);
+            % ---
         end
         % -----------------------------------------------------------------
     end

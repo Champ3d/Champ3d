@@ -59,7 +59,7 @@ classdef EmModel < PhysicalModel
                 args.id_dom2d = []
                 args.id_dom3d = []
                 args.sigma = 0
-                args.speed = 0
+                args.speed = [0 0 0]
             end
             % ---
             args.parent_model = obj;
