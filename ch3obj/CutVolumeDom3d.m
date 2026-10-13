@@ -1,0 +1,120 @@
+%--------------------------------------------------------------------------
+% This code is written by: H-K. Bui, 2024
+% as a contribution to Champ3d code.
+%--------------------------------------------------------------------------
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% See LICENSE and CREDITS files for more information.
+% Huu-Kien.Bui@univ-nantes.fr
+% IREENA Lab - UR 4642, Nantes Universite'
+%--------------------------------------------------------------------------
+
+classdef CutVolumeDom3d < VolumeDom3d
+    properties
+        id_dom3d
+        cut_equation
+        gid_side_node_1
+        gid_side_node_2
+    end
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','id_dom3d','cut_equation'};
+        end
+    end
+    % --- Constructors
+    methods
+        function obj = CutVolumeDom3d(args)
+            arguments
+                % ---
+                args.parent_mesh = []
+                args.id_dom3d = []
+                args.cut_equation = []
+            end
+            % ---
+            obj = obj@VolumeDom3d;
+            % ---
+            obj <= args;
+            % ---
+            CutVolumeDom3d.setup(obj);
+            % ---
+        end
+    end
+    % --- setup/reset
+    methods (Static)
+        function setup(obj)
+            obj.build_from_cutequation;
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            CutVolumeDom3d.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
+        end
+    end
+    % --- Methods
+    methods (Access = private, Hidden)
+        % -----------------------------------------------------------------
+        function build_from_cutequation(obj)
+            % ---
+            gindex_ = [];
+            gid_side_node_1_ = [];
+            gid_side_node_2_ = [];
+            iddom3 = f_to_scellargin(obj.id_dom3d);
+            all_id3 = fieldnames(obj.parent_mesh.dom);
+            for i = 1:length(iddom3)
+                id3 = iddom3{i};
+                valid3 = f_validid(id3,all_id3);
+                % ---
+                if isempty(valid3)
+                    error(['dom3d ' id3 ' not found !']);
+                end
+                % ---
+                dom2cut = obj.parent_mesh.dom.(id3);
+                cut_dom = dom2cut.get_cutdom('cut_equation',obj.cut_equation);
+                gindex_ = [gindex_ cut_dom.gindex];
+                gid_side_node_1_ = [gid_side_node_1_ cut_dom.gid_side_node_1];
+                gid_side_node_2_ = [gid_side_node_2_ cut_dom.gid_side_node_2];
+            end
+            % ---
+            obj.gindex = gindex_;
+            obj.gid_side_node_1 = gid_side_node_1_;
+            obj.gid_side_node_2 = gid_side_node_2_;
+            % -------------------------------------------------------------
+        end
+        % -----------------------------------------------------------------
+    end
+    % ---
+    methods
+        function plot(obj,args)
+            arguments
+                obj
+                args.edge_color = [0.4940 0.1840 0.5560]
+                args.face_color = 'c'
+                args.alpha {mustBeNumeric} = 0.9
+            end
+            % ---
+            argu = f_to_namedarg(args);
+            plot@VolumeDom(obj,argu{:}); hold on
+            % side 1
+            x = obj.parent_mesh.node(1,obj.gid_side_node_1);
+            y = obj.parent_mesh.node(2,obj.gid_side_node_1);
+            z = obj.parent_mesh.node(3,obj.gid_side_node_1);
+            plot3(x,y,z,'or','MarkerFaceColor','r'); hold on
+            % side 1
+            x = obj.parent_mesh.node(1,obj.gid_side_node_2);
+            y = obj.parent_mesh.node(2,obj.gid_side_node_2);
+            z = obj.parent_mesh.node(3,obj.gid_side_node_2);
+            plot3(x,y,z,'ob','MarkerFaceColor','b');
+            % -------------------------------------------------------------
+        end
+    end
+end

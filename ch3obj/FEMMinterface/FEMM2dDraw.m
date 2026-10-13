@@ -1,0 +1,100 @@
+%--------------------------------------------------------------------------
+% Interface to FEMM
+% FEMM (c) David Meeker 1998-2015
+%--------------------------------------------------------------------------
+% This code is written by: H-K. Bui, 2025
+% as a contribution to Champ3d code.
+%--------------------------------------------------------------------------
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% See LICENSE and CREDITS files for more information.
+% Huu-Kien.Bui@univ-nantes.fr
+% IREENA Lab - UR 4642, Nantes Universite'
+%--------------------------------------------------------------------------
+
+classdef FEMM2dDraw < Xhandle
+    properties
+        % ---
+        ref_point     % must be in Oxy coordinates
+        % ---
+        cen_x = 0
+        cen_y = 0
+        cen_r = 0
+        cen_theta = 0
+        % ---
+        base_x
+        base_y
+        base_r
+        base_theta
+        % ---
+        direction
+        % ---
+        bottom
+        top
+        left
+        right
+        % ---
+        bottomright
+        bottomleft
+        topright
+        topleft
+        % --- for choose
+        out_bottomright
+        out_topright
+        out_bottomleft
+        out_topleft
+        % ---
+        bound
+        % ---
+        center = [0,0]  % given in Oxy coordinates
+        base
+        orientation     % given in Oxy coordinates
+        % ---
+        parent_model
+    end
+    % --- Constructor
+    methods
+        function obj = FEMM2dDraw()
+            obj@Xhandle
+        end
+    end
+    % --- Methods/public
+    methods (Access = public)
+        % -----------------------------------------------------------------
+        % -----------------------------------------------------------------
+    end
+    % --- Methods/protected
+    methods (Access = protected)
+        % -----------------------------------------------------------------
+        % --- depend on how center was defined
+        function preprocessing(obj)
+            if ~isempty(obj.cen_x)
+                obj.cen_r = sqrt(obj.cen_x^2 + obj.cen_y^2);
+                obj.cen_theta = atand(obj.cen_y/obj.cen_x);
+                obj.cenxy_defined = 1;
+            elseif ~isempty(obj.cen_r)
+                obj.cen_x = obj.cen_r * cosd(obj.cen_theta);
+                obj.cen_y = obj.cen_r * sind(obj.cen_theta);
+                obj.cenxy_defined = 0;
+            else
+                warning('cen_... is not defined');
+            end
+            % ---
+            obj.center(1) = obj.cen_x;
+            obj.center(2) = obj.cen_y;
+            obj.center    = obj.center + obj.ref_point;
+            % ---
+        end
+        % -----------------------------------------------------------------
+    end
+    % --- Methods/private
+    methods (Access = private)
+    end
+end
