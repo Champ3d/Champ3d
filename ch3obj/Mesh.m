@@ -184,23 +184,43 @@ classdef Mesh < Xhandle
                 id_node_ = f_uniquenode(obj.elem(:,id_elem));
             end
             % ---
-            xmin = min(obj.node(1,id_node_));
-            xmax = max(obj.node(1,id_node_));
-            ymin = min(obj.node(2,id_node_));
-            ymax = max(obj.node(2,id_node_));
+            xnode = obj.node(1,id_node_);
+            ynode = obj.node(2,id_node_);
+            xmean = mean(xnode);
+            ymean = mean(ynode);
             if size(obj.node,1) == 3
-                zmin = min(obj.node(3,id_node_));
-                zmax = max(obj.node(3,id_node_));
+                znode = obj.node(3,id_node_);
+                zmean = mean(znode);
+                % ---
+                r = sqrt((xmean - xnode).^2 + (ymean - ynode).^2 + (zmean - znode).^2);
+                rmax = max(r);
+            else
+                zmean = [];
+                % ---
+                r = sqrt((xmean - xnode).^2 + (ymean - ynode).^2);
+                rmax = max(r);
             end
             % ---
-            lbox.xmin = xmin;
-            lbox.xmax = xmax;
-            lbox.ymin = ymin;
-            lbox.ymax = ymax;
-            if size(obj.node,1) == 3
-                lbox.zmin = zmin;
-                lbox.zmax = zmax;
-            end
+            lbox.center = [xmean; ymean; zmean];
+            lbox.rmax  = rmax;
+            % ---
+            %xmin = min(obj.node(1,id_node_));
+            %xmax = max(obj.node(1,id_node_));
+            %ymin = min(obj.node(2,id_node_));
+            %ymax = max(obj.node(2,id_node_));
+            %if size(obj.node,1) == 3
+            %    zmin = min(obj.node(3,id_node_));
+            %    zmax = max(obj.node(3,id_node_));
+            %end
+            % ---
+            %lbox.xmin = xmin;
+            %lbox.xmax = xmax;
+            %lbox.ymin = ymin;
+            %lbox.ymax = ymax;
+            %if size(obj.node,1) == 3
+            %    lbox.zmin = zmin;
+            %    lbox.zmax = zmax;
+            %end
             % ---
         end
         % -----------------------------------------------------------------
@@ -215,14 +235,14 @@ classdef Mesh < Xhandle
             if isa(obj,'Mesh2d')
                 if isempty(gcoordinates)
                     return
-                elseif any(gcoordinates ~= [0 0])
-                    obj.node = obj.node + gcoordinates;
+                elseif any(gcoordinates ~= [0; 0])
+                    obj.node = obj.node - gcoordinates;
                 end
             elseif isa(obj,'Mesh3d')
                 if isempty(gcoordinates)
                     return
-                elseif any(gcoordinates ~= [0 0 0])
-                    obj.node = obj.node + gcoordinates;
+                elseif any(gcoordinates ~= [0; 0; 0])
+                    obj.node = obj.node - gcoordinates;
                 end
             end
             % ---
@@ -259,21 +279,23 @@ classdef Mesh < Xhandle
             end
             % ---
             if isa(obj,'Mesh2d')
-                gcoordinates = [(lbox.xmax + lbox.xmin)/2; (lbox.ymax + lbox.ymin)/2];
+                gcoordinates = [lbox.center(1); lbox.center(2)];
+                %gcoordinates = [(lbox.xmax + lbox.xmin)/2; (lbox.ymax + lbox.ymin)/2];
             elseif isa(obj,'Mesh3d')
-                gcoordinates = [(lbox.xmax + lbox.xmin)/2; (lbox.ymax + lbox.ymin)/2; (lbox.zmax + lbox.zmin)/2];
+                gcoordinates = [lbox.center(1); lbox.center(2); lbox.center(3)];
+                %gcoordinates = [(lbox.xmax + lbox.xmin)/2; (lbox.ymax + lbox.ymin)/2; (lbox.zmax + lbox.zmin)/2];
             end
             % ---
             if isa(obj,'Mesh2d')
                 if isempty(gcoordinates)
                     return
-                elseif any(gcoordinates ~= [0 0])
+                elseif any(gcoordinates ~= [0; 0])
                     obj.node = obj.node - gcoordinates;
                 end
             elseif isa(obj,'Mesh3d')
                 if isempty(gcoordinates)
                     return
-                elseif any(gcoordinates ~= [0 0 0])
+                elseif any(gcoordinates ~= [0; 0; 0])
                     obj.node = obj.node - gcoordinates;
                 end
             end
