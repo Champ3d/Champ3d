@@ -667,9 +667,10 @@ classdef Parameter < Xhandle
                                     vy_ = fyi(cnode_.');
                                     vx_(isnan(vx_)) = 0;
                                     vy_(isnan(vy_)) = 0;
-                                    fargs{i} = [vx_ vy_];
+                                    fargs{i} = [vx_ vy_].';
                                     % ---
                                     fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
+                                    fargs{i} = target_model.moving_frame.inverse_movevector(fargs{i},target_t);
                                     % ---
                                 elseif dim_ == 3
                                     valx = zeros(nbINode * nb_elem, 1);
@@ -700,9 +701,10 @@ classdef Parameter < Xhandle
                                     vx_(isnan(vx_)) = 0;
                                     vy_(isnan(vy_)) = 0;
                                     vz_(isnan(vz_)) = 0;
-                                    fargs{i} = [vx_ vy_ vz_];
+                                    fargs{i} = [vx_ vy_ vz_].';
                                     % ---
                                     fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
+                                    fargs{i} = target_model.moving_frame.inverse_movevector(fargs{i},target_t);
                                     % ---
                                 end
                             elseif f_strcmpi(place,'face')
@@ -825,9 +827,10 @@ classdef Parameter < Xhandle
                                         vy_ = fyi(cnode_.');
                                         vx_(isnan(vx_)) = 0;
                                         vy_(isnan(vy_)) = 0;
-                                        fargs{i} = [vx_ vy_];
+                                        fargs{i} = [vx_ vy_].';
                                         % ---
                                         fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
+                                        fargs{i} = target_model.moving_frame.inverse_movevector(fargs{i},target_t);
                                         % ---
                                     elseif dim_ == 3
                                         valx = zeros(nbINode * nb_face, 1);
@@ -854,9 +857,10 @@ classdef Parameter < Xhandle
                                         vx_(isnan(vx_)) = 0;
                                         vy_(isnan(vy_)) = 0;
                                         vz_(isnan(vz_)) = 0;
-                                        fargs{i} = [vx_ vy_ vz_];
+                                        fargs{i} = [vx_ vy_ vz_].';
                                         % ---
                                         fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
+                                        fargs{i} = target_model.moving_frame.inverse_movevector(fargs{i},target_t);
                                         % ---
                                     end
                                     % --------------------------------------------------------------
@@ -938,9 +942,10 @@ classdef Parameter < Xhandle
                                         vy_ = fyi(cnode_.');
                                         vx_(isnan(vx_)) = 0;
                                         vy_(isnan(vy_)) = 0;
-                                        fargs{i} = [vx_ vy_];
+                                        fargs{i} = [vx_ vy_].';
                                         % ---
                                         fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
+                                        fargs{i} = target_model.moving_frame.inverse_movevector(fargs{i},target_t);
                                         % ---
                                     elseif dim_ == 3
                                         valx = zeros(nbINode * nb_elem, 1);
@@ -967,9 +972,10 @@ classdef Parameter < Xhandle
                                         vx_(isnan(vx_)) = 0;
                                         vy_(isnan(vy_)) = 0;
                                         vz_(isnan(vz_)) = 0;
-                                        fargs{i} = [vx_ vy_ vz_];
+                                        fargs{i} = [vx_ vy_ vz_].';
                                         % ---
                                         fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
+                                        fargs{i} = target_model.moving_frame.inverse_movevector(fargs{i},target_t);
                                         % ---
                                     end
                                 else

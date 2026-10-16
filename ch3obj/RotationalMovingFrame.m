@@ -27,7 +27,7 @@ classdef RotationalMovingFrame < MovingFrame
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'rot_origin','rot_axis','rot_angle'};
+            argslist = {'axis_origin','rot_axis','rot_angle'};
         end
     end
     % --- Contructor

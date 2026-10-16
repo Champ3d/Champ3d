@@ -34,17 +34,24 @@ if isempty(condition) && isempty(in_box)
 end
 %--------------------------------------------------------------------------
 if ~isempty(in_box)
-    xmin = in_box.xmin;
-    xmax = in_box.xmax;
-    ymin = in_box.ymin;
-    ymax = in_box.ymax;
-    zmin = in_box.zmin;
-    zmax = in_box.zmax;
-    id_elem = f_findelem(node,elem,...
-         'condition',...
-        ['x <= ' num2str(xmax) '&&' 'x >= ' num2str(xmin) '&&' ...
-         'y <= ' num2str(ymax) '&&' 'y >= ' num2str(ymin) '&&' ...
-         'z <= ' num2str(zmax) '&&' 'z >= ' num2str(zmin) ]);
+    cx = in_box.center(1);
+    cy = in_box.center(2);
+    cz = in_box.center(3);
+    r  = in_box.rmax;
+    cond = sprintf('sqrt((x - %f).^2 + (y - %f).^2 + (z - %f).^2) <= %f',cx,cy,cz,r);
+    id_elem = f_findelem(node,elem,'condition',cond);
+    
+%     xmin = in_box.xmin;
+%     xmax = in_box.xmax;
+%     ymin = in_box.ymin;
+%     ymax = in_box.ymax;
+%     zmin = in_box.zmin;
+%     zmax = in_box.zmax;
+%     id_elem = f_findelem(node,elem,...
+%          'condition',...
+%         ['x <= ' num2str(xmax) '&&' 'x >= ' num2str(xmin) '&&' ...
+%          'y <= ' num2str(ymax) '&&' 'y >= ' num2str(ymin) '&&' ...
+%          'z <= ' num2str(zmax) '&&' 'z >= ' num2str(zmin) ]);
     return
 end
 %--------------------------------------------------------------------------
