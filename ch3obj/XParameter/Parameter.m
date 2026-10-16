@@ -23,7 +23,7 @@ classdef Parameter < Xhandle
         depend_on
         from
         varargin_list
-        fvectorized
+        fvectorized = 1
         % ---
         dit
         id_coil
@@ -44,7 +44,7 @@ classdef Parameter < Xhandle
                 args.depend_on
                 args.from
                 args.varargin_list
-                args.fvectorized
+                args.fvectorized = 1
             end
             % ---
             obj = obj@Xhandle;
@@ -66,7 +66,7 @@ classdef Parameter < Xhandle
                 args.depend_on = ''
                 args.from = []
                 args.varargin_list = []
-                args.fvectorized = 0
+                args.fvectorized = 1
             end
             % ---
             parent_model_ = args.parent_model;

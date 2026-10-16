@@ -32,7 +32,7 @@ classdef VectorParameter < Parameter
                 args.depend_on
                 args.from = []
                 args.varargin_list = []
-                args.fvectorized = 0
+                args.fvectorized = 1
             end
             % ---
             obj = obj@Parameter;
