@@ -47,15 +47,15 @@ classdef CloseCoil < Coil
             % ---
             gid_elem_coil = obj.dom.gindex;
             lbox = obj.parent_model.parent_mesh.localbox(gid_elem_coil);
-            lenx = lbox.xmax - lbox.xmin;
-            leny = lbox.ymax - lbox.ymin;
-            lenz = lbox.zmax - lbox.zmin;
-            lbox.xmin = lbox.xmin - lenx/2;
-            lbox.xmax = lbox.xmax + lenx/2;
-            lbox.ymin = lbox.ymin - leny/2;
-            lbox.ymax = lbox.ymax + leny/2;
-            lbox.zmin = lbox.zmin - lenz/2;
-            lbox.zmax = lbox.zmax + lenz/2;
+%             lenx = lbox.xmax - lbox.xmin;
+%             leny = lbox.ymax - lbox.ymin;
+%             lenz = lbox.zmax - lbox.zmin;
+%             lbox.xmin = lbox.xmin - lenx/2;
+%             lbox.xmax = lbox.xmax + lenx/2;
+%             lbox.ymin = lbox.ymin - leny/2;
+%             lbox.ymax = lbox.ymax + leny/2;
+%             lbox.zmin = lbox.zmin - lenz/2;
+%             lbox.zmax = lbox.zmax + lenz/2;
             % ---
             gid_elem_smesh = f_findelem(parent_mesh.node,parent_mesh.elem,'in_box',lbox);
             [~,lid_elem_coil]  = intersect(gid_elem_smesh,gid_elem_coil);

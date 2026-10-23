@@ -29,6 +29,7 @@ classdef HexaMeshFromQuadMesh < HexMesh
         build_discrete_done = 0;
         build_intkit_done = 0;
         build_prokit_done = 0;
+        build_finterpolant_done = 0;
     end
     % --- Valid args list
     methods (Static)
@@ -74,6 +75,7 @@ classdef HexaMeshFromQuadMesh < HexMesh
             obj.build_discrete_done = 0;
             obj.build_intkit_done = 0;
             obj.build_prokit_done = 0;
+            obj.build_finterpolant_done = 0;
             % ---
             if isempty(obj.parent_mesh2d) || isempty(obj.id_zline)
                 return
@@ -212,6 +214,10 @@ classdef HexaMeshFromQuadMesh < HexMesh
             if ~obj.build_intkit_done
                 obj.build_intkit;
                 obj.build_intkit_done = 1;
+            end
+            if ~obj.build_finterpolant_done
+                obj.build_finterpolant;
+                obj.build_finterpolant_done = 1;
             end
             % ---
             obj.build_done = 1;

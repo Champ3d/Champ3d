@@ -36,6 +36,8 @@ classdef Mesh < Xhandle
         discrete
         intkit
         prokit
+        % ---
+        finterpolant
         % --- submesh
         parent_mesh
         gindex
@@ -991,6 +993,24 @@ classdef Mesh < Xhandle
             %--------------------------------------------------------------
         end
         % -----------------------------------------------------------------
+    end
+    % --- interpolant
+    methods
+        function build_finterpolant(obj)
+            interp_node = obj.get_interpnode;
+            nbINode = length(interp_node);
+            nb_elem_ = obj.nb_elem;
+            % ---
+            node_i = zeros(nbINode * nb_elem_, 3);
+            % ---
+            id0 = 1:nb_elem_;
+            for k = 1:nbINode
+                idn = id0 + (k - 1) * nb_elem_;
+                node_i(idn,:) = interp_node{k}(:,:);
+            end
+            % ---
+            obj.finterpolant = scatteredInterpolant(node_i,zeros(size(node_i,1),1));
+        end
     end
     % --- Check
     methods
