@@ -111,18 +111,14 @@ em_01.field{1}.J.face.plot('id_meshdom','scoil'); hold on
 %%
 figure
 em_01.field{1}.B.elem.plot('id_meshdom','fer'); hold on
-
+title("B in core");
 %%
-
 idelem = m3d_01.dom.fer.gindex;
 cpoint = m3d_01.celem(:,idelem);
 cvec   = em_01.field{1}.B.elem.cvalue(idelem);
 figure
-f_quiver(cpoint,imag(cvec));
+f_quiver(cpoint,imag(cvec)); title("B in core");
 
-%%
-figure
-em_01.field{1}.Phi.node.plot('id_meshdom','coil'); hold on
 
 
 

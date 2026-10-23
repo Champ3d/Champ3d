@@ -232,7 +232,7 @@ tensor_lambda = LTensor('parent_model',th_01, ...
                        'ort2_dir',[0 0 1],'ort2_value',10);
 
 
-th_01.add_convection('id_dom3d','s_allplate','h',h);
+th_01.add_convection('id','allphate','id_dom3d','s_allplate','h',h);
 th_01.add_thconductor('id','cfrp','id_dom3d','cfrp','lambda',tensor_lambda);
 th_01.add_thcapacitor('id','cfrp','id_dom3d','cfrp','cp',1000,'rho',1000);
 th_01.add_thconductor('id','copper','id_dom3d','copper','lambda',100);

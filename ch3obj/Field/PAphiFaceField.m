@@ -66,7 +66,7 @@ classdef PAphiFaceField < ScalarFaceField
                 for iec = 1:length(id_phydom_)
                     tarray = obj.sibc.(id_phydom_{iec}).skindepth;
                     % ---
-                    [gindex,lindex] = intersect(id_face,tarray.parent_dom.gindex);
+                    [gindex,lindex] = intersect(tarray.parent_dom.gindex,id_face);
                     % ---
                     val(lindex,:) =+ (1/2 * real(tarray(lindex) * ...
                         obj.Efield(gindex) * conj(obj.Jfield(gindex))));
@@ -94,7 +94,7 @@ classdef PAphiFaceField < ScalarFaceField
                 for iec = 1:length(id_phydom_)
                     tarray = obj.sibc.(id_phydom_{iec}).skindepth;
                     % ---
-                    [gindex,lindex] = intersect(id_face,tarray.parent_dom.gindex);
+                    [gindex,lindex] = intersect(tarray.parent_dom.gindex,id_face);
                     vcell =+ (1/2 * real(tarray(lindex) * ...
                         obj.Efield({gindex}) * conj(obj.Jfield({gindex}))));
                     if iec == 1

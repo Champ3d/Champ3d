@@ -69,7 +69,7 @@ classdef HAphiElemField < VectorElemField
                 for iec = 1:length(id_phydom_)
                     tarray = obj.mconductor.(id_phydom_{iec}).nur;
                     % ---
-                    [gindex,lindex] = intersect(id_elem,tarray.parent_dom.gindex);
+                    [gindex,lindex] = intersect(tarray.parent_dom.gindex,id_elem);
                     val(lindex,:) =+ (obj.Bfield(gindex) * (tarray(lindex) * nu0));
                 end
             end
@@ -103,7 +103,7 @@ classdef HAphiElemField < VectorElemField
                 for iec = 1:length(id_phydom_)
                     tarray = obj.mconductor.(id_phydom_{iec}).nur;
                     % ---
-                    [gindex,lindex] = intersect(id_elem,tarray.parent_dom.gindex);
+                    [gindex,lindex] = intersect(tarray.parent_dom.gindex,id_elem);
                     vcell =+ (obj.Bfield({gindex}) * (tarray(lindex) * nu0));
                 end
                 for i = 1:nbI

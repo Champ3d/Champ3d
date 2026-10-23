@@ -186,19 +186,25 @@ classdef Mesh < Xhandle
                 id_node_ = f_uniquenode(obj.elem(:,id_elem));
             end
             % ---
+            dim_ = size(obj.node,1);
+            % ---
             xnode = obj.node(1,id_node_);
             ynode = obj.node(2,id_node_);
-            xmean = mean(xnode);
-            ymean = mean(ynode);
-            if size(obj.node,1) == 3
+            % ---
+            if isempty(obj.velem) || isempty(obj.celem)
+                obj.build_meshds;
+            end
+            % ---
+            sumv = sum(obj.velem(id_elem));
+            xmean = sum(obj.celem(1,id_elem) .* obj.velem(id_elem)) / sumv;
+            ymean = sum(obj.celem(2,id_elem) .* obj.velem(id_elem)) / sumv;
+            if dim_ == 3
                 znode = obj.node(3,id_node_);
-                zmean = mean(znode);
-                % ---
+                zmean = sum(obj.celem(3,id_elem) .* obj.velem(id_elem)) / sumv;
                 r = sqrt((xmean - xnode).^2 + (ymean - ynode).^2 + (zmean - znode).^2);
                 rmax = max(r);
-            else
+            elseif dim_ == 2
                 zmean = [];
-                % ---
                 r = sqrt((xmean - xnode).^2 + (ymean - ynode).^2);
                 rmax = max(r);
             end
