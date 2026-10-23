@@ -137,7 +137,6 @@ figure
 m3d_01.dom.coil.plot('face_color',f_color(1));
 m3d_02.dom.cfrp.plot('face_color',f_color(2));
 m3d_02.dom.copper.plot('face_color',f_color(3));
-
 %%
 fr = 1e5;
 em_01 = FEM3dAphijw('parent_mesh',m3d_01,'frequency',fr);
