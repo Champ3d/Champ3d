@@ -81,14 +81,12 @@ classdef LTensor < Xhandle
                 meshdom = dom;
             end
             % ---
-            if isa(meshdom,'VolumeDom')
+            if isa(meshdom,'VolumeDom') || ...
+               isa(meshdom,'SurfaceDom') || ...
+               isprop(meshdom,'gindex')
                 id_elem = meshdom.gindex;
-            elseif isa(meshdom,'SurfaceDom')
-                id_elem = meshdom.gindex;
-            elseif isprop(meshdom,'gindex')
-                id_elem = meshdom.gindex;
-            elseif isprop(meshdom,'gindex')
-                id_elem = meshdom.gindex;
+            else
+                id_elem = [];
             end
             % ---
             nb_elem = length(id_elem);

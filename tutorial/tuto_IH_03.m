@@ -77,7 +77,7 @@ m3d_01.add_vdom('id','coil',...
 m3d_01.add_sdom('id','scoil','defined_on','bound','id_dom3d','coil');
 
 m3d_01.centering('coil_face');
-m3d_01.lock_origin('gcoordinates',[xcoil/2  0  tcoil/2 + agap]);
+m3d_01.lock_origin('gcoordinates',[-xcoil/2  0  -(tcoil/2 + agap)]);
 %%
 figure
 m3d_01.plot('face_color','none','alpha',0.1);
@@ -131,7 +131,7 @@ m3d_02.add_vdom('id','cfrp',...
 m3d_02.add_sdom('id','scopper','defined_on','bound','id_dom3d','copper');
 % ---
 m3d_02.centering('cfrp');
-m3d_02.lock_origin('gcoordinates',[0 +yplate/2 -zplate*nplate/2]);
+m3d_02.lock_origin('gcoordinates',[0 yplate/2 +zplate/2]);
 %%
 figure
 m3d_01.dom.coil.plot('face_color',f_color(1));
@@ -176,7 +176,7 @@ em_02.add_ltime(ltime);
 
 speed = 10e-3; % m/s
 step = ScalarParameter('f',@(t)(speed * t),'depend_on','ltime','from',em_02);
-movframe = LinearMovingFrame('dir',[0 -1 0],'step',step);
+movframe = LinearMovingFrame('dir',[0 +1 0],'step',step);
 
 em_02.add_movingframe(movframe);
 
@@ -221,7 +221,7 @@ th_01.add_ltime(ltime);
 
 % --- 1 model - 1 moving-frame (because defend on ltime)
 step = ScalarParameter('f',@(t)(10e-3 * t),'depend_on','ltime','from',th_01);
-movframe = LinearMovingFrame('dir',[0 -1 0],'step',step);
+movframe = LinearMovingFrame('dir',[0 +1 0],'step',step);
 th_01.add_movingframe(movframe);
 
 h = ScalarParameter('f',@(T)(5+T/100),'depend_on','T','from',th_01);
@@ -232,7 +232,7 @@ tensor_lambda = LTensor('parent_model',th_01, ...
                        'ort2_dir',[0 0 1],'ort2_value',10);
 
 
-th_01.add_convection('id_dom3d','s_allplate','h',h);
+th_01.add_convection('id','allphate','id_dom3d','s_allplate','h',h);
 th_01.add_thconductor('id','cfrp','id_dom3d','cfrp','lambda',tensor_lambda);
 th_01.add_thcapacitor('id','cfrp','id_dom3d','cfrp','cp',1000,'rho',1000);
 th_01.add_thconductor('id','copper','id_dom3d','copper','lambda',100);
@@ -254,7 +254,7 @@ for t = 0:0.2:10
     em_01.ltime.it = th_01.ltime.back_it(t);
     em_01.coil.mycoil.plot('alpha',0.5,'face_color','b','edge_color','none');
     %caxis('auto'); colorbar; view(3);
-    caxis([25 50]); colorbar; view(3);
+    caxis([25 80]); colorbar; view(3);
     % ---
     pause(0.5)
     % ---

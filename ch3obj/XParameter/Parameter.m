@@ -23,7 +23,7 @@ classdef Parameter < Xhandle
         depend_on
         from
         varargin_list
-        fvectorized
+        fvectorized = 1
         % ---
         dit
         id_coil
@@ -44,7 +44,7 @@ classdef Parameter < Xhandle
                 args.depend_on
                 args.from
                 args.varargin_list
-                args.fvectorized
+                args.fvectorized = 1
             end
             % ---
             obj = obj@Xhandle;
@@ -66,7 +66,7 @@ classdef Parameter < Xhandle
                 args.depend_on = ''
                 args.from = []
                 args.varargin_list = []
-                args.fvectorized = 0
+                args.fvectorized = 1
             end
             % ---
             parent_model_ = args.parent_model;
@@ -591,6 +591,9 @@ classdef Parameter < Xhandle
                                     id_elem_source = f_findelem(source_model.moving_frame.node(target_t),source_model.parent_mesh.elem,...
                                         'in_box',target_model.moving_frame.localbox(id_elem_target,target_t));
                                 end
+                                % ---
+                                nb_elem = source_model.parent_mesh.nb_elem; %length(id_elem_source);
+                                id_elem_source = 1:nb_elem;
                                 % --- time interpolated data
                                 next_it = min(source_model.ltime.next_it(target_t),source_available_max_it);
                                 back_it = min(source_model.ltime.back_it(target_t),source_available_max_it);
@@ -618,7 +621,8 @@ classdef Parameter < Xhandle
                                 % --- space interpolation
                                 interp_node = source_model.parent_mesh.prokit.node;
                                 nbINode = length(interp_node);
-                                nb_elem = length(id_elem_source);
+                                nb_elem = source_model.parent_mesh.nb_elem; %length(id_elem_source);
+                                id_elem_source = 1:nb_elem;
                                 % ---
                                 node_i = zeros(nbINode * nb_elem, 3);
                                 % ---
@@ -667,9 +671,10 @@ classdef Parameter < Xhandle
                                     vy_ = fyi(cnode_.');
                                     vx_(isnan(vx_)) = 0;
                                     vy_(isnan(vy_)) = 0;
-                                    fargs{i} = [vx_ vy_];
+                                    fargs{i} = [vx_ vy_].';
                                     % ---
                                     fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
+                                    fargs{i} = target_model.moving_frame.inverse_movevector(fargs{i},target_t);
                                     % ---
                                 elseif dim_ == 3
                                     valx = zeros(nbINode * nb_elem, 1);
@@ -684,15 +689,17 @@ classdef Parameter < Xhandle
                                         valz(idn) = valcell{k}(:,3);
                                     end
                                     % ---
-                                    fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                    tic
+                                    source_model.parent_mesh.build;
+                                    toc
+                                    tic
+                                    fxi = source_model.parent_mesh.finterpolant; %scatteredInterpolant(node_i,valx,'linear','none');
+                                    fxi.Values = valx;
                                     fyi = fxi;
                                     fyi.Values = valy;
                                     fzi = fxi;
                                     fzi.Values = valz;
-                                    % ---
-                                    % fxi = scatteredInterpolant(node_i,valx,'linear','none');
-                                    % fyi = scatteredInterpolant(node_i,valy,'linear','none');
-                                    % fzi = scatteredInterpolant(node_i,valz,'linear','none');
+                                    toc
                                     % ---
                                     vx_ = fxi(cnode_.');
                                     vy_ = fyi(cnode_.');
@@ -700,9 +707,10 @@ classdef Parameter < Xhandle
                                     vx_(isnan(vx_)) = 0;
                                     vy_(isnan(vy_)) = 0;
                                     vz_(isnan(vz_)) = 0;
-                                    fargs{i} = [vx_ vy_ vz_];
+                                    fargs{i} = [vx_ vy_ vz_].';
                                     % ---
                                     fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
+                                    fargs{i} = target_model.moving_frame.inverse_movevector(fargs{i},target_t);
                                     % ---
                                 end
                             elseif f_strcmpi(place,'face')
@@ -825,9 +833,10 @@ classdef Parameter < Xhandle
                                         vy_ = fyi(cnode_.');
                                         vx_(isnan(vx_)) = 0;
                                         vy_(isnan(vy_)) = 0;
-                                        fargs{i} = [vx_ vy_];
+                                        fargs{i} = [vx_ vy_].';
                                         % ---
                                         fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
+                                        fargs{i} = target_model.moving_frame.inverse_movevector(fargs{i},target_t);
                                         % ---
                                     elseif dim_ == 3
                                         valx = zeros(nbINode * nb_face, 1);
@@ -854,9 +863,10 @@ classdef Parameter < Xhandle
                                         vx_(isnan(vx_)) = 0;
                                         vy_(isnan(vy_)) = 0;
                                         vz_(isnan(vz_)) = 0;
-                                        fargs{i} = [vx_ vy_ vz_];
+                                        fargs{i} = [vx_ vy_ vz_].';
                                         % ---
                                         fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
+                                        fargs{i} = target_model.moving_frame.inverse_movevector(fargs{i},target_t);
                                         % ---
                                     end
                                     % --------------------------------------------------------------
@@ -938,9 +948,10 @@ classdef Parameter < Xhandle
                                         vy_ = fyi(cnode_.');
                                         vx_(isnan(vx_)) = 0;
                                         vy_(isnan(vy_)) = 0;
-                                        fargs{i} = [vx_ vy_];
+                                        fargs{i} = [vx_ vy_].';
                                         % ---
                                         fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
+                                        fargs{i} = target_model.moving_frame.inverse_movevector(fargs{i},target_t);
                                         % ---
                                     elseif dim_ == 3
                                         valx = zeros(nbINode * nb_elem, 1);
@@ -967,9 +978,10 @@ classdef Parameter < Xhandle
                                         vx_(isnan(vx_)) = 0;
                                         vy_(isnan(vy_)) = 0;
                                         vz_(isnan(vz_)) = 0;
-                                        fargs{i} = [vx_ vy_ vz_];
+                                        fargs{i} = [vx_ vy_ vz_].';
                                         % ---
                                         fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
+                                        fargs{i} = target_model.moving_frame.inverse_movevector(fargs{i},target_t);
                                         % ---
                                     end
                                 else

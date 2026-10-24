@@ -64,7 +64,7 @@ classdef JAphiFaceField < VectorFaceField
                 for iec = 1:length(id_phydom_)
                     tarray = obj.sibc.(id_phydom_{iec}).sigma;
                     % ---
-                    [gindex,lindex] = intersect(id_face,tarray.parent_dom.gindex);
+                    [gindex,lindex] = intersect(tarray.parent_dom.gindex, id_face);
                     val(lindex,:) =+ (obj.Efield(gindex) * tarray(lindex));
                 end
             end
@@ -90,7 +90,7 @@ classdef JAphiFaceField < VectorFaceField
                 for iec = 1:length(id_phydom_)
                     tarray = obj.sibc.(id_phydom_{iec}).sigma;
                     % ---
-                    [gindex,lindex] = intersect(id_face,tarray.parent_dom.gindex);
+                    [gindex,lindex] = intersect(tarray.parent_dom.gindex,id_face);
                     vcell =+ (obj.Efield({gindex}) * tarray(lindex));
                     if iec == 1
                         nbI = length(vcell);

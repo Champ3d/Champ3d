@@ -36,6 +36,8 @@ classdef Mesh < Xhandle
         discrete
         intkit
         prokit
+        % ---
+        finterpolant
         % --- submesh
         parent_mesh
         gindex
@@ -184,23 +186,49 @@ classdef Mesh < Xhandle
                 id_node_ = f_uniquenode(obj.elem(:,id_elem));
             end
             % ---
-            xmin = min(obj.node(1,id_node_));
-            xmax = max(obj.node(1,id_node_));
-            ymin = min(obj.node(2,id_node_));
-            ymax = max(obj.node(2,id_node_));
-            if size(obj.node,1) == 3
-                zmin = min(obj.node(3,id_node_));
-                zmax = max(obj.node(3,id_node_));
+            dim_ = size(obj.node,1);
+            % ---
+            xnode = obj.node(1,id_node_);
+            ynode = obj.node(2,id_node_);
+            % ---
+            if isempty(obj.velem) || isempty(obj.celem)
+                obj.build_meshds;
             end
             % ---
-            lbox.xmin = xmin;
-            lbox.xmax = xmax;
-            lbox.ymin = ymin;
-            lbox.ymax = ymax;
-            if size(obj.node,1) == 3
-                lbox.zmin = zmin;
-                lbox.zmax = zmax;
+            sumv = sum(obj.velem(id_elem));
+            xmean = sum(obj.celem(1,id_elem) .* obj.velem(id_elem)) / sumv;
+            ymean = sum(obj.celem(2,id_elem) .* obj.velem(id_elem)) / sumv;
+            if dim_ == 3
+                znode = obj.node(3,id_node_);
+                zmean = sum(obj.celem(3,id_elem) .* obj.velem(id_elem)) / sumv;
+                r = sqrt((xmean - xnode).^2 + (ymean - ynode).^2 + (zmean - znode).^2);
+                rmax = max(r);
+            elseif dim_ == 2
+                zmean = [];
+                r = sqrt((xmean - xnode).^2 + (ymean - ynode).^2);
+                rmax = max(r);
             end
+            % ---
+            lbox.center = [xmean; ymean; zmean];
+            lbox.rmax  = rmax;
+            % ---
+            %xmin = min(obj.node(1,id_node_));
+            %xmax = max(obj.node(1,id_node_));
+            %ymin = min(obj.node(2,id_node_));
+            %ymax = max(obj.node(2,id_node_));
+            %if size(obj.node,1) == 3
+            %    zmin = min(obj.node(3,id_node_));
+            %    zmax = max(obj.node(3,id_node_));
+            %end
+            % ---
+            %lbox.xmin = xmin;
+            %lbox.xmax = xmax;
+            %lbox.ymin = ymin;
+            %lbox.ymax = ymax;
+            %if size(obj.node,1) == 3
+            %    lbox.zmin = zmin;
+            %    lbox.zmax = zmax;
+            %end
             % ---
         end
         % -----------------------------------------------------------------
@@ -215,14 +243,14 @@ classdef Mesh < Xhandle
             if isa(obj,'Mesh2d')
                 if isempty(gcoordinates)
                     return
-                elseif any(gcoordinates ~= [0 0])
-                    obj.node = obj.node + gcoordinates;
+                elseif any(gcoordinates ~= [0; 0])
+                    obj.node = obj.node - gcoordinates;
                 end
             elseif isa(obj,'Mesh3d')
                 if isempty(gcoordinates)
                     return
-                elseif any(gcoordinates ~= [0 0 0])
-                    obj.node = obj.node + gcoordinates;
+                elseif any(gcoordinates ~= [0; 0; 0])
+                    obj.node = obj.node - gcoordinates;
                 end
             end
             % ---
@@ -259,21 +287,23 @@ classdef Mesh < Xhandle
             end
             % ---
             if isa(obj,'Mesh2d')
-                gcoordinates = [(lbox.xmax + lbox.xmin)/2; (lbox.ymax + lbox.ymin)/2];
+                gcoordinates = [lbox.center(1); lbox.center(2)];
+                %gcoordinates = [(lbox.xmax + lbox.xmin)/2; (lbox.ymax + lbox.ymin)/2];
             elseif isa(obj,'Mesh3d')
-                gcoordinates = [(lbox.xmax + lbox.xmin)/2; (lbox.ymax + lbox.ymin)/2; (lbox.zmax + lbox.zmin)/2];
+                gcoordinates = [lbox.center(1); lbox.center(2); lbox.center(3)];
+                %gcoordinates = [(lbox.xmax + lbox.xmin)/2; (lbox.ymax + lbox.ymin)/2; (lbox.zmax + lbox.zmin)/2];
             end
             % ---
             if isa(obj,'Mesh2d')
                 if isempty(gcoordinates)
                     return
-                elseif any(gcoordinates ~= [0 0])
+                elseif any(gcoordinates ~= [0; 0])
                     obj.node = obj.node - gcoordinates;
                 end
             elseif isa(obj,'Mesh3d')
                 if isempty(gcoordinates)
                     return
-                elseif any(gcoordinates ~= [0 0 0])
+                elseif any(gcoordinates ~= [0; 0; 0])
                     obj.node = obj.node - gcoordinates;
                 end
             end
@@ -969,6 +999,24 @@ classdef Mesh < Xhandle
             %--------------------------------------------------------------
         end
         % -----------------------------------------------------------------
+    end
+    % --- interpolant
+    methods
+        function build_finterpolant(obj)
+            interp_node = obj.get_interpnode;
+            nbINode = length(interp_node);
+            nb_elem_ = obj.nb_elem;
+            % ---
+            node_i = zeros(nbINode * nb_elem_, 3);
+            % ---
+            id0 = 1:nb_elem_;
+            for k = 1:nbINode
+                idn = id0 + (k - 1) * nb_elem_;
+                node_i(idn,:) = interp_node{k}(:,:);
+            end
+            % ---
+            obj.finterpolant = scatteredInterpolant(node_i,zeros(size(node_i,1),1));
+        end
     end
     % --- Check
     methods

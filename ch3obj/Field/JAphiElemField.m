@@ -64,7 +64,7 @@ classdef JAphiElemField < VectorElemField
                 for iec = 1:length(id_phydom_)
                     tarray = obj.econductor.(id_phydom_{iec}).sigma;
                     % ---
-                    [gindex,lindex] = intersect(id_elem,tarray.parent_dom.gindex);
+                    [gindex,lindex] = intersect(tarray.parent_dom.gindex,id_elem);
                     val(lindex,:) =+ (obj.Efield(gindex) * tarray(lindex));
                 end
             end
@@ -94,7 +94,7 @@ classdef JAphiElemField < VectorElemField
                 for iec = 1:length(id_phydom_)
                     tarray = obj.econductor.(id_phydom_{iec}).sigma;
                     % ---
-                    [gindex,lindex] = intersect(id_elem,tarray.parent_dom.gindex);
+                    [gindex,lindex] = intersect(tarray.parent_dom.gindex,id_elem);
                     vcell =+ (obj.Efield({gindex}) * tarray(lindex));
                 end
                 for i = 1:nbI

@@ -106,7 +106,8 @@ em_01.solve;
 
 %%
 format long
-em_01.coil.mycoil.Z
+em_01.coil.mycoil.R
+em_01.coil.mycoil.L
 
 
 

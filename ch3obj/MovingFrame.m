@@ -84,28 +84,31 @@ classdef MovingFrame < Xhandle
             % ---
             lbox = obj.parent_model.parent_mesh.localbox(id_elem);
             % ---
-            xmin = lbox.xmin;
-            xmax = lbox.xmax;
-            ymin = lbox.ymin;
-            ymax = lbox.ymax;
-            zmin = lbox.zmin;
-            zmax = lbox.zmax;
-            % ---
-            limnodes = obj.movenode([xmin xmax; ymin ymax; zmin zmax],t);
-            % ---
-            xmin = limnodes(1,1);
-            xmax = limnodes(1,2);
-            ymin = limnodes(2,1);
-            ymax = limnodes(2,2);
-            zmin = limnodes(3,1);
-            zmax = limnodes(3,2);
-            % ---
-            lbox.xmin = min(xmin,xmax);
-            lbox.xmax = max(xmin,xmax);
-            lbox.ymin = min(ymin,ymax);
-            lbox.ymax = max(ymin,ymax);
-            lbox.zmin = min(zmin,zmax);
-            lbox.zmax = max(zmin,zmax);
+            lbox.center = obj.movenode(lbox.center,t);
+
+%             % ---
+%             xmin = lbox.xmin;
+%             xmax = lbox.xmax;
+%             ymin = lbox.ymin;
+%             ymax = lbox.ymax;
+%             zmin = lbox.zmin;
+%             zmax = lbox.zmax;
+%             % ---
+%             limnodes = obj.movenode([xmin xmax; ymin ymax; zmin zmax],t);
+%             % ---
+%             xmin = limnodes(1,1);
+%             xmax = limnodes(1,2);
+%             ymin = limnodes(2,1);
+%             ymax = limnodes(2,2);
+%             zmin = limnodes(3,1);
+%             zmax = limnodes(3,2);
+%             % ---
+%             lbox.xmin = min(xmin,xmax);
+%             lbox.xmax = max(xmin,xmax);
+%             lbox.ymin = min(ymin,ymax);
+%             lbox.ymax = max(ymin,ymax);
+%             lbox.zmin = min(zmin,zmax);
+%             lbox.zmax = max(zmin,zmax);
         end
     end
 
