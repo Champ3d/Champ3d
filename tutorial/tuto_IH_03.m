@@ -251,10 +251,10 @@ figure
 for t = 0:0.2:10
     th_01.ltime.it = th_01.ltime.back_it(t);
     th_01.thconductor.copper.plotT; hold on
-    em_01.ltime.it = th_01.ltime.back_it(t);
-    em_01.coil.mycoil.plot('alpha',0.5,'face_color','b','edge_color','none');
+    %em_01.ltime.it = th_01.ltime.back_it(t);
+    %em_01.coil.mycoil.plot('alpha',0.5,'face_color','b','edge_color','none');
     %caxis('auto'); colorbar; view(3);
-    caxis([25 80]); colorbar; view(3);
+    %caxis([25 80]); colorbar; view(3);
     % ---
     pause(0.5)
     % ---
