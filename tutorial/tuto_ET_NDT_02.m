@@ -5,9 +5,9 @@ clc
 
 %% Parameters
 
-riCoil = 2e-3;
-roCoil = 4e-3;
-zCoil  = 2e-3;
+riCoil = 0.25e-3;
+roCoil = 6e-3;
+zCoil  = 1e-3;
 csCoil = (roCoil - riCoil) * zCoil;
 Js = 1/csCoil;
 rPlate = 20e-3;
@@ -20,7 +20,7 @@ rBox = 2*rPlate;
 %% mesh2d
 dnum = 20;
 shape_01 = SCircle("id","ri","center",[0 0],"r",riCoil,"dnum",dnum,"choosed_by","top");
-shape_02 = SCircle("id","ro","center",[0 0],"r",roCoil,"dnum",dnum,"choosed_by","top");
+shape_02 = SCircle("id","ro","center",[0 0],"r",roCoil,"dnum",2*dnum,"choosed_by","top");
 shape_03 = SCircle("id","rplate","center",[0 0],"r",rPlate,"dnum",dnum,"choosed_by","top");
 shape_04 = SCircle("id","rair","center",[0 0],"r",rBox,"dnum",dnum,"choosed_by","top");
 
@@ -39,7 +39,7 @@ msh2d_01.dom.coil.plot("face_color",f_color(2));
 m1d_01 = Mesh1d();
 % ---
 msize1 = 4;
-msize2 = 4;
+msize2 = 8;
 % --- z
 m1d_01.add_line1d('id','zabox01','len',rBox,'dnum',msize2,'dtype','log-');
 m1d_01.add_line1d('id','zplate' ,'len',zPlate,'dnum',msize1,'dtype','log-');
@@ -70,17 +70,17 @@ m3d_01.dom.coil.plot('face_color',f_color(1)); hold on
 m3d_01.dom.plate.plot('face_color',f_color(2)); hold on
 
 %% em model
-fr = 100e3;
+fr = 15e3;
 em_01 = FEM3dAphijw('parent_mesh',m3d_01,'frequency',fr);
 % ---
 tsigma = LTensor('parent_model',em_01, ...
-                 'main_dir',[1 0 0],'main_value',40e3, ...
-                 'ort1_dir',[0 1 0],'ort1_value',40e3, ...
-                 'ort2_dir',[0 0 1],'ort2_value',10);
-em_01.add_econductor('id','plate','id_dom3d','plate','sigma',tsigma);
+                 'main_dir',[1 0 0],'main_value',sigPlate, ...
+                 'ort1_dir',[0 1 0],'ort1_value',sigPlate, ...
+                 'ort2_dir',[0 0 1],'ort2_value',sigPlate);
+%em_01.add_econductor('id','plate','id_dom3d','plate','sigma',tsigma);
 % ---
 coil = StrandedCloseJsCoil("parent_model",em_01,'id_dom3d','coil','cs_area',csCoil,...
-                           'spin_vector',[0 0 1],'nb_turn',100, ...
+                           'spin_vector',[0 0 1],'nb_turn',720, ...
                            'Js',Js);
 em_01.add_coil('id','mycoil','coil_obj',coil);
 %% solve
