@@ -114,6 +114,7 @@ classdef FEM3dAphijw < FEM3dAphi
             obj.matrix.a_bs = zeros(nb_edge,1);
             obj.matrix.a_Is = zeros(nb_edge,1);
             obj.matrix.a_pm = zeros(nb_edge,1);
+            obj.matrix.h_Is = zeros(nb_edge,1);
             %--------------------------------------------------------------
             allowed_physical_dom = {'nomesh','airbox','mconductor'};
             %--------------------------------------------------------------
@@ -186,9 +187,9 @@ classdef FEM3dAphijw < FEM3dAphi
                 ((1/mu0).* obj.matrix.wfwf) * ...
                 obj.parent_mesh.discrete.rot * obj.matrix.a_bs;
             % ---
-            filCoilRHS = obj.parent_mesh.discrete.rot.' * ...
-                ((1/mu0).* obj.matrix.wfwf) * ...
-                obj.parent_mesh.discrete.rot * obj.matrix.a_Is;
+            % filCoilRHS = obj.parent_mesh.discrete.rot.' * ((1/mu0).* obj.matrix.wfwf) * obj.parent_mesh.discrete.rot * obj.matrix.a_Is;
+            % ---
+            filCoilRHS = obj.parent_mesh.discrete.rot.' * obj.matrix.wewf.' * obj.matrix.h_Is;
             % ---
             pmagnetRHS = obj.parent_mesh.discrete.rot.' * ...
                 ((1/mu0).* obj.matrix.wfwf) * ...
