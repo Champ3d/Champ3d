@@ -689,17 +689,13 @@ classdef Parameter < Xhandle
                                         valz(idn) = valcell{k}(:,3);
                                     end
                                     % ---
-                                    tic
-                                    source_model.parent_mesh.build;
-                                    toc
-                                    tic
+                                    source_model.parent_mesh.build_finterpolant;
                                     fxi = source_model.parent_mesh.finterpolant; %scatteredInterpolant(node_i,valx,'linear','none');
                                     fxi.Values = valx;
                                     fyi = fxi;
                                     fyi.Values = valy;
                                     fzi = fxi;
                                     fzi.Values = valz;
-                                    toc
                                     % ---
                                     vx_ = fxi(cnode_.');
                                     vy_ = fyi(cnode_.');

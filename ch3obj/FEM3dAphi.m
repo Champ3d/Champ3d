@@ -114,7 +114,7 @@ classdef FEM3dAphi < EmModel
             obj.matrix.wfwfx = wfwfx; clear wfwfx
             %--------------------------------------------------------------
             % --- wewe / wewex
-            no_wewe = 0;
+            no_wewe = 1; % !!! XTODO : switch to 0 when needed
             if ~isfield(obj,'matrix')
                 no_wewe = 1;
             elseif ~isfield(obj.matrix,'wewe')
@@ -122,7 +122,7 @@ classdef FEM3dAphi < EmModel
             elseif isempty(obj.matrix.wewe)
                 no_wewe = 1;
             end
-            no_wewex = 0;
+            no_wewex = 1; % !!! XTODO : switch to 0 when needed
             if ~isfield(obj,'matrix')
                 no_wewex = 1;
             elseif ~isfield(obj.matrix,'wewex')
