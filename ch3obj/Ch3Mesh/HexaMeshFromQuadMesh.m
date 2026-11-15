@@ -215,13 +215,20 @@ classdef HexaMeshFromQuadMesh < HexMesh
                 obj.build_intkit;
                 obj.build_intkit_done = 1;
             end
-            if ~obj.build_finterpolant_done
-                obj.build_finterpolant;
-                obj.build_finterpolant_done = 1;
-            end
+            % ---
+            %if ~obj.build_finterpolant_done
+            %    obj.build_finterpolant;
+            %    obj.build_finterpolant_done = 1;
+            %end
             % ---
             obj.build_done = 1;
             % ---
+        end
+        function build_finterpolant(obj)
+            if ~obj.build_finterpolant_done
+               build_finterpolant@Mesh3d(obj);
+               obj.build_finterpolant_done = 1;
+            end
         end
     end
 end

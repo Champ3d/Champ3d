@@ -62,12 +62,16 @@ classdef OxyArcWire < Xhandle
             lnode = obj.local_node(node);
             % ---
             rho = sqrt(lnode(1,:).^2 + lnode(2,:).^2);
+            rho(rho <= 1e-6) = 1e-6;
             % ---
             phi = acos(lnode(1,:)./rho) .* sign(lnode(2,:));
             dz  = lnode(3,:);
             % ---
             c1 = (obj.r + rho).^2 + dz.^2;
             m = 4*obj.r.*rho ./ c1;
+            % --- m must be in (0,1)
+            m(m >= 1-1e-8) = 1-1e-8;
+            m(m <= 1e-8) = 1e-8;
             % ---
             c2 = obj.r^2 + rho.^2 + dz.^2;
             f3_phi1 = 1./sqrt(c2 - 2*obj.r.*rho .* cos(obj.phi1/180*pi - phi));
@@ -85,6 +89,8 @@ classdef OxyArcWire < Xhandle
             f4_phi2 = c2./c1.^(3/2) .* elPi_phi2 - 1./sqrt(c1) .* elF_phi2;
             % ---
             c3 = rho.^2 - obj.r.^2 + dz.^2;
+            c3(c3 <= +1e-8 & c3 >= 0) = +1e-8;
+            c3(c3 >= -1e-8 & c3 <= 0) = -1e-8;
             f5_phi1 = -c3./c1.^(3/2) .* elPi_phi1 + 1./sqrt(c1) .* elF_phi1;
             f5_phi2 = -c3./c1.^(3/2) .* elPi_phi2 + 1./sqrt(c1) .* elF_phi2;
             % ---
