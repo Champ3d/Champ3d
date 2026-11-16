@@ -201,7 +201,7 @@ classdef StrandedCloseJsCoil < CloseCoil & StrandedCoil & JsCoil
                     case 'tx'
                         obj.I(it) = obj.matrix.js_array(1) * obj.cs_area / obj.nb_turn;
                         obj.Z(it) = obj.V(it) / obj.I(it);
-                        obj.L(it) = abs(imag(obj.Z(it))) / (jome/1j);
+                        obj.L(it) = abs(imag(obj.Z(it))) / abs(jome);
                         obj.R(it) = abs(real(obj.Z(it)));
                         obj.P(it) = 1/2 * real(obj.V(it) * conj(obj.I(it)));
                         obj.Q(it) = 1/2 * imag(obj.V(it) * conj(obj.I(it)));

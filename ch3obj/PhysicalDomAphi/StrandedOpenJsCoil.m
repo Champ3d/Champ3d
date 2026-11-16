@@ -193,10 +193,10 @@ classdef StrandedOpenJsCoil < OpenCoil & StrandedCoil & JsCoil
                         obj.P(it) = 0;
                         obj.Q(it) = 0;
                     case 'tx'
-                        obj.I(it) = obj.matrix.js_array(1) * obj.cs_area;
+                        obj.I(it) = obj.matrix.js_array(1) * obj.cs_area / obj.nb_turn;
                         obj.Z(it) = obj.V(it) / obj.I(it);
-                        obj.L(it) = imag(obj.Z(it)) / abs(jome);
-                        obj.R(it) = real(obj.Z(it));
+                        obj.L(it) = abs(imag(obj.Z(it))) / abs(jome);
+                        obj.R(it) = abs(real(obj.Z(it)));
                         obj.P(it) = 1/2 * real(obj.V(it) * conj(obj.I(it)));
                         obj.Q(it) = 1/2 * imag(obj.V(it) * conj(obj.I(it)));
                 end
