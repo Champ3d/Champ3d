@@ -186,14 +186,20 @@ classdef HexMesh < Mesh3d
             refelem.cWeigh  = 8; % 2x2x2
             refelem.nbG = length(refelem.U);
             % ---
-            refelem.nbI = 15;
-            e = 1e-6;
             refelem.nU = [-1 +1 +1 -1 -1 +1 +1 -1];
             refelem.nV = [-1 -1 +1 +1 -1 -1 +1 +1];
             refelem.nW = [-1 -1 -1 -1 +1 +1 +1 +1];
-            refelem.iU = [(1+e) * refelem.nU    0     0     0     0     0  -1-e  +1+e];
-            refelem.iV = [(1+e) * refelem.nV    0     0     0  -1-e  +1+e     0     0];
-            refelem.iW = [(1+e) * refelem.nW    0  -1-e  +1+e     0     0     0     0];
+            % ---
+            % e = 1e-6;
+            % refelem.iU = [(1+e) * refelem.nU    0     0     0     0     0  -1-e  +1+e];
+            % refelem.iV = [(1+e) * refelem.nV    0     0     0  -1-e  +1+e     0     0];
+            % refelem.iW = [(1+e) * refelem.nW    0  -1-e  +1+e     0     0     0     0];
+            % refelem.nbI = length(refelem.iU); % when nbI=1, iU=cU
+            % ---
+            refelem.iU = refelem.cU;
+            refelem.iV = refelem.cV;
+            refelem.iW = refelem.cW;
+            refelem.nbI = length(refelem.iU); % when nbI=1, iU=cU
             % ---
             refelem.N{1} = @(u,v,w) 1/8.*(1-u).*(1-v).*(1-w);
             refelem.N{2} = @(u,v,w) 1/8.*(1+u).*(1-v).*(1-w);
