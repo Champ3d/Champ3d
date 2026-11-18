@@ -33,6 +33,9 @@ classdef Field < Array
     end
 
     % --- obj's methods - field([...]), field({[...]}), field({{[...]}})
+    % field([...])      : get cvalue/value
+    % field({[...]})    : get ivalue
+    % field({{[...]}})  : get gvalue
     methods
         % -----------------------------------------------------------------
         function fout = subsref(obj,gidstruct)
@@ -123,6 +126,7 @@ classdef Field < Array
         % get : value = obj(gindex).value
         %-------------------------------------------------------------------
         function value = uplus(obj)
+            % usage : value =+ obj.([...]), value =+ obj.({[...]})
             value = obj.value;
         end
         %-------------------------------------------------------------------

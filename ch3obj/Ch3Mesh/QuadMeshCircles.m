@@ -31,7 +31,7 @@ classdef QuadMeshCircles < QuadMesh
         build_meshds_done = 0;
         build_discrete_done = 0;
         build_intkit_done = 0;
-        build_prokit_done = 0;
+        build_finterpolant_done = 0;
     end
     % --- Valid args list
     methods (Static)
@@ -71,7 +71,7 @@ classdef QuadMeshCircles < QuadMesh
             obj.build_meshds_done = 0;
             obj.build_discrete_done = 0;
             obj.build_intkit_done = 0;
-            obj.build_prokit_done = 0;
+            obj.build_finterpolant_done = 0;
             % ---
             radius_ = obj.radius;
             rnum_   = obj.rnum;
@@ -183,26 +183,14 @@ classdef QuadMeshCircles < QuadMesh
     % --- build
     methods
         function build(obj)
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            if ~obj.build_meshds_done
-                obj.build_meshds;
-                obj.build_meshds_done = 1;
-            end
-            if ~obj.build_discrete_done
-                obj.build_discrete;
-                obj.build_discrete_done = 1;
-            end
-            if ~obj.build_intkit_done
-                obj.build_intkit;
-                obj.build_intkit_done = 1;
-            end
-            % ---
+            if obj.build_done, return; end
+            if ~obj.build_meshds_done,   obj.build_meshds; obj.build_meshds_done = 1; end
+            if ~obj.build_discrete_done, obj.build_discrete; obj.build_discrete_done = 1; end
+            if ~obj.build_intkit_done,   obj.build_intkit; obj.build_intkit_done = 1; end
             obj.build_done = 1;
-            % ---
+        end
+        function build_finterpolant(obj)
+            if ~obj.build_finterpolant_done, build_finterpolant@Mesh(obj); obj.build_finterpolant_done = 1; end
         end
     end
 end

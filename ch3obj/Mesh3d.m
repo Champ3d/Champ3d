@@ -1122,13 +1122,9 @@ classdef Mesh3d < Mesh
             end
             elem = obj.elem;
             %--------------------------------------------------------------
+            obj.build_intkit;
             switch on_
                 case 'center'
-                    % ---
-                    if isempty(obj.intkit.cWn)
-                        obj.build_intkit;
-                    end
-                    % ---
                     nbG = 1;
                     % ---
                     Wx = cell(1,nbG);
@@ -1136,11 +1132,6 @@ classdef Mesh3d < Mesh
                         Wx{iG} = obj.intkit.cWn{iG}(id_elem,:);
                     end
                 case 'gauss_points'
-                    % ---
-                    if isempty(obj.intkit.Wn)
-                        obj.build_intkit;
-                    end
-                    % ---
                     nbG = refelem.nbG;
                     % ---
                     Wx = cell(1,nbG);
@@ -1148,16 +1139,11 @@ classdef Mesh3d < Mesh
                         Wx{iG} = obj.intkit.Wn{iG}(id_elem,:);
                     end
                 case 'interpolation_points'
-                    % ---
-                    if isempty(obj.prokit.Wn)
-                        obj.build_prokit;
-                    end
-                    % ---
-                    nbG = obj.refelem.nbI;
+                    nbG = 1;
                     % ---
                     Wx = cell(1,nbG);
                     for iG = 1:nbG
-                        Wx{iG} = obj.prokit.Wn{iG}(id_elem,:);
+                        Wx{iG} = obj.intkit.cWn{iG}(id_elem,:);
                     end
             end
             %--------------------------------------------------------------
@@ -1221,13 +1207,9 @@ classdef Mesh3d < Mesh
             end
             id_edge_in_elem = obj.meshds.id_edge_in_elem;
             %--------------------------------------------------------------
+            obj.build_intkit;
             switch on_
                 case 'center'
-                    % ---
-                    if isempty(obj.intkit.cWe)
-                        obj.build_intkit;
-                    end
-                    % ---
                     nbG = 1;
                     % ---
                     Wx = cell(1,nbG);
@@ -1235,11 +1217,6 @@ classdef Mesh3d < Mesh
                         Wx{iG} = obj.intkit.cWe{iG}(id_elem,:,:);
                     end
                 case 'gauss_points'
-                    % ---
-                    if isempty(obj.intkit.We)
-                        obj.build_intkit;
-                    end
-                    % ---
                     nbG = refelem.nbG;
                     % ---
                     Wx = cell(1,nbG);
@@ -1247,16 +1224,11 @@ classdef Mesh3d < Mesh
                         Wx{iG} = obj.intkit.We{iG}(id_elem,:,:);
                     end
                 case 'interpolation_points'
-                    % ---
-                    if isempty(obj.prokit.We)
-                        obj.build_prokit;
-                    end
-                    % ---
-                    nbG = obj.refelem.nbI;
+                    nbG = 1;
                     % ---
                     Wx = cell(1,nbG);
                     for iG = 1:nbG
-                        Wx{iG} = obj.prokit.We{iG}(id_elem,:,:);
+                        Wx{iG} = obj.intkit.cWe{iG}(id_elem,:,:);
                     end
             end
             %--------------------------------------------------------------
@@ -1352,13 +1324,9 @@ classdef Mesh3d < Mesh
             end
             id_face_in_elem = obj.meshds.id_face_in_elem;
             %--------------------------------------------------------------
+            obj.build_intkit;
             switch on_
                 case 'center'
-                    % ---
-                    if isempty(obj.intkit.cWf)
-                        obj.build_intkit;
-                    end
-                    % ---
                     nbG = 1;
                     % ---
                     Wx = cell(1,nbG);
@@ -1366,11 +1334,6 @@ classdef Mesh3d < Mesh
                         Wx{iG} = obj.intkit.cWf{iG}(id_elem,:,:);
                     end
                 case 'gauss_points'
-                    % ---
-                    if isempty(obj.intkit.Wf)
-                        obj.build_intkit;
-                    end
-                    % ---
                     nbG = refelem.nbG;
                     % ---
                     Wx = cell(1,nbG);
@@ -1378,16 +1341,11 @@ classdef Mesh3d < Mesh
                         Wx{iG} = obj.intkit.Wf{iG}(id_elem,:,:);
                     end
                 case 'interpolation_points'
-                    % ---
-                    if isempty(obj.prokit.Wf)
-                        obj.build_prokit;
-                    end
-                    % ---
-                    nbG = obj.refelem.nbI;
+                    nbG = 1;
                     % ---
                     Wx = cell(1,nbG);
                     for iG = 1:nbG
-                        Wx{iG} = obj.prokit.Wf{iG}(id_elem,:,:);
+                        Wx{iG} = obj.intkit.cWf{iG}(id_elem,:,:);
                     end
             end
             %--------------------------------------------------------------

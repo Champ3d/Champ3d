@@ -40,43 +40,6 @@ classdef FaceField < Field
             val = obj.parent_model.parent_mesh.cface(:,id_face).';
         end
         % -----------------------------------------------------------------
-        function val = inode(obj,id_face)
-            % ---
-            if nargin <= 1
-                id_face = 1:obj.parent_model.parent_mesh.nb_face;
-            end
-            % ---
-            if isempty(id_face)
-                val = [];
-                return
-            end
-            % ---
-            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gindex',id_face);
-            % ---
-            lnb_face = length(dom.gindex);
-            % ---
-            submesh = dom.submesh;
-            % ---
-            nbNodeI = submesh{1}.refelem.nbI;
-            for i = 1:nbNodeI
-                val{i} = zeros(lnb_face,3);
-            end
-            % ---
-            for k = 1:length(submesh)
-                sm = submesh{k};
-                sm.build_prokit;
-                % ---
-                lindex = sm.lindex;
-                inode = sm.prokit.node;
-                % ---
-                for i = 1:length(inode)
-                    val{i}(lindex,:) = inode{i};
-                end
-                % ---
-            end
-            % ---
-        end
-        % -----------------------------------------------------------------
         function val = gnode(obj,id_face)
             % ---
             if nargin <= 1

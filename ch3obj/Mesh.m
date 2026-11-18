@@ -35,7 +35,6 @@ classdef Mesh < Xhandle
         meshds
         discrete
         intkit
-        prokit
         % ---
         finterpolant
         % --- submesh
@@ -92,14 +91,6 @@ classdef Mesh < Xhandle
             obj.intkit.Wf = {};
             obj.intkit.Wn = {};
             obj.intkit.node = {};
-            % ---
-            obj.prokit.detJ = {};
-            obj.prokit.gradWn = {};
-            obj.prokit.Jinv = {};
-            obj.prokit.We = {};
-            obj.prokit.Wf = {};
-            obj.prokit.Wn = {};
-            obj.prokit.node = {};
             % ---
         end
     end
@@ -212,24 +203,6 @@ classdef Mesh < Xhandle
             lbox.center = [xmean; ymean; zmean];
             lbox.rmax  = rmax;
             % ---
-            %xmin = min(obj.node(1,id_node_));
-            %xmax = max(obj.node(1,id_node_));
-            %ymin = min(obj.node(2,id_node_));
-            %ymax = max(obj.node(2,id_node_));
-            %if size(obj.node,1) == 3
-            %    zmin = min(obj.node(3,id_node_));
-            %    zmax = max(obj.node(3,id_node_));
-            %end
-            % ---
-            %lbox.xmin = xmin;
-            %lbox.xmax = xmax;
-            %lbox.ymin = ymin;
-            %lbox.ymax = ymax;
-            %if size(obj.node,1) == 3
-            %    lbox.zmin = zmin;
-            %    lbox.zmax = zmax;
-            %end
-            % ---
         end
         % -----------------------------------------------------------------
         function lock_origin(obj,args)
@@ -238,20 +211,12 @@ classdef Mesh < Xhandle
                 args.gcoordinates = []
             end
             % ---
-            gcoordinates = f_tocolv(args.gcoordinates);
+            gcoordinates = args.gcoordinates;
             % ---
             if isa(obj,'Mesh2d')
-                if isempty(gcoordinates)
-                    return
-                elseif any(gcoordinates ~= [0; 0])
-                    obj.node = obj.node - gcoordinates;
-                end
+                obj.node = obj.node - [gcoordinates(1);gcoordinates(2)];
             elseif isa(obj,'Mesh3d')
-                if isempty(gcoordinates)
-                    return
-                elseif any(gcoordinates ~= [0; 0; 0])
-                    obj.node = obj.node - gcoordinates;
-                end
+                obj.node = obj.node - [gcoordinates(1);gcoordinates(2);gcoordinates(3)];
             end
             % ---
             obj.celem = obj.cal_celem;
@@ -272,41 +237,16 @@ classdef Mesh < Xhandle
                     lbox = obj.localbox;
                 else
                     alldom = fieldnames(obj.dom);
-                    if any(f_strcmpi(id_dom,alldom))
-                        for idd = 1:length(alldom)
-                            if strcmpi(alldom{idd},id_dom)
-                                id_elem = obj.dom.(id_dom).gindex;
-                                lbox = obj.localbox(id_elem);
-                                break
-                            end
-                        end
-                    else
+                    if isempty(find(strcmpi(id_dom,alldom),1))
                         error(['#dom ' id_dom ' not found !']);
+                    else
+                        id_elem = obj.dom.(id_dom).gindex;
+                        lbox = obj.localbox(id_elem);
                     end
                 end
             end
             % ---
-            if isa(obj,'Mesh2d')
-                gcoordinates = [lbox.center(1); lbox.center(2)];
-                %gcoordinates = [(lbox.xmax + lbox.xmin)/2; (lbox.ymax + lbox.ymin)/2];
-            elseif isa(obj,'Mesh3d')
-                gcoordinates = [lbox.center(1); lbox.center(2); lbox.center(3)];
-                %gcoordinates = [(lbox.xmax + lbox.xmin)/2; (lbox.ymax + lbox.ymin)/2; (lbox.zmax + lbox.zmin)/2];
-            end
-            % ---
-            if isa(obj,'Mesh2d')
-                if isempty(gcoordinates)
-                    return
-                elseif any(gcoordinates ~= [0; 0])
-                    obj.node = obj.node - gcoordinates;
-                end
-            elseif isa(obj,'Mesh3d')
-                if isempty(gcoordinates)
-                    return
-                elseif any(gcoordinates ~= [0; 0; 0])
-                    obj.node = obj.node - gcoordinates;
-                end
-            end
+            obj.node = obj.node - lbox.center;
             % ---
             obj.celem = obj.cal_celem;
             obj.cface = obj.cal_cface;
@@ -453,9 +393,8 @@ classdef Mesh < Xhandle
                     'ori_edge_in_face','sign_edge_in_face'})} = 'all'
             end
             %--------------------------------------------------------------
-            %tic
-            %f_fprintf(0,'Make #meshds \n');
-            %fprintf('   ');
+            tic
+            f_fprintf(0,'Make #meshds \n');
             % ---
             get = args.get;
             % ---
@@ -570,9 +509,7 @@ classdef Mesh < Xhandle
             end
             %--------------------------------------------------------------
             %--- Log message
-            %f_fprintf(0,'--- in',...
-            %    1,toc, ...
-            %    0,'s \n');
+            f_fprintf(0,'--- in',1,toc,0,'s \n');
         end
         function obj = build_discrete(obj,args)
             arguments
@@ -582,9 +519,8 @@ classdef Mesh < Xhandle
                     {'all','div','grad','curl'})} = 'all'
             end
             %--------------------------------------------------------------
-            %tic
-            %f_fprintf(0,'Make #discrete \n');
-            %fprintf('   ');
+            tic
+            f_fprintf(0,'Make #discrete \n');
             % ---
             get = args.get;
             % ---
@@ -724,20 +660,17 @@ classdef Mesh < Xhandle
             end
             %--------------------------------------------------------------
             %--- Log message
-            %f_fprintf(0,'--- in',...
-            %    1,toc, ...
-            %    0,'s \n');
+            f_fprintf(0,'--- in',1,toc,0,'s \n');
         end
         % -----------------------------------------------------------------
     end
-    % --- Intkit
+    % --- Intkit, used also as prokit
     methods
         % -----------------------------------------------------------------
         function obj = build_intkit(obj)
             %--------------------------------------------------------------
-            %tic
-            %f_fprintf(0,'Make #intkit \n');
-            %fprintf('   ');
+            tic
+            f_fprintf(0,'Make #intkit \n');
             %--------------------------------------------------------------
             refelem_ = obj.refelem;
             U  = refelem_.U;
@@ -830,9 +763,7 @@ classdef Mesh < Xhandle
             obj.intkit.node = node_g;
             %--------------------------------------------------------------
             %--- Log message
-            %f_fprintf(0,'--- in',...
-            %    1,toc, ...
-            %    0,'s \n');
+            f_fprintf(0,'--- in',1,toc,0,'s \n');
         end
         % -----------------------------------------------------------------
         function node_g = get_gaussnode(obj,node)
@@ -880,142 +811,11 @@ classdef Mesh < Xhandle
             end
             %--------------------------------------------------------------
         end
-        % -----------------------------------------------------------------
-    end
-    % --- Prokit
-    methods
-        % -----------------------------------------------------------------
-        function obj = build_prokit(obj)
-            %--------------------------------------------------------------
-            %tic
-            %f_fprintf(0,'Make #prokit \n');
-            %fprintf('   ');
-            %--------------------------------------------------------------
-            refelem_ = obj.refelem;
-            U = refelem_.iU;
-            V = refelem_.iV;
-            if isfield(refelem_,'iW')
-                W = refelem_.iW;
-            else
-                W = [];
-            end
-            %--------------------------------------------------------------
-            fnmeshds = fieldnames(obj.meshds);
-            for i = 1:length(fnmeshds)
-                if isempty(obj.meshds.(fnmeshds{i}))
-                    obj.build_meshds;
-                    break
-                end
-            end
-            %--------------------------------------------------------------
-            [detJ, Jinv] = obj.jacobien('u',U,'v',V,'w',W);
-            Wn = obj.wn('u',U,'v',V,'w',W);
-            [gradWn, gradF] = obj.gradwn('u',U,'v',V,'w',W,'jinv',Jinv,'get','gradF');
-            We = obj.we('u',U,'v',V,'w',W,'wn',Wn,'gradf',gradF,'jinv',Jinv);
-            Wf = obj.wf('u',U,'v',V,'w',W,'wn',Wn,'gradf',gradF,'jinv',Jinv);
-            %--------------------------------------------------------------
-            for3d = 0;
-            dim_   = 2;
-            if size(obj.node,1) == 3
-                for3d = 1;
-                dim_   = 3;
-            end
-            %--------------------------------------------------------------------------
-            nbNo_inEl = refelem_.nbNo_inEl;
-            realx = (reshape(obj.node(1,obj.elem),nbNo_inEl,[])).';
-            realy = (reshape(obj.node(2,obj.elem),nbNo_inEl,[])).';
-            if for3d
-                realz = (reshape(obj.node(3,obj.elem),nbNo_inEl,[])).';
-            end
-            nb_inode  = length(U);
-            node_i = cell(1,nb_inode);
-            for i = 1:nb_inode
-                node_i{i} = zeros(obj.nb_elem,dim_);
-                node_i{i}(:,1) = sum(Wn{i} .* realx,2);
-                node_i{i}(:,2) = sum(Wn{i} .* realy,2);
-                if for3d
-                    node_i{i}(:,3) = sum(Wn{i} .* realz,2);
-                end
-            end
-            %--------------------------------------------------------------
-            % --- Outputs
-            obj.prokit.detJ = detJ;
-            obj.prokit.Jinv = Jinv;
-            obj.prokit.Wn = Wn;
-            obj.prokit.gradWn = gradWn;
-            obj.prokit.We = We;
-            obj.prokit.Wf = Wf;
-            obj.prokit.node = node_i;
-            %--------------------------------------------------------------
-            %--- Log message
-            %f_fprintf(0,'--- in',...
-            %    1,toc, ...
-            %    0,'s \n');
-        end
-        % -----------------------------------------------------------------
-        function node_i = get_interpnode(obj,node)
-            %--- can provide node after move
-            if nargin <= 1
-                node = obj.node;
-            end
-            %--------------------------------------------------------------
-            refelem_ = obj.refelem;
-            U = refelem_.iU;
-            V = refelem_.iV;
-            if isfield(refelem_,'iW')
-                W = refelem_.iW;
-            else
-                W = [];
-            end
-            %--------------------------------------------------------------
-            obj.build_meshds;
-            %--------------------------------------------------------------
-            for3d = 0;
-            dim_   = 2;
-            if size(node,1) == 3
-                for3d = 1;
-                dim_   = 3;
-            end
-            %--------------------------------------------------------------
-            % Interpolation points
-            Wn = obj.wn('u',U,'v',V,'w',W);
-            %--------------------------------------------------------------
-            nbNo_inEl = refelem_.nbNo_inEl;
-            realx = (reshape(node(1,obj.elem),nbNo_inEl,[])).';
-            realy = (reshape(node(2,obj.elem),nbNo_inEl,[])).';
-            if for3d
-                realz = (reshape(node(3,obj.elem),nbNo_inEl,[])).';
-            end
-            nb_inode  = length(U);
-            node_i = cell(1,nb_inode);
-            for i = 1:nb_inode
-                node_i{i} = zeros(obj.nb_elem,dim_);
-                node_i{i}(:,1) = sum(Wn{i} .* realx,2);
-                node_i{i}(:,2) = sum(Wn{i} .* realy,2);
-                if for3d
-                    node_i{i}(:,3) = sum(Wn{i} .* realz,2);
-                end
-            end
-            %--------------------------------------------------------------
-        end
-        % -----------------------------------------------------------------
     end
     % --- interpolant
     methods
         function build_finterpolant(obj)
-            interp_node = obj.get_interpnode;
-            nbINode = length(interp_node);
-            nb_elem_ = obj.nb_elem;
-            % ---
-            node_i = zeros(nbINode * nb_elem_, 3);
-            % ---
-            id0 = 1:nb_elem_;
-            for k = 1:nbINode
-                idn = id0 + (k - 1) * nb_elem_;
-                node_i(idn,:) = interp_node{k}(:,:);
-            end
-            % ---
-            obj.finterpolant = scatteredInterpolant(node_i,zeros(size(node_i,1),1));
+            obj.finterpolant = scatteredInterpolant(obj.celem.',zeros(obj.nb_elem,1));
         end
     end
     % --- Check

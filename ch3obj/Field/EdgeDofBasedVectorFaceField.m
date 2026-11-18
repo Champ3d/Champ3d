@@ -86,60 +86,8 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
             %--------------------------------------------------------------
         end
         % -----------------------------------------------------------------
-        function val = ivalue(obj,id_face)
-            % ---
-            if nargin <= 1
-                id_face = 1:obj.parent_model.parent_mesh.nb_face;
-            end
-            % ---
-            if isempty(id_face)
-                val = [];
-                return
-            end
-            % ---
-            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gindex',id_face);
-            % ---
-            lnb_face = length(dom.gindex);
-            % ---
-            submesh = dom.submesh;
-            % ---
-            nbNodeI = submesh{1}.refelem.nbI;
-            for i = 1:nbNodeI
-                val{i} = zeros(lnb_face,2);
-            end
-            % ---
-            for k = 1:length(submesh)
-                sm = submesh{k};
-                sm.build_prokit;
-                % ---
-                lindex = sm.lindex;
-                gindex = sm.gindex;
-                Wx = sm.prokit.We;
-                % --- same id system as submesh
-                % --- same as sm.meshds.id_edge_in_elem
-                id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face(:,gindex);
-                % ---
-                if any(f_strcmpi(sm.elem_type,'tri'))
-                    dof_ = obj.dof.value(id_edge_in_face(1:3,:)).';
-                elseif any(f_strcmpi(sm.elem_type,'quad'))
-                    dof_ = obj.dof.value(id_edge_in_face(1:4,:)).';
-                end
-                % ---
-                for m = 1:nbNodeI
-                    vi = zeros(length(lindex),2);
-                    for l = 1:sm.refelem.nbEd_inEl
-                        wix = Wx{m}(:,1,l);
-                        wiy = Wx{m}(:,2,l);
-                        vi(:,1) = vi(:,1) + wix .* dof_(:,l);
-                        vi(:,2) = vi(:,2) + wiy .* dof_(:,l);
-                    end
-                    % ---
-                    val{m}(lindex,:) = vi;
-                end
-            end
-            %--------------------------------------------------------------
-            delete(dom);
-            %--------------------------------------------------------------
+        function val = gvalue(obj,id_face)
+            val = [];
         end
         % -----------------------------------------------------------------
     end

@@ -70,60 +70,6 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
             % ---
         end
         % -----------------------------------------------------------------
-        function val = ivalue(obj,id_face)
-            % ---
-            if nargin <= 1
-                id_face = 1:obj.parent_model.parent_mesh.nb_face;
-            end
-            % ---
-            if isempty(id_face)
-                val = [];
-                return
-            end
-            % ---
-            face_ = obj.parent_model.parent_mesh.face;
-            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gindex',id_face);
-            % ---
-            lnb_face = length(dom.gindex);
-            % ---
-            submesh = dom.submesh;
-            % ---
-            nbNodeI = submesh{1}.refelem.nbI;
-            for i = 1:nbNodeI
-                val{i} = zeros(lnb_face,1);
-            end
-            % ---
-            for k = 1:length(submesh)
-                sm = submesh{k};
-                sm.build_prokit;
-                % ---
-                lindex = sm.lindex;
-                gindex = sm.gindex;
-                Wx = sm.prokit.Wn;
-                % ---
-                if any(f_strcmpi(sm.elem_type,'tri'))
-                    dof_ = obj.dof.value(face_(1:3,gindex)).';
-                elseif any(f_strcmpi(sm.elem_type,'quad'))
-                    dof_ = obj.dof.value(face_(1:4,gindex)).';
-                end
-                % ---
-                for m = 1:nbNodeI
-                    vi = zeros(length(lindex),1);
-                    for l = 1:sm.refelem.nbNo_inEl
-                        wi = Wx{m}(:,l);
-                        vi = vi + wi .* dof_(:,l);
-                    end
-                    % ---
-                    val{m}(lindex) = vi;
-                end
-            end
-            % ---
-            for i = 1:nbNodeI
-                val{i} = val{i} + obj.reference_potential;
-            end
-            % ---
-        end
-        % -----------------------------------------------------------------
         function val = gvalue(obj,id_face)
             % ---
             if nargin <= 1

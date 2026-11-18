@@ -40,20 +40,6 @@ classdef NodeField < Field
             val = obj.parent_model.parent_mesh.node(:,id_node).';
         end
         % -----------------------------------------------------------------
-        function val = inode(obj,id_node)
-            % ---
-            if nargin <= 1
-                id_node = 1:obj.parent_model.parent_mesh.nb_node;
-            end
-            % ---
-            if isempty(id_node)
-                val = [];
-                return
-            end
-            % ---
-            val{1} = obj.parent_model.parent_mesh.node(:,id_node).';
-        end
-        % -----------------------------------------------------------------
         function val = gnode(obj,id_node)
             % ---
             if nargin <= 1
