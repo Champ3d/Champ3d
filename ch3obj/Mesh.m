@@ -689,12 +689,7 @@ classdef Mesh < Xhandle
                 cW = [];
             end
             %--------------------------------------------------------------
-            fnmeshds = fieldnames(obj.meshds);
-            for i = 1:length(fnmeshds)
-                if isempty(obj.meshds.(fnmeshds{i}))
-                    obj.build_meshds('get',fnmeshds{i});
-                end
-            end
+            obj.build_meshds;
             %--------------------------------------------------------------
             for3d = 0;
             dim_   = 2;
@@ -717,8 +712,6 @@ classdef Mesh < Xhandle
             % elseif any(f_strcmpi(obj.elem_type,{'tet','tetra','prism','hex','hexa'}))
             %     obj.velem = 1./cWv{1};
             % end
-            %--------------------------------------------------------------
-            obj.build_meshds('get','celem');
             %--------------------------------------------------------------
             % Gauss points
             [detJ, Jinv] = obj.jacobien('u',U,'v',V,'w',W);

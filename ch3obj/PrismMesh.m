@@ -81,6 +81,15 @@ classdef PrismMesh < Mesh3d
             if ~obj.build_intkit_done,   obj.build_intkit; obj.build_intkit_done = 1; end
             obj.build_done = 1;
         end
+        function build_meshds(obj)
+            if ~obj.build_meshds_done, build_meshds@Mesh(obj); obj.build_meshds_done = 1; end
+        end
+        function build_discrete(obj)
+            if ~obj.build_discrete_done, build_discrete@Mesh(obj); obj.build_discrete_done = 1; end
+        end
+        function build_intkit(obj)
+            if ~obj.build_intkit_done, build_intkit@Mesh(obj); obj.build_intkit_done = 1; end
+        end
         function build_finterpolant(obj)
             if ~obj.build_finterpolant_done, build_finterpolant@Mesh(obj); obj.build_finterpolant_done = 1; end
         end
@@ -101,21 +110,12 @@ classdef PrismMesh < Mesh3d
             face_color_  = args.face_color;
             alpha_       = args.alpha;
             %--------------------------------------------------------------
-            %if isempty(obj.face)
-            %    obj.build_meshds('get','face');
-            %end
-            %--------------------------------------------------------------
             clear msh;
             %--------------------------------------------------------------
             boface = f_boundface(obj.elem,obj.node,'elem_type','prism');
             allfac = 1:size(boface,2);
             %--------------------------------------------------------------
-            if f_strcmpi(args.coordinate_system,'global')
-                %msh.Vertices = obj.moving_frame;
-                msh.Vertices = obj.node.';
-            else
-                msh.Vertices = obj.node.';
-            end
+            msh.Vertices = obj.node.';
             %--------------------------------------------------------------
             msh.FaceColor = face_color_;
             msh.EdgeColor = edge_color_; % [0.7 0.7 0.7] --> gray

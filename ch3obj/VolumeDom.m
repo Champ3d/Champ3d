@@ -368,7 +368,7 @@ classdef VolumeDom < MeshDom
             % for i = 1:length(submesh_)
             %     submesh_{i}.plot(argu{:}); hold on
             %     % ---
-            %     submesh_{i}.build_meshds('get','celem');
+            %     submesh_{i}.build_meshds;
             %     cnode = submesh_{i}.celem(:,1);
             %     if length(cnode) == 2
             %         t = text(cnode(1),cnode(2),obj.id);
