@@ -60,28 +60,6 @@ classdef EdgeDofBasedVectorElemField < VectorElemField
             val = val(id_elem,:);
         end
         % -----------------------------------------------------------------
-        function val = ivalue(obj,id_elem)
-            % ---
-            if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
-            end
-            % ---
-            if isempty(id_elem)
-                val = [];
-                return
-            end
-            % ---
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,...
-                  'on','interpolation_points','id_elem',id_elem);
-            % ---
-            if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
-                for i = 1:length(val)
-                    val{i} = val{i}(id_elem,:);
-                end
-            end
-            % ---
-        end
-        % -----------------------------------------------------------------
         function val = gvalue(obj,id_elem)
             % ---
             if nargin <= 1

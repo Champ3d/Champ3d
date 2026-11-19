@@ -239,5 +239,3 @@ end
 figure; model01.field{5}.T.node.plot('id_meshdom','plate');
 figure; model01.field{5}.T.elem.plot('id_meshdom','plate');
 figure; model01.field{5}.T.face.plot('id_meshdom','hsurface');
-% model01.field{5}.T.elem.ivalue
-% model01.field{5}.T.face.ivalue

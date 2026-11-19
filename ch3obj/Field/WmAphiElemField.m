@@ -61,21 +61,6 @@ classdef WmAphiElemField < ScalarElemField
             % --- non-linear -- XTODO
         end
         % -----------------------------------------------------------------
-        function val = ivalue(obj,id_elem)
-            % ---
-            if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
-            end
-            % ---
-            if isempty(id_elem)
-                val = [];
-                return
-            end
-            % --- linear
-            val =+ (1/2 * real(obj.Bfield({id_elem}) * obj.Hfield({id_elem})));
-            % --- non-linear -- XTODO
-        end
-        % -----------------------------------------------------------------
         function val = gvalue(obj,id_elem)
             
         end

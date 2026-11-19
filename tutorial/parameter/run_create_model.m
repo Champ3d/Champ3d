@@ -388,9 +388,6 @@ figure; model01.field{3}.E.elem.plot('id_meshdom','plate');
 % model01.parent_mesh.cface,real(model01.field{3}.E.face.cvalue)
 % model04.parent_mesh.cface,real(model04.field{2}.E.face.cvalue)
 % ---
-model01.field{3}.E.face.inode
-model01.field{3}.E.face.inode(model01.parent_mesh.dom.hsurface.gid_face)
-% ---
 model01.field{3}.E.face.gnode
 model01.field{3}.E.face.gnode(model01.parent_mesh.dom.hsurface.gid_face)
 % ---

@@ -792,9 +792,9 @@ classdef Mesh < Xhandle
             if for3d
                 realz = (reshape(node(3,obj.elem),nbNo_inEl,[])).';
             end
-            nb_inode  = length(U);
-            node_g = cell(1,nb_inode);
-            for i = 1:nb_inode
+            nb_gnode  = length(U);
+            node_g = cell(1,nb_gnode);
+            for i = 1:nb_gnode
                 node_g{i} = zeros(obj.nb_elem,dim_);
                 node_g{i}(:,1) = sum(Wn{i} .* realx,2);
                 node_g{i}(:,2) = sum(Wn{i} .* realy,2);

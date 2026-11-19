@@ -62,32 +62,6 @@ classdef NodeDofBasedScalarElemField < ScalarElemField
             val = val(id_elem) + obj.reference_potential;
         end
         % -----------------------------------------------------------------
-        function val = ivalue(obj,id_elem)
-            % ---
-            if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
-            end
-            % ---
-            if isempty(id_elem)
-                val = [];
-                return
-            end
-            % ---
-            val = obj.parent_model.parent_mesh.field_wn('dof',obj.dof.value,...
-                  'on','interpolation_points','id_elem',id_elem);
-            % ---
-            if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
-                for i = 1:length(val)
-                    val{i} = val{i}(id_elem) + obj.reference_potential;
-                end
-            else
-                for i = 1:length(val)
-                    val{i} = val{i} + obj.reference_potential;
-                end
-            end
-            % ---
-        end
-        % -----------------------------------------------------------------
         function val = gvalue(obj,id_elem)
             % ---
             if nargin <= 1

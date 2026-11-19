@@ -71,39 +71,6 @@ classdef JAphiElemField < VectorElemField
             % ---
         end
         % -----------------------------------------------------------------
-        function val = ivalue(obj,id_elem)
-            % ---
-            if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
-            end
-            % ---
-            if isempty(id_elem)
-                val = [];
-                return
-            end
-            % ---
-            nbI = obj.parent_model.parent_mesh.refelem.nbI;
-            val = {};
-            for i = 1:nbI
-                val{i} = zeros(length(id_elem),3);
-            end
-            % ---
-            if ~isempty(obj.econductor)
-                id_phydom_ = fieldnames(obj.econductor);
-                % ---
-                for iec = 1:length(id_phydom_)
-                    tarray = obj.econductor.(id_phydom_{iec}).sigma;
-                    % ---
-                    [gindex,lindex] = intersect(tarray.parent_dom.gindex,id_elem);
-                    vcell =+ (obj.Efield({gindex}) * tarray(lindex));
-                end
-                for i = 1:nbI
-                    val{i}(lindex,:) = vcell{i};
-                end
-            end
-            % ---
-        end
-        % -----------------------------------------------------------------
         function val = gvalue(obj,id_elem)
             
         end

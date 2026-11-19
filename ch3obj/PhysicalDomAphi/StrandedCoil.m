@@ -34,7 +34,7 @@ classdef StrandedCoil < Coil
             it = obj.parent_model.ltime.it;
             gindex = obj.matrix.gindex;
             % ---
-            ANcell =+ (obj.parent_model.field{it}.A.elem({{gindex}}) * obj.uJfield(gindex));
+            ANcell =+ (obj.parent_model.field{it}.A.elem({gindex}) * obj.uJfield(gindex));
             % ---
             nbG   = length(ANcell);
             detJ  = zeros(nbG,length(gindex));

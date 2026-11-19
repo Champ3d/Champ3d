@@ -34,17 +34,11 @@ classdef Field < Array
 
     % --- obj's methods - field([...]), field({[...]}), field({{[...]}})
     % field([...])      : get cvalue/value
-    % field({[...]})    : get ivalue
+    % field({[...]})    : get gvalue
     % field({{[...]}})  : get gvalue
     methods
         % -----------------------------------------------------------------
         function fout = subsref(obj,gidstruct)
-            % ---
-            % applied to subclass !
-            % ---
-            % field([...]), field({[...]}), field({{[...]}})
-            % field([]), field({[]}), field({{[]}})
-            % ---
             value_ = [];
             switch gidstruct(1).type
                 case '()'
@@ -56,37 +50,24 @@ classdef Field < Array
                             value_ = obj.value;
                         end
                     else
+                        % ---
                         gindex = gidstruct(1).subs{1};
                         if iscell(gindex)
+                            % case 2 : x = field({[]})
+                            % case 3 : x = field({{[]}})
                             gindex = gindex{1};
                             if iscell(gindex)
-                                % case 2 : x = field({{[]}})
-                                % --- gvalue
                                 gindex = gindex{1};
-                                if ismethod(obj,'gvalue') || isprop(obj,'gvalue')
-                                    value_ = obj.gvalue(gindex);
-                                else
-                                    if iscell(obj.value)
-                                        for ic = 1:length(obj.value)
-                                            value_{ic} = obj.value{ic}(gindex,:);
-                                        end
-                                    else
-                                        value_ = obj.value(gindex,:);
+                            end
+                            if ismethod(obj,'gvalue') || isprop(obj,'gvalue')
+                                value_ = obj.gvalue(gindex);
+                            else
+                                if iscell(obj.value)
+                                    for ic = 1:length(obj.value)
+                                        value_{ic} = obj.value{ic}(gindex,:);
                                     end
-                                end
-                            elseif isnumeric(gindex)
-                                % case 3 : x = field({[]})
-                                % --- ivalue
-                                if ismethod(obj,'ivalue') || isprop(obj,'ivalue')
-                                    value_ = obj.ivalue(gindex);
                                 else
-                                    if iscell(obj.value)
-                                        for ic = 1:length(obj.value)
-                                            value_{ic} = obj.value{ic}(gindex,:);
-                                        end
-                                    else
-                                        value_ = obj.value(gindex,:);
-                                    end
+                                    value_ = obj.value(gindex,:);
                                 end
                             end
                         elseif isnumeric(gindex)

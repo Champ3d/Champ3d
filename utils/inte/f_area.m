@@ -38,7 +38,7 @@ if ~isempty(cdetJ)
         elem_type = f_elemtype(face,'defined_on','face');
     end
     % ---
-    refelem = f_connexion(elem_type);
+    refelem = f_refelem(elem_type);
     cWeigh = refelem.cWeigh;
     % ---
     area = cdetJ{1} .* cWeigh;

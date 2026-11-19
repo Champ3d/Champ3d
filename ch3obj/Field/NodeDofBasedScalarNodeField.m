@@ -60,20 +60,6 @@ classdef NodeDofBasedScalarNodeField < ScalarNodeField
             val = obj.dof.value(id_node) + obj.reference_potential;
         end
         % -----------------------------------------------------------------
-        function val = ivalue(obj,id_node)
-            % ---
-            if nargin <= 1
-                id_node = 1:obj.parent_model.parent_mesh.nb_node;
-            end
-            % ---
-            if isempty(id_node)
-                val = [];
-                return
-            end
-            % ---
-            val{1} = obj.dof.value(id_node) + obj.reference_potential;
-        end
-        % -----------------------------------------------------------------
         function val = gvalue(obj,id_node)
             % ---
             if nargin <= 1

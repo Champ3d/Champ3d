@@ -76,43 +76,6 @@ classdef HAphiElemField < VectorElemField
             % ---
         end
         % -----------------------------------------------------------------
-        function val = ivalue(obj,id_elem)
-            % ---
-            if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
-            end
-            % ---
-            if isempty(id_elem)
-                val = [];
-                return
-            end
-            % ---
-            nbI = obj.parent_model.parent_mesh.refelem.nbI;
-            val = {};
-            % ---
-            mu0 = 4 * pi * 1e-7;
-            nu0 = 1/mu0;
-            for i = 1:nbI
-                %val{i} = zeros(length(id_elem),3);
-                val{i} =+ (obj.Bfield(id_elem) * nu0);
-            end
-            % ---
-            if ~isempty(obj.mconductor)
-                id_phydom_ = fieldnames(obj.mconductor);
-                % ---
-                for iec = 1:length(id_phydom_)
-                    tarray = obj.mconductor.(id_phydom_{iec}).nur;
-                    % ---
-                    [gindex,lindex] = intersect(tarray.parent_dom.gindex,id_elem);
-                    vcell =+ (obj.Bfield({gindex}) * (tarray(lindex) * nu0));
-                end
-                for i = 1:nbI
-                    val{i}(lindex,:) = vcell{i};
-                end
-            end
-            % ---
-        end
-        % -----------------------------------------------------------------
         function val = gvalue(obj,id_elem)
             
         end
