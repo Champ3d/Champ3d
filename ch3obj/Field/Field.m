@@ -49,6 +49,7 @@ classdef Field < Array
             switch gidstruct(1).type
                 case '()'
                     if isempty(gidstruct(1).subs)
+                        % case 1 : x = field()
                         if ismethod(obj,'cvalue') || isprop(obj,'cvalue')
                             value_ = obj.cvalue;
                         else
@@ -59,6 +60,7 @@ classdef Field < Array
                         if iscell(gindex)
                             gindex = gindex{1};
                             if iscell(gindex)
+                                % case 2 : x = field({{[]}})
                                 % --- gvalue
                                 gindex = gindex{1};
                                 if ismethod(obj,'gvalue') || isprop(obj,'gvalue')
@@ -73,6 +75,7 @@ classdef Field < Array
                                     end
                                 end
                             elseif isnumeric(gindex)
+                                % case 3 : x = field({[]})
                                 % --- ivalue
                                 if ismethod(obj,'ivalue') || isprop(obj,'ivalue')
                                     value_ = obj.ivalue(gindex);
@@ -87,6 +90,7 @@ classdef Field < Array
                                 end
                             end
                         elseif isnumeric(gindex)
+                            % case 4 : x = field([])
                             % --- cvalue
                             if ismethod(obj,'cvalue') || isprop(obj,'cvalue')
                                 value_ = obj.cvalue(gindex);
@@ -126,7 +130,7 @@ classdef Field < Array
         % get : value = obj(gindex).value
         %-------------------------------------------------------------------
         function value = uplus(obj)
-            % usage : value =+ obj.([...]), value =+ obj.({[...]})
+            % usage : value =+ obj([...]), value =+ obj({[...]})
             value = obj.value;
         end
         %-------------------------------------------------------------------
