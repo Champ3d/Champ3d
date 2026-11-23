@@ -1503,6 +1503,12 @@ classdef Mesh3d < Mesh
                     idl = ['ri_' num2str(i)]; m3d.add_vdom("id",idl,"id_dom2d",'ri',"id_zline",idz);
                 end
         end
+        % --- sdom
+        for i = 1:nb_layer
+            idl = ['layer_' num2str(i)]; m3d.add_sdom("id",['s' idl],"defined_on","bound","id_dom3d",idl);
+            idl = ['ring_' num2str(i)]; m3d.add_sdom("id",['s' idl],"defined_on","bound","id_dom3d",idl);
+            idl = ['ri_' num2str(i)]; m3d.add_sdom("id",['s' idl],"defined_on","bound","id_dom3d",idl);
+        end
         % ---
         end
     end
