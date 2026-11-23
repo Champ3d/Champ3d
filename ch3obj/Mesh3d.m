@@ -1407,6 +1407,105 @@ classdef Mesh3d < Mesh
         end
         % -----------------------------------------------------------------
     end
+
+    % --- Sample mesh
+    methods (Static)
+        function m3d = samplemesh01(args)
+        arguments
+            args.elem_type {mustBeMember(args.elem_type,{'hex','prism','tetra'})} = 'hex'
+            args.ri = 0
+            args.ro = 1
+            args.rair = 0
+            args.tlayer = 5e-3
+            args.nb_layer = 3
+            args.dnum = []
+        end
+        % --- default values
+        dnum.zair = 4; dnum.layer = 1; dnum.angle = 12; dnum.ri = 2; dnum.ro = 3; dnum.rair = 4;
+        % ---
+        ri = args.ri; ro = args.ro; rair = args.rair; tlayer = args.tlayer; nb_layer = args.nb_layer;
+        if ri <= 0 || ri >= ro, ri = ro/2; end
+        if nb_layer <= 0, nb_layer = 1; end
+        if rair > 0 && rair <= ro, rair = 2*ro; end
+        % ---
+        fname = fieldnames(dnum);
+        for i = 1:length(fname), if isfield(args.dnum,fname{i}), dnum.(fname{i}) = args.dnum.(fname{i}); end; end
+        % ------------------------------------------------------------------------------------------------------------------
+        % --- z mesh1d
+        m1d_z = Mesh1d();
+        m1d_z.add_line1d("id","zabox_1" ,"len",rair,"dnum",dnum.zair,"dtype","log-");
+        for i = 1:nb_layer
+            idz = ['zlayer_' num2str(i)]; m1d_z.add_line1d("id",idz,"len",tlayer,"dnum",dnum.layer,"dtype","lin");
+        end
+        m1d_z.add_line1d("id","zabox_2" ,"len",rair,"dnum",dnum.zair,"dtype","log+");
+        % ------------------------------------------------------------------------------------------------------------------
+        switch args.elem_type
+            case 'hex'
+                if rair <= 0
+                    m2d = QuadMeshCircles('id_dom',{'ri','ro'},'radius',[ri,ro],'anum',dnum.angle,'rnum',[dnum.ri,dnum.ro],'rtype',{'lin','lin'});
+                else
+                    m2d = QuadMeshCircles('id_dom',{'ri','ro','rair'},'radius',[ri,ro,rair],'anum',dnum.angle,'rnum',[dnum.ri,dnum.ro,dnum.rair],'rtype',{'lin','lin','log+'});
+                end
+                % ---
+                m3d = HexaMeshFromQuadMesh("parent_mesh2d",m2d,"parent_mesh1d",m1d_z,"id_zline",{'z...'});
+                m3d.lock_origin("gcoordinates",[0, 0, rair]);
+            case 'prism'
+                if dnum.angle < 20, dnum.angle = 20; end
+                shape2d = {};
+                shape2d{1} = SCircle("id","ri","center",[0 0],"r",ri,"dnum",dnum.angle,"choosed_by","top");
+                shape2d{2} = SCircle("id","ro","center",[0 0],"r",ro,"dnum",dnum.angle,"choosed_by","top");
+                if rair > 0, shape2d{3} = SCircle("id","rair","center",[0 0],"r",rair,"dnum",dnum.angle,"choosed_by","top"); end
+                % ---
+                m2d = TriMeshFromPDETool("shape",shape2d,"hgrad",1.3,"hmax",1e6);
+                m2d.add_vdom("id","ri","elem_code",3); m2d.add_vdom("id","ro","elem_code",1); m2d.add_vdom("id","rair","elem_code",2);
+                % ---
+                m3d = PrismMeshFromTriMesh("parent_mesh2d",m2d,"parent_mesh1d",m1d_z,"id_zline",{'z...'});
+                m3d.lock_origin("gcoordinates",[0, 0, rair]);
+            case 'tetra'
+                shape3d_ring = {};
+                shape3d_ri = {};
+                for i = 1:nb_layer
+                    zcen = tlayer/2 + (i-1) * tlayer;
+                    shape3d_ri{i} = BCylinder('center',[0 0 zcen],'r',ri,'hei',tlayer,'opening_angle',360,'orientation',[0 0 1]);
+                    shape3d_ring{i} = BHollowCylinder('center',[0 0 zcen],'ri',ri,'ro',ro,'hei',tlayer,'opening_angle',360,'orientation',[0 0 1]);
+                end
+                % --- airbox shape
+                shape3d_air = BSphere('center',[0, 0, nb_layer*tlayer/2],'r',rair+nb_layer*tlayer/2);
+                % --- Physical Volume
+                vdom = {};
+                for i = 1:nb_layer
+                    idri = ['ri_' num2str(i)];
+                    idring = ['ring_' num2str(i)];
+                    vdom{end+1} = PhysicalVolume('id',idri,'volume_shape',shape3d_ri{i},'mesh_size',ri/(2*dnum.ri));
+                    vdom{end+1} = PhysicalVolume('id',idring,'volume_shape',shape3d_ring{i},'mesh_size',ro/(2*dnum.ro));
+                end
+                % --- Airbox Volume
+                airdom = AirboxVolume('id','air','volume_shape',shape3d_air);
+                % --- Mesh
+                m3d = TetraMeshFromGMSH('id','samplemesh_tetra','physical_volume',vdom,'airbox_volume',airdom);
+                % --- vdom update
+                for i = 1:nb_layer
+                    idlayer = ['layer_' num2str(i)];
+                    idri = ['ri_' num2str(i)];
+                    idring = ['ring_' num2str(i)];
+                    vdomlayer = m3d.dom.(idri) + m3d.dom.(idring);
+                    m3d.add_vdom("id",idlayer,"dom_obj",vdomlayer);
+                end
+                % ---
+        end
+        % --- vdom
+        switch args.elem_type
+            case {'hex','prism'}
+                for i = 1:nb_layer
+                    idz = ['zlayer_' num2str(i)];
+                    idl = ['layer_' num2str(i)]; m3d.add_vdom("id",idl,"id_dom2d",{'ri','ro'},"id_zline",idz);
+                    idl = ['ring_' num2str(i)]; m3d.add_vdom("id",idl,"id_dom2d",'ro',"id_zline",idz);
+                    idl = ['ri_' num2str(i)]; m3d.add_vdom("id",idl,"id_dom2d",'ri',"id_zline",idz);
+                end
+        end
+        % ---
+        end
+    end
 end
 
 

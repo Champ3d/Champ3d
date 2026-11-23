@@ -93,4 +93,17 @@ classdef VolumeShape < Shape
             % XTODO
         end
     end
+
+    % --- Methods
+    methods (Static)
+        function shape = sum(shape_list)
+            shape_list = f_to_scellargin(shape_list);
+            sum_shape = shape_list(1);
+            nb_shape = length(shape_list);
+            for i = 2:nb_shape
+                sum_shape{i} = sum_shape{i-1} + shape_list{i};
+            end
+            shape = sum_shape{end};
+        end
+    end
 end
