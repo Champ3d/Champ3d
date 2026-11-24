@@ -32,6 +32,9 @@ classdef Mesh < Xhandle
         sface
         velem
         % ---
+        uvecedge
+        uvecface
+        % ---
         meshds
         discrete
         intkit
@@ -121,6 +124,13 @@ classdef Mesh < Xhandle
             val = obj.reference;
         end
         % ---
+        function val = get.uvecedge(obj)
+            val = f_chavec(obj.node,obj.edge);
+        end
+        % ---
+        function val = get.uvecface(obj)
+            val = f_chavec(obj.node,obj.face);
+        end
     end
     % --- Utility
     methods (Static)

@@ -1,5 +1,6 @@
 function VM = f_norm(V,varargin)
-% F_NORM returns the norm of vectors in an array of column vectors.
+% F_NORM returns the norm of column vectors in the array V
+% V = dim x n
 %--------------------------------------------------------------------------
 % VM = F_NORM(V);
 %--------------------------------------------------------------------------
