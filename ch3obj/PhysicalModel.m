@@ -27,6 +27,7 @@ classdef PhysicalModel < Xhandle
         matrix
         field
         dof
+        prop
     end
     % --- Constructor
     methods
