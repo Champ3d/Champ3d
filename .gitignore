@@ -13,3 +13,18 @@
 #!*.mexa64
 #!*.mexmaci64
 #!*.mexmaca64
+
+# Ignorer tous les dossiers à la racine...
+/*/
+
+# ...sauf ceux-ci
+!/app/
+!/bin/
+!/ch3obj/
+!/doc/
+!/outsource/
+!/show/
+!/tutorial/
+!/utest/
+!/utils/
+
