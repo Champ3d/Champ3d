@@ -7,6 +7,7 @@
 !*.md
 !*.c
 !*.h
+!.gitignore
 
 # --- ?
 #!*.mexw64
@@ -16,7 +17,6 @@
 
 # Ignorer tous les dossiers à la racine...
 /*/
-
 # ...sauf ceux-ci
 !/app/
 !/bin/
